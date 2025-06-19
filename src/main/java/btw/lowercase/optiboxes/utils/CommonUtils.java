@@ -1,6 +1,5 @@
 package btw.lowercase.optiboxes.utils;
 
-import btw.lowercase.optiboxes.utils.components.Fade;
 import btw.lowercase.optiboxes.utils.components.Range;
 import btw.lowercase.optiboxes.utils.components.Weather;
 import com.google.gson.JsonArray;
@@ -9,18 +8,41 @@ import com.mojang.serialization.Codec;
 import net.minecraft.ResourceLocationException;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
 import java.io.InputStream;
 import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
-public class CommonUtils {
+public final class CommonUtils {
     private static final Pattern OPTIFINE_RANGE_SEPARATOR = Pattern.compile("(\\d|\\))-(\\d|\\()");
 
-    public static JsonObject convertOptiFineSkyProperties(OptiFineResourceHelper optiFineResourceHelper, Properties properties, ResourceLocation propertiesResourceLocation) {
+    public static final UVRange[] TEXTURE_UV_RANGE_FACES = new UVRange[]{
+            new UVRange(0, 0, 1.0F / 3.0F, 1.0F / 2.0F), // 0 (Bottom)
+            new UVRange(1.0F / 3.0F, 1.0F / 2.0F, 2.0F / 3.0F, 1), // 1 (North)
+            new UVRange(2.0F / 3.0F, 0, 1, 1.0F / 2.0F), // 2 (South)
+            new UVRange(1.0F / 3.0F, 0, 2.0F / 3.0F, 1.0F / 2.0F), // 3 (Top)
+            new UVRange(2.0F / 3.0F, 1.0F / 2.0F, 1, 1), // 4 (East)
+            new UVRange(0, 1.0F / 2.0F, 1.0F / 3.0F, 1) // 5 (West)
+    };
+
+    private static final Matrix4f[] MATRIX4F_ROTATED_FACES = new Matrix4f[]{
+            new Matrix4f(), // 0 (Bottom)
+            new Matrix4f().rotateX((float) Math.toRadians(90.0F)), // 1 (North)
+            new Matrix4f().rotateX((float) Math.toRadians(-90.0F)).rotateY((float) Math.toRadians(180.0F)), // 2 (South)
+            new Matrix4f().rotateX((float) Math.toRadians(180.0F)), // 3 (Top)
+            new Matrix4f().rotateZ((float) Math.toRadians(90.0F)).rotateY((float) Math.toRadians(-90.0F)), // 4 (East)
+            new Matrix4f().rotateZ((float) Math.toRadians(-90.0F)).rotateY((float) Math.toRadians(90.0F)) // 5 (West)
+    };
+
+    private CommonUtils() {
+    }
+
+    public static JsonObject convertOptiFineSkyProperties(SkyboxResourceHelper skyboxResourceHelper, Properties properties, ResourceLocation propertiesResourceLocation) {
         JsonObject jsonObject = new JsonObject();
-        ResourceLocation sourceTexture = parseSourceTexture(properties.getProperty("source", null), optiFineResourceHelper, propertiesResourceLocation);
+        ResourceLocation sourceTexture = parseSourceTexture(properties.getProperty("source", null), skyboxResourceHelper, propertiesResourceLocation);
         if (sourceTexture == null) {
             return null;
         } else {
@@ -162,7 +184,7 @@ public class CommonUtils {
         return jsonObject;
     }
 
-    public static ResourceLocation parseSourceTexture(String source, OptiFineResourceHelper optiFineResourceHelper, ResourceLocation propertiesId) {
+    public static ResourceLocation parseSourceTexture(String source, SkyboxResourceHelper skyboxResourceHelper, ResourceLocation propertiesId) {
         ResourceLocation textureId;
         String namespace;
         String path;
@@ -197,7 +219,7 @@ public class CommonUtils {
             return null;
         }
 
-        InputStream textureInputStream = optiFineResourceHelper.getInputStream(textureId);
+        InputStream textureInputStream = skyboxResourceHelper.getInputStream(textureId);
         if (textureInputStream == null) {
             return null;
         }
@@ -391,11 +413,27 @@ public class CommonUtils {
         return Mth.clamp(weatherAlpha, 0.0F, 1.0F);
     }
 
-    public static float getFadeAlpha(Fade fade, int timeOfDay) {
-        if (!fade.alwaysOn()) {
-            return CommonUtils.calculateFadeAlphaValue(1.0F, 0.0F, timeOfDay, fade.startFadeIn(), fade.endFadeIn(), fade.startFadeOut(), fade.endFadeOut());
+    public static UVRange getUvRangeForFace(int face) {
+        if (face >= TEXTURE_UV_RANGE_FACES.length) {
+            throw new RuntimeException("Face is out of bounds");
         } else {
-            return 1.0F;
+            return TEXTURE_UV_RANGE_FACES[face];
         }
+    }
+
+    public static Matrix4f getRotationMatrixForFace(int face) {
+        if (face >= MATRIX4F_ROTATED_FACES.length) {
+            throw new RuntimeException("Face is out of bounds");
+        } else {
+            return MATRIX4F_ROTATED_FACES[face];
+        }
+    }
+
+    public static Vector3f getMatrixTransform(Matrix4f matrix4f, float x, float y, float z) {
+        return new Vector3f(
+                matrix4f.m00() * x + matrix4f.m10() * y + matrix4f.m20() * z + matrix4f.m30(),
+                matrix4f.m01() * x + matrix4f.m11() * y + matrix4f.m21() * z + matrix4f.m31(),
+                matrix4f.m02() * x + matrix4f.m12() * y + matrix4f.m22() * z + matrix4f.m32()
+        );
     }
 }

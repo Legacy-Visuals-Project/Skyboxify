@@ -1,6 +1,6 @@
 package btw.lowercase.optiboxes.skybox;
 
-import btw.lowercase.optiboxes.config.OptiBoxesConfig;
+import btw.lowercase.optiboxes.OptiBoxesClient;
 import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -8,7 +8,9 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class OptiFineSkybox {
     public static final Codec<OptiFineSkybox> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -18,6 +20,8 @@ public class OptiFineSkybox {
 
     private final List<OptiFineSkyLayer> layers;
     private final ResourceKey<Level> worldResourceKey;
+
+    private final Map<OptiFineSkyLayer, Float> optiFineSkyLayerAlphaMap = new HashMap<>();
     private boolean active = true;
 
     public OptiFineSkybox(List<OptiFineSkyLayer> layers, ResourceKey<Level> worldResourceKey) {
@@ -27,16 +31,20 @@ public class OptiFineSkybox {
 
     public void tick(ClientLevel level) {
         this.active = true;
-        if (level.dimension().equals(this.worldResourceKey) || (OptiBoxesConfig.instance().showOverworldForUnknownDimension && this.worldResourceKey.equals(Level.OVERWORLD) && !level.dimension().equals(Level.NETHER) && !level.dimension().equals(Level.END))) {
-            this.layers.forEach(layer -> layer.tick(level));
+        if (level.dimension().equals(this.worldResourceKey) || (OptiBoxesClient.getConfig().showOverworldForUnknownDimension.isEnabled() && this.worldResourceKey.equals(Level.OVERWORLD) && !level.dimension().equals(Level.NETHER) && !level.dimension().equals(Level.END))) {
+            this.layers.forEach(layer -> optiFineSkyLayerAlphaMap.put(layer, layer.getPositionBrightness(level, this.getConditionAlphaFor(layer))));
         } else {
-            this.layers.forEach(layer -> layer.setConditionAlpha(-1.0F));
+            this.layers.forEach(layer -> optiFineSkyLayerAlphaMap.put(layer, -1.0F));
             this.active = false;
         }
     }
 
     public boolean isActive() {
         return this.active;
+    }
+
+    public float getConditionAlphaFor(OptiFineSkyLayer optiFineSkyLayer) {
+        return optiFineSkyLayerAlphaMap.getOrDefault(optiFineSkyLayer, -1.0F);
     }
 
     public List<OptiFineSkyLayer> getLayers() {

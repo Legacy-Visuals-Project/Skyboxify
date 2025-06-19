@@ -1,50 +1,98 @@
 package btw.lowercase.optiboxes.skybox;
 
 import btw.lowercase.optiboxes.utils.CommonUtils;
+import btw.lowercase.optiboxes.utils.UVRange;
 import btw.lowercase.optiboxes.utils.components.Blend;
+import com.mojang.blaze3d.buffers.BufferUsage;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
-import com.mojang.math.Axis;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.CoreShaders;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
+import org.joml.AxisAngle4f;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
+import org.joml.Quaternionf;
 
-public class OptiFineSkyRenderer {
+public final class OptiFineSkyRenderer {
+    public static final OptiFineSkyRenderer INSTANCE = new OptiFineSkyRenderer();
+
     private VertexBuffer skyBuffer = null;
 
-    private void buildSky(VertexConsumer vertexConsumer) {
-        PoseStack poseStack = new PoseStack();
-        poseStack.pushPose();
-        poseStack.mulPose(Axis.XP.rotationDegrees(90.0F));
-        poseStack.mulPose(Axis.ZP.rotationDegrees(-90.0F));
-        this.renderSide(poseStack, vertexConsumer, 4);
-        poseStack.pushPose();
-        poseStack.mulPose(Axis.XP.rotationDegrees(90.0F));
-        this.renderSide(poseStack, vertexConsumer, 1);
-        poseStack.popPose();
-        poseStack.pushPose();
-        poseStack.mulPose(Axis.XP.rotationDegrees(-90.0F));
-        this.renderSide(poseStack, vertexConsumer, 0);
-        poseStack.popPose();
-        poseStack.mulPose(Axis.ZP.rotationDegrees(90.0F));
-        this.renderSide(poseStack, vertexConsumer, 5);
-        poseStack.mulPose(Axis.ZP.rotationDegrees(90.0F));
-        this.renderSide(poseStack, vertexConsumer, 2);
-        poseStack.mulPose(Axis.ZP.rotationDegrees(90.0F));
-        this.renderSide(poseStack, vertexConsumer, 3);
-        poseStack.popPose();
+    private OptiFineSkyRenderer() {
+        Minecraft.getInstance().schedule(this::buildSky);
     }
 
-    private void renderSide(PoseStack poseStack, VertexConsumer vertexConsumer, int side) {
-        float u = (float) (side % 3) / 3.0F;
-        float v = (float) (side / 3) / 2.0F;
-        Matrix4f matrix4f = poseStack.last().pose();
-        vertexConsumer.addVertex(matrix4f, -100.0F, -100.0F, -100.0F).setUv(u, v);
-        vertexConsumer.addVertex(matrix4f, -100.0F, -100.0F, 100.0F).setUv(u, v + 0.5F);
-        vertexConsumer.addVertex(matrix4f, 100.0F, -100.0F, 100.0F).setUv(u + 0.33333334F, v + 0.5F);
-        vertexConsumer.addVertex(matrix4f, 100.0F, -100.0F, -100.0F).setUv(u + 0.33333334F, v);
+    private void buildSky() {
+        VertexFormat vertexFormat = DefaultVertexFormat.POSITION_TEX;
+        VertexFormat.Mode vertexFormatMode = VertexFormat.Mode.QUADS;
+
+        ByteBufferBuilder byteBufferBuilder = new ByteBufferBuilder(vertexFormat.getVertexSize() * 24);
+        BufferBuilder builder = new BufferBuilder(byteBufferBuilder, vertexFormatMode, vertexFormat);
+        for (int face = 0; face < 6; ++face) {
+            UVRange uvRange = CommonUtils.getUvRangeForFace(face);
+            Matrix4f matrix4f = CommonUtils.getRotationMatrixForFace(face);
+            final float quadSize = 100.0F;
+            builder.addVertex(CommonUtils.getMatrixTransform(matrix4f, -quadSize, -quadSize, -quadSize)).setUv(uvRange.minU(), uvRange.minV());
+            builder.addVertex(CommonUtils.getMatrixTransform(matrix4f, -quadSize, -quadSize, quadSize)).setUv(uvRange.minU(), uvRange.maxV());
+            builder.addVertex(CommonUtils.getMatrixTransform(matrix4f, quadSize, -quadSize, quadSize)).setUv(uvRange.maxU(), uvRange.maxV());
+            builder.addVertex(CommonUtils.getMatrixTransform(matrix4f, quadSize, -quadSize, -quadSize)).setUv(uvRange.maxU(), uvRange.minV());
+        }
+
+        this.skyBuffer = new VertexBuffer(BufferUsage.STATIC_WRITE);
+        this.skyBuffer.bind();
+        this.skyBuffer.upload(builder.build());
+        VertexBuffer.unbind();
+    }
+
+    public void renderSkybox(OptiFineSkybox optiFineSkybox, Matrix4fStack modelViewStack, Level level, float tickDelta) {
+        long dayTime = level.getDayTime();
+        int clampedTimeOfDay = (int) (dayTime % 24000L);
+        float skyAngle = level.getTimeOfDay(tickDelta);
+        float thunderLevel = level.getThunderLevel(tickDelta);
+        float rainLevel = level.getRainLevel(tickDelta);
+        if (rainLevel > 0.0F) {
+            thunderLevel /= rainLevel;
+        }
+
+        for (OptiFineSkyLayer optiFineSkyLayer : optiFineSkybox.getLayers().stream().filter(layer -> layer.isActive(dayTime, clampedTimeOfDay)).toList()) {
+            renderSkyLayer(optiFineSkyLayer, modelViewStack, level, clampedTimeOfDay, skyAngle, rainLevel, thunderLevel, optiFineSkybox.getConditionAlphaFor(optiFineSkyLayer));
+        }
+
+        Blend.ADD.apply(1.0F - rainLevel);
+    }
+
+    public void renderSkyLayer(OptiFineSkyLayer optiFineSkyLayer, Matrix4fStack modelViewStack, Level level, int timeOfDay, float skyAngle, float rainGradient, float thunderGradient, float conditionAlpha) {
+        float weatherAlpha = CommonUtils.getWeatherAlpha(optiFineSkyLayer.weatherConditions(), rainGradient, thunderGradient);
+        float fadeAlpha = optiFineSkyLayer.fade().getAlpha(timeOfDay);
+        float finalAlpha = Mth.clamp(conditionAlpha * weatherAlpha * fadeAlpha, 0.0F, 1.0F);
+        if (!(finalAlpha < 1.0E-4F) && this.skyBuffer != null) {
+            modelViewStack.pushMatrix();
+            if (optiFineSkyLayer.rotate()) {
+                // NOTE: Using `mulPose` directly gives a different result.
+                final float angle = this.getAngle(level, skyAngle, optiFineSkyLayer.speed());
+                modelViewStack.rotate(new Quaternionf(new AxisAngle4f((float) Math.toRadians(angle), optiFineSkyLayer.axis())));
+            }
+
+            RenderSystem.setShaderTexture(0, optiFineSkyLayer.source());
+            RenderSystem.setShader(CoreShaders.POSITION_TEX);
+            Blend blend = optiFineSkyLayer.blend();
+            blend.apply(finalAlpha);
+            if (blend.getBlendFunction() != null) {
+                RenderSystem.enableBlend();
+                RenderSystem.blendFunc(blend.getBlendFunction().sourceFactor(), blend.getBlendFunction().destFactor());
+            } else {
+                RenderSystem.disableBlend();
+            }
+
+            this.skyBuffer.bind();
+            this.skyBuffer.drawWithShader(modelViewStack, RenderSystem.getProjectionMatrix(), RenderSystem.getShader());
+            VertexBuffer.unbind();
+
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+            modelViewStack.popMatrix();
+        }
     }
 
     private float getAngle(Level level, float skyAngle, float speed) {
@@ -57,59 +105,5 @@ public class OptiFineSkyRenderer {
         }
 
         return 360.0F * (angleDayStart + skyAngle * speed);
-    }
-
-    public void renderSkybox(OptiFineSkybox optiFineSkybox, PoseStack poseStack, Level level, float tickDelta) {
-        if (this.skyBuffer == null) {
-            this.skyBuffer = VertexBuffer.uploadStatic(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX, this::buildSky);
-        }
-
-        long dayTime = level.getDayTime();
-        int clampedTimeOfDay = (int) (dayTime % 24000L);
-        float skyAngle = level.getTimeOfDay(tickDelta);
-        float thunderLevel = level.getThunderLevel(tickDelta);
-        float rainLevel = level.getRainLevel(tickDelta);
-        if (rainLevel > 0.0F) {
-            thunderLevel /= rainLevel;
-        }
-
-        for (OptiFineSkyLayer optiFineSkyLayer : optiFineSkybox.getLayers().stream().filter(layer -> layer.isActive(dayTime, clampedTimeOfDay)).toList()) {
-            renderSkyLayer(optiFineSkyLayer, level, poseStack, clampedTimeOfDay, skyAngle, rainLevel, thunderLevel);
-        }
-
-        Blend.ADD.apply(1.0F - rainLevel);
-    }
-
-    public void renderSkyLayer(OptiFineSkyLayer optiFineSkyLayer, Level level, PoseStack poseStack, int timeOfDay, float skyAngle, float rainGradient, float thunderGradient) {
-        float weatherAlpha = CommonUtils.getWeatherAlpha(optiFineSkyLayer.getWeatherConditions(), rainGradient, thunderGradient);
-        float fadeAlpha = CommonUtils.getFadeAlpha(optiFineSkyLayer.getFade(), timeOfDay);
-        float finalAlpha = Mth.clamp(optiFineSkyLayer.conditionAlpha * weatherAlpha * fadeAlpha, 0.0F, 1.0F);
-        if (!(finalAlpha < 1.0E-4F) && this.skyBuffer != null) {
-            poseStack.pushPose();
-            if (optiFineSkyLayer.shouldRotate()) {
-                poseStack.mulPose(Axis.of(optiFineSkyLayer.getAxis()).rotationDegrees(this.getAngle(level, skyAngle, optiFineSkyLayer.getSpeed())));
-            }
-
-            RenderSystem.setShaderTexture(0, optiFineSkyLayer.getSource());
-            RenderSystem.setShader(CoreShaders.POSITION_TEX);
-            Blend blend = optiFineSkyLayer.getBlend();
-            blend.apply(finalAlpha);
-            if (blend.getBlendFunction() != null) {
-                RenderSystem.enableBlend();
-                RenderSystem.blendFunc(blend.getBlendFunction().sourceFactor(), blend.getBlendFunction().destFactor());
-            } else {
-                RenderSystem.disableBlend();
-            }
-
-            Matrix4fStack matrix4fStack = RenderSystem.getModelViewStack();
-            matrix4fStack.pushMatrix();
-            matrix4fStack.mul(poseStack.last().pose());
-            this.skyBuffer.bind();
-            this.skyBuffer.drawWithShader(matrix4fStack, RenderSystem.getProjectionMatrix(), RenderSystem.getShader());
-            VertexBuffer.unbind();
-            matrix4fStack.popMatrix();
-
-            poseStack.popPose();
-        }
     }
 }

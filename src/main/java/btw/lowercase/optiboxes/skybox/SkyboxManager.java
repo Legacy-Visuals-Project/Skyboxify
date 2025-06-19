@@ -1,6 +1,6 @@
 package btw.lowercase.optiboxes.skybox;
 
-import btw.lowercase.optiboxes.config.OptiBoxesConfig;
+import btw.lowercase.optiboxes.OptiBoxesClient;
 import com.google.common.base.Preconditions;
 import net.minecraft.client.multiplayer.ClientLevel;
 
@@ -13,7 +13,6 @@ public class SkyboxManager {
 
     private final List<OptiFineSkybox> loadedSkyboxes = new ArrayList<>();
     private final List<OptiFineSkybox> activeSkyboxes = new LinkedList<>();
-    private final OptiFineSkyRenderer optiFineSkyRenderer = new OptiFineSkyRenderer();
 
     public void addSkybox(OptiFineSkybox optiFineSkybox) {
         Preconditions.checkNotNull(optiFineSkybox, "Skybox was null");
@@ -39,14 +38,10 @@ public class SkyboxManager {
     }
 
     public boolean isEnabled(ClientLevel level) {
-        return OptiBoxesConfig.instance().enabled && !activeSkyboxes.isEmpty() && level != null;
+        return OptiBoxesClient.getConfig().enabled.isEnabled() && !activeSkyboxes.isEmpty() && level != null;
     }
 
     public List<OptiFineSkybox> getActiveSkyboxes() {
         return this.activeSkyboxes;
-    }
-
-    public OptiFineSkyRenderer getOptiFineSkyRenderer() {
-        return optiFineSkyRenderer;
     }
 }

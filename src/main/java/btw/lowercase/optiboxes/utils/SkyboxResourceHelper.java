@@ -1,7 +1,6 @@
 package btw.lowercase.optiboxes.utils;
 
 import btw.lowercase.optiboxes.OptiBoxesClient;
-import btw.lowercase.optiboxes.config.OptiBoxesConfig;
 import btw.lowercase.optiboxes.skybox.SkyboxManager;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.minecraft.resources.ResourceLocation;
@@ -15,7 +14,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.stream.Stream;
 
-public class OptiFineResourceHelper implements IdentifiableResourceReloadListener {
+public class SkyboxResourceHelper implements IdentifiableResourceReloadListener {
     private ResourceManager resourceManager;
 
     @Override
@@ -23,7 +22,7 @@ public class OptiFineResourceHelper implements IdentifiableResourceReloadListene
         this.resourceManager = resourceManager;
         return CompletableFuture.runAsync(() -> {
             SkyboxManager.INSTANCE.clearSkyboxes();
-            if (OptiBoxesConfig.instance().enabled) {
+            if (OptiBoxesClient.getConfig().enabled.isEnabled()) {
                 OptiBoxesClient.INSTANCE.getLogger().info("Looking for OptiFine/MCPatcher Skies...");
                 OptiBoxesClient.INSTANCE.convert(this);
             }
