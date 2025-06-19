@@ -5,19 +5,18 @@ import btw.lowercase.optiboxes.skybox.OptiFineSkybox;
 import btw.lowercase.optiboxes.skybox.SkyboxManager;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import com.mojang.blaze3d.framegraph.FrameGraphBuilder;
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.math.Axis;
 import net.minecraft.client.Camera;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.DimensionSpecialEffects;
-import net.minecraft.client.renderer.FogParameters;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.SkyRenderer;
+import net.minecraft.client.renderer.LightTexture;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -38,13 +37,13 @@ public abstract class MixinLevelRenderer {
     @Unique
     private float optiboxes$tickDelta;
 
-    @Inject(method = "addSkyPass", at = @At("HEAD"))
-    private void optiboxes$getLocals(FrameGraphBuilder frameGraphBuilder, Camera camera, float tickDelta, FogParameters fogParameters, CallbackInfo ci) {
-        this.optiboxes$tickDelta = tickDelta;
+    @Inject(method = "renderLevel", at = @At("HEAD"))
+    private void optiboxes$getLocals(DeltaTracker deltaTracker, boolean bl, Camera camera, GameRenderer gameRenderer, LightTexture lightTexture, Matrix4f matrix4f, Matrix4f matrix4f2, CallbackInfo ci) {
+        this.optiboxes$tickDelta = deltaTracker.getGameTimeDeltaPartialTick(false);
     }
 
-    @WrapOperation(method = "method_62215", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SkyRenderer;renderEndSky(Lcom/mojang/blaze3d/vertex/PoseStack;)V"))
-    private void optiboxes$renderEndSkybox(SkyRenderer instance, PoseStack poseStack, Operation<Void> original) {
+    @WrapOperation(method = "renderSky", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/LevelRenderer;renderEndSky(Lcom/mojang/blaze3d/vertex/PoseStack;)V"))
+    private void optiboxes$renderEndSkybox(LevelRenderer instance, PoseStack poseStack, Operation<Void> original, @Local(argsOnly = true, ordinal = 0) Matrix4f matrix4f) {
         original.call(instance, poseStack);
         List<OptiFineSkybox> activeSkyboxes = SkyboxManager.INSTANCE.getActiveSkyboxes();
         boolean isEnabled = SkyboxManager.INSTANCE.isEnabled(this.level);
@@ -57,6 +56,7 @@ public abstract class MixinLevelRenderer {
             ClientLevel clientLevel = Objects.requireNonNull(this.level);
             Matrix4fStack modelViewStack = RenderSystem.getModelViewStack();
             modelViewStack.pushMatrix();
+            modelViewStack.mul(matrix4f);
             modelViewStack.rotate(Axis.YP.rotationDegrees(-90.0F));
             for (OptiFineSkybox optiFineSkybox : activeSkyboxes) {
                 OptiFineSkyRenderer.INSTANCE.renderSkybox(optiFineSkybox, modelViewStack, clientLevel, 0.0F);
@@ -68,41 +68,19 @@ public abstract class MixinLevelRenderer {
         }
     }
 
-    @Inject(method = "method_62215", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;<init>()V", shift = At.Shift.AFTER))
-    private void optiboxes$top(FogParameters fogParameters, DimensionSpecialEffects.SkyType skyType, float tickDelta, DimensionSpecialEffects dimensionSpecialEffects, CallbackInfo ci) {
+    @Inject(method = "renderSky", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;setShaderColor(FFFF)V", ordinal = 2, shift = At.Shift.AFTER))
+    private void optiboxes$renderSkyboxes(Matrix4f matrix4f, Matrix4f matrix4f2, float tickDelta, Camera camera, boolean bl, Runnable runnable, CallbackInfo ci) {
         if (SkyboxManager.INSTANCE.isEnabled(this.level)) {
-            RenderSystem.enableBlend();
-            RenderSystem.depthMask(false);
-        }
-    }
-
-    @WrapOperation(method = "method_62215", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunMoonAndStars(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/Tesselator;FIFFLnet/minecraft/client/renderer/FogParameters;)V"))
-    private void optiboxes$renderSkyboxes(SkyRenderer instance, PoseStack poseStack, Tesselator tesselator, float timeOfDay, int moonPhases, float rainLevel, float starBrightness, FogParameters fogParameters, Operation<Void> original) {
-        boolean isEnabled = SkyboxManager.INSTANCE.isEnabled(this.level);
-        if (isEnabled) {
             List<OptiFineSkybox> activeSkyboxes = SkyboxManager.INSTANCE.getActiveSkyboxes();
             ClientLevel clientLevel = Objects.requireNonNull(this.level);
             Matrix4fStack modelViewStack = RenderSystem.getModelViewStack();
             modelViewStack.pushMatrix();
+            modelViewStack.mul(matrix4f);
             modelViewStack.rotate(Axis.YP.rotationDegrees(-90.0F));
             for (OptiFineSkybox optiFineSkybox : activeSkyboxes) {
                 OptiFineSkyRenderer.INSTANCE.renderSkybox(optiFineSkybox, modelViewStack, clientLevel, this.optiboxes$tickDelta);
             }
             modelViewStack.popMatrix();
-        }
-
-        original.call(instance, poseStack, tesselator, timeOfDay, moonPhases, rainLevel, starBrightness, fogParameters);
-        if (isEnabled) {
-            RenderSystem.disableBlend();
-            RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-        }
-    }
-
-    @Inject(method = "method_62215", at = @At("TAIL"))
-    private void optiboxes$bottom(FogParameters fogParameters, DimensionSpecialEffects.SkyType skyType, float tickDelta, DimensionSpecialEffects dimensionSpecialEffects, CallbackInfo ci) {
-        if (SkyboxManager.INSTANCE.isEnabled(this.level) && Objects.requireNonNull(this.level).effects().skyType() != DimensionSpecialEffects.SkyType.END) {
-            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-            RenderSystem.depthMask(true);
         }
     }
 }

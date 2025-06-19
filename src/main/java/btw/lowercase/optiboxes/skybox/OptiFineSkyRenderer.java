@@ -3,11 +3,10 @@ package btw.lowercase.optiboxes.skybox;
 import btw.lowercase.optiboxes.utils.CommonUtils;
 import btw.lowercase.optiboxes.utils.UVRange;
 import btw.lowercase.optiboxes.utils.components.Blend;
-import com.mojang.blaze3d.buffers.BufferUsage;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.CoreShaders;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import org.joml.AxisAngle4f;
@@ -21,7 +20,7 @@ public final class OptiFineSkyRenderer {
     private VertexBuffer skyBuffer = null;
 
     private OptiFineSkyRenderer() {
-        Minecraft.getInstance().schedule(this::buildSky);
+        Minecraft.getInstance().tell(this::buildSky);
     }
 
     private void buildSky() {
@@ -40,7 +39,7 @@ public final class OptiFineSkyRenderer {
             builder.addVertex(CommonUtils.getMatrixTransform(matrix4f, quadSize, -quadSize, -quadSize)).setUv(uvRange.maxU(), uvRange.minV());
         }
 
-        this.skyBuffer = new VertexBuffer(BufferUsage.STATIC_WRITE);
+        this.skyBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
         this.skyBuffer.bind();
         this.skyBuffer.upload(builder.build());
         VertexBuffer.unbind();
@@ -76,7 +75,7 @@ public final class OptiFineSkyRenderer {
             }
 
             RenderSystem.setShaderTexture(0, optiFineSkyLayer.source());
-            RenderSystem.setShader(CoreShaders.POSITION_TEX);
+            RenderSystem.setShader(() -> GameRenderer.getPositionTexShader());
             Blend blend = optiFineSkyLayer.blend();
             blend.apply(finalAlpha);
             if (blend.getBlendFunction() != null) {

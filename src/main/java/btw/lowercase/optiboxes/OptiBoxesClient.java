@@ -65,7 +65,7 @@ public final class OptiBoxesClient implements ClientModInitializer {
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
                 dispatcher.register(ClientCommandManager.literal(MOD_ID).executes((context) -> {
                     Minecraft minecraft = Minecraft.getInstance();
-                    minecraft.schedule(() -> minecraft.setScreen(CONFIG_INSTANCE.getConfigScreen(minecraft.screen)));
+                    minecraft.tell(() -> minecraft.setScreen(CONFIG_INSTANCE.getConfigScreen(minecraft.screen)));
                     return Command.SINGLE_SUCCESS;
                 })));
     }

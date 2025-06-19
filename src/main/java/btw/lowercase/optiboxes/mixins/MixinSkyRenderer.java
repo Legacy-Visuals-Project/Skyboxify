@@ -2,27 +2,28 @@ package btw.lowercase.optiboxes.mixins;
 
 import btw.lowercase.optiboxes.OptiBoxesClient;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
-import net.minecraft.client.renderer.FogParameters;
-import net.minecraft.client.renderer.SkyRenderer;
+import com.mojang.blaze3d.vertex.MeshData;
+import com.mojang.blaze3d.vertex.VertexBuffer;
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.ShaderInstance;
+import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-@Mixin(SkyRenderer.class)
+@Mixin(LevelRenderer.class)
 public abstract class MixinSkyRenderer {
-    @WrapWithCondition(method = "renderSunMoonAndStars", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSun(FLcom/mojang/blaze3d/vertex/Tesselator;Lcom/mojang/blaze3d/vertex/PoseStack;)V"))
-    private boolean uniskies$toggleSun(SkyRenderer instance, float rainLevel, Tesselator tesselator, PoseStack poseStack) {
+    @WrapWithCondition(method = "renderSky", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/BufferUploader;drawWithShader(Lcom/mojang/blaze3d/vertex/MeshData;)V", ordinal = 1))
+    private boolean uniskies$toggleSun(MeshData meshData) {
         return !OptiBoxesClient.getConfig().enabled.isEnabled() || OptiBoxesClient.getConfig().renderSunMoon.isEnabled();
     }
 
-    @WrapWithCondition(method = "renderSunMoonAndStars", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SkyRenderer;renderMoon(IFLcom/mojang/blaze3d/vertex/Tesselator;Lcom/mojang/blaze3d/vertex/PoseStack;)V"))
-    private boolean uniskies$toggleMoon(SkyRenderer instance, int moonPhases, float rainLevel, Tesselator tesselator, PoseStack poseStack) {
+    @WrapWithCondition(method = "renderSky", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/BufferUploader;drawWithShader(Lcom/mojang/blaze3d/vertex/MeshData;)V", ordinal = 2))
+    private boolean uniskies$toggleMoon(MeshData meshData) {
         return !OptiBoxesClient.getConfig().enabled.isEnabled() || OptiBoxesClient.getConfig().renderSunMoon.isEnabled();
     }
 
-    @WrapWithCondition(method = "renderSunMoonAndStars", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SkyRenderer;renderStars(Lnet/minecraft/client/renderer/FogParameters;FLcom/mojang/blaze3d/vertex/PoseStack;)V"))
-    private boolean uniskies$toggleStars(SkyRenderer instance, FogParameters fogParameters, float starBrightness, PoseStack poseStack) {
+    @WrapWithCondition(method = "renderSky", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/VertexBuffer;drawWithShader(Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;Lnet/minecraft/client/renderer/ShaderInstance;)V", ordinal = 1))
+    private boolean uniskies$toggleStars(VertexBuffer instance, Matrix4f matrix4f, Matrix4f matrix4f2, ShaderInstance shaderInstance) {
         return !OptiBoxesClient.getConfig().enabled.isEnabled() || OptiBoxesClient.getConfig().renderSunMoon.isEnabled();
     }
 }

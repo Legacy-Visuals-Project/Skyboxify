@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.util.profiling.ProfilerFiller;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -18,7 +19,7 @@ public class SkyboxResourceHelper implements IdentifiableResourceReloadListener 
     private ResourceManager resourceManager;
 
     @Override
-    public @NotNull CompletableFuture<Void> reload(PreparationBarrier preparationBarrier, ResourceManager resourceManager, Executor executor, Executor executor2) {
+    public @NotNull CompletableFuture<Void> reload(PreparationBarrier preparationBarrier, ResourceManager resourceManager, ProfilerFiller profilerFiller, ProfilerFiller profilerFiller2, Executor executor, Executor executor2) {
         this.resourceManager = resourceManager;
         return CompletableFuture.runAsync(() -> {
             SkyboxManager.INSTANCE.clearSkyboxes();

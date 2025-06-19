@@ -49,7 +49,8 @@ public record OptiFineSkyLayer(ResourceLocation source, boolean biomeInclusion, 
                 return false;
             }
 
-            if (!(this.biomeInclusion && this.biomes.contains(level.registryAccess().lookupOrThrow(Registries.BIOME).getKey(currentBiome.value())))) {
+
+            if (!(this.biomeInclusion && this.biomes.contains(level.registryAccess().lookupOrThrow(Registries.BIOME).get(currentBiome.unwrapKey().get())))) {
                 return false;
             }
         }
