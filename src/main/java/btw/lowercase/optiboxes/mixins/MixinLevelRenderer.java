@@ -44,7 +44,6 @@ public abstract class MixinLevelRenderer {
 
     @WrapOperation(method = "renderSky", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/LevelRenderer;renderEndSky(Lcom/mojang/blaze3d/vertex/PoseStack;)V"))
     private void optiboxes$renderEndSkybox(LevelRenderer instance, PoseStack poseStack, Operation<Void> original, @Local(argsOnly = true, ordinal = 0) Matrix4f matrix4f) {
-        original.call(instance, poseStack);
         List<OptiFineSkybox> activeSkyboxes = SkyboxManager.INSTANCE.getActiveSkyboxes();
         boolean isEnabled = SkyboxManager.INSTANCE.isEnabled(this.level);
         if (isEnabled) {
@@ -52,6 +51,7 @@ public abstract class MixinLevelRenderer {
             RenderSystem.depthMask(false);
         }
 
+        original.call(instance, poseStack);
         if (isEnabled) {
             ClientLevel clientLevel = Objects.requireNonNull(this.level);
             Matrix4fStack modelViewStack = RenderSystem.getModelViewStack();

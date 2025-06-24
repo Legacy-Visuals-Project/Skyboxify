@@ -2,12 +2,12 @@
 	"schemaVersion": 1,
 	"id": "optiboxes",
 	"version": "${version}",
-	"name": "OptiBoxes",
-	"description": "Skybox mod made for OptiFine skybox packs.",
+	"name": "Optiboxes",
+	"description": "A skybox mod that allows you to use Optifine skies in Fabric 1.21+",
 	"authors": [
+		"lowercasebtw",
 		"FlashyReese",
-		"AMereBagatelle",
-		"lowercasebtw"
+		"AMereBagatelle"
 	],
 	"icon": "assets/optiboxes/icon.png",
 	"license": "GPL-3.0",
