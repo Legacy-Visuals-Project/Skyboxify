@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 @Mixin(RenderPipelines.class)
 public interface RenderPipelinesAccessor {
     @Accessor("MATRICES_PROJECTION_SNIPPET")
-    static RenderPipeline.Snippet getMatricesProjectionSnippet() {
+    static RenderPipeline.Snippet optiboxes$getMatricesProjectionSnippet() {
         return null;
     }
 }

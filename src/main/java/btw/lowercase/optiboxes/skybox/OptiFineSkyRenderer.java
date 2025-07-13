@@ -4,6 +4,7 @@ import btw.lowercase.optiboxes.OptiBoxesClient;
 import btw.lowercase.optiboxes.mixins.RenderPipelinesAccessor;
 import btw.lowercase.optiboxes.utils.CommonUtils;
 import btw.lowercase.optiboxes.utils.DynamicTransformsBuilder;
+import btw.lowercase.optiboxes.utils.IrisUtil;
 import btw.lowercase.optiboxes.utils.UVRange;
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
@@ -18,9 +19,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
-import org.joml.*;
+import org.joml.AxisAngle4f;
+import org.joml.Matrix4f;
+import org.joml.Matrix4fStack;
+import org.joml.Quaternionf;
 
-import java.lang.Math;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.OptionalDouble;
@@ -64,7 +67,7 @@ public final class OptiFineSkyRenderer {
     }
 
     public static RenderPipeline getCustomSkyPipeline(BlendFunction blendFunction) {
-        RenderPipeline.Builder builder = RenderPipeline.builder(RenderPipelinesAccessor.getMatricesProjectionSnippet());
+        RenderPipeline.Builder builder = RenderPipeline.builder(RenderPipelinesAccessor.optiboxes$getMatricesProjectionSnippet());
         builder.withLocation(OptiBoxesClient.id("pipeline/custom_skybox"));
         builder.withVertexShader(OptiBoxesClient.id("core/custom_skybox"));
         builder.withFragmentShader(OptiBoxesClient.id("core/custom_skybox"));
@@ -116,7 +119,11 @@ public final class OptiFineSkyRenderer {
             try (RenderPass renderPass = RenderSystem.getDevice()
                     .createCommandEncoder()
                     .createRenderPass(() -> "Custom Sky Rendering", renderTarget.getColorTextureView(), OptionalInt.empty(), renderTarget.getDepthTextureView(), OptionalDouble.empty())) {
-                RenderPipeline renderPipeline = this.renderPipelineCache.computeIfAbsent(optiFineSkyLayer.source(), (resourceLocation) -> getCustomSkyPipeline(optiFineSkyLayer.blend().getBlendFunction()));
+                RenderPipeline renderPipeline = this.renderPipelineCache.computeIfAbsent(optiFineSkyLayer.source(), (resourceLocation) -> {
+                    RenderPipeline pipeline = getCustomSkyPipeline(optiFineSkyLayer.blend().getBlendFunction());
+                    IrisUtil.assignPipeline(pipeline, IrisUtil.skyTextured());
+                    return pipeline;
+                });
                 renderPass.setPipeline(renderPipeline);
                 renderPass.setVertexBuffer(0, this.skyBuffer);
                 renderPass.setIndexBuffer(indexBuffer, this.skyBufferIndices.type());
