@@ -13,9 +13,9 @@ base {
 static def getCheckedOutGitCommitHash() {
     String commit = 'git rev-parse --verify --short HEAD'.execute().text.trim()
     if (commit.size() > 0) {
-        return "-" + commit;
+        return "-" + commit
     } else {
-        return "";
+        return ""
     }
 }
 
