@@ -41,7 +41,9 @@ public final class OptiFineSkyRenderer {
 
         this.skyBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
         this.skyBuffer.bind();
-        this.skyBuffer.upload(builder.build());
+        try (MeshData meshData = builder.buildOrThrow()) {
+            this.skyBuffer.upload(meshData);
+        }
         VertexBuffer.unbind();
     }
 
@@ -70,12 +72,11 @@ public final class OptiFineSkyRenderer {
             modelViewStack.pushMatrix();
             if (optiFineSkyLayer.rotate()) {
                 // NOTE: Using `mulPose` directly gives a different result.
-                final float angle = this.getAngle(level, skyAngle, optiFineSkyLayer.speed());
-                modelViewStack.rotate(new Quaternionf(new AxisAngle4f((float) Math.toRadians(angle), optiFineSkyLayer.axis())));
+                modelViewStack.rotate(new Quaternionf(new AxisAngle4f(this.getAngle(level, skyAngle, optiFineSkyLayer.speed()), optiFineSkyLayer.axis())));
             }
 
             RenderSystem.setShaderTexture(0, optiFineSkyLayer.source());
-            RenderSystem.setShader(() -> GameRenderer.getPositionTexShader());
+            RenderSystem.setShader(GameRenderer::getPositionTexShader);
             Blend blend = optiFineSkyLayer.blend();
             blend.apply(finalAlpha);
             if (blend.getBlendFunction() != null) {
@@ -103,6 +104,6 @@ public final class OptiFineSkyRenderer {
             angleDayStart = (float) (currentAngle % 1.0D);
         }
 
-        return 360.0F * (angleDayStart + skyAngle * speed);
+        return (float) Math.toRadians(360.0F * (angleDayStart + skyAngle * speed));
     }
 }

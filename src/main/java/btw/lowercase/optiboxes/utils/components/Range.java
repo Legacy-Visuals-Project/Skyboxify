@@ -3,6 +3,7 @@ package btw.lowercase.optiboxes.utils.components;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.jetbrains.annotations.NotNull;
 
 public record Range(float min, float max) {
     public static final Codec<Range> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -17,7 +18,7 @@ public record Range(float min, float max) {
     }
 
     @Override
-    public String toString() {
+    public @NotNull String toString() {
         return ToStringBuilder.reflectionToString(this);
     }
 }
