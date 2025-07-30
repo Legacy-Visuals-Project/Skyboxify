@@ -1,9 +1,6 @@
 package btw.lowercase.lightconfig.lib.v1;
 
-import btw.lowercase.lightconfig.lib.v1.field.AbstractConfigField;
-import btw.lowercase.lightconfig.lib.v1.field.BooleanConfigField;
-import btw.lowercase.lightconfig.lib.v1.field.NumericConfigField;
-import btw.lowercase.lightconfig.lib.v1.field.StringConfigField;
+import btw.lowercase.lightconfig.lib.v1.field.*;
 import com.google.gson.*;
 import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.client.gui.screens.Screen;
@@ -48,13 +45,18 @@ public abstract class Config {
         return field;
     }
 
+    public <T extends Enum<T>> EnumConfigField<T> enumFieldOf(final String name, final T defaultValue, final Class<T> clazz) {
+        final EnumConfigField<T> field = new EnumConfigField<>(this, name, defaultValue, clazz);
+        this.configFields.add(field);
+        return field;
+    }
+
     public void load() {
         if (!this.path.toFile().exists()) {
             this.logger.info("Config file doesn't exist! Creating one...");
             this.save();
             return;
         }
-
 
         try {
             final String json = Files.readString(this.path);
@@ -65,8 +67,8 @@ public abstract class Config {
                 this.configFields.forEach(field -> {
                     try {
                         field.load(object);
-                    } catch (Exception ignored) {
-                        this.logger.warn("Failed to load config field '{}', setting it to default value!", field.getName());
+                    } catch (Exception exception) {
+                        this.logger.warn(exception.getMessage());
                     }
                 });
             }
