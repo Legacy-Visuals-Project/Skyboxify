@@ -2,6 +2,7 @@ package btw.lowercase.optiboxes.config;
 
 import btw.lowercase.lightconfig.lib.v1.Config;
 import btw.lowercase.lightconfig.lib.v1.field.BooleanConfigField;
+import btw.lowercase.lightconfig.lib.v1.screen.ConfigScreenBuilder;
 import btw.lowercase.optiboxes.OptiBoxesClient;
 import net.minecraft.client.gui.screens.Screen;
 
@@ -21,6 +22,10 @@ public class OptiBoxesConfig extends Config {
 
     @Override
     public Screen getConfigScreen(Screen parent) {
-        return new OptiBoxesConfigScreen(parent, this);
+        ConfigScreenBuilder builder = ConfigScreenBuilder.builder(this);
+
+        // TODO: Add config stuff
+
+        return builder.build(parent);
     }
 }
