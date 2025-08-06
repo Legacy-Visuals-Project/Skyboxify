@@ -1,5 +1,6 @@
 package btw.lowercase.optiboxes.utils;
 
+import btw.lowercase.optiboxes.OptiBoxesClient;
 import btw.lowercase.optiboxes.utils.components.Range;
 import btw.lowercase.optiboxes.utils.components.Weather;
 import com.google.gson.JsonArray;
@@ -49,6 +50,10 @@ public final class CommonUtils {
     public static JsonObject convertOptiFineSkyProperties(SkyboxResourceHelper skyboxResourceHelper, Properties properties, ResourceLocation propertiesResourceLocation) {
         JsonObject jsonObject = new JsonObject();
         Optional<ResourceLocation> sourceTexture = Optional.ofNullable(parseSourceTexture(properties.getProperty("source", null), skyboxResourceHelper, propertiesResourceLocation));
+        if (sourceTexture.isEmpty() && OptiBoxesClient.getConfig().ignoreBrokenSkies.isEnabled()) {
+            return null;
+        }
+
         jsonObject.addProperty("source", sourceTexture.orElse(MissingTextureAtlasSprite.getLocation()).toString());
 
         // Blend

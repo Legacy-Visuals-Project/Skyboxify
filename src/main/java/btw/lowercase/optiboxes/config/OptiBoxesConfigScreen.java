@@ -13,13 +13,11 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 
 public class OptiBoxesConfigScreen extends Screen {
-    private static final Component TITLE = Component.translatable("options.optiboxes.title");
-
     private final Screen parent;
     private final OptiBoxesConfig config;
 
-    public OptiBoxesConfigScreen(Screen parent, OptiBoxesConfig config) {
-        super(TITLE);
+    public OptiBoxesConfigScreen(Screen parent, Component title, OptiBoxesConfig config) {
+        super(title);
         this.parent = parent;
         this.config = config;
     }
@@ -30,7 +28,7 @@ public class OptiBoxesConfigScreen extends Screen {
 
         HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this, 61, 33);
         LinearLayout linearLayout = layout.addToHeader(LinearLayout.vertical().spacing(8));
-        linearLayout.addChild(new StringWidget(TITLE, this.font), LayoutSettings::alignHorizontallyCenter);
+        linearLayout.addChild(new StringWidget(this.getTitle(), this.font), LayoutSettings::alignHorizontallyCenter);
 
         GridLayout gridLayout = new GridLayout();
         gridLayout.defaultCellSetting().paddingHorizontal(4).paddingBottom(4).alignHorizontallyCenter().alignVerticallyMiddle();
@@ -42,6 +40,7 @@ public class OptiBoxesConfigScreen extends Screen {
         rowHelper.addChild(config.processMCPatcher.createWidget(() -> this.minecraft.reloadResourcePacks()));
         rowHelper.addChild(config.renderSunMoon.createWidget());
         rowHelper.addChild(config.renderStars.createWidget());
+        rowHelper.addChild(config.ignoreBrokenSkies.createWidget());
         layout.addToContents(gridLayout);
 
         GridLayout footerGridLayout = new GridLayout();

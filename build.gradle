@@ -70,7 +70,6 @@ java {
         toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
     }
 
-    archivesBaseName = project.archives_base_name
     withSourcesJar()
     sourceCompatibility = javaVersion
     targetCompatibility = javaVersion

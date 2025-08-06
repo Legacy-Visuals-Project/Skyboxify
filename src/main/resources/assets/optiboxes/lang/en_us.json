@@ -12,6 +12,8 @@
 	"options.optiboxes.renderStars.tooltip": "Enable/disable rendering of the stars.",
 	"options.optiboxes.showOverworldForUnknownDimension": "Show Overworld In Unknown Dimensions",
 	"options.optiboxes.showOverworldForUnknownDimension.tooltip": "Will show the overworld skyboxes in unknown dimensions. Will not show in nether/end though unless a skybox defines it.",
+	"options.optiboxes.ignoreBrokenSkies": "Ignore Broken Skies",
+	"options.optiboxes.ignoreBrokenSkies.tooltip": "If something inside of a sky layer fails to load, it will ignore it and not load it.",
 	"options.template": "%s: %s",
 	"options.on": "ON",
 	"options.off": "OFF",
