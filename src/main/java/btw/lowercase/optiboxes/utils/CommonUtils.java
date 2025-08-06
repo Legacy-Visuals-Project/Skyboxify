@@ -1,5 +1,6 @@
 package btw.lowercase.optiboxes.utils;
 
+import btw.lowercase.optiboxes.OptiBoxesClient;
 import btw.lowercase.optiboxes.utils.components.Range;
 import btw.lowercase.optiboxes.utils.components.Weather;
 import com.google.gson.JsonArray;
@@ -46,9 +47,15 @@ public final class CommonUtils {
     private CommonUtils() {
     }
 
-    public static JsonObject convertOptiFineSkyProperties(SkyboxResourceHelper skyboxResourceHelper, Properties properties, ResourceLocation propertiesResourceLocation) {
+    public static @Nullable JsonObject convertOptiFineSkyProperties(SkyboxResourceHelper skyboxResourceHelper, Properties properties, ResourceLocation propertiesResourceLocation) {
         JsonObject jsonObject = new JsonObject();
-        Optional<ResourceLocation> sourceTexture = Optional.ofNullable(parseSourceTexture(properties.getProperty("source", null), skyboxResourceHelper, propertiesResourceLocation));
+        String sourceString = properties.getProperty("source", null);
+        Optional<ResourceLocation> sourceTexture = Optional.ofNullable(parseSourceTexture(sourceString, skyboxResourceHelper, propertiesResourceLocation));
+        if (sourceTexture.isEmpty() && OptiBoxesClient.getConfig().ignoreBrokenSkies.isEnabled()) {
+            LOGGER.warn("Detected a broken source texture path \"{}\" whilst loading a sky. Since the ignoreBrokenSkies setting is enabled, this sky will be ignored.", sourceString);
+            return null;
+        }
+
         jsonObject.addProperty("source", sourceTexture.orElse(MissingTextureAtlasSprite.getLocation()).toString());
 
         // Blend
