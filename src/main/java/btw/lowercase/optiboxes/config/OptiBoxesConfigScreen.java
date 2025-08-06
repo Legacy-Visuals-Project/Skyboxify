@@ -40,7 +40,7 @@ public class OptiBoxesConfigScreen extends Screen {
         rowHelper.addChild(config.processMCPatcher.createWidget(() -> this.minecraft.reloadResourcePacks()));
         rowHelper.addChild(config.renderSunMoon.createWidget());
         rowHelper.addChild(config.renderStars.createWidget());
-        rowHelper.addChild(config.ignoreBrokenSkies.createWidget());
+        rowHelper.addChild(config.ignoreBrokenSkies.createWidget(() -> this.minecraft.reloadResourcePacks()));
         layout.addToContents(gridLayout);
 
         GridLayout footerGridLayout = new GridLayout();

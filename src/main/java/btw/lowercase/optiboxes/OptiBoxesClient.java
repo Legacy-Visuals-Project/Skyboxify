@@ -137,9 +137,11 @@ public final class OptiBoxesClient implements ClientModInitializer {
                 }
 
                 final JsonObject json = CommonUtils.convertOptiFineSkyProperties(skyboxResourceHelper, properties, id);
-                switch (world) {
-                    case "world0" -> overworldLayers.add(json);
-                    case "world1" -> endLayers.add(json);
+                if (json != null) { // NOTE: Don't add broken skies (returns null if broken)
+                    switch (world) {
+                        case "world0" -> overworldLayers.add(json);
+                        case "world1" -> endLayers.add(json);
+                    }
                 }
             }
         });

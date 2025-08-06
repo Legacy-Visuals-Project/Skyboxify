@@ -47,7 +47,7 @@ public final class CommonUtils {
     private CommonUtils() {
     }
 
-    public static JsonObject convertOptiFineSkyProperties(SkyboxResourceHelper skyboxResourceHelper, Properties properties, ResourceLocation propertiesResourceLocation) {
+    public static @Nullable JsonObject convertOptiFineSkyProperties(SkyboxResourceHelper skyboxResourceHelper, Properties properties, ResourceLocation propertiesResourceLocation) {
         JsonObject jsonObject = new JsonObject();
         Optional<ResourceLocation> sourceTexture = Optional.ofNullable(parseSourceTexture(properties.getProperty("source", null), skyboxResourceHelper, propertiesResourceLocation));
         if (sourceTexture.isEmpty() && OptiBoxesClient.getConfig().ignoreBrokenSkies.isEnabled()) {
