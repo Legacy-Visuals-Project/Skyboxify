@@ -51,13 +51,13 @@ public abstract class MixinLevelRenderer {
 
         original.call(instance, poseStack);
         if (isEnabled) {
-            ClientLevel clientLevel = Objects.requireNonNull(this.level);
             Matrix4fStack modelViewStack = RenderSystem.getModelViewStack();
             modelViewStack.pushMatrix();
             modelViewStack.mul(matrix4f);
             modelViewStack.rotate(Axis.YP.rotationDegrees(-90.0F));
             for (OptiFineSkybox optiFineSkybox : SkyboxManager.INSTANCE.getActiveSkyboxes()) {
-                OptiFineSkyRenderer.INSTANCE.renderSkybox(optiFineSkybox, modelViewStack, clientLevel, 0.0F);
+                //noinspection DataFlowIssue
+                OptiFineSkyRenderer.INSTANCE.renderSkybox(optiFineSkybox, modelViewStack, this.level, 0.0F);
             }
             modelViewStack.popMatrix();
             RenderSystem.depthMask(true);
@@ -69,13 +69,13 @@ public abstract class MixinLevelRenderer {
     @Inject(method = "renderSky", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;setShaderColor(FFFF)V", ordinal = 2, shift = At.Shift.AFTER))
     private void optiboxes$renderSkyboxes(Matrix4f matrix4f, Matrix4f matrix4f2, float tickDelta, Camera camera, boolean bl, Runnable runnable, CallbackInfo ci) {
         if (SkyboxManager.INSTANCE.isEnabled(this.level)) {
-            ClientLevel clientLevel = Objects.requireNonNull(this.level);
             Matrix4fStack modelViewStack = RenderSystem.getModelViewStack();
             modelViewStack.pushMatrix();
             modelViewStack.mul(matrix4f);
             modelViewStack.rotate(Axis.YP.rotationDegrees(-90.0F));
             for (OptiFineSkybox optiFineSkybox : SkyboxManager.INSTANCE.getActiveSkyboxes()) {
-                OptiFineSkyRenderer.INSTANCE.renderSkybox(optiFineSkybox, modelViewStack, clientLevel, this.optiboxes$tickDelta);
+                //noinspection DataFlowIssue
+                OptiFineSkyRenderer.INSTANCE.renderSkybox(optiFineSkybox, modelViewStack, this.level, this.optiboxes$tickDelta);
             }
             modelViewStack.popMatrix();
         }
