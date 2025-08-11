@@ -53,12 +53,12 @@ public abstract class MixinLevelRenderer {
         original.call(instance);
         if (SkyboxManager.INSTANCE.isEnabled(this.level)) {
             List<OptiFineSkybox> activeSkyboxes = SkyboxManager.INSTANCE.getActiveSkyboxes();
-            ClientLevel clientLevel = Objects.requireNonNull(this.level);
             Matrix4fStack modelViewStack = RenderSystem.getModelViewStack();
             modelViewStack.pushMatrix();
             modelViewStack.rotate(Axis.YP.rotationDegrees(-90.0F));
             for (OptiFineSkybox optiFineSkybox : activeSkyboxes) {
-                OptiFineSkyRenderer.INSTANCE.renderSkybox(optiFineSkybox, modelViewStack, clientLevel, 0.0F);
+                //noinspection DataFlowIssue
+                OptiFineSkyRenderer.INSTANCE.renderSkybox(optiFineSkybox, modelViewStack, this.level, 0.0F);
             }
             modelViewStack.popMatrix();
         }
@@ -76,12 +76,12 @@ public abstract class MixinLevelRenderer {
     private void optiboxes$renderSkyboxes(SkyRenderer instance, PoseStack poseStack, MultiBufferSource.BufferSource bufferSource, float timeOfDay, int moonPhases, float rainLevel, float starBrightness, Operation<Void> original) {
         if (SkyboxManager.INSTANCE.isEnabled(this.level)) {
             List<OptiFineSkybox> activeSkyboxes = SkyboxManager.INSTANCE.getActiveSkyboxes();
-            ClientLevel clientLevel = Objects.requireNonNull(this.level);
             Matrix4fStack modelViewStack = RenderSystem.getModelViewStack();
             modelViewStack.pushMatrix();
             modelViewStack.rotate(Axis.YP.rotationDegrees(-90.0F));
             for (OptiFineSkybox optiFineSkybox : activeSkyboxes) {
-                OptiFineSkyRenderer.INSTANCE.renderSkybox(optiFineSkybox, modelViewStack, clientLevel, this.optiboxes$tickDelta);
+                //noinspection DataFlowIssue
+                OptiFineSkyRenderer.INSTANCE.renderSkybox(optiFineSkybox, modelViewStack, this.level, this.optiboxes$tickDelta);
             }
             modelViewStack.popMatrix();
         }
