@@ -4,6 +4,8 @@ import btw.lowercase.optiboxes.OptiBoxesClient;
 import com.google.common.base.Preconditions;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -42,8 +44,12 @@ public final class SkyboxManager {
         }
     }
 
-    public boolean isEnabled(ClientLevel level) {
+    public boolean isEnabled(Level level) {
         return OptiBoxesClient.getConfig().enabled.isEnabled() && !activeSkyboxes.isEmpty() && level != null;
+    }
+
+    public boolean containsEnabled(ResourceKey<Level> resourceKey) {
+        return !getActiveSkyboxes().stream().filter(skybox -> resourceKey.location().equals(skybox.getWorldResourceKey().location())).toList().isEmpty();
     }
 
     public List<OptiFineSkybox> getActiveSkyboxes() {

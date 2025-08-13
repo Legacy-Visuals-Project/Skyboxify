@@ -23,9 +23,8 @@ public class OptiBoxesConfigScreen extends Screen {
     }
 
     @Override
+    @SuppressWarnings("DataFlowIssue")
     protected void init() {
-        assert this.minecraft != null;
-
         HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this, 61, 33);
         LinearLayout linearLayout = layout.addToHeader(LinearLayout.vertical().spacing(8));
         linearLayout.addChild(new StringWidget(this.getTitle(), this.font), LayoutSettings::alignHorizontallyCenter);
@@ -58,10 +57,9 @@ public class OptiBoxesConfigScreen extends Screen {
     }
 
     @Override
+    @SuppressWarnings("DataFlowIssue")
     public void onClose() {
-        if (this.minecraft != null) {
-            OptiBoxesClient.getConfig().save();
-            this.minecraft.setScreen(parent);
-        }
+        this.config.save();
+        this.minecraft.setScreen(this.parent);
     }
 }

@@ -4,6 +4,7 @@
 	"package": "btw.lowercase.optiboxes.mixins",
 	"compatibilityLevel": "JAVA_21",
 	"client": [
+		"MixinFogRenderer",
 		"MixinLevelRenderer",
 		"MixinSkyRenderer",
 		"RenderPipelinesAccessor"

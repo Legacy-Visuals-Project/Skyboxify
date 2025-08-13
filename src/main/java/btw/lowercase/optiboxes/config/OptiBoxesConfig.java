@@ -19,7 +19,7 @@ public class OptiBoxesConfig extends Config {
     public final BooleanConfigField ignoreBrokenSkies = this.booleanFieldOf("ignoreBrokenSkies", false);
 
     public OptiBoxesConfig(Path path) {
-        super(OptiBoxesClient.INSTANCE.getModContainer(), path);
+        super(OptiBoxesClient.getModContainer(), path);
     }
 
     @Override

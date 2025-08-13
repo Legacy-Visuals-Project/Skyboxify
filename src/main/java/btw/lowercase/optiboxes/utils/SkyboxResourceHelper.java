@@ -25,8 +25,8 @@ public class SkyboxResourceHelper implements IdentifiableResourceReloadListener 
         return CompletableFuture.runAsync(() -> {
             SkyboxManager.INSTANCE.clearSkyboxes();
             if (OptiBoxesClient.getConfig().enabled.isEnabled()) {
-                OptiBoxesClient.INSTANCE.getLogger().info("Looking for OptiFine/MCPatcher Skies...");
-                OptiBoxesClient.INSTANCE.convert(this);
+                OptiBoxesClient.LOGGER.info("Looking for OptiFine/MCPatcher Skies...");
+                OptiBoxesClient.convert(this);
             }
         }).thenCompose(preparationBarrier::wait);
     }

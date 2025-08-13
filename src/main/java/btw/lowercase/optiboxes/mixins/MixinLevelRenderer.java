@@ -13,10 +13,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderBuffers;
-import net.minecraft.client.renderer.SkyRenderer;
+import net.minecraft.client.renderer.*;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4fStack;
 import org.spongepowered.asm.mixin.Final;
@@ -28,7 +26,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
-import java.util.Objects;
 
 @Mixin(value = LevelRenderer.class, priority = 900)
 public abstract class MixinLevelRenderer {
@@ -92,5 +89,15 @@ public abstract class MixinLevelRenderer {
     @WrapWithCondition(method = "method_62215", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;endBatch()V"))
     private boolean optiboxes$moveEndBatch(MultiBufferSource.BufferSource instance) {
         return !SkyboxManager.INSTANCE.isEnabled(this.level);
+    }
+
+    @WrapOperation(method = "addSkyPass", at = @At(value = "FIELD", target = "Lnet/minecraft/client/renderer/DimensionSpecialEffects$SkyType;NONE:Lnet/minecraft/client/renderer/DimensionSpecialEffects$SkyType;"))
+    private DimensionSpecialEffects.SkyType optiboxes$allowNetherSky(Operation<DimensionSpecialEffects.SkyType> original) {
+        //noinspection DataFlowIssue
+        if (SkyboxManager.INSTANCE.isEnabled(this.level) && SkyboxManager.INSTANCE.containsEnabled(Level.NETHER) && this.level.dimension().equals(Level.NETHER)) {
+            return DimensionSpecialEffects.SkyType.OVERWORLD;
+        } else {
+            return original.call();
+        }
     }
 }
