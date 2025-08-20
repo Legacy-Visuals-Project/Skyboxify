@@ -1,36 +1,31 @@
 {
 	"schemaVersion": 1,
-	"id": "optiboxes",
+	"id": "${id}",
 	"version": "${version}",
-	"name": "Optiboxes",
-	"description": "A skybox mod that allows you to use Optifine skies in Fabric 1.21+",
+	"name": "${name}",
+	"description": "${description}",
 	"authors": [
 		"lowercasebtw",
 		"FlashyReese",
 		"AMereBagatelle"
 	],
 	"icon": "assets/optiboxes/icon.png",
-	"license": "GPL-3.0",
+	"license": "${license}",
 	"environment": "client",
-	"entrypoints": {
-		"client": [
-			"btw.lowercase.optiboxes.OptiBoxesClient"
-		],
-		"modmenu": [
-			"btw.lowercase.optiboxes.config.ModMenuIntegration"
-		]
-	},
-	"mixins": [
-		"optiboxes.mixins.json"
-	],
 	"depends": {
-		"fabricloader": ">=0.16.5",
-		"minecraft": [
-			">1.21.8",
-			"<1.22",
-			"<1.21.10"
-		],
+		"fabricloader": ">=${fabric_loader_version}",
+		"minecraft": "${mcdep}",
 		"fabric-resource-loader-v0": "*",
 		"fabric-command-api-v2": "*"
+	},
+	"custom": {
+		"modmenu": {
+			"links": {
+				"modmenu.discord": "${discord}",
+				"modmenu.modrinth": "${modrinth}",
+				"modmenu.curseforge": "${curseforge}"
+			},
+			"update_checker": true
+		}
 	}
 }
