@@ -3,7 +3,6 @@ package btw.lowercase.optiboxes.skybox;
 import btw.lowercase.optiboxes.OptiBoxesClient;
 import btw.lowercase.optiboxes.mixins.RenderPipelinesAccessor;
 import btw.lowercase.optiboxes.utils.CommonUtils;
-import btw.lowercase.optiboxes.utils.DynamicTransformsBuilder;
 import btw.lowercase.optiboxes.utils.IrisUtil;
 import btw.lowercase.optiboxes.utils.UVRange;
 import com.mojang.blaze3d.buffers.GpuBuffer;
@@ -107,13 +106,13 @@ public final class OptiFineSkyRenderer {
 
             //? >=1.21.5 {
             //? >=1.21.6 {
-            com.mojang.blaze3d.buffers.GpuBufferSlice transforms = DynamicTransformsBuilder.of()
+            com.mojang.blaze3d.buffers.GpuBufferSlice transforms = btw.lowercase.optiboxes.utils.DynamicTransformsBuilder.of()
                     .withModelViewMatrix(modelViewStack)
                     .withShaderColor(shaderColor)
                     .build();
-            //? else {
-            // RenderSystem.setShaderColor(shaderColor.x, shaderColor.y, shaderColor.z, shaderColor.w);
-            //? }
+            //?} else {
+            /*RenderSystem.setShaderColor(shaderColor.x, shaderColor.y, shaderColor.z, shaderColor.w);
+            *///?}
 
             RenderPipeline renderPipeline = this.renderPipelineCache.computeIfAbsent(optiFineSkyLayer.source(), (resourceLocation) -> {
                 RenderPipeline pipeline = getSkyboxPipeline(optiFineSkyLayer.blend().getBlendFunction().toNative());
@@ -133,11 +132,11 @@ public final class OptiFineSkyRenderer {
                 //? >=1.21.6 {
                 RenderSystem.bindDefaultUniforms(renderPass);
                 renderPass.setUniform("DynamicTransforms", transforms);
-                //? }
+                //?}
                 renderPass.bindSampler("Sampler0", texture);
                 renderPass.drawIndexed(0, 0, this.skyBufferIndexCount, 1);
             }
-            //? }
+            //?}
 
             modelViewStack.popMatrix();
         }
