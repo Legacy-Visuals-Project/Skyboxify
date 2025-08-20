@@ -26,7 +26,6 @@ class Dependencies {
     val neoforgeVersion = property("deps.neoforge_version")
     val fabricLoaderVersion = property("deps.fabric_loader_version")
     val fabricApiVersion = property("deps.fabric_api_version")
-    val modmenuVersion = property("deps.modmenu_version")
     val devauthVersion = property("deps.devauth_version")
     val mixinconstraintsVersion = property("deps.mixinconstraints_version")
     val mixinsquaredVersion = property("deps.mixinsquared_version")
@@ -66,7 +65,8 @@ loom {
 
     runConfigs.all {
         ideConfigGenerated(stonecutter.current.isActive)
-        runDir = "../../run" // This sets the run folder for all mc versions to the same folder. Remove this line if you want individual run folders.
+        runDir =
+            "../../run" // This sets the run folder for all mc versions to the same folder. Remove this line if you want individual run folders.
     }
 
     runConfigs.remove(runConfigs["server"]) // Removes server run configs
@@ -130,7 +130,7 @@ dependencies {
     if (loader.isFabric) {
         modImplementation("net.fabricmc:fabric-loader:${deps.fabricLoaderVersion}")!!
         modImplementation("net.fabricmc.fabric-api:fabric-api:${deps.fabricApiVersion}+${mc.version}")
-        modImplementation("com.terraformersmc:modmenu:${deps.modmenuVersion}")
+        modImplementation(fletchingTable.modrinth("modmenu", "${mc.version}", "fabric"))
     } else if (loader.isNeoforge) {
         "neoForge"("net.neoforged:neoforge:${deps.neoforgeVersion}")
     }
@@ -165,12 +165,10 @@ publishMods {
         modrinth {
             projectId = property("publish.modrinth").toString()
             accessToken = findProperty("modrinth.token").toString()
-
             if (rangeRegex.matches(mc.dep)) {
                 val match = rangeRegex.find(mc.dep)!!
                 val minVersion = match.groupValues[1]
                 val maxVersion = match.groupValues.getOrNull(2)?.takeIf { it.isNotBlank() } ?: "latest"
-
                 minecraftVersionRange {
                     start = minVersion
                     end = maxVersion
@@ -181,7 +179,7 @@ publishMods {
 
             if (loader.isFabric) {
                 requires("fabric-api")
-                requires("modmenu")
+                optional("modmenu")
             }
         }
     }
@@ -190,12 +188,10 @@ publishMods {
         curseforge {
             projectId = property("publish.curseforge").toString()
             accessToken = findProperty("curseforge.token").toString()
-
             if (rangeRegex.matches(mc.dep)) {
                 val match = rangeRegex.find(mc.dep)!!
                 val minVersion = match.groupValues[1]
                 val maxVersion = match.groupValues.getOrNull(2)?.takeIf { it.isNotBlank() } ?: "latest"
-
                 minecraftVersionRange {
                     start = minVersion
                     end = maxVersion
@@ -234,7 +230,6 @@ tasks.processResources {
 
         if (loader.isFabric) {
             put("fabric_loader_version", deps.fabricLoaderVersion)
-            put("modmenu_version", deps.modmenuVersion)
         }
 
         if (loader.isNeoforge) {

@@ -9,6 +9,7 @@ import btw.lowercase.optiboxes.utils.SkyboxResourceHelper;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.JsonOps;
+import dev.kikugie.fletching_table.annotation.fabric.Entrypoint;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
@@ -29,6 +30,7 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Entrypoint
 public final class OptiBoxesClient implements ClientModInitializer {
     public static final String MOD_ID = "optiboxes";
 
