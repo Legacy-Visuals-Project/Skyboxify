@@ -1,14 +1,17 @@
 package btw.lowercase.optiboxes.mixins;
 
-import com.mojang.blaze3d.pipeline.RenderPipeline;
-import net.minecraft.client.renderer.RenderPipelines;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin(RenderPipelines.class)
+//? >= 1.21.5 {
+@Mixin(net.minecraft.client.renderer.RenderPipelines.class)
 public interface RenderPipelinesAccessor {
     @Accessor("MATRICES_PROJECTION_SNIPPET")
-    static RenderPipeline.Snippet optiboxes$getMatricesProjectionSnippet() {
+    static com.mojang.blaze3d.pipeline.RenderPipeline.Snippet optiboxes$getMatricesProjectionSnippet() {
         return null;
     }
 }
+//? else {
+// public interface RenderPipelinesAccessor {
+// }
+//? }

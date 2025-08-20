@@ -7,7 +7,6 @@ import btw.lowercase.optiboxes.utils.DynamicTransformsBuilder;
 import btw.lowercase.optiboxes.utils.IrisUtil;
 import btw.lowercase.optiboxes.utils.UVRange;
 import com.mojang.blaze3d.buffers.GpuBuffer;
-import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.pipeline.BlendFunction;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.pipeline.RenderTarget;
@@ -20,11 +19,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
-import org.joml.AxisAngle4f;
-import org.joml.Matrix4f;
-import org.joml.Matrix4fStack;
-import org.joml.Quaternionf;
+import org.joml.*;
 
+import java.lang.Math;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.OptionalDouble;
@@ -106,13 +103,20 @@ public final class OptiFineSkyRenderer {
                 modelViewStack.rotate(new Quaternionf(new AxisAngle4f(this.getAngle(level, skyAngle, optiFineSkyLayer.speed()), optiFineSkyLayer.axis())));
             }
 
-            GpuBufferSlice transforms = DynamicTransformsBuilder.of()
+            Vector4f shaderColor = optiFineSkyLayer.blend().getShaderColor(finalAlpha);
+
+            //? >=1.21.5 {
+            //? >=1.21.6 {
+            com.mojang.blaze3d.buffers.GpuBufferSlice transforms = DynamicTransformsBuilder.of()
                     .withModelViewMatrix(modelViewStack)
-                    .withShaderColor(optiFineSkyLayer.blend().getShaderColor(finalAlpha))
+                    .withShaderColor(shaderColor)
                     .build();
+            //? else {
+            // RenderSystem.setShaderColor(shaderColor.x, shaderColor.y, shaderColor.z, shaderColor.w);
+            //? }
 
             RenderPipeline renderPipeline = this.renderPipelineCache.computeIfAbsent(optiFineSkyLayer.source(), (resourceLocation) -> {
-                RenderPipeline pipeline = getSkyboxPipeline(optiFineSkyLayer.blend().getBlendFunction());
+                RenderPipeline pipeline = getSkyboxPipeline(optiFineSkyLayer.blend().getBlendFunction().toNative());
                 IrisUtil.assignPipeline(pipeline, IrisUtil.skyTextured());
                 return pipeline;
             });
@@ -126,11 +130,14 @@ public final class OptiFineSkyRenderer {
                 renderPass.setPipeline(renderPipeline);
                 renderPass.setVertexBuffer(0, this.skyBuffer);
                 renderPass.setIndexBuffer(indexBuffer, this.skyBufferIndices.type());
+                //? >=1.21.6 {
                 RenderSystem.bindDefaultUniforms(renderPass);
                 renderPass.setUniform("DynamicTransforms", transforms);
+                //? }
                 renderPass.bindSampler("Sampler0", texture);
                 renderPass.drawIndexed(0, 0, this.skyBufferIndexCount, 1);
             }
+            //? }
 
             modelViewStack.popMatrix();
         }

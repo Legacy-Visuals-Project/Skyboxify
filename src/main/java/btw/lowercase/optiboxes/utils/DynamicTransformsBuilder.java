@@ -1,7 +1,5 @@
 package btw.lowercase.optiboxes.utils;
 
-import com.mojang.blaze3d.buffers.GpuBufferSlice;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.util.ARGB;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -61,13 +59,15 @@ public final class DynamicTransformsBuilder {
         return this;
     }
 
-    public GpuBufferSlice build() {
-        return RenderSystem.getDynamicUniforms().writeTransform(
-                this.modelViewMatrix.orElse(RenderSystem.getModelViewMatrix()),
+    //? >=1.21.6 {
+    public com.mojang.blaze3d.buffers.GpuBufferSlice build() {
+        return com.mojang.blaze3d.systems.RenderSystem.getDynamicUniforms().writeTransform(
+                this.modelViewMatrix.orElse(com.mojang.blaze3d.systems.RenderSystem.getModelViewMatrix()),
                 this.colorModulator.orElse(new Vector4f(1.0F, 1.0F, 1.0F, 1.0F)),
                 this.modelOffset.orElse(new Vector3f()),
-                this.textureMatrix.orElse(RenderSystem.getTextureMatrix()),
-                this.lineWidth.orElse(RenderSystem.getShaderLineWidth())
+                this.textureMatrix.orElse(com.mojang.blaze3d.systems.RenderSystem.getTextureMatrix()),
+                this.lineWidth.orElse(com.mojang.blaze3d.systems.RenderSystem.getShaderLineWidth())
         );
     }
+    //? }
 }
