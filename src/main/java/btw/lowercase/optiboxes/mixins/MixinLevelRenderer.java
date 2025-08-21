@@ -6,7 +6,6 @@ import btw.lowercase.optiboxes.skybox.SkyboxManager;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.framegraph.FrameGraphBuilder;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -41,7 +40,16 @@ public abstract class MixinLevelRenderer {
     private float optiboxes$tickDelta;
 
     @Inject(method = "addSkyPass", at = @At("HEAD"))
-    private void optiboxes$getLocals(FrameGraphBuilder frameGraphBuilder, Camera camera, float tickDelta, GpuBufferSlice gpuBufferSlice, CallbackInfo ci) {
+    private void optiboxes$getLocals(
+            FrameGraphBuilder frameGraphBuilder,
+            Camera camera,
+            float tickDelta,
+            //? >=1.21.6 {
+            /*com.mojang.blaze3d.buffers.GpuBufferSlice gpuBufferSlice,
+            *///?} else {
+            FogParameters gpuBufferSlice,
+            //?}
+            CallbackInfo ci) {
         this.optiboxes$tickDelta = tickDelta;
     }
 
@@ -69,8 +77,29 @@ public abstract class MixinLevelRenderer {
         }
     }
 
-    @WrapOperation(method = "method_62215", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunMoonAndStars(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;FIFF)V"))
-    private void optiboxes$renderSkyboxes(SkyRenderer instance, PoseStack poseStack, MultiBufferSource.BufferSource bufferSource, float timeOfDay, int moonPhases, float rainLevel, float starBrightness, Operation<Void> original) {
+    @WrapOperation(
+            method = "method_62215",
+            at = @At(
+                    value = "INVOKE",
+                    //? >=1.21.6 {
+                    /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunMoonAndStars(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;FIFF)V"
+                    *///?} else {
+                    target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunMoonAndStars(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;FIFFLnet/minecraft/client/renderer/FogParameters;)V"
+                    //?}
+            )
+    )
+    private void optiboxes$renderSkyboxes(
+            SkyRenderer instance,
+            PoseStack poseStack,
+            MultiBufferSource.BufferSource bufferSource,
+            float timeOfDay,
+            int moonPhases,
+            float rainLevel,
+            float starBrightness,
+            //? <1.21.6
+            FogParameters fog,
+            Operation<Void> original
+    ) {
         if (SkyboxManager.INSTANCE.isEnabled(this.level)) {
             List<OptiFineSkybox> activeSkyboxes = SkyboxManager.INSTANCE.getActiveSkyboxes();
             Matrix4fStack modelViewStack = RenderSystem.getModelViewStack();
@@ -83,7 +112,17 @@ public abstract class MixinLevelRenderer {
             modelViewStack.popMatrix();
         }
 
-        original.call(instance, poseStack, bufferSource, timeOfDay, moonPhases, rainLevel, starBrightness);
+        original.call(
+                instance,
+                poseStack,
+                bufferSource,
+                timeOfDay,
+                moonPhases,
+                rainLevel,
+                starBrightness
+                //? <1.21.6
+                , fog
+        );
     }
 
     @WrapWithCondition(method = "method_62215", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;endBatch()V"))

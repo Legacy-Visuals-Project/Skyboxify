@@ -25,8 +25,24 @@ public abstract class MixinSkyRenderer {
         return !OptiBoxesClient.getConfig().enabled.isEnabled() || OptiBoxesClient.getConfig().renderSunMoon.isEnabled();
     }
 
-    @WrapWithCondition(method = "renderSunMoonAndStars", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SkyRenderer;renderStars(FLcom/mojang/blaze3d/vertex/PoseStack;)V"))
-    private boolean uniskies$toggleStars(SkyRenderer instance, float starBrightness, PoseStack poseStack) {
+    @WrapWithCondition(
+            method = "renderSunMoonAndStars",
+            at = @At(
+                    value = "INVOKE",
+                    //? >=1.21.6 {
+                    /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderStars(FLcom/mojang/blaze3d/vertex/PoseStack;)V"
+                    *///?} else {
+                    target = "Lnet/minecraft/client/renderer/SkyRenderer;renderStars(Lnet/minecraft/client/renderer/FogParameters;FLcom/mojang/blaze3d/vertex/PoseStack;)V"
+                    //?}
+            )
+    )
+    private boolean uniskies$toggleStars(
+            SkyRenderer instance,
+            //? <1.21.6
+            net.minecraft.client.renderer.FogParameters fog,
+            float starBrightness,
+            PoseStack poseStack
+    ) {
         return !OptiBoxesClient.getConfig().enabled.isEnabled() || OptiBoxesClient.getConfig().renderStars.isEnabled();
     }
 }
