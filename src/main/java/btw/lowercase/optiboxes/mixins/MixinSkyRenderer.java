@@ -30,16 +30,16 @@ public abstract class MixinSkyRenderer {
             at = @At(
                     value = "INVOKE",
                     //? >=1.21.6 {
-                    /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderStars(FLcom/mojang/blaze3d/vertex/PoseStack;)V"
-                    *///?} else {
-                    target = "Lnet/minecraft/client/renderer/SkyRenderer;renderStars(Lnet/minecraft/client/renderer/FogParameters;FLcom/mojang/blaze3d/vertex/PoseStack;)V"
-                    //?}
+                    target = "Lnet/minecraft/client/renderer/SkyRenderer;renderStars(FLcom/mojang/blaze3d/vertex/PoseStack;)V"
+                    //?} else {
+                    /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderStars(Lnet/minecraft/client/renderer/FogParameters;FLcom/mojang/blaze3d/vertex/PoseStack;)V"
+                    *///?}
             )
     )
     private boolean uniskies$toggleStars(
             SkyRenderer instance,
             //? <1.21.6
-            net.minecraft.client.renderer.FogParameters fog,
+            /*net.minecraft.client.renderer.FogParameters fog,*/
             float starBrightness,
             PoseStack poseStack
     ) {

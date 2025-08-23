@@ -45,10 +45,10 @@ public abstract class MixinLevelRenderer {
             Camera camera,
             float tickDelta,
             //? >=1.21.6 {
-            /*com.mojang.blaze3d.buffers.GpuBufferSlice gpuBufferSlice,
-            *///?} else {
-            FogParameters gpuBufferSlice,
-            //?}
+            com.mojang.blaze3d.buffers.GpuBufferSlice gpuBufferSlice,
+            //?} else {
+            /*FogParameters gpuBufferSlice,
+            *///?}
             CallbackInfo ci) {
         this.optiboxes$tickDelta = tickDelta;
     }
@@ -82,10 +82,10 @@ public abstract class MixinLevelRenderer {
             at = @At(
                     value = "INVOKE",
                     //? >=1.21.6 {
-                    /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunMoonAndStars(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;FIFF)V"
-                    *///?} else {
-                    target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunMoonAndStars(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;FIFFLnet/minecraft/client/renderer/FogParameters;)V"
-                    //?}
+                    target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunMoonAndStars(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;FIFF)V"
+                    //?} else {
+                    /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunMoonAndStars(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;FIFFLnet/minecraft/client/renderer/FogParameters;)V"
+                    *///?}
             )
     )
     private void optiboxes$renderSkyboxes(
@@ -97,7 +97,7 @@ public abstract class MixinLevelRenderer {
             float rainLevel,
             float starBrightness,
             //? <1.21.6
-            FogParameters fog,
+            /*FogParameters fog,*/
             Operation<Void> original
     ) {
         if (SkyboxManager.INSTANCE.isEnabled(this.level)) {
@@ -121,7 +121,7 @@ public abstract class MixinLevelRenderer {
                 rainLevel,
                 starBrightness
                 //? <1.21.6
-                , fog
+                /*, fog*/
         );
     }
 
