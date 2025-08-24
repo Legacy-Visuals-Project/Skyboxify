@@ -5,7 +5,6 @@ import btw.lowercase.optiboxes.utils.UVRange;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.CoreShaders;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import org.joml.AxisAngle4f;
@@ -22,7 +21,7 @@ public final class OptiFineSkyRenderer {
     private int skyBufferIndexCount;
     //?} else {
     /*private com.mojang.blaze3d.vertex.VertexBuffer skyBuffer;
-    *///?}
+     *///?}
 
     private OptiFineSkyRenderer() {
         Minecraft.getInstance().schedule(this::buildSky);
@@ -68,7 +67,7 @@ public final class OptiFineSkyRenderer {
     }
 
     //? >=1.21.5 {
-    private final Map<ResourceLocation, com.mojang.blaze3d.pipeline.RenderPipeline> renderPipelineCache = new HashMap<>();
+    private final java.util.Map<net.minecraft.resources.ResourceLocation, com.mojang.blaze3d.pipeline.RenderPipeline> renderPipelineCache = new java.util.HashMap<>();
 
     public static com.mojang.blaze3d.pipeline.RenderPipeline getSkyboxPipeline(@org.jetbrains.annotations.Nullable btw.lowercase.optiboxes.utils.BlendFunction blendFunction) {
         com.mojang.blaze3d.pipeline.RenderPipeline.Builder builder = com.mojang.blaze3d.pipeline.RenderPipeline.builder(btw.lowercase.optiboxes.mixins.RenderPipelinesAccessor.optiboxes$getMatricesProjectionSnippet());
@@ -102,7 +101,7 @@ public final class OptiFineSkyRenderer {
 
         //? <=1.21.5 {
         /*btw.lowercase.optiboxes.utils.components.Blend.ADD.apply(1.0F - rainLevel);
-        *///?}
+         *///?}
     }
 
     public void renderSkyLayer(OptiFineSkyLayer optiFineSkyLayer, Matrix4fStack modelViewStack, Level level, int timeOfDay, float skyAngle, float rainGradient, float thunderGradient, float conditionAlpha) {
@@ -123,7 +122,7 @@ public final class OptiFineSkyRenderer {
                     .build();
             //?} else {
             /*RenderSystem.setShaderTexture(0, optiFineSkyLayer.source());
-            RenderSystem.setShader(CoreShaders.POSITION_TEX);
+            RenderSystem.setShader(net.minecraft.client.renderer.CoreShaders.POSITION_TEX);
             optiFineSkyLayer.blend().apply(finalAlpha);
             *///?}
 
@@ -135,6 +134,7 @@ public final class OptiFineSkyRenderer {
             });
 
             com.mojang.blaze3d.pipeline.RenderTarget renderTarget = Minecraft.getInstance().getMainRenderTarget();
+            net.minecraft.client.renderer.texture.AbstractTexture skyTexture = Minecraft.getInstance().getTextureManager().getTexture(optiFineSkyLayer.source());
 
             //? >=1.21.6 {
             com.mojang.blaze3d.textures.GpuTextureView texture = skyTexture.getTextureView();
@@ -146,7 +146,6 @@ public final class OptiFineSkyRenderer {
             com.mojang.blaze3d.textures.GpuTexture depthTexture = renderTarget.getDepthTexture();
             *///?}
 
-            net.minecraft.client.renderer.texture.AbstractTexture skyTexture = Minecraft.getInstance().getTextureManager().getTexture(optiFineSkyLayer.source());
             com.mojang.blaze3d.buffers.GpuBuffer indexBuffer = this.skyBufferIndices.getBuffer(this.skyBufferIndexCount);
             try (com.mojang.blaze3d.systems.RenderPass renderPass = RenderSystem.getDevice()
                     .createCommandEncoder()
@@ -154,9 +153,9 @@ public final class OptiFineSkyRenderer {
                             //? >=1.21.6
                             () -> "Custom Sky Rendering",
                             colorTexture,
-                            OptionalInt.empty(),
+                            java.util.OptionalInt.empty(),
                             depthTexture,
-                            OptionalDouble.empty()
+                            java.util.OptionalDouble.empty()
                     )) {
                 renderPass.setPipeline(renderPipeline);
                 renderPass.setVertexBuffer(0, this.skyBuffer);
@@ -197,6 +196,6 @@ public final class OptiFineSkyRenderer {
     public void clearCache() {
         //? >=1.21.5 {
         this.renderPipelineCache.clear();
-         //?}
+        //?}
     }
 }
