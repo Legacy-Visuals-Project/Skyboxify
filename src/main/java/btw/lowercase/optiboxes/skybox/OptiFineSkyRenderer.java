@@ -1,36 +1,28 @@
 package btw.lowercase.optiboxes.skybox;
 
-import btw.lowercase.optiboxes.OptiBoxesClient;
-import btw.lowercase.optiboxes.mixins.RenderPipelinesAccessor;
 import btw.lowercase.optiboxes.utils.CommonUtils;
-import btw.lowercase.optiboxes.utils.IrisUtil;
 import btw.lowercase.optiboxes.utils.UVRange;
-import btw.lowercase.optiboxes.utils.components.Blend;
-import com.mojang.blaze3d.buffers.GpuBuffer;
-import com.mojang.blaze3d.pipeline.RenderTarget;
-import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.AbstractTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.CoreShaders;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.Nullable;
-import org.joml.*;
-
-import java.lang.Math;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.OptionalDouble;
-import java.util.OptionalInt;
+import org.joml.AxisAngle4f;
+import org.joml.Matrix4f;
+import org.joml.Matrix4fStack;
+import org.joml.Quaternionf;
 
 public final class OptiFineSkyRenderer {
     public static final OptiFineSkyRenderer INSTANCE = new OptiFineSkyRenderer();
 
-    private GpuBuffer skyBuffer;
+    //? >=1.21.5 {
+    private com.mojang.blaze3d.buffers.GpuBuffer skyBuffer;
     private RenderSystem.AutoStorageIndexBuffer skyBufferIndices;
     private int skyBufferIndexCount;
+    //?} else {
+    /*private com.mojang.blaze3d.vertex.VertexBuffer skyBuffer;
+    *///?}
 
     private OptiFineSkyRenderer() {
         Minecraft.getInstance().schedule(this::buildSky);
@@ -52,29 +44,37 @@ public final class OptiFineSkyRenderer {
             builder.addVertex(CommonUtils.getMatrixTransform(matrix4f, quadSize, -quadSize, -quadSize)).setUv(uvRange.maxU(), uvRange.minV());
         }
 
+        //? >=1.21.5
         skyBufferIndices = RenderSystem.getSequentialBuffer(vertexFormatMode);
         try (MeshData meshData = builder.buildOrThrow()) {
+            //? >=1.21.5 {
             skyBufferIndexCount = meshData.drawState().indexCount();
             skyBuffer = RenderSystem.getDevice().createBuffer(
                     () -> "OptiFine Skybox",
                     //? >=1.21.6 {
-                    GpuBuffer.USAGE_COPY_DST,
+                    com.mojang.blaze3d.buffers.GpuBuffer.USAGE_COPY_DST,
                     //?} else {
                     /*com.mojang.blaze3d.buffers.BufferType.VERTICES, com.mojang.blaze3d.buffers.BufferUsage.STATIC_WRITE,
-                    *///?}
+                     *///?}
                     meshData.vertexBuffer()
             );
+            //?} else {
+            /*skyBuffer = new com.mojang.blaze3d.vertex.VertexBuffer(com.mojang.blaze3d.buffers.BufferUsage.STATIC_WRITE);
+            skyBuffer.bind();
+            skyBuffer.upload(meshData);
+            com.mojang.blaze3d.vertex.VertexBuffer.unbind();
+            *///?}
         }
     }
 
     //? >=1.21.5 {
     private final Map<ResourceLocation, com.mojang.blaze3d.pipeline.RenderPipeline> renderPipelineCache = new HashMap<>();
 
-    public static com.mojang.blaze3d.pipeline.RenderPipeline getSkyboxPipeline(@Nullable btw.lowercase.optiboxes.utils.BlendFunction blendFunction) {
-        com.mojang.blaze3d.pipeline.RenderPipeline.Builder builder = com.mojang.blaze3d.pipeline.RenderPipeline.builder(RenderPipelinesAccessor.optiboxes$getMatricesProjectionSnippet());
-        builder.withLocation(OptiBoxesClient.id("pipeline/custom_skybox"));
-        builder.withVertexShader(OptiBoxesClient.id("core/custom_skybox"));
-        builder.withFragmentShader(OptiBoxesClient.id("core/custom_skybox"));
+    public static com.mojang.blaze3d.pipeline.RenderPipeline getSkyboxPipeline(@org.jetbrains.annotations.Nullable btw.lowercase.optiboxes.utils.BlendFunction blendFunction) {
+        com.mojang.blaze3d.pipeline.RenderPipeline.Builder builder = com.mojang.blaze3d.pipeline.RenderPipeline.builder(btw.lowercase.optiboxes.mixins.RenderPipelinesAccessor.optiboxes$getMatricesProjectionSnippet());
+        builder.withLocation(btw.lowercase.optiboxes.OptiBoxesClient.id("pipeline/custom_skybox"));
+        builder.withVertexShader(btw.lowercase.optiboxes.OptiBoxesClient.id("core/custom_skybox"));
+        builder.withFragmentShader(btw.lowercase.optiboxes.OptiBoxesClient.id("core/custom_skybox"));
         builder.withDepthWrite(false);
         builder.withColorWrite(true, false);
         if (blendFunction != null) {
@@ -101,8 +101,7 @@ public final class OptiFineSkyRenderer {
         }
 
         //? <=1.21.5 {
-        /*Vector4f shaderColor = Blend.ADD.getShaderColor(1.0F - rainLevel);
-        RenderSystem.setShaderColor(shaderColor.x, shaderColor.y, shaderColor.z, shaderColor.w);
+        /*btw.lowercase.optiboxes.utils.components.Blend.ADD.apply(1.0F - rainLevel);
         *///?}
     }
 
@@ -117,26 +116,25 @@ public final class OptiFineSkyRenderer {
                 modelViewStack.rotate(new Quaternionf(new AxisAngle4f(this.getAngle(level, skyAngle, optiFineSkyLayer.speed()), optiFineSkyLayer.axis())));
             }
 
-            Vector4f shaderColor = optiFineSkyLayer.blend().getShaderColor(finalAlpha);
-            AbstractTexture skyTexture = Minecraft.getInstance().getTextureManager().getTexture(optiFineSkyLayer.source());
-
             //? >=1.21.6 {
             com.mojang.blaze3d.buffers.GpuBufferSlice transforms = btw.lowercase.optiboxes.utils.DynamicTransformsBuilder.of()
                     .withModelViewMatrix(modelViewStack)
-                    .withShaderColor(shaderColor)
+                    .withShaderColor(optiFineSkyLayer.blend().getShaderColor(finalAlpha))
                     .build();
             //?} else {
-            /*RenderSystem.setShaderColor(shaderColor.x, shaderColor.y, shaderColor.z, shaderColor.w);
+            /*RenderSystem.setShaderTexture(0, optiFineSkyLayer.source());
+            RenderSystem.setShader(CoreShaders.POSITION_TEX);
+            optiFineSkyLayer.blend().apply(finalAlpha);
             *///?}
 
             //? >=1.21.5 {
             com.mojang.blaze3d.pipeline.RenderPipeline renderPipeline = this.renderPipelineCache.computeIfAbsent(optiFineSkyLayer.source(), (resourceLocation) -> {
                 com.mojang.blaze3d.pipeline.RenderPipeline pipeline = getSkyboxPipeline(optiFineSkyLayer.blend().getBlendFunction());
-                IrisUtil.assignPipeline(pipeline, IrisUtil.skyTextured());
+                btw.lowercase.optiboxes.utils.IrisUtil.assignPipeline(pipeline, btw.lowercase.optiboxes.utils.IrisUtil.skyTextured());
                 return pipeline;
             });
 
-            RenderTarget renderTarget = Minecraft.getInstance().getMainRenderTarget();
+            com.mojang.blaze3d.pipeline.RenderTarget renderTarget = Minecraft.getInstance().getMainRenderTarget();
 
             //? >=1.21.6 {
             com.mojang.blaze3d.textures.GpuTextureView texture = skyTexture.getTextureView();
@@ -148,8 +146,9 @@ public final class OptiFineSkyRenderer {
             com.mojang.blaze3d.textures.GpuTexture depthTexture = renderTarget.getDepthTexture();
             *///?}
 
-            GpuBuffer indexBuffer = this.skyBufferIndices.getBuffer(this.skyBufferIndexCount);
-            try (RenderPass renderPass = RenderSystem.getDevice()
+            net.minecraft.client.renderer.texture.AbstractTexture skyTexture = Minecraft.getInstance().getTextureManager().getTexture(optiFineSkyLayer.source());
+            com.mojang.blaze3d.buffers.GpuBuffer indexBuffer = this.skyBufferIndices.getBuffer(this.skyBufferIndexCount);
+            try (com.mojang.blaze3d.systems.RenderPass renderPass = RenderSystem.getDevice()
                     .createCommandEncoder()
                     .createRenderPass(
                             //? >=1.21.6
@@ -169,13 +168,15 @@ public final class OptiFineSkyRenderer {
                 renderPass.bindSampler("Sampler0", texture);
                 //? >=1.21.6 {
                 renderPass.drawIndexed(0, 0, this.skyBufferIndexCount, 1);
-                 //?} else {
+                //?} else {
                 /*renderPass.drawIndexed(0, this.skyBufferIndexCount);
-                *///?}
+                 *///?}
             }
             //?} else {
-
-            //?}
+            /*this.skyBuffer.bind();
+            this.skyBuffer.drawWithShader(modelViewStack, RenderSystem.getProjectionMatrix(), RenderSystem.getShader());
+            com.mojang.blaze3d.vertex.VertexBuffer.unbind();
+            *///?}
 
             modelViewStack.popMatrix();
         }
@@ -196,6 +197,6 @@ public final class OptiFineSkyRenderer {
     public void clearCache() {
         //? >=1.21.5 {
         this.renderPipelineCache.clear();
-        //?}
+         //?}
     }
 }

@@ -40,6 +40,19 @@ public enum Blend {
         return this.blendConsumer.apply(value);
     }
 
+    //? <=1.21.5 {
+    /*public void apply(float value) {
+        final Vector4f shaderColor = getShaderColor(value);
+        com.mojang.blaze3d.systems.RenderSystem.setShaderColor(shaderColor.x, shaderColor.y, shaderColor.z, shaderColor.w);
+        if (this.blendFunction != null) {
+            com.mojang.blaze3d.systems.RenderSystem.enableBlend();
+            com.mojang.blaze3d.systems.RenderSystem.blendFunc(this.blendFunction.srcFactor(), this.blendFunction.dstFactor());
+        } else {
+            com.mojang.blaze3d.systems.RenderSystem.disableBlend();
+        }
+    }
+    *///?}
+
     public BlendFunction getBlendFunction() {
         return this.blendFunction;
     }
