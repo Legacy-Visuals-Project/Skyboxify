@@ -1,7 +1,10 @@
 package btw.lowercase.lightconfig.lib.v1;
 
 import btw.lowercase.lightconfig.lib.v1.field.*;
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.client.gui.screens.Screen;
 import org.jetbrains.annotations.Nullable;
@@ -14,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Config {
-    protected static final Gson GSON = new GsonBuilder().setPrettyPrinting().setStrictness(Strictness.STRICT).create();
+    protected static final Gson GSON = new GsonBuilder().setPrettyPrinting().setLenient().create();
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
     protected final List<AbstractConfigField<?>> configFields = new ArrayList<>();
     protected final ModContainer modContainer;

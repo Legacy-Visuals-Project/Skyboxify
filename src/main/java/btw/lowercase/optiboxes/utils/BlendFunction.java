@@ -1,6 +1,8 @@
 package btw.lowercase.optiboxes.utils;
 
+//? >=1.21.5 {
 import org.lwjgl.opengl.GL11;
+//?}
 
 public record BlendFunction(int srcFactor, int dstFactor) {
     //? >=1.21.5 {

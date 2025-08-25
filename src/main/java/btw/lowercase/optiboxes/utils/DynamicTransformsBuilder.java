@@ -1,6 +1,5 @@
 package btw.lowercase.optiboxes.utils;
 
-import net.minecraft.util.ARGB;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -38,10 +37,6 @@ public final class DynamicTransformsBuilder {
 
     public DynamicTransformsBuilder withShaderColor(float red, float green, float blue) {
         return this.withShaderColor(new Vector3f(red, green, blue));
-    }
-
-    public DynamicTransformsBuilder withShaderColor(int argb) {
-        return this.withShaderColor(ARGB.redFloat(argb), ARGB.greenFloat(argb), ARGB.blueFloat(argb), ARGB.alphaFloat(argb));
     }
 
     public DynamicTransformsBuilder withModelOffset(Vector3f vector3f) {

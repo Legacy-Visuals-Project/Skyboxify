@@ -3,27 +3,74 @@ package btw.lowercase.optiboxes.mixins;
 import btw.lowercase.optiboxes.OptiBoxesClient;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.mojang.blaze3d.vertex.Tesselator;
 import net.minecraft.client.renderer.SkyRenderer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(SkyRenderer.class)
 public abstract class MixinSkyRenderer {
-    @WrapWithCondition(method = "renderSunMoonAndStars", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSun(FLnet/minecraft/client/renderer/MultiBufferSource;Lcom/mojang/blaze3d/vertex/PoseStack;)V"))
-    private boolean uniskies$toggleSun(SkyRenderer instance, float rainLevel, MultiBufferSource multiBufferSource, PoseStack poseStack) {
+    @WrapWithCondition(
+            method = "renderSunMoonAndStars",
+            at = @At(
+                    value = "INVOKE",
+                    //? >=1.21.4 {
+                    target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSun(FLnet/minecraft/client/renderer/MultiBufferSource;Lcom/mojang/blaze3d/vertex/PoseStack;)V"
+                    //?} else {
+                    /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSun(FLcom/mojang/blaze3d/vertex/Tesselator;Lcom/mojang/blaze3d/vertex/PoseStack;)V"
+                    *///?}
+            )
+    )
+    private boolean uniskies$toggleSun(
+            SkyRenderer instance,
+            float rainLevel,
+            //? >=1.21.4 {
+            net.minecraft.client.renderer.MultiBufferSource multiBufferSource,
+            //?} else {
+            /*Tesselator tesselator,
+            *///?}
+            PoseStack poseStack
+    ) {
         return !OptiBoxesClient.getConfig().enabled.isEnabled() || OptiBoxesClient.getConfig().renderSunMoon.isEnabled();
     }
 
-    @WrapWithCondition(method = "renderSunMoonAndStars", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SkyRenderer;renderMoon(IFLnet/minecraft/client/renderer/MultiBufferSource;Lcom/mojang/blaze3d/vertex/PoseStack;)V"))
-    private boolean uniskies$toggleMoon(SkyRenderer instance, int moonPhases, float rainLevel, MultiBufferSource multiBufferSource, PoseStack poseStack) {
+    @WrapWithCondition(
+            method = "renderSunMoonAndStars",
+            at = @At(
+                    value = "INVOKE",
+                    //? >=1.21.4 {
+                    target = "Lnet/minecraft/client/renderer/SkyRenderer;renderMoon(IFLnet/minecraft/client/renderer/MultiBufferSource;Lcom/mojang/blaze3d/vertex/PoseStack;)V"
+                    //?} else {
+                    /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderMoon(IFLcom/mojang/blaze3d/vertex/Tesselator;Lcom/mojang/blaze3d/vertex/PoseStack;)V"
+                    *///?}
+            )
+    )
+    private boolean uniskies$toggleMoon(
+            SkyRenderer instance,
+            int moonPhases,
+            float rainLevel,
+            //? >=1.21.4 {
+            net.minecraft.client.renderer.MultiBufferSource multiBufferSource,
+            //?} else {
+            /*Tesselator tesselator,
+            *///?}
+            PoseStack poseStack
+    ) {
         return !OptiBoxesClient.getConfig().enabled.isEnabled() || OptiBoxesClient.getConfig().renderSunMoon.isEnabled();
     }
 
-    @WrapWithCondition(method = "renderSunMoonAndStars", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;endBatch()V"))
-    private boolean uniskies$disableBatch(MultiBufferSource.BufferSource instance) {
+    //? >=1.21.4 {
+    @WrapWithCondition(
+            method = "renderSunMoonAndStars",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;endBatch()V"
+            )
+    )
+    private boolean uniskies$disableBatch(net.minecraft.client.renderer.MultiBufferSource.BufferSource instance) {
         return !OptiBoxesClient.getConfig().enabled.isEnabled() || OptiBoxesClient.getConfig().renderSunMoon.isEnabled();
     }
+    //?}
 
     @WrapWithCondition(
             method = "renderSunMoonAndStars",
