@@ -126,15 +126,18 @@ dependencies {
     modRuntimeOnly("me.djtheredstoner:DevAuth-${loader.loader}:${deps.devauthVersion}")
     include(implementation("com.moulberry:mixinconstraints:${deps.mixinconstraintsVersion}")!!)!!
     include(implementation(annotationProcessor("com.github.bawnorton.mixinsquared:mixinsquared-${loader.loader}:${deps.mixinsquaredVersion}")!!)!!)
-
     if (loader.isFabric) {
         modImplementation("net.fabricmc:fabric-loader:${deps.fabricLoaderVersion}")!!
-        modImplementation("net.fabricmc.fabric-api:fabric-api:${deps.fabricApiVersion}+${mc.version}")
-        modImplementation(fletchingTable.modrinth("modmenu", "${mc.version}", "fabric"))
+        modImplementation("net.fabricmc.fabric-api:fabric-api:${deps.fabricApiVersion}")
+        if (project.hasProperty("deps.modmenu_version")) {
+            modImplementation("com.terraformersmc:modmenu:${property("deps.modmenu_version")}")
+        } else {
+            modImplementation(fletchingTable.modrinth("modmenu", "${mc.version}", "fabric"))
+        }
+
     } else if (loader.isNeoforge) {
         "neoForge"("net.neoforged:neoforge:${deps.neoforgeVersion}")
     }
-
 }
 
 // mc_dep fields must be in the format 'x', '>=x', '>=x <=y'
@@ -227,7 +230,6 @@ tasks.processResources {
         put("modrinth", mod.modrinth)
         put("curseforge", mod.curseforge)
         put("discord", mod.discord)
-
         if (loader.isFabric) {
             put("fabric_loader_version", deps.fabricLoaderVersion)
         }

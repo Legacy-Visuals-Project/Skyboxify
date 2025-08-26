@@ -18,8 +18,24 @@ public class SkyboxResourceHelper implements IdentifiableResourceReloadListener 
     private ResourceManager resourceManager;
 
     @Override
-    public @NotNull CompletableFuture<Void> reload(PreparationBarrier preparationBarrier, ResourceManager resourceManager, Executor backgroundExecutor, Executor gameExecutor) {
-        this.resourceManager = resourceManager;
+    public @NotNull CompletableFuture<Void> reload(
+            //? >=1.21.9
+            SharedState sharedState,
+            //? <1.21.9
+            /*PreparationBarrier preparationBarrier,*/
+            //? <1.21.9
+            /*ResourceManager resourceManager,*/
+            Executor backgroundExecutor,
+            //? >=1.21.9
+            PreparationBarrier preparationBarrier,
+            Executor gameExecutor
+    ) {
+        this.resourceManager =
+            //? >=1.21.9 {
+            sharedState.resourceManager();
+            //? } else {
+            /*resourceManager;*/
+            //? }
         return CompletableFuture.runAsync(() -> {
             SkyboxManager.INSTANCE.clearSkyboxes();
             if (OptiBoxesClient.getConfig().enabled.isEnabled()) {
