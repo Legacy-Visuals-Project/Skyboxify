@@ -1,5 +1,4 @@
 [versions]
-
 kotlin-jvm = "2.2.0"
 loom = "1.11-SNAPSHOT"
 publishing = "0.8.4"
@@ -8,7 +7,6 @@ ksp = "2.2.0-2.0.2"
 fletchingtable = "0.1.0-alpha.13"
 
 [plugins]
-
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-jvm" }
 loom = { id = "dev.architectury.loom", version.ref = "loom" }
 publishing = { id = "me.modmuss50.mod-publish-plugin", version.ref = "publishing" }

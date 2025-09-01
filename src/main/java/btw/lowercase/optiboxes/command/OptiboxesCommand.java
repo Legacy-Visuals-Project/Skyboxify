@@ -1,7 +1,7 @@
 package btw.lowercase.optiboxes.command;
 
 import btw.lowercase.optiboxes.OptiBoxesClient;
-import btw.lowercase.optiboxes.TestScreen;
+import btw.lowercase.optiboxes.screens.DimensionsListScreen;
 import btw.lowercase.optiboxes.skybox.OptiFineSkyLayer;
 import btw.lowercase.optiboxes.skybox.OptiFineSkybox;
 import btw.lowercase.optiboxes.skybox.SkyboxManager;
@@ -52,8 +52,8 @@ public class OptiboxesCommand extends LiteralArgumentBuilder<FabricClientCommand
             return Command.SINGLE_SUCCESS;
         }));
 
-        then(ClientCommandManager.literal("test").executes((context) -> {
-            minecraft.schedule(() -> minecraft.setScreen(new TestScreen(minecraft.screen)));
+        then(ClientCommandManager.literal("manage").executes((context) -> {
+            minecraft.schedule(() -> minecraft.setScreen(new DimensionsListScreen(minecraft.screen)));
             return Command.SINGLE_SUCCESS;
         }));
     }

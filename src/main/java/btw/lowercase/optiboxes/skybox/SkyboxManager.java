@@ -48,8 +48,12 @@ public final class SkyboxManager {
         return OptiBoxesClient.getConfig().enabled.isEnabled() && !activeSkyboxes.isEmpty() && level != null;
     }
 
+    public List<OptiFineSkybox> getSkiesFor(ResourceKey<Level> resourceKey) {
+        return getActiveSkyboxes().stream().filter(skybox -> resourceKey.equals(skybox.getWorldResourceKey())).toList();
+    }
+
     public boolean containsEnabled(ResourceKey<Level> resourceKey) {
-        return !getActiveSkyboxes().stream().filter(skybox -> resourceKey.location().equals(skybox.getWorldResourceKey().location())).toList().isEmpty();
+        return !getSkiesFor(resourceKey).isEmpty();
     }
 
     public List<OptiFineSkybox> getActiveSkyboxes() {
