@@ -1,7 +1,7 @@
 package btw.lowercase.optiboxes.command;
 
 import btw.lowercase.optiboxes.OptiBoxesClient;
-import btw.lowercase.optiboxes.config.OptiBoxesConfig;
+import btw.lowercase.optiboxes.TestScreen;
 import btw.lowercase.optiboxes.skybox.OptiFineSkyLayer;
 import btw.lowercase.optiboxes.skybox.OptiFineSkybox;
 import btw.lowercase.optiboxes.skybox.SkyboxManager;
@@ -17,8 +17,9 @@ import java.util.List;
 public class OptiboxesCommand extends LiteralArgumentBuilder<FabricClientCommandSource> {
     public OptiboxesCommand() {
         super("optiboxes");
+
+        Minecraft minecraft = Minecraft.getInstance();
         executes((context) -> {
-            Minecraft minecraft = Minecraft.getInstance();
             minecraft.schedule(() -> minecraft.setScreen(OptiBoxesClient.getConfig().getConfigScreen(minecraft.screen)));
             return Command.SINGLE_SUCCESS;
         });
@@ -48,6 +49,11 @@ public class OptiboxesCommand extends LiteralArgumentBuilder<FabricClientCommand
                 context.getSource().sendFeedback(Component.literal("No skies enabled..."));
             }
 
+            return Command.SINGLE_SUCCESS;
+        }));
+
+        then(ClientCommandManager.literal("test").executes((context) -> {
+            minecraft.schedule(() -> minecraft.setScreen(new TestScreen(minecraft.screen)));
             return Command.SINGLE_SUCCESS;
         }));
     }

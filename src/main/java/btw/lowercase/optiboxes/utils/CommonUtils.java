@@ -26,24 +26,6 @@ public final class CommonUtils {
     private static final Pattern OPTIFINE_RANGE_SEPARATOR = Pattern.compile("(\\d|\\))-(\\d|\\()");
     private static final Logger LOGGER = LoggerFactory.getLogger(CommonUtils.class);
 
-    public static final UVRange[] TEXTURE_UV_RANGE_FACES = new UVRange[]{
-            new UVRange(0.0F, 0.0F, 0.33333334F, 0.5F), // 0 (Bottom)
-            new UVRange(0.33333334F, 0.0F, 0.6666667F, 0.5F), // 1 (Top)
-            new UVRange(0.6666667F, 0.0F, 1.0F, 0.5F), // 2 (East)
-            new UVRange(0.0F, 0.5F, 0.33333334F, 1.0F), // 3 (South)
-            new UVRange(0.33333334F, 0.5F, 0.6666667F, 1.0F), // 4 (West)
-            new UVRange(0.6666667F, 0.5F, 1.0F, 1.0F), // 5 (North)
-    };
-
-    private static final Matrix4f[] MATRIX4F_ROTATED_FACES = new Matrix4f[]{
-            new Matrix4f().rotateY((float) Math.toRadians(90.0F)), // 0 (Bottom)
-            new Matrix4f().rotateX((float) Math.toRadians(180.0F)).rotateY((float) Math.toRadians(-90.0F)), // 1 (Top)
-            new Matrix4f().rotateX((float) Math.toRadians(90.0F)).rotateZ((float) Math.toRadians(90.0F)), // 2 (East)
-            new Matrix4f().rotateX((float) Math.toRadians(90.0F)).rotateZ((float) Math.toRadians(180.0F)), // 3 (South)
-            new Matrix4f().rotateX((float) Math.toRadians(90.0F)).rotateZ((float) Math.toRadians(-90.0F)), // 4 (West)
-            new Matrix4f().rotateX((float) Math.toRadians(90.0F)) // 5 (North)
-    };
-
     private CommonUtils() {
     }
 
@@ -425,22 +407,6 @@ public final class CommonUtils {
         }
 
         return Mth.clamp(weatherAlpha, 0.0F, 1.0F);
-    }
-
-    public static UVRange getUvRangeForFace(int face) {
-        if (face < 0 || face >= TEXTURE_UV_RANGE_FACES.length) {
-            throw new RuntimeException("Face is out of bounds");
-        } else {
-            return TEXTURE_UV_RANGE_FACES[face];
-        }
-    }
-
-    public static Matrix4f getRotationMatrixForFace(int face) {
-        if (face < 0 || face >= MATRIX4F_ROTATED_FACES.length) {
-            throw new RuntimeException("Face is out of bounds");
-        } else {
-            return MATRIX4F_ROTATED_FACES[face];
-        }
     }
 
     public static Vector3f getMatrixTransform(Matrix4f matrix4f, float x, float y, float z) {

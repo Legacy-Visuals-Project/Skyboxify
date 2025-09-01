@@ -1,6 +1,8 @@
 package btw.lowercase.optiboxes.skybox;
 
 import btw.lowercase.optiboxes.utils.CommonUtils;
+import btw.lowercase.optiboxes.utils.SkyMapping;
+import btw.lowercase.optiboxes.utils.SkyPart;
 import btw.lowercase.optiboxes.utils.UVRange;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
@@ -12,8 +14,12 @@ import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
 import org.joml.Quaternionf;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public final class OptiFineSkyRenderer {
     public static final OptiFineSkyRenderer INSTANCE = new OptiFineSkyRenderer();
+    private static final Map<SkyPart, SkyMapping> SKY_MAPPING = new HashMap<>();
 
     //? >=1.21.5 {
     private com.mojang.blaze3d.buffers.GpuBuffer skyBuffer;
@@ -31,11 +37,12 @@ public final class OptiFineSkyRenderer {
         VertexFormat vertexFormat = DefaultVertexFormat.POSITION_TEX;
         VertexFormat.Mode vertexFormatMode = VertexFormat.Mode.QUADS;
 
-        ByteBufferBuilder byteBufferBuilder = new ByteBufferBuilder(vertexFormat.getVertexSize() * 24);
+        ByteBufferBuilder byteBufferBuilder = new ByteBufferBuilder(vertexFormat.getVertexSize() * SkyPart.COUNT * 4);
         BufferBuilder builder = new BufferBuilder(byteBufferBuilder, vertexFormatMode, vertexFormat);
-        for (int face = 0; face < 6; ++face) {
-            UVRange uvRange = CommonUtils.getUvRangeForFace(face);
-            Matrix4f matrix4f = CommonUtils.getRotationMatrixForFace(face);
+        for (SkyPart part : SkyPart.VALUES) {
+            SkyMapping skyMapping = SKY_MAPPING.get(part);
+            Matrix4f matrix4f = skyMapping.rotationMatrix();
+            UVRange uvRange = skyMapping.mapping();
             final float quadSize = 100.0F;
             builder.addVertex(CommonUtils.getMatrixTransform(matrix4f, -quadSize, -quadSize, -quadSize)).setUv(uvRange.minU(), uvRange.minV());
             builder.addVertex(CommonUtils.getMatrixTransform(matrix4f, -quadSize, -quadSize, quadSize)).setUv(uvRange.minU(), uvRange.maxV());
@@ -122,7 +129,7 @@ public final class OptiFineSkyRenderer {
                     .build();
             //?} else {
             /*RenderSystem.setShaderTexture(0, optiFineSkyLayer.source());
-            RenderSystem.setShader(net.minecraft.client.renderer.CoreShaders.POSITION_TEX);
+            RenderSystem.setShader(net.minecraft.client.renderer.CoreShaders.POSITION_TEX); // TODO: Use our custom_skybox shader
             optiFineSkyLayer.blend().apply(finalAlpha);
             *///?}
 
@@ -197,5 +204,32 @@ public final class OptiFineSkyRenderer {
         //? >=1.21.5 {
         this.renderPipelineCache.clear();
         //?}
+    }
+
+    static {
+        SKY_MAPPING.put(SkyPart.BOTTOM, new SkyMapping(
+                new Matrix4f().rotateY((float) Math.toRadians(90.0F)),
+                new UVRange(0.0F, 0.0F, 0.33333334F, 0.5F)
+        ));
+        SKY_MAPPING.put(SkyPart.TOP, new SkyMapping(
+                new Matrix4f().rotateX((float) Math.toRadians(180.0F)).rotateY((float) Math.toRadians(-90.0F)),
+                new UVRange(0.33333334F, 0.0F, 0.6666667F, 0.5F)
+        ));
+        SKY_MAPPING.put(SkyPart.EAST, new SkyMapping(
+                new Matrix4f().rotateX((float) Math.toRadians(90.0F)).rotateZ((float) Math.toRadians(90.0F)),
+                new UVRange(0.6666667F, 0.0F, 1.0F, 0.5F)
+        ));
+        SKY_MAPPING.put(SkyPart.SOUTH, new SkyMapping(
+                new Matrix4f().rotateX((float) Math.toRadians(90.0F)).rotateZ((float) Math.toRadians(180.0F)),
+                new UVRange(0.0F, 0.5F, 0.33333334F, 1.0F)
+        ));
+        SKY_MAPPING.put(SkyPart.WEST, new SkyMapping(
+                new Matrix4f().rotateX((float) Math.toRadians(90.0F)).rotateZ((float) Math.toRadians(-90.0F)),
+                new UVRange(0.33333334F, 0.5F, 0.6666667F, 1.0F)
+        ));
+        SKY_MAPPING.put(SkyPart.NORTH, new SkyMapping(
+                new Matrix4f().rotateX((float) Math.toRadians(90.0F)),
+                new UVRange(0.6666667F, 0.5F, 1.0F, 1.0F)
+        ));
     }
 }
