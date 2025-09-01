@@ -1,46 +1,88 @@
 package btw.lowercase.optiboxes.utils;
 
-import org.joml.Matrix4f;
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.Minecraft;
 import org.joml.Matrix4fStack;
 import org.joml.Vector4f;
 
 public final class Renderer {
-    private static final Renderer INSTANCE = new Renderer();
-
-    private Color shaderColor = new Color();
-    private Matrix4fStack modelViewMatrix;
-    private Matrix4f textureMatrix;
+    private static Color shaderColor = new Color();
+    private static Matrix4fStack modelViewMatrix;
+    //? >=1.21.5 {
+    private static com.mojang.blaze3d.pipeline.RenderPipeline renderPipeline;
+    //? }
 
     public static void setModelViewMatrix(Matrix4fStack matrix4fStack) {
-        INSTANCE.modelViewMatrix = matrix4fStack;
-    }
-
-    public static void setTextureMatrix(Matrix4f matrix4f) {
-        INSTANCE.textureMatrix = matrix4f;
+        modelViewMatrix = matrix4fStack;
     }
 
     public static void setShaderColor(float red, float green, float blue, float alpha) {
-        INSTANCE.shaderColor = new Color(red, green, blue, alpha);
+        shaderColor = new Color(red, green, blue, alpha);
     }
 
     public static void setShaderColor(float red, float green, float blue) {
         setShaderColor(red, green, blue, 1.0F);
     }
 
-    public static void drawWithShader() {
+    //? >=1.21.5 {
+    public static void setRenderPipeline(com.mojang.blaze3d.pipeline.RenderPipeline renderPipeline) {
+        renderPipeline = renderPipeline;
+    }
+    //? } else {
+    /*public static void setShader(CompiledShaderProgram shaderProgram) {
+        RenderSystem.setShader(shaderProgram);
+    }
+    *///? }
+
+    public static void drawWithShader(
+            //? >=1.21.5 {
+            com.mojang.blaze3d.buffers.GpuBuffer vertexBuffer
+            //? else {
+            /*com.mojang.blaze3d.vertex.VertexBuffer vertexBuffer
+             *///? }
+    ) {
         //? >=1.21.5
         //? >=1.21.6
         com.mojang.blaze3d.buffers.GpuBufferSlice transforms = btw.lowercase.optiboxes.utils.DynamicTransformsBuilder.of()
-                .withModelViewMatrix(INSTANCE.modelViewMatrix)
-                .withTextureMatrix(INSTANCE.textureMatrix)
-                .withShaderColor(INSTANCE.shaderColor.vector4f())
+                .withModelViewMatrix(modelViewMatrix)
+                .withShaderColor(shaderColor.vector4f())
                 .build();
+
+        com.mojang.blaze3d.pipeline.RenderTarget renderTarget = Minecraft.getInstance().getMainRenderTarget();
+
+        //? >=1.21.6 {
+        com.mojang.blaze3d.textures.GpuTextureView colorTexture = renderTarget.getColorTextureView();
+        com.mojang.blaze3d.textures.GpuTextureView depthTexture = renderTarget.getDepthTextureView();
+        //?} else {
+        /*com.mojang.blaze3d.textures.GpuTexture colorTexture = renderTarget.getColorTexture();
+        com.mojang.blaze3d.textures.GpuTexture depthTexture = renderTarget.getDepthTexture();
+        *///?}
+
+        try (com.mojang.blaze3d.systems.RenderPass renderPass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
+                //? >=1.21.6
+                () -> "",
+                colorTexture,
+                java.util.OptionalInt.empty(),
+                depthTexture,
+                java.util.OptionalDouble.empty()
+        )) {
+            renderPass.setPipeline(renderPipeline);
+            renderPass.setVertexBuffer(0, vertexBuffer);
+            for (int i = 0; i < 9; ++i) {
+                renderPass.bindSampler("Sampler" + i, RenderSystem.getShaderTexture(i));
+            }
+            //? >=1.21.6
+            renderPass.setUniform("DynamicTransforms", transforms);
+            renderPass.draw(0, vertexBuffer.size()); // TODO: wrong
+        }
+
         //? }
         //? } else {
-        /*
-        RenderSystem.setTextureMatrix(INSTANCE.textureMatrix);
-        RenderSystem.setShaderColor(INSTANCE.shaderColor.red(), INSTANCE.shaderColor.green(), INSTANCE.shaderColor.blue(), INSTANCE.shaderColor.alpha());
-        *///? }
+        /*RenderSystem.setShaderColor(shaderColor.red(), shaderColor.green(), shaderColor.blue(), shaderColor.alpha());
+        vertexBuffer.bind();
+        vertexBuffer.drawWithShader(modelViewMatrix, projectionMatrix, RenderSystem.getShader());
+        com.mojang.blaze3d.vertex.VertexBuffer.unbind();
+         *///? }
     }
 
     private record Color(float red, float green, float blue, float alpha) {
