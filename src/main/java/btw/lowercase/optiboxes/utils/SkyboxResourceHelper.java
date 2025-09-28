@@ -33,9 +33,9 @@ public class SkyboxResourceHelper implements IdentifiableResourceReloadListener 
         this.resourceManager =
             //? >=1.21.9 {
             sharedState.resourceManager();
-            //? } else {
-            /*resourceManager;*/
-            //? }
+            //?} else {
+            /*resourceManager;
+            *///?}
         return CompletableFuture.runAsync(() -> {
             SkyboxManager.INSTANCE.clearSkyboxes();
             if (OptiBoxesClient.getConfig().enabled.isEnabled()) {

@@ -29,6 +29,7 @@ class Dependencies {
     val devauthVersion = property("deps.devauth_version")
     val mixinconstraintsVersion = property("deps.mixinconstraints_version")
     val mixinsquaredVersion = property("deps.mixinsquared_version")
+    val modmenuVersion = property("deps.modmenu_version")
 }
 
 class LoaderData {
@@ -129,12 +130,7 @@ dependencies {
     if (loader.isFabric) {
         modImplementation("net.fabricmc:fabric-loader:${deps.fabricLoaderVersion}")!!
         modImplementation("net.fabricmc.fabric-api:fabric-api:${deps.fabricApiVersion}")
-        if (project.hasProperty("deps.modmenu_version")) {
-            modImplementation("com.terraformersmc:modmenu:${property("deps.modmenu_version")}")
-        } else {
-            modImplementation(fletchingTable.modrinth("modmenu", "${mc.version}", "fabric"))
-        }
-
+        modImplementation("com.terraformersmc:modmenu:${deps.modmenuVersion}")
     } else if (loader.isNeoforge) {
         "neoForge"("net.neoforged:neoforge:${deps.neoforgeVersion}")
     }
@@ -161,9 +157,7 @@ publishMods {
     type = STABLE
 
     modLoaders.add(loader.loader)
-
     dryRun = modrinthId == null && curseforgeId == null
-
     if (modrinthId != null) {
         modrinth {
             projectId = property("publish.modrinth").toString()

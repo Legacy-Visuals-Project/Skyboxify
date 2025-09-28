@@ -1,22 +1,31 @@
 package btw.lowercase.optiboxes.mixins;
 
+import org.spongepowered.asm.mixin.Mixin;
+
+//? >=1.21.2 {
 import btw.lowercase.optiboxes.OptiBoxesClient;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
 import net.minecraft.client.renderer.SkyRenderer;
-import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+//?}
 
+//? >=1.21.2 {
 @Mixin(SkyRenderer.class)
+//?} else {
+/*@Mixin(net.minecraft.client.Minecraft.class)
+*///?}
 public abstract class MixinSkyRenderer {
+    //? >=1.21.2 {
     @WrapWithCondition(
             method = "renderSunMoonAndStars",
             at = @At(
                     value = "INVOKE",
-                    //? >=1.21.4 {
-                    target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSun(FLnet/minecraft/client/renderer/MultiBufferSource;Lcom/mojang/blaze3d/vertex/PoseStack;)V"
-                    //?} else {
+                    //? >=1.21.9 {
+                    target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSun(FLcom/mojang/blaze3d/vertex/PoseStack;)V"
+                    //?} else >=1.21.4 {
+                    /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSun(FLnet/minecraft/client/renderer/MultiBufferSource;Lcom/mojang/blaze3d/vertex/PoseStack;)V"
+                    *///?} else {
                     /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSun(FLcom/mojang/blaze3d/vertex/Tesselator;Lcom/mojang/blaze3d/vertex/PoseStack;)V"
                     *///?}
             )
@@ -24,10 +33,12 @@ public abstract class MixinSkyRenderer {
     private boolean uniskies$toggleSun(
             SkyRenderer instance,
             float rainLevel,
-            //? >=1.21.4 {
+            //? <1.21.9 {
+            /*//? >=1.21.4 {
             net.minecraft.client.renderer.MultiBufferSource multiBufferSource,
-            //?} else {
-            /*Tesselator tesselator,
+             //?} else {
+            /^com.mojang.blaze3d.vertex.Tesselator tesselator,
+             ^///?}
             *///?}
             PoseStack poseStack
     ) {
@@ -38,9 +49,11 @@ public abstract class MixinSkyRenderer {
             method = "renderSunMoonAndStars",
             at = @At(
                     value = "INVOKE",
-                    //? >=1.21.4 {
-                    target = "Lnet/minecraft/client/renderer/SkyRenderer;renderMoon(IFLnet/minecraft/client/renderer/MultiBufferSource;Lcom/mojang/blaze3d/vertex/PoseStack;)V"
-                    //?} else {
+                    //? >=1.21.9 {
+                    target = "Lnet/minecraft/client/renderer/SkyRenderer;renderMoon(IFLcom/mojang/blaze3d/vertex/PoseStack;)V"
+                    //?} else >=1.21.4 {
+                    /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderMoon(IFLnet/minecraft/client/renderer/MultiBufferSource;Lcom/mojang/blaze3d/vertex/PoseStack;)V"
+                    *///?} else {
                     /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderMoon(IFLcom/mojang/blaze3d/vertex/Tesselator;Lcom/mojang/blaze3d/vertex/PoseStack;)V"
                     *///?}
             )
@@ -49,18 +62,20 @@ public abstract class MixinSkyRenderer {
             SkyRenderer instance,
             int moonPhases,
             float rainLevel,
-            //? >=1.21.4 {
+            //? <1.21.9 {
+            /*//? >=1.21.4 {
             net.minecraft.client.renderer.MultiBufferSource multiBufferSource,
-            //?} else {
-            /*Tesselator tesselator,
+             //?} else {
+            /^com.mojang.blaze3d.vertex.Tesselator tesselator,
+             ^///?}
             *///?}
             PoseStack poseStack
     ) {
         return !OptiBoxesClient.getConfig().enabled.isEnabled() || OptiBoxesClient.getConfig().renderSunMoon.isEnabled();
     }
 
-    //? >=1.21.4 {
-    @WrapWithCondition(
+    //? >=1.21.4 <1.21.9 {
+    /*@WrapWithCondition(
             method = "renderSunMoonAndStars",
             at = @At(
                     value = "INVOKE",
@@ -70,7 +85,7 @@ public abstract class MixinSkyRenderer {
     private boolean uniskies$disableBatch(net.minecraft.client.renderer.MultiBufferSource.BufferSource instance) {
         return !OptiBoxesClient.getConfig().enabled.isEnabled() || OptiBoxesClient.getConfig().renderSunMoon.isEnabled();
     }
-    //?}
+    *///?}
 
     @WrapWithCondition(
             method = "renderSunMoonAndStars",
@@ -92,4 +107,5 @@ public abstract class MixinSkyRenderer {
     ) {
         return !OptiBoxesClient.getConfig().enabled.isEnabled() || OptiBoxesClient.getConfig().renderStars.isEnabled();
     }
+    //?}
 }

@@ -106,7 +106,7 @@ public final class OptiFineSkyRenderer {
             renderSkyLayer(optiFineSkyLayer, modelViewStack, level, clampedTimeOfDay, skyAngle, rainLevel, thunderLevel, optiFineSkybox.getConditionAlphaFor(optiFineSkyLayer));
         }
 
-        //? <=1.21.5 {
+        //? <=1.21.4 {
         /*btw.lowercase.optiboxes.utils.components.Blend.ADD.apply(1.0F - rainLevel);
          *///?}
     }
@@ -122,18 +122,20 @@ public final class OptiFineSkyRenderer {
                 modelViewStack.rotate(new Quaternionf(new AxisAngle4f(this.getAngle(level, skyAngle, optiFineSkyLayer.speed()), optiFineSkyLayer.axis())));
             }
 
+            //? <=1.21.4 {
+            /*RenderSystem.setShaderTexture(0, optiFineSkyLayer.source());
+            RenderSystem.setShader(net.minecraft.client.renderer.CoreShaders.POSITION_TEX); // TODO: Use the custom_skybox shader
+            optiFineSkyLayer.blend().apply(finalAlpha);
+            *///?}
+
+            //? >=1.21.5 {
             //? >=1.21.6 {
             com.mojang.blaze3d.buffers.GpuBufferSlice transforms = btw.lowercase.optiboxes.utils.DynamicTransformsBuilder.of()
                     .withModelViewMatrix(modelViewStack)
                     .withShaderColor(optiFineSkyLayer.blend().getShaderColor(finalAlpha))
                     .build();
-            //?} else {
-            /*RenderSystem.setShaderTexture(0, optiFineSkyLayer.source());
-            RenderSystem.setShader(net.minecraft.client.renderer.CoreShaders.POSITION_TEX); // TODO: Use our custom_skybox shader
-            optiFineSkyLayer.blend().apply(finalAlpha);
-            *///?}
+            //?}
 
-            //? >=1.21.5 {
             com.mojang.blaze3d.pipeline.RenderPipeline renderPipeline = this.renderPipelineCache.computeIfAbsent(optiFineSkyLayer.source(), (resourceLocation) -> {
                 com.mojang.blaze3d.pipeline.RenderPipeline pipeline = getSkyboxPipeline(optiFineSkyLayer.blend().getBlendFunction());
                 btw.lowercase.optiboxes.utils.IrisUtil.assignPipeline(pipeline, btw.lowercase.optiboxes.utils.IrisUtil.skyTextured());
