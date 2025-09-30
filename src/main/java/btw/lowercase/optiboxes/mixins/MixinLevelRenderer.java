@@ -14,7 +14,6 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.DimensionSpecialEffects;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.RenderBuffers;
-import net.minecraft.client.renderer.SkyRenderer;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4fStack;
@@ -56,9 +55,9 @@ public abstract class MixinLevelRenderer {
         this.optiboxes$tickDelta =
                 //? >=1.21.9 {
                 net.minecraft.client.Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
-                //?} else {
+                 //?} else {
                 /*tickDelta;
-                *///?}
+        *///?}
     }
 
     @WrapOperation(
@@ -73,7 +72,7 @@ public abstract class MixinLevelRenderer {
             )
     )
     private void optiboxes$renderEndSkybox(
-            SkyRenderer instance,
+            net.minecraft.client.renderer.SkyRenderer instance,
             //? <=1.21.3
             /*PoseStack poseStack,*/
             Operation<Void> original
@@ -110,11 +109,11 @@ public abstract class MixinLevelRenderer {
             )
     )
     private void optiboxes$endBatchSunrise(
-            SkyRenderer instance,
+            net.minecraft.client.renderer.SkyRenderer instance,
             PoseStack poseStack,
             //? >=1.21.4 <1.21.9
             /*net.minecraft.client.renderer.MultiBufferSource.BufferSource bufferSource,*/
-             //? <=1.21.3
+            //? <=1.21.3
             /*com.mojang.blaze3d.vertex.Tesselator tesselator,*/
             float sunAngle,
             int sunriseOrSunsetColor,
@@ -125,7 +124,7 @@ public abstract class MixinLevelRenderer {
                 poseStack,
                 //? >=1.21.4 <1.21.9
                 /*bufferSource,*/
-                 //? <=1.21.3
+                //? <=1.21.3
                 /*tesselator,*/
                 sunAngle,
                 sunriseOrSunsetColor
@@ -139,9 +138,11 @@ public abstract class MixinLevelRenderer {
             method = "method_62215",
             at = @At(
                     value = "INVOKE",
-                    //? >=1.21.6 {
+                    //? >=1.21.9 {
                     target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunMoonAndStars(Lcom/mojang/blaze3d/vertex/PoseStack;FIFF)V"
-                    //?} else >=1.21.4 {
+                    //?} else >=1.21.6 {
+                    /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunMoonAndStars(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;FIFF)V"
+                    *///?} else >=1.21.4 {
                     /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunMoonAndStars(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;FIFFLnet/minecraft/client/renderer/FogParameters;)V"
                     *///?} else {
                     /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunMoonAndStars(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/Tesselator;FIFFLnet/minecraft/client/renderer/FogParameters;)V"
@@ -149,11 +150,11 @@ public abstract class MixinLevelRenderer {
             )
     )
     private void optiboxes$renderSkyboxes(
-            SkyRenderer instance,
+            net.minecraft.client.renderer.SkyRenderer instance,
             PoseStack poseStack,
             //? >=1.21.4 <1.21.9
             /*net.minecraft.client.renderer.MultiBufferSource.BufferSource bufferSource,*/
-             //? <=1.21.3
+            //? <=1.21.3
             /*com.mojang.blaze3d.vertex.Tesselator tesselator,*/
             float timeOfDay,
             int moonPhases,
@@ -180,7 +181,7 @@ public abstract class MixinLevelRenderer {
                 poseStack,
                 //? >=1.21.4 <1.21.9
                 /*bufferSource,*/
-                 //? <=1.21.3
+                //? <=1.21.3
                 /*tesselator,*/
                 timeOfDay,
                 moonPhases,
@@ -198,13 +199,31 @@ public abstract class MixinLevelRenderer {
     }
     *///?}
 
-    @WrapOperation(method = "addSkyPass", at = @At(value = "FIELD", target = "Lnet/minecraft/client/renderer/DimensionSpecialEffects$SkyType;NONE:Lnet/minecraft/client/renderer/DimensionSpecialEffects$SkyType;"))
-    private DimensionSpecialEffects.SkyType optiboxes$allowNetherSky(Operation<DimensionSpecialEffects.SkyType> original) {
+    @WrapOperation(
+            method = "addSkyPass",
+            at = @At(
+                    //? >=1.21.9 {
+                    value = "FIELD",
+                    target = "Lnet/minecraft/client/renderer/state/SkyRenderState;skyType:Lnet/minecraft/client/renderer/DimensionSpecialEffects$SkyType;"
+                    //?} else {
+                    /*value = "INVOKE",
+                    target = "Lnet/minecraft/client/renderer/DimensionSpecialEffects;skyType()Lnet/minecraft/client/renderer/DimensionSpecialEffects$SkyType;"
+                    *///?}
+            )
+    )
+    private DimensionSpecialEffects.SkyType optiboxes$allowNetherSky(
+            //? >= 1.21.9 {
+            net.minecraft.client.renderer.state.SkyRenderState instance,
+             //?} else {
+            /*DimensionSpecialEffects instance,
+            *///?}
+            Operation<DimensionSpecialEffects.SkyType> original
+    ) {
         //noinspection DataFlowIssue
         if (SkyboxManager.INSTANCE.isEnabled(this.level) && SkyboxManager.INSTANCE.containsEnabled(Level.NETHER) && this.level.dimension().equals(Level.NETHER)) {
             return DimensionSpecialEffects.SkyType.OVERWORLD;
         } else {
-            return original.call();
+            return original.call(instance);
         }
     }
 }

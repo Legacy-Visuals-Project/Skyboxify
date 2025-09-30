@@ -5,7 +5,7 @@
 	"compatibilityLevel": "JAVA_21",
 	"client": [
 		"MixinClientLevel",
-		"MixinFogRenderer",
+		"MixinGameRenderer",
 		"MixinLevelRenderer",
 		"MixinSkyRenderer",
 		"RenderPipelinesAccessor"

@@ -142,14 +142,17 @@ public final class OptiBoxesClient implements ClientModInitializer {
 
         for (Map.Entry<String, JsonArray> entry : layers.entrySet()) {
             JsonObject skyJson = new JsonObject();
-            skyJson.add("layers", entry.getValue());
-            skyJson.addProperty("world",
-                    (switch (entry.getKey()) {
-                        case "world-1" -> Level.NETHER;
-                        case "world1" -> Level.END;
-                        default -> Level.OVERWORLD;
-                    }).location().toString());
-            SkyboxManager.INSTANCE.addSkybox(OptiFineSkybox.CODEC.decode(JsonOps.INSTANCE, skyJson).getOrThrow().getFirst());
+            JsonArray skyLayers = entry.getValue();
+            if (!skyLayers.isEmpty()) {
+                skyJson.add("layers", skyLayers);
+                skyJson.addProperty("world",
+                        (switch (entry.getKey()) {
+                            case "world-1" -> Level.NETHER;
+                            case "world1" -> Level.END;
+                            default -> Level.OVERWORLD;
+                        }).location().toString());
+                SkyboxManager.INSTANCE.addSkybox(OptiFineSkybox.CODEC.decode(JsonOps.INSTANCE, skyJson).getOrThrow().getFirst());
+            }
         }
     }
 }
