@@ -3,6 +3,7 @@ package btw.lowercase.optiboxes.mixins;
 import btw.lowercase.optiboxes.skybox.OptiFineSkyRenderer;
 import btw.lowercase.optiboxes.skybox.OptiFineSkybox;
 import btw.lowercase.optiboxes.skybox.SkyboxManager;
+import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.framegraph.FrameGraphBuilder;
@@ -14,6 +15,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.DimensionSpecialEffects;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.RenderBuffers;
+import net.minecraft.client.renderer.SkyRenderer;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4fStack;
@@ -157,8 +159,8 @@ public abstract class MixinLevelRenderer {
             //? <=1.21.3
             /*com.mojang.blaze3d.vertex.Tesselator tesselator,*/
             float timeOfDay,
-            int moonPhases,
-            float rainLevel,
+            int moonPhase,
+            float rainBrightness,
             float starBrightness,
             //? <1.21.6
             /*net.minecraft.client.renderer.FogParameters fog,*/
@@ -184,8 +186,8 @@ public abstract class MixinLevelRenderer {
                 //? <=1.21.3
                 /*tesselator,*/
                 timeOfDay,
-                moonPhases,
-                rainLevel,
+                moonPhase,
+                rainBrightness,
                 starBrightness
                 //? <1.21.6
                 /*, fog*/
@@ -225,5 +227,40 @@ public abstract class MixinLevelRenderer {
         } else {
             return original.call(instance);
         }
+    }
+
+    @WrapWithCondition(
+            method = "method_62215",
+            at = @At(
+                    value = "INVOKE",
+                    //? >=1.21.9 {
+                    target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunMoonAndStars(Lcom/mojang/blaze3d/vertex/PoseStack;FIFF)V"
+                    //?} else >=1.21.6 {
+                    /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunMoonAndStars(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;FIFF)V"
+                    *///?} else >=1.21.4 {
+                    /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunMoonAndStars(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;FIFFLnet/minecraft/client/renderer/FogParameters;)V"
+                    *///?} else {
+                    /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunMoonAndStars(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/Tesselator;FIFFLnet/minecraft/client/renderer/FogParameters;)V"
+                    *///?}
+            )
+    )
+    private boolean optiboxes$disableSunMoonStarsInNether(
+            SkyRenderer instance,
+            PoseStack poseStack,
+            //? >=1.21.4 <1.21.9
+            /*net.minecraft.client.renderer.MultiBufferSource.BufferSource bufferSource,*/
+            //? <=1.21.3
+            /*com.mojang.blaze3d.vertex.Tesselator tesselator,*/
+            float timeOfDay,
+            int moonPhase,
+            float rainBrightness,
+            float starBrightness
+            //? <1.21.6
+            /*,net.minecraft.client.renderer.FogParameters fog*/
+    ) {
+        //noinspection DataFlowIssue
+        return !SkyboxManager.INSTANCE.isEnabled(this.level) ||
+                !SkyboxManager.INSTANCE.containsEnabled(Level.NETHER) ||
+                !(this.level.effects() instanceof DimensionSpecialEffects.NetherEffects);
     }
 }
