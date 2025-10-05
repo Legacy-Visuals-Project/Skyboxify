@@ -45,11 +45,11 @@ public class OptiBoxesConfigScreen extends Screen {
         GridLayout footerGridLayout = new GridLayout();
         footerGridLayout.defaultCellSetting().paddingHorizontal(4).paddingBottom(4).alignHorizontallyCenter();
         GridLayout.RowHelper footerRowHelper = footerGridLayout.createRowHelper(2);
-        footerRowHelper.addChild(Button.builder(CommonComponents.GUI_DONE, (button) -> this.onClose()).width(125).build());
         footerRowHelper.addChild(Button.builder(ConfigTranslate.RESET, (button) -> {
             config.reset();
             this.minecraft.reloadResourcePacks();
         }).width(125).build());
+        footerRowHelper.addChild(Button.builder(CommonComponents.GUI_DONE, (button) -> this.onClose()).width(125).build());
         layout.addToFooter(footerGridLayout);
 
         layout.visitWidgets(this::addRenderableWidget);
