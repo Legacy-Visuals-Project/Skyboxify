@@ -142,16 +142,16 @@ public final class OptiFineSkyRenderer {
                 return pipeline;
             });
 
-            com.mojang.blaze3d.pipeline.RenderTarget renderTarget = Minecraft.getInstance().getMainRenderTarget();
-            net.minecraft.client.renderer.texture.AbstractTexture skyTexture = Minecraft.getInstance().getTextureManager().getTexture(optiFineSkyLayer.source());
+            Minecraft minecraft = Minecraft.getInstance();
+
+            com.mojang.blaze3d.pipeline.RenderTarget renderTarget = minecraft.getMainRenderTarget();
+            net.minecraft.client.renderer.texture.AbstractTexture skyTexture = minecraft.getTextureManager().getTexture(optiFineSkyLayer.source());
 
             //? >=1.21.6 {
-            com.mojang.blaze3d.textures.GpuTextureView texture = skyTexture.getTextureView();
             com.mojang.blaze3d.textures.GpuTextureView colorTexture = renderTarget.getColorTextureView();
             com.mojang.blaze3d.textures.GpuTextureView depthTexture = renderTarget.getDepthTextureView();
             //?} else {
-            /*com.mojang.blaze3d.textures.GpuTexture texture = skyTexture.getTexture();
-            com.mojang.blaze3d.textures.GpuTexture colorTexture = renderTarget.getColorTexture();
+            /*com.mojang.blaze3d.textures.GpuTexture colorTexture = renderTarget.getColorTexture();
             com.mojang.blaze3d.textures.GpuTexture depthTexture = renderTarget.getDepthTexture();
             *///?}
 
@@ -169,16 +169,25 @@ public final class OptiFineSkyRenderer {
                 renderPass.setPipeline(renderPipeline);
                 renderPass.setVertexBuffer(0, this.skyBuffer);
                 renderPass.setIndexBuffer(indexBuffer, this.skyBufferIndices.type());
+
                 //? >=1.21.6 {
                 RenderSystem.bindDefaultUniforms(renderPass);
                 renderPass.setUniform("DynamicTransforms", transforms);
                 //?}
-                renderPass.bindSampler("Sampler0", texture);
+
+                //? >=1.21.11 {
+                renderPass.bindTexture("Sampler0", skyTexture.getTextureView(), skyTexture.getSampler());
+                //? } else >= 1.21.6 {
+                /*renderPass.bindSampler("Sampler0", skyTexture.getTextureView());
+                *///? } else {
+                /*renderPass.bindSampler("Sampler0", skyTexture.getTexture());
+                *///? }
+
                 //? >=1.21.6 {
                 renderPass.drawIndexed(0, 0, this.skyBufferIndexCount, 1);
                 //?} else {
                 /*renderPass.drawIndexed(0, this.skyBufferIndexCount);
-                 *///?}
+                *///?}
             }
             //?} else {
             /*this.skyBuffer.bind();

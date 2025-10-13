@@ -10,14 +10,13 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Camera;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.DimensionSpecialEffects;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.RenderBuffers;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4fStack;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -30,15 +29,11 @@ import java.util.List;
 @Mixin(value = LevelRenderer.class, priority = 900)
 public abstract class MixinLevelRenderer {
     @Shadow
-    @Final
-    private RenderBuffers renderBuffers;
-
-    @Shadow
     @Nullable
     private ClientLevel level;
 
     @Unique
-    private float optiboxes$tickDelta;
+    private static float optiboxes$tickDelta;
 
     @Inject(method = "addSkyPass", at = @At("HEAD"))
     private void optiboxes$getLocals(
@@ -52,7 +47,7 @@ public abstract class MixinLevelRenderer {
             /*net.minecraft.client.renderer.FogParameters gpuBufferSlice,
              *///?}
             CallbackInfo ci) {
-        this.optiboxes$tickDelta =
+        optiboxes$tickDelta =
                 //? >=1.21.9 {
                 net.minecraft.client.Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
                  //?} else {
@@ -71,7 +66,10 @@ public abstract class MixinLevelRenderer {
                     *///?}
             )
     )
-    private void optiboxes$renderEndSkybox(
+    private
+    //? >=1.21.11
+    static
+    void optiboxes$renderEndSkybox(
             net.minecraft.client.renderer.SkyRenderer instance,
             //? <=1.21.3
             /*PoseStack poseStack,*/
@@ -82,19 +80,21 @@ public abstract class MixinLevelRenderer {
                 //? <=1.21.3
                 /*, poseStack*/
         );
-        if (SkyboxManager.INSTANCE.isEnabled(this.level)) {
+        Minecraft minecraft = Minecraft.getInstance();
+        if (SkyboxManager.INSTANCE.isEnabled(minecraft.level)) {
             List<OptiFineSkybox> activeSkyboxes = SkyboxManager.INSTANCE.getActiveSkyboxes();
             Matrix4fStack modelViewStack = RenderSystem.getModelViewStack();
             modelViewStack.pushMatrix();
             modelViewStack.rotate(Axis.YP.rotationDegrees(-90.0F));
             for (OptiFineSkybox optiFineSkybox : activeSkyboxes) {
                 //noinspection DataFlowIssue
-                OptiFineSkyRenderer.INSTANCE.renderSkybox(optiFineSkybox, modelViewStack, this.level, 0.0F);
+                OptiFineSkyRenderer.INSTANCE.renderSkybox(optiFineSkybox, modelViewStack, minecraft.level, 0.0F);
             }
             modelViewStack.popMatrix();
         }
     }
 
+    // TODO: Fix later
     @WrapOperation(
             method = "method_62215",
             at = @At(
@@ -108,7 +108,10 @@ public abstract class MixinLevelRenderer {
                     *///?}
             )
     )
-    private void optiboxes$endBatchSunrise(
+    private
+    //? >=1.21.11
+    static
+    void optiboxes$endBatchSunrise(
             net.minecraft.client.renderer.SkyRenderer instance,
             PoseStack poseStack,
             //? >=1.21.4 <1.21.9
@@ -129,18 +132,22 @@ public abstract class MixinLevelRenderer {
                 sunAngle,
                 sunriseOrSunsetColor
         );
-        if (SkyboxManager.INSTANCE.isEnabled(this.level)) {
-            renderBuffers.bufferSource().endBatch();
+        //? >=1.21.4 <1.21.9 {
+        /*if (SkyboxManager.INSTANCE.isEnabled(this.level)) {
+            bufferSource.endBatch();
         }
+        *///? }
     }
 
     @WrapOperation(
             method = "method_62215",
             at = @At(
                     value = "INVOKE",
-                    //? >=1.21.9 {
-                    target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunMoonAndStars(Lcom/mojang/blaze3d/vertex/PoseStack;FIFF)V"
-                    //?} else >=1.21.6 {
+                    //? >=1.21.11 {
+                    target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunMoonAndStars(Lcom/mojang/blaze3d/vertex/PoseStack;FLnet/minecraft/world/level/MoonPhase;FF)V"
+                    //?} else >=1.21.9 {
+                    /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunMoonAndStars(Lcom/mojang/blaze3d/vertex/PoseStack;FIFF)V"
+                    *///?} else >=1.21.6 {
                     /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunMoonAndStars(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;FIFF)V"
                     *///?} else >=1.21.4 {
                     /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunMoonAndStars(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;FIFFLnet/minecraft/client/renderer/FogParameters;)V"
@@ -149,7 +156,10 @@ public abstract class MixinLevelRenderer {
                     *///?}
             )
     )
-    private void optiboxes$renderSkyboxes(
+    private
+    //? >=1.21.11
+    static
+    void optiboxes$renderSkyboxes(
             net.minecraft.client.renderer.SkyRenderer instance,
             PoseStack poseStack,
             //? >=1.21.4 <1.21.9
@@ -157,30 +167,35 @@ public abstract class MixinLevelRenderer {
             //? <=1.21.3
             /*com.mojang.blaze3d.vertex.Tesselator tesselator,*/
             float timeOfDay,
-            int moonPhase,
+            //? >=1.21.11 {
+            net.minecraft.world.level.MoonPhase moonPhase,
+            //? } else {
+            /*int moonPhase,
+            *///? }
             float rainBrightness,
             float starBrightness,
             //? <1.21.6
             /*net.minecraft.client.renderer.FogParameters fog,*/
             Operation<Void> original
     ) {
-        if (SkyboxManager.INSTANCE.isEnabled(this.level)) {
+        ClientLevel level = Minecraft.getInstance().level;
+        if (SkyboxManager.INSTANCE.isEnabled(level)) {
             List<OptiFineSkybox> activeSkyboxes = SkyboxManager.INSTANCE.getActiveSkyboxes();
             Matrix4fStack modelViewStack = RenderSystem.getModelViewStack();
             modelViewStack.pushMatrix();
             modelViewStack.rotate(Axis.YP.rotationDegrees(-90.0F));
             for (OptiFineSkybox optiFineSkybox : activeSkyboxes) {
                 //noinspection DataFlowIssue
-                OptiFineSkyRenderer.INSTANCE.renderSkybox(optiFineSkybox, modelViewStack, this.level, this.optiboxes$tickDelta);
+                OptiFineSkyRenderer.INSTANCE.renderSkybox(optiFineSkybox, modelViewStack, level, optiboxes$tickDelta);
             }
             modelViewStack.popMatrix();
         }
 
         // Disable Sun, Moon, & Stars in the Nether
         //noinspection DataFlowIssue
-        if (!SkyboxManager.INSTANCE.isEnabled(this.level) ||
+        if (!SkyboxManager.INSTANCE.isEnabled(level) ||
                 !SkyboxManager.INSTANCE.containsEnabled(Level.NETHER) ||
-                !(this.level.effects() instanceof DimensionSpecialEffects.NetherEffects)) {
+                !(level.effects() instanceof DimensionSpecialEffects.NetherEffects)) {
             original.call(
                     instance,
                     poseStack,

@@ -29,7 +29,6 @@ class Dependencies {
     val devauthVersion = property("deps.devauth_version")
     val mixinconstraintsVersion = property("deps.mixinconstraints_version")
     val mixinsquaredVersion = property("deps.mixinsquared_version")
-    val modmenuVersion = property("deps.modmenu_version")
 }
 
 class LoaderData {
@@ -130,7 +129,9 @@ dependencies {
     if (loader.isFabric) {
         modImplementation("net.fabricmc:fabric-loader:${deps.fabricLoaderVersion}")!!
         modImplementation("net.fabricmc.fabric-api:fabric-api:${deps.fabricApiVersion}")
-        modImplementation("com.terraformersmc:modmenu:${deps.modmenuVersion}")
+        optionalProp("deps.modmenu_version") { prop ->
+            modImplementation("com.terraformersmc:modmenu:${prop}")
+        }
     } else if (loader.isNeoforge) {
         "neoForge"("net.neoforged:neoforge:${deps.neoforgeVersion}")
     }

@@ -17,9 +17,24 @@ import org.joml.Vector3f;
 
 import java.util.List;
 
-public record OptiFineSkyLayer(ResourceLocation source, boolean biomeInclusion, List<ResourceLocation> biomes,
-                               List<Range> heights, Blend blend, Fade fade, boolean rotate, float speed, Vector3f axis,
-                               Loop loop, float transition, List<Weather> weatherConditions) {
+public record OptiFineSkyLayer(
+        ResourceLocation source,
+        boolean biomeInclusion,
+        List<ResourceLocation> biomes,
+        List<Range> heights,
+        Blend blend,
+        Fade fade,
+        boolean rotate,
+        float speed,
+        //? >=1.21.11 {
+        org.joml.Vector3fc axis,
+        //? } else {
+        /*Vector3f axis,
+        *///? }
+        Loop loop,
+        float transition,
+        List<Weather> weatherConditions
+) {
     public static final Codec<OptiFineSkyLayer> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             ResourceLocation.CODEC.fieldOf("source").forGetter(OptiFineSkyLayer::source),
             Codec.BOOL.optionalFieldOf("biomeInclusion", true).forGetter(OptiFineSkyLayer::biomeInclusion),
