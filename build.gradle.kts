@@ -1,3 +1,5 @@
+import com.google.devtools.ksp.processing.parseBoolean
+
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.loom)
@@ -20,6 +22,8 @@ class ModData {
     val modrinth = property("mod.modrinth")
     val curseforge = property("mod.curseforge")
     val discord = property("mod.discord")
+
+    val stable = parseBoolean(property("mod.stable").toString())
     val releaseRange = property("mod.release_range").toString()
     val mcVersion = property("mod.mc_version")
     val mcDep = property("mod.mc_dep").toString()
@@ -144,6 +148,10 @@ val curseforgeId = findProperty("publish.curseforge")?.toString()?.takeIf { it.i
 // modrinth.token=
 // curseforge.token=
 publishMods {
+    if (!mod.stable) {
+        return@publishMods;
+    }
+
     file = project.tasks.remapJar.get().archiveFile
 
     displayName = "Release ${mod.version} for ${mod.releaseRange.ifEmpty { mod.mcVersion }}"
