@@ -5,8 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.jetbrains.annotations.NotNull;
 
-public record
-Range(float min, float max) {
+public record Range(float min, float max) {
     public static final Codec<Range> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.FLOAT.fieldOf("min").forGetter(Range::min),
             Codec.FLOAT.fieldOf("max").forGetter(Range::max)

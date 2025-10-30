@@ -68,7 +68,7 @@ public abstract class MixinLevelRenderer {
     )
     private
     //? >=1.21.11
-    static
+    /*static*/
     void optiboxes$renderEndSkybox(
             net.minecraft.client.renderer.SkyRenderer instance,
             //? <=1.21.3
@@ -110,7 +110,7 @@ public abstract class MixinLevelRenderer {
     )
     private
     //? >=1.21.11
-    static
+    /*static*/
     void optiboxes$endBatchSunrise(
             net.minecraft.client.renderer.SkyRenderer instance,
             PoseStack poseStack,
@@ -136,7 +136,7 @@ public abstract class MixinLevelRenderer {
         /*if (SkyboxManager.INSTANCE.isEnabled(this.level)) {
             bufferSource.endBatch();
         }
-        *///? }
+        *///?}
     }
 
     @WrapOperation(
@@ -144,10 +144,10 @@ public abstract class MixinLevelRenderer {
             at = @At(
                     value = "INVOKE",
                     //? >=1.21.11 {
-                    target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunMoonAndStars(Lcom/mojang/blaze3d/vertex/PoseStack;FLnet/minecraft/world/level/MoonPhase;FF)V"
-                    //?} else >=1.21.9 {
-                    /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunMoonAndStars(Lcom/mojang/blaze3d/vertex/PoseStack;FIFF)V"
-                    *///?} else >=1.21.6 {
+                    /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunMoonAndStars(Lcom/mojang/blaze3d/vertex/PoseStack;FLnet/minecraft/world/level/MoonPhase;FF)V"
+                    *///?} else >=1.21.9 {
+                    target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunMoonAndStars(Lcom/mojang/blaze3d/vertex/PoseStack;FIFF)V"
+                    //?} else >=1.21.6 {
                     /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunMoonAndStars(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;FIFF)V"
                     *///?} else >=1.21.4 {
                     /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunMoonAndStars(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;FIFFLnet/minecraft/client/renderer/FogParameters;)V"
@@ -158,7 +158,7 @@ public abstract class MixinLevelRenderer {
     )
     private
     //? >=1.21.11
-    static
+    /*static*/
     void optiboxes$renderSkyboxes(
             net.minecraft.client.renderer.SkyRenderer instance,
             PoseStack poseStack,
@@ -168,10 +168,10 @@ public abstract class MixinLevelRenderer {
             /*com.mojang.blaze3d.vertex.Tesselator tesselator,*/
             float timeOfDay,
             //? >=1.21.11 {
-            net.minecraft.world.level.MoonPhase moonPhase,
-            //? } else {
-            /*int moonPhase,
-            *///? }
+            /*net.minecraft.world.level.MoonPhase moonPhase,
+            *///?} else {
+            int moonPhase,
+            //?}
             float rainBrightness,
             float starBrightness,
             //? <1.21.6

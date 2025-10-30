@@ -27,10 +27,10 @@ public record OptiFineSkyLayer(
         boolean rotate,
         float speed,
         //? >=1.21.11 {
-        org.joml.Vector3fc axis,
-        //? } else {
-        /*Vector3f axis,
-        *///? }
+        /*org.joml.Vector3fc axis,
+        *///?} else {
+        Vector3f axis,
+        //?}
         Loop loop,
         float transition,
         List<Weather> weatherConditions

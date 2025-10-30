@@ -12,8 +12,6 @@ import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix4f;
-import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -407,14 +405,6 @@ public final class CommonUtils {
         }
 
         return Mth.clamp(weatherAlpha, 0.0F, 1.0F);
-    }
-
-    public static Vector3f getMatrixTransform(Matrix4f matrix4f, float x, float y, float z) {
-        return new Vector3f(
-                matrix4f.m00() * x + matrix4f.m10() * y + matrix4f.m20() * z + matrix4f.m30(),
-                matrix4f.m01() * x + matrix4f.m11() * y + matrix4f.m21() * z + matrix4f.m31(),
-                matrix4f.m02() * x + matrix4f.m12() * y + matrix4f.m22() * z + matrix4f.m32()
-        );
     }
 
     // Safety

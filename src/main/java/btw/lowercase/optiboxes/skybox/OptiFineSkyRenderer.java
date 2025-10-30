@@ -1,7 +1,6 @@
 package btw.lowercase.optiboxes.skybox;
 
 import btw.lowercase.optiboxes.utils.CommonUtils;
-import btw.lowercase.optiboxes.utils.SkyMapping;
 import btw.lowercase.optiboxes.utils.SkyPart;
 import btw.lowercase.optiboxes.utils.UVRange;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -14,12 +13,8 @@ import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
 import org.joml.Quaternionf;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public final class OptiFineSkyRenderer {
     public static final OptiFineSkyRenderer INSTANCE = new OptiFineSkyRenderer();
-    private static final Map<SkyPart, SkyMapping> SKY_MAPPING = new HashMap<>();
 
     //? >=1.21.5 {
     private com.mojang.blaze3d.buffers.GpuBuffer skyBuffer;
@@ -35,41 +30,41 @@ public final class OptiFineSkyRenderer {
 
     private void buildSky() {
         VertexFormat vertexFormat = DefaultVertexFormat.POSITION_TEX;
-        VertexFormat.Mode vertexFormatMode = VertexFormat.Mode.QUADS;
+        try (ByteBufferBuilder byteBufferBuilder = new ByteBufferBuilder(vertexFormat.getVertexSize() * SkyPart.COUNT * 4)) {
+            VertexFormat.Mode vertexFormatMode = VertexFormat.Mode.QUADS;
 
-        ByteBufferBuilder byteBufferBuilder = new ByteBufferBuilder(vertexFormat.getVertexSize() * SkyPart.COUNT * 4);
-        BufferBuilder builder = new BufferBuilder(byteBufferBuilder, vertexFormatMode, vertexFormat);
-        for (SkyPart part : SkyPart.VALUES) {
-            SkyMapping skyMapping = SKY_MAPPING.get(part);
-            Matrix4f matrix4f = skyMapping.rotationMatrix();
-            UVRange uvRange = skyMapping.mapping();
-            final float quadSize = 100.0F;
-            builder.addVertex(CommonUtils.getMatrixTransform(matrix4f, -quadSize, -quadSize, -quadSize)).setUv(uvRange.minU(), uvRange.minV());
-            builder.addVertex(CommonUtils.getMatrixTransform(matrix4f, -quadSize, -quadSize, quadSize)).setUv(uvRange.minU(), uvRange.maxV());
-            builder.addVertex(CommonUtils.getMatrixTransform(matrix4f, quadSize, -quadSize, quadSize)).setUv(uvRange.maxU(), uvRange.maxV());
-            builder.addVertex(CommonUtils.getMatrixTransform(matrix4f, quadSize, -quadSize, -quadSize)).setUv(uvRange.maxU(), uvRange.minV());
-        }
+            BufferBuilder builder = new BufferBuilder(byteBufferBuilder, vertexFormatMode, vertexFormat);
+            for (final SkyPart skyPart : SkyPart.VALUES) {
+                Matrix4f matrix4f = skyPart.getRotationMatrix();
+                UVRange uvRange = skyPart.getUVRange();
+                final float quadSize = 30.0F;
+                builder.addVertex(matrix4f, -quadSize, -quadSize, -quadSize).setUv(uvRange.minU(), uvRange.minV());
+                builder.addVertex(matrix4f, -quadSize, -quadSize, quadSize).setUv(uvRange.minU(), uvRange.maxV());
+                builder.addVertex(matrix4f, quadSize, -quadSize, quadSize).setUv(uvRange.maxU(), uvRange.maxV());
+                builder.addVertex(matrix4f, quadSize, -quadSize, -quadSize).setUv(uvRange.maxU(), uvRange.minV());
+            }
 
-        //? >=1.21.5
-        skyBufferIndices = RenderSystem.getSequentialBuffer(vertexFormatMode);
-        try (MeshData meshData = builder.buildOrThrow()) {
-            //? >=1.21.5 {
-            skyBufferIndexCount = meshData.drawState().indexCount();
-            skyBuffer = RenderSystem.getDevice().createBuffer(
-                    () -> "OptiFine Skybox",
-                    //? >=1.21.6 {
-                    com.mojang.blaze3d.buffers.GpuBuffer.USAGE_COPY_DST,
-                    //?} else {
-                    /*com.mojang.blaze3d.buffers.BufferType.VERTICES, com.mojang.blaze3d.buffers.BufferUsage.STATIC_WRITE,
-                     *///?}
-                    meshData.vertexBuffer()
-            );
-            //?} else {
-            /*skyBuffer = new com.mojang.blaze3d.vertex.VertexBuffer(com.mojang.blaze3d.buffers.BufferUsage.STATIC_WRITE);
-            skyBuffer.bind();
-            skyBuffer.upload(meshData);
-            com.mojang.blaze3d.vertex.VertexBuffer.unbind();
-            *///?}
+            //? >=1.21.5
+            skyBufferIndices = RenderSystem.getSequentialBuffer(vertexFormatMode);
+            try (MeshData meshData = builder.buildOrThrow()) {
+                //? >=1.21.5 {
+                skyBufferIndexCount = meshData.drawState().indexCount();
+                skyBuffer = RenderSystem.getDevice().createBuffer(
+                        () -> "OptiFine Skybox",
+                        //? >=1.21.6 {
+                        com.mojang.blaze3d.buffers.GpuBuffer.USAGE_COPY_DST,
+                        //?} else {
+                        /*com.mojang.blaze3d.buffers.BufferType.VERTICES, com.mojang.blaze3d.buffers.BufferUsage.STATIC_WRITE,
+                         *///?}
+                        meshData.vertexBuffer()
+                );
+                //?} else {
+                /*skyBuffer = new com.mojang.blaze3d.vertex.VertexBuffer(com.mojang.blaze3d.buffers.BufferUsage.STATIC_WRITE);
+                skyBuffer.bind();
+                skyBuffer.upload(meshData);
+                com.mojang.blaze3d.vertex.VertexBuffer.unbind();
+                *///?}
+            }
         }
     }
 
@@ -138,7 +133,7 @@ public final class OptiFineSkyRenderer {
 
             com.mojang.blaze3d.pipeline.RenderPipeline renderPipeline = this.renderPipelineCache.computeIfAbsent(optiFineSkyLayer.source(), (resourceLocation) -> {
                 com.mojang.blaze3d.pipeline.RenderPipeline pipeline = getSkyboxPipeline(optiFineSkyLayer.blend().getBlendFunction());
-                btw.lowercase.optiboxes.utils.IrisUtil.assignPipeline(pipeline, btw.lowercase.optiboxes.utils.IrisUtil.skyTextured());
+                btw.lowercase.optiboxes.utils.IrisUtil.assignPipeline(pipeline, btw.lowercase.optiboxes.utils.IrisPipeline.SKY_TEXTURED);
                 return pipeline;
             });
 
@@ -176,18 +171,18 @@ public final class OptiFineSkyRenderer {
                 //?}
 
                 //? >=1.21.11 {
-                renderPass.bindTexture("Sampler0", skyTexture.getTextureView(), skyTexture.getSampler());
-                //? } else >= 1.21.6 {
-                /*renderPass.bindSampler("Sampler0", skyTexture.getTextureView());
-                *///? } else {
+                /*renderPass.bindTexture("Sampler0", skyTexture.getTextureView(), skyTexture.getSampler());
+                 *///?} else >= 1.21.6 {
+                renderPass.bindSampler("Sampler0", skyTexture.getTextureView());
+                //?} else {
                 /*renderPass.bindSampler("Sampler0", skyTexture.getTexture());
-                *///? }
+                 *///?}
 
                 //? >=1.21.6 {
                 renderPass.drawIndexed(0, 0, this.skyBufferIndexCount, 1);
                 //?} else {
                 /*renderPass.drawIndexed(0, this.skyBufferIndexCount);
-                *///?}
+                 *///?}
             }
             //?} else {
             /*this.skyBuffer.bind();
@@ -215,32 +210,5 @@ public final class OptiFineSkyRenderer {
         //? >=1.21.5 {
         this.renderPipelineCache.clear();
         //?}
-    }
-
-    static {
-        SKY_MAPPING.put(SkyPart.BOTTOM, new SkyMapping(
-                new Matrix4f().rotateY((float) Math.toRadians(90.0F)),
-                new UVRange(0.0F, 0.0F, 0.33333334F, 0.5F)
-        ));
-        SKY_MAPPING.put(SkyPart.TOP, new SkyMapping(
-                new Matrix4f().rotateX((float) Math.toRadians(180.0F)).rotateY((float) Math.toRadians(-90.0F)),
-                new UVRange(0.33333334F, 0.0F, 0.6666667F, 0.5F)
-        ));
-        SKY_MAPPING.put(SkyPart.EAST, new SkyMapping(
-                new Matrix4f().rotateX((float) Math.toRadians(90.0F)).rotateZ((float) Math.toRadians(90.0F)),
-                new UVRange(0.6666667F, 0.0F, 1.0F, 0.5F)
-        ));
-        SKY_MAPPING.put(SkyPart.SOUTH, new SkyMapping(
-                new Matrix4f().rotateX((float) Math.toRadians(90.0F)).rotateZ((float) Math.toRadians(180.0F)),
-                new UVRange(0.0F, 0.5F, 0.33333334F, 1.0F)
-        ));
-        SKY_MAPPING.put(SkyPart.WEST, new SkyMapping(
-                new Matrix4f().rotateX((float) Math.toRadians(90.0F)).rotateZ((float) Math.toRadians(-90.0F)),
-                new UVRange(0.33333334F, 0.5F, 0.6666667F, 1.0F)
-        ));
-        SKY_MAPPING.put(SkyPart.NORTH, new SkyMapping(
-                new Matrix4f().rotateX((float) Math.toRadians(90.0F)),
-                new UVRange(0.6666667F, 0.5F, 1.0F, 1.0F)
-        ));
     }
 }

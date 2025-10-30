@@ -26,7 +26,6 @@ class Dependencies {
     val neoforgeVersion = property("deps.neoforge_version")
     val fabricLoaderVersion = property("deps.fabric_loader_version")
     val fabricApiVersion = property("deps.fabric_api_version")
-    val devauthVersion = property("deps.devauth_version")
     val mixinconstraintsVersion = property("deps.mixinconstraints_version")
     val mixinsquaredVersion = property("deps.mixinsquared_version")
 }
@@ -104,7 +103,6 @@ repositories {
     maven("https://maven.terraformersmc.com") // Mod Menu
     maven("https://maven.nucleoid.xyz/") // Placeholder API - required by Mod Menu
     maven("https://maven.neoforged.net/releases") // NeoForge
-    maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1") // DevAuth
     maven("https://maven.bawnorton.com/releases") // MixinSquared
     maven("https://api.modrinth.com/maven") // Modrinth
 }
@@ -119,11 +117,11 @@ dependencies {
 
         // Parchment mappings (it adds parameter mappings & javadoc)
         optionalProp("deps.parchment_version") {
-            parchment("org.parchmentmc.data:parchment-${mc.version}:$it@zip")
+            var snapshot = !mc.version.toString().contains(".")
+            parchment("org.parchmentmc.data:parchment-${if (snapshot) "1.21.10" else mc.version}:$it@zip")
         }
     })
 
-    modRuntimeOnly("me.djtheredstoner:DevAuth-${loader.loader}:${deps.devauthVersion}")
     include(implementation("com.moulberry:mixinconstraints:${deps.mixinconstraintsVersion}")!!)!!
     include(implementation(annotationProcessor("com.github.bawnorton.mixinsquared:mixinsquared-${loader.loader}:${deps.mixinsquaredVersion}")!!)!!)
     if (loader.isFabric) {

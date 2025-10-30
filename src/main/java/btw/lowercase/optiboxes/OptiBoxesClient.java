@@ -32,7 +32,7 @@ import java.util.regex.Pattern;
 
 @Entrypoint
 public final class OptiBoxesClient implements ClientModInitializer {
-    public static final String MOD_ID = "optiboxes";
+    public static final String MOD_ID = "@MODID@";
 
     private static final String OPTIFINE_SKY_PARENT = "optifine/sky";
     private static final String SKY_PATTERN_ENDING = "(?<world>[\\w-]+)/(?<name>\\w+).properties$";
