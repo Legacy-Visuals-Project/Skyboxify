@@ -205,7 +205,6 @@ publishMods {
 }
 
 java {
-    // withSourcesJar() // Uncomment if you want sources
     sourceCompatibility = JavaVersion.VERSION_21
     targetCompatibility = JavaVersion.VERSION_21
 }
