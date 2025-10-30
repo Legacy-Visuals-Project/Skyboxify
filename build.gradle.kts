@@ -150,7 +150,7 @@ val curseforgeId = findProperty("publish.curseforge")?.toString()?.takeIf { it.i
 publishMods {
     file = project.tasks.remapJar.get().archiveFile
 
-    displayName = "${mod.name} ${mod.version}"
+    displayName = "Release ${mod.version} for ${mc.version}"
     this.version = mod.version.toString()
     changelog = project.rootProject.file("CHANGELOG.md").takeIf { it.exists() }?.readText() ?: "No changelog provided."
     type = STABLE
