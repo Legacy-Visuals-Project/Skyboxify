@@ -20,6 +20,9 @@ class ModData {
     val modrinth = property("mod.modrinth")
     val curseforge = property("mod.curseforge")
     val discord = property("mod.discord")
+    val releaseRange = property("mod.release_range").toString()
+    val mcVersion = property("mod.mc_version")
+    val mcDep = property("mod.mc_dep").toString()
 }
 
 class Dependencies {
@@ -36,17 +39,11 @@ class LoaderData {
     val isNeoforge = loader == "neoforge"
 }
 
-class McData {
-    val version = property("mod.mc_version")
-    val dep = property("mod.mc_dep").toString()
-}
-
-val mc = McData()
 val mod = ModData()
 val deps = Dependencies()
 val loader = LoaderData()
 
-version = "${mod.version}+${mc.version}-${loader.loader}"
+version = "${mod.version}+${mod.mcVersion}-${loader.loader}"
 group = mod.group
 base { archivesName.set(mod.id) }
 
@@ -64,8 +61,7 @@ loom {
 
     runConfigs.all {
         ideConfigGenerated(stonecutter.current.isActive)
-        runDir =
-            "../../run" // This sets the run folder for all mc versions to the same folder. Remove this line if you want individual run folders.
+        runDir = "../../run"
     }
 
     runConfigs.remove(runConfigs["server"]) // Removes server run configs
@@ -108,7 +104,7 @@ repositories {
 }
 
 dependencies {
-    minecraft("com.mojang:minecraft:${mc.version}")
+    minecraft("com.mojang:minecraft:${mod.mcVersion}")
 
     @Suppress("UnstableApiUsage")
     mappings(loom.layered {
@@ -117,8 +113,8 @@ dependencies {
 
         // Parchment mappings (it adds parameter mappings & javadoc)
         optionalProp("deps.parchment_version") {
-            var snapshot = !mc.version.toString().contains(".")
-            parchment("org.parchmentmc.data:parchment-${if (snapshot) "1.21.10" else mc.version}:$it@zip")
+            var snapshot = !mod.mcVersion.toString().contains(".")
+            parchment("org.parchmentmc.data:parchment-${if (snapshot) "1.21.10" else mod.mcVersion}:$it@zip")
         }
     })
 
@@ -150,7 +146,7 @@ val curseforgeId = findProperty("publish.curseforge")?.toString()?.takeIf { it.i
 publishMods {
     file = project.tasks.remapJar.get().archiveFile
 
-    displayName = "Release ${mod.version} for ${mc.version}"
+    displayName = "Release ${mod.version} for ${mod.releaseRange.ifEmpty { mod.mcVersion }}"
     this.version = mod.version.toString()
     changelog = project.rootProject.file("CHANGELOG.md").takeIf { it.exists() }?.readText() ?: "No changelog provided."
     type = STABLE
@@ -161,16 +157,16 @@ publishMods {
         modrinth {
             projectId = property("publish.modrinth").toString()
             accessToken = findProperty("modrinth.token").toString()
-            if (rangeRegex.matches(mc.dep)) {
-                val match = rangeRegex.find(mc.dep)!!
+            if (rangeRegex.matches(mod.mcDep)) {
+                val match = rangeRegex.find(mod.mcDep)!!
                 val minVersion = match.groupValues[1]
                 val maxVersion = match.groupValues.getOrNull(2)?.takeIf { it.isNotBlank() } ?: "latest"
                 minecraftVersionRange {
                     start = minVersion
                     end = maxVersion
                 }
-            } else if (exactVersionRegex.matches(mc.dep)) {
-                minecraftVersions.add(mc.dep)
+            } else if (exactVersionRegex.matches(mod.mcDep)) {
+                minecraftVersions.add(mod.mcDep)
             }
 
             if (loader.isFabric) {
@@ -184,16 +180,16 @@ publishMods {
         curseforge {
             projectId = property("publish.curseforge").toString()
             accessToken = findProperty("curseforge.token").toString()
-            if (rangeRegex.matches(mc.dep)) {
-                val match = rangeRegex.find(mc.dep)!!
+            if (rangeRegex.matches(mod.mcDep)) {
+                val match = rangeRegex.find(mod.mcDep)!!
                 val minVersion = match.groupValues[1]
                 val maxVersion = match.groupValues.getOrNull(2)?.takeIf { it.isNotBlank() } ?: "latest"
                 minecraftVersionRange {
                     start = minVersion
                     end = maxVersion
                 }
-            } else if (exactVersionRegex.matches(mc.dep)) {
-                minecraftVersions.add(mc.dep)
+            } else if (exactVersionRegex.matches(mod.mcDep)) {
+                minecraftVersions.add(mod.mcDep)
             }
 
             if (loader.isFabric) {
@@ -214,7 +210,7 @@ tasks.processResources {
         put("id", mod.id)
         put("name", mod.name)
         put("version", mod.version)
-        put("mcdep", mc.dep)
+        put("mcdep", mod.mcDep)
         put("description", mod.description)
         put("source", mod.source)
         put("issues", mod.issues)
