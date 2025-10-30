@@ -1,16 +1,18 @@
 package btw.lowercase.optiboxes.utils;
 
+//? >=1.21.5 {
 import com.mojang.blaze3d.pipeline.RenderPipeline;
-
 import java.lang.reflect.Method;
 import java.util.Arrays;
+//? }
 
 public final class IrisUtil {
-    private static Object IRIS_INSTANCE = null;
-    private static Method IRIS_ASSIGN_PIPELINE_METHOD = null;
-
     private IrisUtil() {
     }
+
+    //? >=1.21.5 {
+    private static Object IRIS_INSTANCE = null;
+    private static Method IRIS_ASSIGN_PIPELINE_METHOD = null;
 
     public static void assignPipeline(RenderPipeline pipeline, IrisPipeline program) {
         try {
@@ -41,4 +43,5 @@ public final class IrisUtil {
         } catch (Exception ignored) {
         }
     }
+    //? }
 }
