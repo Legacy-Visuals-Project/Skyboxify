@@ -146,7 +146,7 @@ publishMods {
     }
 
     file = project.tasks.remapJar.get().archiveFile
-    val niceVersionRangeTitle = if (mod.stable || mod.mcVersionRange.contains(' ')) {
+    val niceVersionRangeTitle = if (mod.stable && mod.mcVersionRange.contains(' ')) {
         val parts = mod.mcVersionRange.trim().split(' ')
         parts.first() + '-' + parts.last()
     } else {
@@ -210,7 +210,7 @@ tasks.processResources {
             put("forge_version", deps.neoForgeVersion)
         }
 
-        val mcVersionRange = if (mod.stable || mod.mcVersionRange.contains(' ')) {
+        val mcVersionRange = if (mod.stable && mod.mcVersionRange.contains(' ')) {
             val parts = mod.mcVersionRange.trim().split(' ')
             ">=" + parts.first() + ' ' + "<=" + parts.last()
         } else {
