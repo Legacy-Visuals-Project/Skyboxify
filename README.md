@@ -1,8 +1,11 @@
 # optiboxes
 
 A skybox mod that allows you to use Optifine skies in Fabric 1.21+
-
 Join our discord: https://discord.gg/zqnXSUqedW
+
+## License
+
+This project is licensed under the GPL-3.0 license w/ Minecraft Linking Exception.
 
 ## Notes
 

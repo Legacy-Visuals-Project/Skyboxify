@@ -1,10 +1,12 @@
 package btw.lowercase.optiboxes.config;
 
+import dev.kikugie.fletching_table.annotation.fabric.Entrypoint;
+
 //? <1.21.11 {
+import btw.lowercase.optiboxes.OptiBoxesClient;
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;
 //?}
-import dev.kikugie.fletching_table.annotation.fabric.Entrypoint;
 
 @Entrypoint("modmenu")
 public class ModMenuIntegration
@@ -14,7 +16,7 @@ public class ModMenuIntegration
     //? <1.21.11 {
     @Override
     public ConfigScreenFactory<?> getModConfigScreenFactory() {
-        return btw.lowercase.optiboxes.OptiBoxesClient.getConfig()::getConfigScreen;
+        return OptiBoxesClient.getConfig()::getConfigScreen;
     }
     //?}
 }

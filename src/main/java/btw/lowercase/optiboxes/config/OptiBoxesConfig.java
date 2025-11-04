@@ -1,11 +1,11 @@
 package btw.lowercase.optiboxes.config;
 
-import btw.lowercase.lightconfig.lib.v1.Config;
-import btw.lowercase.lightconfig.lib.v1.field.BooleanConfigField;
-import btw.lowercase.lightconfig.lib.v1.screen.ConfigScreenBuilder;
 import btw.lowercase.optiboxes.OptiBoxesClient;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import org.visuals.legacy.lightconfig.lib.v1.Config;
+import org.visuals.legacy.lightconfig.lib.v1.field.BooleanConfigField;
+import org.visuals.legacy.lightconfig.lib.v1.serializer.JsonSerializer;
 
 import java.nio.file.Path;
 
@@ -19,14 +19,11 @@ public class OptiBoxesConfig extends Config {
     public final BooleanConfigField ignoreBrokenSkies = this.booleanFieldOf("ignoreBrokenSkies", false);
 
     public OptiBoxesConfig(Path path) {
-        super(OptiBoxesClient.getModContainer(), path);
+        super(OptiBoxesClient.getModContainer(), path, new JsonSerializer());
     }
 
     @Override
     public Screen getConfigScreen(Screen parent) {
-        ConfigScreenBuilder builder = ConfigScreenBuilder.builder(this)
-                .setTitle(Component.translatable("options.optiboxes.title"));
-        // TODO: Add config stuff
-        return builder.build(parent);
+        return new OptiBoxesConfigScreen(Component.translatable("options.optiboxes.title"), this, parent);
     }
 }

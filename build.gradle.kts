@@ -35,6 +35,7 @@ class Dependencies {
     val fabricApiVersion = property("deps.fabric_api_version")
     val mixinconstraintsVersion = property("deps.mixinconstraints_version")
     val mixinsquaredVersion = property("deps.mixinsquared_version")
+    val lightConfigVersion = property("deps.lightconfig")
 }
 
 class LoaderData {
@@ -96,12 +97,14 @@ fletchingTable {
 }
 
 repositories {
+    mavenCentral()
     maven("https://maven.parchmentmc.org") // Parchment
     maven("https://maven.terraformersmc.com") // Mod Menu
     maven("https://maven.nucleoid.xyz/") // Placeholder API - required by Mod Menu
     maven("https://maven.neoforged.net/releases") // NeoForge
     maven("https://maven.bawnorton.com/releases") // MixinSquared
     maven("https://api.modrinth.com/maven") // Modrinth
+    maven("https://jitpack.io") // LightConfig
 }
 
 dependencies {
@@ -111,13 +114,15 @@ dependencies {
     mappings(loom.layered {
         // Mojmap mappings
         officialMojangMappings()
-
         // Parchment mappings (it adds parameter mappings & javadoc)
         optionalProp("deps.parchment_version") {
             var snapshot = !mod.mcVersion.toString().contains(".")
             parchment("org.parchmentmc.data:parchment-${if (snapshot) "1.21.10" else mod.mcVersion}:$it@zip")
         }
     })
+
+    // LightConfig
+    include(modImplementation("com.github.Legacy-Visuals-Project:LightConfig:${deps.lightConfigVersion}")!!)
 
     include(implementation("com.moulberry:mixinconstraints:${deps.mixinconstraintsVersion}")!!)!!
     include(implementation(annotationProcessor("com.github.bawnorton.mixinsquared:mixinsquared-${loader.loader}:${deps.mixinsquaredVersion}")!!)!!)
