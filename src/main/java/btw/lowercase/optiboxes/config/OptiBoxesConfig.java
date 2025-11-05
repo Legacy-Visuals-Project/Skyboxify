@@ -1,11 +1,10 @@
 package btw.lowercase.optiboxes.config;
 
-import btw.lowercase.optiboxes.OptiBoxesClient;
+import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.visuals.legacy.lightconfig.lib.v1.Config;
 import org.visuals.legacy.lightconfig.lib.v1.field.BooleanConfigField;
-import org.visuals.legacy.lightconfig.lib.v1.serializer.JsonSerializer;
 
 import java.nio.file.Path;
 
@@ -18,8 +17,8 @@ public class OptiBoxesConfig extends Config {
     public final BooleanConfigField showOverworldForUnknownDimension = this.booleanFieldOf("showOverworldForUnknownDimension", true);
     public final BooleanConfigField ignoreBrokenSkies = this.booleanFieldOf("ignoreBrokenSkies", false);
 
-    public OptiBoxesConfig(Path path) {
-        super(OptiBoxesClient.getModContainer(), path, new JsonSerializer());
+    public OptiBoxesConfig(ModContainer modContainer, Path path) {
+        super(modContainer, path);
     }
 
     @Override

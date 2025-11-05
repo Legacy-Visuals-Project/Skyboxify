@@ -4,7 +4,7 @@ package btw.lowercase.optiboxes.utils;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-//? }
+//?}
 
 public final class IrisUtil {
     private IrisUtil() {
@@ -43,5 +43,5 @@ public final class IrisUtil {
         } catch (Exception ignored) {
         }
     }
-    //? }
+    //?}
 }

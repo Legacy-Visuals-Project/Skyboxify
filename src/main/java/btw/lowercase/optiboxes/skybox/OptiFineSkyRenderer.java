@@ -6,6 +6,7 @@ import btw.lowercase.optiboxes.utils.UVRange;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import org.joml.AxisAngle4f;
@@ -69,7 +70,7 @@ public final class OptiFineSkyRenderer {
     }
 
     //? >=1.21.5 {
-    private final java.util.Map<net.minecraft.resources.ResourceLocation, com.mojang.blaze3d.pipeline.RenderPipeline> renderPipelineCache = new java.util.HashMap<>();
+    private final java.util.Map<net.minecraft.resources.Identifier, com.mojang.blaze3d.pipeline.RenderPipeline> renderPipelineCache = new java.util.HashMap<>();
 
     public static com.mojang.blaze3d.pipeline.RenderPipeline getSkyboxPipeline(@org.jetbrains.annotations.Nullable btw.lowercase.optiboxes.utils.BlendFunction blendFunction) {
         com.mojang.blaze3d.pipeline.RenderPipeline.Builder builder = com.mojang.blaze3d.pipeline.RenderPipeline.builder(btw.lowercase.optiboxes.mixins.RenderPipelinesAccessor.optiboxes$getMatricesProjectionSnippet());
@@ -87,10 +88,14 @@ public final class OptiFineSkyRenderer {
     }
     //?}
 
-    public void renderSkybox(OptiFineSkybox optiFineSkybox, Matrix4fStack modelViewStack, Level level, float tickDelta) {
+    public void renderSkybox(OptiFineSkybox optiFineSkybox, Matrix4fStack modelViewStack, ClientLevel level, float tickDelta) {
         long dayTime = level.getDayTime();
         int clampedTimeOfDay = (int) (dayTime % 24000L);
-        float skyAngle = level.getTimeOfDay(tickDelta);
+        //? >=1.21.11 {
+        float skyAngle = getTimeOfDay(level);
+        //? } else {
+        /*float skyAngle = level.getTimeOfDay(tickDelta);
+         *///? }
         float thunderLevel = level.getThunderLevel(tickDelta);
         float rainLevel = level.getRainLevel(tickDelta);
         if (rainLevel > 0.0F) {
@@ -119,7 +124,8 @@ public final class OptiFineSkyRenderer {
 
             //? <=1.21.4 {
             /*RenderSystem.setShaderTexture(0, optiFineSkyLayer.source());
-            RenderSystem.setShader(net.minecraft.client.renderer.CoreShaders.POSITION_TEX); // TODO: Use the custom_skybox shader
+            RenderSystem.setShader(net.minecraft.client.renderer.CoreShaders.POSITION_TEX);
+            RenderSystem.depthMask(false);
             optiFineSkyLayer.blend().apply(finalAlpha);
             *///?}
 
@@ -171,10 +177,10 @@ public final class OptiFineSkyRenderer {
                 //?}
 
                 //? >=1.21.11 {
-                /*renderPass.bindTexture("Sampler0", skyTexture.getTextureView(), skyTexture.getSampler());
-                 *///?} else >= 1.21.6 {
-                renderPass.bindSampler("Sampler0", skyTexture.getTextureView());
-                //?} else {
+                renderPass.bindTexture("Sampler0", skyTexture.getTextureView(), skyTexture.getSampler());
+                 //?} else >= 1.21.6 {
+                /*renderPass.bindSampler("Sampler0", skyTexture.getTextureView());
+                *///?} else {
                 /*renderPass.bindSampler("Sampler0", skyTexture.getTexture());
                  *///?}
 
@@ -188,6 +194,8 @@ public final class OptiFineSkyRenderer {
             /*this.skyBuffer.bind();
             this.skyBuffer.drawWithShader(modelViewStack, RenderSystem.getProjectionMatrix(), RenderSystem.getShader());
             com.mojang.blaze3d.vertex.VertexBuffer.unbind();
+            RenderSystem.disableBlend();
+            RenderSystem.defaultBlendFunc();
             *///?}
 
             modelViewStack.popMatrix();
@@ -211,4 +219,21 @@ public final class OptiFineSkyRenderer {
         this.renderPipelineCache.clear();
         //?}
     }
+
+    //? >=1.21.11 {
+    private float getTimeOfDay(Level level) {
+        long fixedTime = level.getDayTime();
+        if (level.dimensionType().hasFixedTime()) {
+            if (level.dimension().equals(Level.NETHER)) {
+                fixedTime = 18000L;
+            } else if (level.dimension().equals(Level.END)) {
+                fixedTime = 6000L;
+            }
+        }
+
+        double frac = Mth.frac(fixedTime / 24000.0 - 0.25);
+        double mul = 0.5 - Math.cos(frac * Math.PI) / 2.0;
+        return (float)(frac * 2.0 + mul) / 3.0F;
+    }
+    //? }
 }

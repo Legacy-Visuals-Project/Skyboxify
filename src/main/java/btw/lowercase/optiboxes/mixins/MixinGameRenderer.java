@@ -3,7 +3,7 @@ package btw.lowercase.optiboxes.mixins;
 import org.spongepowered.asm.mixin.Mixin;
 
 //? <=1.21.10 {
-import btw.lowercase.optiboxes.skybox.SkyboxManager;
+/*import btw.lowercase.optiboxes.skybox.SkyboxManager;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.Minecraft;
@@ -12,7 +12,7 @@ import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-//?}
+*///?}
 
 //? >=1.21.6 {
 @Mixin(net.minecraft.client.renderer.GameRenderer.class)
@@ -21,7 +21,7 @@ import org.spongepowered.asm.mixin.injection.At;
  *///?}
 public abstract class MixinGameRenderer {
     //? <=1.21.10 {
-    @Shadow
+    /*@Shadow
     @Final
     private Minecraft minecraft;
 
@@ -40,5 +40,5 @@ public abstract class MixinGameRenderer {
             return original.call(instance, x, y);
         }
     }
-    //?}
+    *///?}
 }

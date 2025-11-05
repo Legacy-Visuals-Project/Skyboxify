@@ -55,6 +55,10 @@ base { archivesName.set(mod.id) }
 stonecutter {
     constants["fabric"] = loader.isFabric
     constants["neoforge"] = loader.isNeoforge
+    replacements.string {
+        direction = eval(current.version, ">=1.21.11")
+        replace("ResourceLocation", "Identifier")
+    }
 }
 
 blossom {

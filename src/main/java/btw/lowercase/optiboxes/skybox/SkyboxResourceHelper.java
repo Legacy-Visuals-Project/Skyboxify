@@ -1,9 +1,8 @@
-package btw.lowercase.optiboxes.utils;
+package btw.lowercase.optiboxes.skybox;
 
 import btw.lowercase.optiboxes.OptiBoxesClient;
-import btw.lowercase.optiboxes.skybox.SkyboxManager;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.jetbrains.annotations.NotNull;
@@ -46,15 +45,15 @@ public class SkyboxResourceHelper implements IdentifiableResourceReloadListener 
     }
 
     @Override
-    public ResourceLocation getFabricId() {
-        return ResourceLocation.fromNamespaceAndPath(OptiBoxesClient.MOD_ID, "skybox_reader");
+    public Identifier getFabricId() {
+        return OptiBoxesClient.id("skybox_reader");
     }
 
-    public Stream<ResourceLocation> searchIn(String parent) {
+    public Stream<Identifier> searchIn(String parent) {
         return this.resourceManager.listResources(parent, path -> true).keySet().stream();
     }
 
-    public InputStream getInputStream(ResourceLocation resourceLocation) {
+    public InputStream getInputStream(Identifier resourceLocation) {
         try {
             Resource resource = this.resourceManager.getResource(resourceLocation).orElse(null);
             return resource == null ? null : resource.open();

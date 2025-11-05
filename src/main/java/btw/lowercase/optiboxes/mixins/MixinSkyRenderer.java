@@ -50,10 +50,10 @@ public abstract class MixinSkyRenderer {
             at = @At(
                     value = "INVOKE",
                     //? >=1.21.11 {
-                    /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderMoon(Lnet/minecraft/world/level/MoonPhase;FLcom/mojang/blaze3d/vertex/PoseStack;)V"
-                    *///?} else >=1.21.9 {
-                    target = "Lnet/minecraft/client/renderer/SkyRenderer;renderMoon(IFLcom/mojang/blaze3d/vertex/PoseStack;)V"
-                    //?} else >=1.21.4 {
+                    target = "Lnet/minecraft/client/renderer/SkyRenderer;renderMoon(Lnet/minecraft/world/level/MoonPhase;FLcom/mojang/blaze3d/vertex/PoseStack;)V"
+                    //?} else >=1.21.9 {
+                    /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderMoon(IFLcom/mojang/blaze3d/vertex/PoseStack;)V"
+                    *///?} else >=1.21.4 {
                     /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderMoon(IFLnet/minecraft/client/renderer/MultiBufferSource;Lcom/mojang/blaze3d/vertex/PoseStack;)V"
                     *///?} else {
                     /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderMoon(IFLcom/mojang/blaze3d/vertex/Tesselator;Lcom/mojang/blaze3d/vertex/PoseStack;)V"
@@ -63,10 +63,10 @@ public abstract class MixinSkyRenderer {
     private boolean uniskies$toggleMoon(
             SkyRenderer instance,
             //? >=1.21.11 {
-            /*net.minecraft.world.level.MoonPhase moonPhases,
-            *///?} else {
-            int moonPhases,
-            //?}
+            net.minecraft.world.level.MoonPhase moonPhases,
+            //?} else {
+            /*int moonPhases,
+            *///?}
             float rainLevel,
             //? <1.21.9 {
             /*//? >=1.21.4 {

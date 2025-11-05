@@ -4,8 +4,8 @@ import btw.lowercase.optiboxes.command.OptiboxesCommand;
 import btw.lowercase.optiboxes.config.OptiBoxesConfig;
 import btw.lowercase.optiboxes.skybox.OptiFineSkybox;
 import btw.lowercase.optiboxes.skybox.SkyboxManager;
+import btw.lowercase.optiboxes.skybox.SkyboxResourceHelper;
 import btw.lowercase.optiboxes.utils.CommonUtils;
-import btw.lowercase.optiboxes.utils.SkyboxResourceHelper;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.JsonOps;
@@ -15,7 +15,8 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallba
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.world.level.Level;
 import org.slf4j.Logger;
@@ -44,28 +45,21 @@ public final class OptiBoxesClient implements ClientModInitializer {
     private static ModContainer MOD_CONTAINER = null;
     public static final Logger LOGGER = LoggerFactory.getLogger(OptiBoxesClient.class);
 
-    public static ResourceLocation id(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
+    public static Identifier id(String path) {
+        return Identifier.fromNamespaceAndPath(MOD_ID, path);
     }
 
     public static OptiBoxesConfig getConfig() {
         if (CONFIG_INSTANCE == null) {
-            CONFIG_INSTANCE = new OptiBoxesConfig(FabricLoader.getInstance().getConfigDir().resolve(OptiBoxesClient.MOD_ID + ".json"));
+            CONFIG_INSTANCE = new OptiBoxesConfig(MOD_CONTAINER, FabricLoader.getInstance().getConfigDir().resolve(OptiBoxesClient.MOD_ID + ".json"));
         }
 
         return CONFIG_INSTANCE;
     }
 
-    public static ModContainer getModContainer() {
-        if (MOD_CONTAINER == null) {
-            MOD_CONTAINER = FabricLoader.getInstance().getModContainer(MOD_ID).orElseThrow(() -> new RuntimeException("Mod metadata container was null."));
-        }
-
-        return MOD_CONTAINER;
-    }
-
     @Override
     public void onInitializeClient() {
+        MOD_CONTAINER = FabricLoader.getInstance().getModContainer(MOD_ID).orElseThrow(() -> new RuntimeException("Mod metadata container was null."));
         getConfig().load();
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new SkyboxResourceHelper());
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(new OptiboxesCommand()));
@@ -86,7 +80,7 @@ public final class OptiBoxesClient implements ClientModInitializer {
         layers.put("world0", new JsonArray()); // Overworld
         layers.put("world-1", new JsonArray()); // Nether
         layers.put("world1", new JsonArray()); // The End
-        skyboxResourceHelper.searchIn(skyParent).filter(id -> id.getPath().endsWith(".properties")).sorted(Comparator.comparing(ResourceLocation::getPath, (id1, id2) -> {
+        skyboxResourceHelper.searchIn(skyParent).filter(id -> id.getPath().endsWith(".properties")).sorted(Comparator.comparing(Identifier::getPath, (id1, id2) -> {
             final Matcher matcherId1 = skyPattern.matcher(id1);
             final Matcher matcherId2 = skyPattern.matcher(id2);
             if (matcherId1.find() && matcherId2.find()) {
@@ -145,12 +139,19 @@ public final class OptiBoxesClient implements ClientModInitializer {
             JsonArray skyLayers = entry.getValue();
             if (!skyLayers.isEmpty()) {
                 skyJson.add("layers", skyLayers);
-                skyJson.addProperty("world",
-                        (switch (entry.getKey()) {
-                            case "world-1" -> Level.NETHER;
-                            case "world1" -> Level.END;
-                            default -> Level.OVERWORLD;
-                        }).location().toString());
+                ResourceKey<Level> resourceKey = switch (entry.getKey()) {
+                    case "world-1" -> Level.NETHER;
+                    case "world1" -> Level.END;
+                    default -> Level.OVERWORLD;
+                };
+                skyJson.addProperty(
+                        "world",
+                        //? >=1.21.11 {
+                        resourceKey.identifier().toString()
+                        //?} else {
+                        /*resourceKey.location().toString()
+                         *///?}
+                );
                 SkyboxManager.INSTANCE.addSkybox(OptiFineSkybox.CODEC.decode(JsonOps.INSTANCE, skyJson).getOrThrow().getFirst());
             }
         }

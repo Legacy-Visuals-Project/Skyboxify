@@ -8,7 +8,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
@@ -18,27 +18,27 @@ import org.joml.Vector3f;
 import java.util.List;
 
 public record OptiFineSkyLayer(
-        ResourceLocation source,
+        Identifier source,
         boolean biomeInclusion,
-        List<ResourceLocation> biomes,
+        List<Identifier> biomes,
         List<Range> heights,
         Blend blend,
         Fade fade,
         boolean rotate,
         float speed,
         //? >=1.21.11 {
-        /*org.joml.Vector3fc axis,
-        *///?} else {
-        Vector3f axis,
-        //?}
+        org.joml.Vector3fc axis,
+        //?} else {
+        /*Vector3f axis,
+        *///?}
         Loop loop,
         float transition,
         List<Weather> weatherConditions
 ) {
     public static final Codec<OptiFineSkyLayer> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            ResourceLocation.CODEC.fieldOf("source").forGetter(OptiFineSkyLayer::source),
+            Identifier.CODEC.fieldOf("source").forGetter(OptiFineSkyLayer::source),
             Codec.BOOL.optionalFieldOf("biomeInclusion", true).forGetter(OptiFineSkyLayer::biomeInclusion),
-            ResourceLocation.CODEC.listOf().optionalFieldOf("biomes", ImmutableList.of()).forGetter(OptiFineSkyLayer::biomes),
+            Identifier.CODEC.listOf().optionalFieldOf("biomes", ImmutableList.of()).forGetter(OptiFineSkyLayer::biomes),
             Range.CODEC.listOf().optionalFieldOf("heights", ImmutableList.of()).forGetter(OptiFineSkyLayer::heights),
             Blend.CODEC.optionalFieldOf("blend", Blend.ADD).forGetter(OptiFineSkyLayer::blend),
             Fade.CODEC.optionalFieldOf("fade", Fade.DEFAULT).forGetter(OptiFineSkyLayer::fade),
@@ -51,19 +51,25 @@ public record OptiFineSkyLayer(
     ).apply(instance, OptiFineSkyLayer::new));
 
     public boolean getConditionCheck(Level level) {
-        Entity cameraEntity = Minecraft.getInstance().getCameraEntity();
+        final Entity cameraEntity = Minecraft.getInstance().getCameraEntity();
         if (cameraEntity == null) {
             return false;
         }
 
-        BlockPos entityPos = cameraEntity.getOnPos();
+        final BlockPos entityPos = cameraEntity.getOnPos();
         if (!this.biomes.isEmpty()) {
-            Holder<Biome> currentBiome = level.getBiome(entityPos);
+            final Holder<Biome> currentBiome = level.getBiome(entityPos);
             if (!currentBiome.isBound()) {
                 return false;
             }
 
-            if (!(this.biomeInclusion && this.biomes.contains(level.getBiome(cameraEntity.blockPosition()).unwrapKey().orElseThrow().location()))) {
+            if (!(this.biomeInclusion && this.biomes.contains(level.getBiome(cameraEntity.blockPosition()).unwrapKey().orElseThrow()
+                    //? >=1.21.11 {
+                    .identifier()
+                    //?} else {
+                    /*.location()
+                    *///?}
+            ))) {
                 return false;
             }
         }

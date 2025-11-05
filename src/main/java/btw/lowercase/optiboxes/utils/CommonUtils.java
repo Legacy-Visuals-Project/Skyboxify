@@ -1,15 +1,16 @@
 package btw.lowercase.optiboxes.utils;
 
 import btw.lowercase.optiboxes.OptiBoxesClient;
+import btw.lowercase.optiboxes.skybox.SkyboxResourceHelper;
 import btw.lowercase.optiboxes.utils.components.Range;
 import btw.lowercase.optiboxes.utils.components.Weather;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
-import net.minecraft.ResourceLocationException;
+import net.minecraft.IdentifierException;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -27,9 +28,9 @@ public final class CommonUtils {
     private CommonUtils() {
     }
 
-    public static @Nullable JsonObject convertOptiFineSkyProperties(SkyboxResourceHelper skyboxResourceHelper, Properties properties, ResourceLocation propertiesResourceLocation) {
+    public static @Nullable JsonObject convertOptiFineSkyProperties(SkyboxResourceHelper skyboxResourceHelper, Properties properties, Identifier propertiesIdentifier) {
         JsonObject jsonObject = new JsonObject();
-        Optional<ResourceLocation> sourceTexture = Optional.ofNullable(parseSourceTexture(properties.getProperty("source", null), skyboxResourceHelper, propertiesResourceLocation));
+        Optional<Identifier> sourceTexture = Optional.ofNullable(parseSourceTexture(properties.getProperty("source", null), skyboxResourceHelper, propertiesIdentifier));
         if (sourceTexture.isEmpty() && OptiBoxesClient.getConfig().ignoreBrokenSkies.isEnabled()) {
             return null;
         }
@@ -115,7 +116,7 @@ public final class CommonUtils {
             String[] biomes = biomesString.trim().split(" ");
             if (biomes.length > 0) {
                 JsonArray jsonBiomes = new JsonArray();
-                Arrays.stream(biomes).filter(ResourceLocation::isValidPath).forEach(jsonBiomes::add);
+                Arrays.stream(biomes).filter(Identifier::isValidPath).forEach(jsonBiomes::add);
                 jsonObject.add("biomes", jsonBiomes);
             }
         }
@@ -152,8 +153,8 @@ public final class CommonUtils {
         return jsonObject;
     }
 
-    public static @Nullable ResourceLocation parseSourceTexture(String source, SkyboxResourceHelper skyboxResourceHelper, ResourceLocation propertiesId) {
-        ResourceLocation textureId;
+    public static @Nullable Identifier parseSourceTexture(String source, SkyboxResourceHelper skyboxResourceHelper, Identifier propertiesId) {
+        Identifier textureId;
         String namespace;
         String path;
         if (source == null) {
@@ -170,7 +171,7 @@ public final class CommonUtils {
                     namespace = parts[1];
                     path = parts[2];
                 } else {
-                    ResourceLocation location = ResourceLocation.tryParse(source);
+                    Identifier location = Identifier.tryParse(source);
                     if (location != null) {
                         namespace = location.getNamespace();
                         path = location.getPath();
@@ -182,8 +183,8 @@ public final class CommonUtils {
         }
 
         try {
-            textureId = ResourceLocation.fromNamespaceAndPath(namespace, path);
-        } catch (ResourceLocationException e) {
+            textureId = Identifier.fromNamespaceAndPath(namespace, path);
+        } catch (IdentifierException e) {
             LOGGER.error("Failed to read texture path '{}:{}' as resource location", namespace, path);
             return null;
         }
@@ -391,6 +392,7 @@ public final class CommonUtils {
     public static float getWeatherAlpha(List<Weather> weatherConditions, float rainStrength, float thunderStrength) {
         final float alpha = 1.0F - rainStrength;
         final float calculatedRainStrength = rainStrength - thunderStrength;
+
         float weatherAlpha = 0.0F;
         if (weatherConditions.contains(Weather.CLEAR)) {
             weatherAlpha += alpha;
@@ -406,7 +408,6 @@ public final class CommonUtils {
 
         return Mth.clamp(weatherAlpha, 0.0F, 1.0F);
     }
-
     // Safety
     public static int safeParseInteger(String value, int defaultValue) {
         try {

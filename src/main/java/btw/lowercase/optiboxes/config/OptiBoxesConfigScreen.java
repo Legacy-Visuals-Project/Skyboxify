@@ -9,16 +9,16 @@ import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import org.visuals.legacy.lightconfig.lib.v1.ConfigTranslate;
+import org.visuals.legacy.lightconfig.lib.v1.Translations;
 import org.visuals.legacy.lightconfig.lib.v1.screen.InternalConfigScreen;
 
+@SuppressWarnings("UnstableApiUsage")
 public class OptiBoxesConfigScreen extends InternalConfigScreen {
     public OptiBoxesConfigScreen(Component title, OptiBoxesConfig config, Screen parent) {
         super(title, config, parent);
     }
 
     @Override
-    @SuppressWarnings("DataFlowIssue")
     protected void init() {
         OptiBoxesConfig optiBoxesConfig = (OptiBoxesConfig) this.config;
 
@@ -32,17 +32,17 @@ public class OptiBoxesConfigScreen extends InternalConfigScreen {
         // Didn't iterate fields here because I wanted custom order
         rowHelper.addChild(optiBoxesConfig.enabled.createWidget());
         rowHelper.addChild(optiBoxesConfig.showOverworldForUnknownDimension.createWidget());
-        rowHelper.addChild(optiBoxesConfig.processOptiFine.createWidget(() -> this.minecraft.reloadResourcePacks()));
-        rowHelper.addChild(optiBoxesConfig.processMCPatcher.createWidget(() -> this.minecraft.reloadResourcePacks()));
+        rowHelper.addChild(optiBoxesConfig.processOptiFine.createWidget(this.minecraft::reloadResourcePacks));
+        rowHelper.addChild(optiBoxesConfig.processMCPatcher.createWidget(this.minecraft::reloadResourcePacks));
         rowHelper.addChild(optiBoxesConfig.renderSunMoon.createWidget());
         rowHelper.addChild(optiBoxesConfig.renderStars.createWidget());
-        rowHelper.addChild(optiBoxesConfig.ignoreBrokenSkies.createWidget(() -> this.minecraft.reloadResourcePacks()));
+        rowHelper.addChild(optiBoxesConfig.ignoreBrokenSkies.createWidget(this.minecraft::reloadResourcePacks));
         layout.addToContents(gridLayout);
 
         GridLayout footerGridLayout = new GridLayout();
         footerGridLayout.defaultCellSetting().paddingHorizontal(4).paddingBottom(4).alignHorizontallyCenter();
         GridLayout.RowHelper footerRowHelper = footerGridLayout.createRowHelper(2);
-        footerRowHelper.addChild(Button.builder(ConfigTranslate.RESET, (button) -> this.reset()).width(125).build());
+        footerRowHelper.addChild(Button.builder(Translations.RESET, (button) -> this.reset()).width(125).build());
         footerRowHelper.addChild(Button.builder(CommonComponents.GUI_DONE, (button) -> this.onClose()).width(125).build());
         layout.addToFooter(footerGridLayout);
 
