@@ -1,4 +1,4 @@
-package btw.lowercase.optiboxes.utils.components;
+package btw.lowercase.optiboxes.skybox.components;
 
 import com.mojang.serialization.Codec;
 

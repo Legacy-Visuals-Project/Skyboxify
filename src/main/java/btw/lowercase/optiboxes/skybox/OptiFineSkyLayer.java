@@ -1,7 +1,7 @@
 package btw.lowercase.optiboxes.skybox;
 
+import btw.lowercase.optiboxes.skybox.components.*;
 import btw.lowercase.optiboxes.utils.CommonUtils;
-import btw.lowercase.optiboxes.utils.components.*;
 import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -30,7 +30,7 @@ public record OptiFineSkyLayer(
         org.joml.Vector3fc axis,
         //?} else {
         /*Vector3f axis,
-        *///?}
+         *///?}
         Loop loop,
         float transition,
         List<Weather> weatherConditions
@@ -68,7 +68,7 @@ public record OptiFineSkyLayer(
                     .identifier()
                     //?} else {
                     /*.location()
-                    *///?}
+                     *///?}
             ))) {
                 return false;
             }
@@ -93,11 +93,11 @@ public record OptiFineSkyLayer(
         } else if (this.loop.ranges() != null) {
             long adjustedTime = dayTime - (long) this.fade.startFadeIn();
             while (adjustedTime < 0L) {
-                adjustedTime += 24000L * (int) this.loop.days();
+                adjustedTime += 24000L * this.loop.days();
             }
 
             final int daysPassed = (int) (adjustedTime / 24000L);
-            final int currentDay = daysPassed % (int) this.loop.days();
+            final int currentDay = daysPassed % this.loop.days();
             return CommonUtils.checkRanges(currentDay, this.loop.ranges());
         } else {
             return true;

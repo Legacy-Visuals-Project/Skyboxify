@@ -1,8 +1,7 @@
 package btw.lowercase.optiboxes.skybox;
 
 import btw.lowercase.optiboxes.utils.CommonUtils;
-import btw.lowercase.optiboxes.utils.SkyPart;
-import btw.lowercase.optiboxes.utils.UVRange;
+import btw.lowercase.optiboxes.skybox.components.UVRange;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.Minecraft;
@@ -74,9 +73,9 @@ public final class OptiFineSkyRenderer {
 
     public static com.mojang.blaze3d.pipeline.RenderPipeline getSkyboxPipeline(@org.jetbrains.annotations.Nullable btw.lowercase.optiboxes.utils.BlendFunction blendFunction) {
         com.mojang.blaze3d.pipeline.RenderPipeline.Builder builder = com.mojang.blaze3d.pipeline.RenderPipeline.builder(btw.lowercase.optiboxes.mixins.RenderPipelinesAccessor.optiboxes$getMatricesProjectionSnippet());
-        builder.withLocation(btw.lowercase.optiboxes.OptiBoxesClient.id("pipeline/custom_skybox"));
-        builder.withVertexShader(btw.lowercase.optiboxes.OptiBoxesClient.id("core/custom_skybox"));
-        builder.withFragmentShader(btw.lowercase.optiboxes.OptiBoxesClient.id("core/custom_skybox"));
+        builder.withLocation(btw.lowercase.optiboxes.OptiBoxesClient.locationOrNull("pipeline/custom_skybox"));
+        builder.withVertexShader(btw.lowercase.optiboxes.OptiBoxesClient.locationOrNull("core/custom_skybox"));
+        builder.withFragmentShader(btw.lowercase.optiboxes.OptiBoxesClient.locationOrNull("core/custom_skybox"));
         builder.withDepthWrite(false);
         builder.withColorWrite(true, false);
         if (blendFunction != null) {
@@ -91,11 +90,7 @@ public final class OptiFineSkyRenderer {
     public void renderSkybox(OptiFineSkybox optiFineSkybox, Matrix4fStack modelViewStack, ClientLevel level, float tickDelta) {
         long dayTime = level.getDayTime();
         int clampedTimeOfDay = (int) (dayTime % 24000L);
-        //? >=1.21.11 {
         float skyAngle = getTimeOfDay(level);
-        //? } else {
-        /*float skyAngle = level.getTimeOfDay(tickDelta);
-         *///? }
         float thunderLevel = level.getThunderLevel(tickDelta);
         float rainLevel = level.getRainLevel(tickDelta);
         if (rainLevel > 0.0F) {
@@ -220,8 +215,8 @@ public final class OptiFineSkyRenderer {
         //?}
     }
 
-    //? >=1.21.11 {
     private float getTimeOfDay(Level level) {
+        //? >=1.21.11 {
         long fixedTime = level.getDayTime();
         if (level.dimensionType().hasFixedTime()) {
             if (level.dimension().equals(Level.NETHER)) {
@@ -234,6 +229,8 @@ public final class OptiFineSkyRenderer {
         double frac = Mth.frac(fixedTime / 24000.0 - 0.25);
         double mul = 0.5 - Math.cos(frac * Math.PI) / 2.0;
         return (float)(frac * 2.0 + mul) / 3.0F;
+        //? } else {
+        /*return level.getTimeOfDay(1.0F);
+        *///? }
     }
-    //? }
 }

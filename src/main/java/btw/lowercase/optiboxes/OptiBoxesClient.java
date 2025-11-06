@@ -6,13 +6,13 @@ import btw.lowercase.optiboxes.skybox.OptiFineSkybox;
 import btw.lowercase.optiboxes.skybox.SkyboxManager;
 import btw.lowercase.optiboxes.skybox.SkyboxResourceHelper;
 import btw.lowercase.optiboxes.utils.CommonUtils;
+import btw.lowercase.optiboxes.skybox.SkyboxParser;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.JsonOps;
 import dev.kikugie.fletching_table.annotation.fabric.Entrypoint;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.resources.Identifier;
@@ -45,8 +45,8 @@ public final class OptiBoxesClient implements ClientModInitializer {
     private static ModContainer MOD_CONTAINER = null;
     public static final Logger LOGGER = LoggerFactory.getLogger(OptiBoxesClient.class);
 
-    public static Identifier id(String path) {
-        return Identifier.fromNamespaceAndPath(MOD_ID, path);
+    public static Identifier locationOrNull(String path) {
+        return Identifier.tryBuild(MOD_ID, path);
     }
 
     public static OptiBoxesConfig getConfig() {
@@ -61,8 +61,12 @@ public final class OptiBoxesClient implements ClientModInitializer {
     public void onInitializeClient() {
         MOD_CONTAINER = FabricLoader.getInstance().getModContainer(MOD_ID).orElseThrow(() -> new RuntimeException("Mod metadata container was null."));
         getConfig().load();
-        ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new SkyboxResourceHelper());
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(new OptiboxesCommand()));
+        //? >=1.21.10 {
+        net.fabricmc.fabric.api.resource.v1.ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloader(locationOrNull("skybox_reader"), new SkyboxResourceHelper());
+        //? } else {
+        /*net.fabricmc.fabric.api.resource.ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new SkyboxResourceHelper());
+        *///? }
     }
 
     public static void convert(SkyboxResourceHelper skyboxResourceHelper) {
@@ -92,7 +96,7 @@ public final class OptiBoxesClient implements ClientModInitializer {
             }
             return 0;
         })).forEach(id -> {
-            Matcher matcher = skyPattern.matcher(id.getPath());
+            final Matcher matcher = skyPattern.matcher(id.getPath());
             if (matcher.find()) {
                 final String world = matcher.group("world");
                 final String name = matcher.group("name");
@@ -126,7 +130,7 @@ public final class OptiBoxesClient implements ClientModInitializer {
                     }
                 }
 
-                final JsonObject json = CommonUtils.convertOptiFineSkyProperties(skyboxResourceHelper, properties, id);
+                final JsonObject json = SkyboxParser.parseSkyProperties(properties, id);
                 // NOTE: Don't add broken skies (returns null if broken)
                 if (json != null && layers.containsKey(world)) {
                     layers.get(world).add(json);

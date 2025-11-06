@@ -1,19 +1,22 @@
 package btw.lowercase.optiboxes.skybox;
 
 import btw.lowercase.optiboxes.OptiBoxesClient;
-import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.minecraft.resources.Identifier;
-import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.stream.Stream;
 
-public class SkyboxResourceHelper implements IdentifiableResourceReloadListener {
+public class SkyboxResourceHelper implements
+        //? >=1.21.10 {
+        net.minecraft.server.packs.resources.PreparableReloadListener
+        //? } else {
+        /*net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener
+        *///? }
+{
     private ResourceManager resourceManager;
 
     @Override
@@ -24,10 +27,10 @@ public class SkyboxResourceHelper implements IdentifiableResourceReloadListener 
             /*PreparationBarrier preparationBarrier,*/
             //? <1.21.9
             /*ResourceManager resourceManager,*/
-            Executor backgroundExecutor,
+            @NotNull Executor backgroundExecutor,
             //? >=1.21.9
             PreparationBarrier preparationBarrier,
-            Executor gameExecutor
+            @NotNull Executor gameExecutor
     ) {
         this.resourceManager =
             //? >=1.21.9 {
@@ -44,10 +47,12 @@ public class SkyboxResourceHelper implements IdentifiableResourceReloadListener 
         }).thenCompose(preparationBarrier::wait);
     }
 
-    @Override
+    //? <=1.21.8 {
+    /*@Override
     public Identifier getFabricId() {
-        return OptiBoxesClient.id("skybox_reader");
+        return OptiBoxesClient.locationOrNull("skybox_reader");
     }
+    *///? }
 
     public Stream<Identifier> searchIn(String parent) {
         return this.resourceManager.listResources(parent, path -> true).keySet().stream();
@@ -55,9 +60,8 @@ public class SkyboxResourceHelper implements IdentifiableResourceReloadListener 
 
     public InputStream getInputStream(Identifier resourceLocation) {
         try {
-            Resource resource = this.resourceManager.getResource(resourceLocation).orElse(null);
-            return resource == null ? null : resource.open();
-        } catch (IOException e) {
+            return this.resourceManager.getResource(resourceLocation).orElseThrow().open();
+        } catch (Exception ignored) {
             return null;
         }
     }

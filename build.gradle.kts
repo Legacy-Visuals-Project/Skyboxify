@@ -32,7 +32,7 @@ class ModData {
 class Dependencies {
     val neoForgeVersion = property("deps.neoforge_version")
     val fabricLoaderVersion = property("deps.fabric_loader_version")
-    val fabricApiVersion = property("deps.fabric_api_version")
+    val fabricApiVersion = property("deps.fabric_api_version").toString()
     val mixinconstraintsVersion = property("deps.mixinconstraints_version")
     val mixinsquaredVersion = property("deps.mixinsquared_version")
     val lightConfigVersion = property("deps.lightconfig")
@@ -131,8 +131,11 @@ dependencies {
     include(implementation("com.moulberry:mixinconstraints:${deps.mixinconstraintsVersion}")!!)!!
     include(implementation(annotationProcessor("com.github.bawnorton.mixinsquared:mixinsquared-${loader.loader}:${deps.mixinsquaredVersion}")!!)!!)
     if (loader.isFabric) {
-        modImplementation("net.fabricmc:fabric-loader:${deps.fabricLoaderVersion}")!!
-        modImplementation("net.fabricmc.fabric-api:fabric-api:${deps.fabricApiVersion}")
+        modImplementation("net.fabricmc:fabric-loader:${deps.fabricLoaderVersion}")
+
+        modImplementation(fabricApi.module("fabric-resource-loader-v0", deps.fabricApiVersion))
+        modImplementation(fabricApi.module("fabric-command-api-v2", deps.fabricApiVersion))
+
         optionalProp("deps.modmenu_version") { prop ->
             modImplementation("com.terraformersmc:modmenu:${prop}")
         }

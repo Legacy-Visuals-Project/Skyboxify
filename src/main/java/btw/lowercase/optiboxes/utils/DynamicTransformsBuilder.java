@@ -11,8 +11,6 @@ public final class DynamicTransformsBuilder {
     private Optional<Vector4f> colorModulator = Optional.empty();
     private Optional<Vector3f> modelOffset = Optional.empty();
     private Optional<Matrix4f> textureMatrix = Optional.empty();
-    //? <1.21.11
-    /*private Optional<Float> lineWidth = Optional.empty();*/
 
     public static DynamicTransformsBuilder of() {
         return new DynamicTransformsBuilder();
@@ -50,13 +48,6 @@ public final class DynamicTransformsBuilder {
         return this;
     }
 
-    //? <1.21.11 {
-    /*public DynamicTransformsBuilder withLineWidth(float lineWidth) {
-        this.lineWidth = Optional.of(lineWidth);
-        return this;
-    }
-    *///?}
-
     //? >=1.21.6 {
     public com.mojang.blaze3d.buffers.GpuBufferSlice build() {
         return com.mojang.blaze3d.systems.RenderSystem.getDynamicUniforms().writeTransform(
@@ -66,12 +57,12 @@ public final class DynamicTransformsBuilder {
                 this.textureMatrix.orElse(
                         //? >=1.21.11 {
                         new org.joml.Matrix4f()
-                         //?} else {
+                        //?} else {
                         /*com.mojang.blaze3d.systems.RenderSystem.getTextureMatrix()
-                        *///?}
+                         *///?}
                 )
                 //? <1.21.11
-                /*, this.lineWidth.orElse(com.mojang.blaze3d.systems.RenderSystem.getShaderLineWidth())*/
+                /*, com.mojang.blaze3d.systems.RenderSystem.getShaderLineWidth()*/
         );
     }
     //?}

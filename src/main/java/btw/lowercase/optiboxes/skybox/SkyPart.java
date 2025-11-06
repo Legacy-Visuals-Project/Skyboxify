@@ -1,5 +1,6 @@
-package btw.lowercase.optiboxes.utils;
+package btw.lowercase.optiboxes.skybox;
 
+import btw.lowercase.optiboxes.skybox.components.UVRange;
 import org.joml.Matrix4f;
 
 public enum SkyPart {
