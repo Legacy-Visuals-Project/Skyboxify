@@ -1,6 +1,8 @@
 package btw.lowercase.optiboxes.screen;
 
 import btw.lowercase.optiboxes.OptiBoxesClient;
+import btw.lowercase.optiboxes.screen.widget.Gidget;
+import btw.lowercase.optiboxes.screen.widget.SimpleButton;
 import btw.lowercase.optiboxes.skybox.OptiFineSkybox;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -18,7 +20,7 @@ import java.util.List;
 public class OptiboxesDebugScreen extends Screen {
     private final Screen parent;
     private final List<OptiFineSkybox> skyboxes;
-    private final List<SimpleButton> buttons;
+    private final List<Gidget> gidgets;
 
     private static final Identifier SKYBOX_LOCATION = OptiBoxesClient.locationOrNull("skybox");
 
@@ -26,25 +28,25 @@ public class OptiboxesDebugScreen extends Screen {
         super(Component.empty());
         this.parent = parent;
         this.skyboxes = skyboxes;
-        this.buttons = new ArrayList<>();
+        this.gidgets = new ArrayList<>();
     }
 
     @Override
     protected void init() {
         int index = 0;
-        this.buttons.clear();
+        this.gidgets.clear();
         this.addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, (button) -> this.onClose())
                 .pos((this.width / 2) - (Button.DEFAULT_WIDTH / 2), this.height - Button.DEFAULT_HEIGHT - 4)
                 .build());
         for (OptiFineSkybox skybox : this.skyboxes) {
             SimpleButton.DataHolder<OptiFineSkybox> button = new SimpleButton.DataHolder<>(
                     Component.literal(skybox.getWorldResourceKey().identifier().toString()),
-                    (this.width / 2) - (SimpleButton.WIDTH / 2),
-                    30 + ((SimpleButton.HEIGHT + 8) * index),
+                    (this.width / 2) - (SimpleButton.DEFAULT_WIDTH / 2),
+                    30 + ((SimpleButton.DEFAULT_HEIGHT + 8) * index),
                     this::buttonClicked
             );
             button.put(SKYBOX_LOCATION, skybox);
-            this.buttons.add(button);
+            this.gidgets.add(button);
             index++;
         }
     }
@@ -53,15 +55,17 @@ public class OptiboxesDebugScreen extends Screen {
     public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
         super.render(guiGraphics, mouseX, mouseY, delta);
         guiGraphics.drawCenteredString(this.font, this.skyboxes.isEmpty() ? "No skies enabled..." : this.skyboxes.size() + " Total Active Skyboxes", this.width / 2, 12, ARGB.white(1.0F));
-        for (SimpleButton button : this.buttons) {
-            button.render(guiGraphics, mouseX, mouseY);
+        for (Gidget gidget : this.gidgets) {
+            if (gidget instanceof SimpleButton button) {
+                button.render(guiGraphics, mouseX, mouseY);
+            }
         }
     }
 
     @Override
     public boolean mouseClicked(@NotNull MouseButtonEvent event, boolean isDoubleClick) {
-        for (SimpleButton button : this.buttons) {
-            if (button.isInside(event.x(), event.y())) {
+        for (Gidget gidget : this.gidgets) {
+            if (gidget instanceof SimpleButton button && button.isInside(event.x(), event.y())) {
                 button.onClick().accept(button);
             }
         }

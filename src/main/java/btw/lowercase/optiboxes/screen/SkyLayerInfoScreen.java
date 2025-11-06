@@ -12,11 +12,13 @@ import org.jetbrains.annotations.NotNull;
 public class SkyLayerInfoScreen extends Screen {
     private final Screen parent;
     private final OptiFineSkyLayer skyLayer;
+    private final int index;
 
-    public SkyLayerInfoScreen(Screen parent, OptiFineSkyLayer skyLayer) {
+    public SkyLayerInfoScreen(Screen parent, OptiFineSkyLayer skyLayer, int index) {
         super(Component.empty());
         this.parent = parent;
         this.skyLayer = skyLayer;
+        this.index = index;
     }
 
     @Override
@@ -29,7 +31,18 @@ public class SkyLayerInfoScreen extends Screen {
     @Override
     public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
         super.render(guiGraphics, mouseX, mouseY, delta);
-        guiGraphics.drawCenteredString(this.font, "TODO", this.width / 2, 12, ARGB.white(1.0F));
+        guiGraphics.drawCenteredString(this.font, Component.literal(this.index + " - " + this.skyLayer.source().toString()), this.width / 2, 12, ARGB.white(1.0F));
+        // context.getSource().sendFeedback(Component.literal("    Rotate: " + skyLayer.rotate()));
+        // context.getSource().sendFeedback(Component.literal("    Axis: " + skyLayer.axis()));
+        // context.getSource().sendFeedback(Component.literal("    Blend: " + skyLayer.blend()));
+        // context.getSource().sendFeedback(Component.literal("    Speed: " + skyLayer.speed()));
+        // context.getSource().sendFeedback(Component.literal("    Transition: " + skyLayer.transition()));
+        // context.getSource().sendFeedback(Component.literal("    Fade: " + skyLayer.fade()));
+        // context.getSource().sendFeedback(Component.literal("    Loop: " + skyLayer.loop()));
+        // context.getSource().sendFeedback(Component.literal("    Include Biome: " + skyLayer.biomeInclusion()));
+        // context.getSource().sendFeedback(Component.literal("    Biomes: " + skyLayer.biomes()));
+        // context.getSource().sendFeedback(Component.literal("    Heights: " + skyLayer.heights()));
+        // context.getSource().sendFeedback(Component.literal("    Weather Conditions: " + skyLayer.weatherConditions()));
     }
 
     @Override
@@ -37,16 +50,3 @@ public class SkyLayerInfoScreen extends Screen {
         this.minecraft.setScreen(this.parent);
     }
 }
-
-// context.getSource().sendFeedback(Component.literal("  #" + index + " (" + skyLayer.source() + ")"));
-// context.getSource().sendFeedback(Component.literal("    Rotate: " + skyLayer.rotate()));
-// context.getSource().sendFeedback(Component.literal("    Axis: " + skyLayer.axis()));
-// context.getSource().sendFeedback(Component.literal("    Blend: " + skyLayer.blend()));
-// context.getSource().sendFeedback(Component.literal("    Speed: " + skyLayer.speed()));
-// context.getSource().sendFeedback(Component.literal("    Transition: " + skyLayer.transition()));
-// context.getSource().sendFeedback(Component.literal("    Fade: " + skyLayer.fade()));
-// context.getSource().sendFeedback(Component.literal("    Loop: " + skyLayer.loop()));
-// context.getSource().sendFeedback(Component.literal("    Include Biome: " + skyLayer.biomeInclusion()));
-// context.getSource().sendFeedback(Component.literal("    Biomes: " + skyLayer.biomes()));
-// context.getSource().sendFeedback(Component.literal("    Heights: " + skyLayer.heights()));
-// context.getSource().sendFeedback(Component.literal("    Weather Conditions: " + skyLayer.weatherConditions()));
