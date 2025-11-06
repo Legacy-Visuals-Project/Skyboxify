@@ -10,14 +10,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
-public class SimpleButton extends Gidget {
+public class SimpleButton extends Gidget implements Clickable {
     public static final int DEFAULT_WIDTH = 200;
     public static final int DEFAULT_HEIGHT = 20;
 
     private final Component text;
-    private final Consumer<SimpleButton> onClick;
+    private final Consumer<? super SimpleButton> onClick;
 
-    public SimpleButton(Component text, int x, int y, Consumer<SimpleButton> onClick) {
+    public SimpleButton(Component text, int x, int y, Consumer<? super SimpleButton> onClick) {
         super(x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT);
         this.text = text;
         this.onClick = onClick;
@@ -33,19 +33,20 @@ public class SimpleButton extends Gidget {
         guiGraphics.drawString(font, this.text, this.x + ((this.width / 2) - (textWidth / 2)), this.y + ((this.height / 2) - (font.lineHeight / 2)), 0xFFFFFFFF);
     }
 
-    public Component getText() {
-        return this.text;
+    @Override
+    public void click(double mouseX, double mouseY) {
+        this.onClick.accept(this);
     }
 
-    public Consumer<SimpleButton> onClick() {
-        return this.onClick;
+    public Component getText() {
+        return this.text;
     }
 
     public static class Storage extends SimpleButton {
         private final Map<Identifier, Object> data;
 
-        public Storage(Component text, int x, int y, Consumer<SimpleButton> onClick) {
-            super(text, x, y, onClick);
+        public Storage(Component text, int x, int y, Consumer<Storage> onClick) {
+            super(text, x, y, (Consumer<? super SimpleButton>) (Consumer<?>) onClick);
             this.data = new HashMap<>();
         }
 

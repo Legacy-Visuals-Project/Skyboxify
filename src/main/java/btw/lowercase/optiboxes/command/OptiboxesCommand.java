@@ -2,7 +2,7 @@ package btw.lowercase.optiboxes.command;
 
 import btw.lowercase.optiboxes.OptiBoxesClient;
 import btw.lowercase.optiboxes.skybox.SkyboxManager;
-import btw.lowercase.optiboxes.screen.OptiboxesDebugScreen;
+import btw.lowercase.optiboxes.screen.SkyboxListScreen;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
@@ -20,7 +20,7 @@ public class OptiboxesCommand extends LiteralArgumentBuilder<FabricClientCommand
         });
 
         then(ClientCommandManager.literal("debug").executes((context) -> {
-            minecraft.schedule(() -> minecraft.setScreen(new OptiboxesDebugScreen(minecraft.screen, SkyboxManager.INSTANCE.getActiveSkyboxes())));
+            minecraft.schedule(() -> minecraft.setScreen(new SkyboxListScreen(minecraft.screen, SkyboxManager.INSTANCE.getActiveSkyboxes())));
             return Command.SINGLE_SUCCESS;
         }));
     }

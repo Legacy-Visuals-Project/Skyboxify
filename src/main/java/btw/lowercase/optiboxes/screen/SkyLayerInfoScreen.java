@@ -1,33 +1,24 @@
 package btw.lowercase.optiboxes.screen;
 
-import btw.lowercase.optiboxes.screen.widget.Gidget;
 import btw.lowercase.optiboxes.screen.widget.Text;
 import btw.lowercase.optiboxes.skybox.OptiFineSkyLayer;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class SkyLayerInfoScreen extends Screen {
-    private final Screen parent;
+public class SkyLayerInfoScreen extends DebugScreen {
     private final OptiFineSkyLayer skyLayer;
-    private final List<Gidget> gidgets;
 
     public SkyLayerInfoScreen(Screen parent, OptiFineSkyLayer skyLayer, int index) {
-        super(Component.literal(index + " - " + skyLayer.source().toString()));
-        this.parent = parent;
+        super(Component.literal(index + " - " + skyLayer.source().toString()), parent);
         this.skyLayer = skyLayer;
-        this.gidgets = new ArrayList<>();
     }
 
     @Override
     protected void init() {
-        this.gidgets.clear();
+        super.init();
+
         this.gidgets.add(new Text.Builder(this.font, this.title, this.width / 2, 12).centered().build());
 
         int y = 12 + (this.font.lineHeight * 3);
@@ -56,18 +47,5 @@ public class SkyLayerInfoScreen extends Screen {
         this.addRenderableWidget(Button.builder(CommonComponents.GUI_BACK, (button) -> this.onClose())
                 .pos((this.width / 2) - (Button.DEFAULT_WIDTH / 2), this.height - Button.DEFAULT_HEIGHT - 4)
                 .build());
-    }
-
-    @Override
-    public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
-        super.render(guiGraphics, mouseX, mouseY, delta);
-        for (Gidget gidget : this.gidgets) {
-            gidget.render(guiGraphics, mouseX, mouseY);
-        }
-    }
-
-    @Override
-    public void onClose() {
-        this.minecraft.setScreen(this.parent);
     }
 }
