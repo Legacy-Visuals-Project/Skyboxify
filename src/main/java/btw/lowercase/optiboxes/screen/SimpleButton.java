@@ -10,16 +10,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
-public class Button {
+public class SimpleButton {
     public static final int WIDTH = 200;
     public static final int HEIGHT = 20;
 
     private final Component text;
     private final int x;
     private final int y;
-    private final Consumer<Button> onClick;
+    private final Consumer<SimpleButton> onClick;
 
-    public Button(Component text, int x, int y, Consumer<Button> onClick) {
+    public SimpleButton(Component text, int x, int y, Consumer<SimpleButton> onClick) {
         this.text = text;
         this.x = x;
         this.y = y;
@@ -51,20 +51,24 @@ public class Button {
         return this.y;
     }
 
-    public Consumer<Button> onClick() {
+    public Consumer<SimpleButton> onClick() {
         return this.onClick;
     }
 
-    public static class DataHolder<T> extends Button {
+    public static class DataHolder<T> extends SimpleButton {
         private final Map<Identifier, T> data;
 
-        public DataHolder(Component text, int x, int y, Consumer<Button> onClick) {
+        public DataHolder(Component text, int x, int y, Consumer<SimpleButton> onClick) {
             super(text, x, y, onClick);
             this.data = new HashMap<>();
         }
 
         public void put(Identifier location, T data) {
             this.data.put(location, data);
+        }
+
+        public boolean has(Identifier location) {
+            return this.data.containsKey(location);
         }
 
         public T get(Identifier location) {
