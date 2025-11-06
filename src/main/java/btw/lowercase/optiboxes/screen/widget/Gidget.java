@@ -3,10 +3,10 @@ package btw.lowercase.optiboxes.screen.widget;
 import net.minecraft.client.gui.GuiGraphics;
 
 public abstract class Gidget {
-    protected final int x;
-    protected final int y;
-    protected final int width;
-    protected final int height;
+    private final int x;
+    private final int y;
+    private final int width;
+    private final int height;
 
     public Gidget(int x, int y, int width, int height) {
         this.x = x;

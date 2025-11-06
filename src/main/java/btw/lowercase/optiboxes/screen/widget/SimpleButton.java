@@ -28,13 +28,15 @@ public class SimpleButton extends Gidget implements Clickable, TextHolder {
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         boolean hovered = this.isInside(mouseX, mouseY);
 
-        int backgroundColor = hovered ? ARGB.color(0.7F, 0xFFFFFF) : ARGB.color(0.58F, 0xFFFFFF);
-        guiGraphics.fill(this.x, this.y, this.x + this.width, this.y + this.height, backgroundColor);
+        int backgroundColor = hovered ? ARGB.white(0.7F) : ARGB.white(0.58F);
+        guiGraphics.fill(this.x(), this.y(), this.x() + this.width(), this.y() + this.height(), backgroundColor);
 
         Font font = Minecraft.getInstance().font;
-        int textWidth = font.width(this.text.getString());
-        int textColor = hovered ? ARGB.color(1.0F, 0xFFFFA0) : ARGB.color(1.0F, 0xE0E0E0);
-        guiGraphics.drawString(font, this.text, this.x + ((this.width / 2) - (textWidth / 2)), this.y + ((this.height / 2) - (font.lineHeight / 2)), textColor);
+        Text text = new Text.Builder(this.text, this.x() + (this.width() / 2), this.y() + (this.height() / 2))
+                .withColor(hovered ? ARGB.color(1.0F, 0xFFFFA0) : ARGB.color(1.0F, 0xE0E0E0))
+                .positioned(Text.Positioned.BOTH)
+                .build(font);
+        text.render(guiGraphics, mouseX, mouseY);
     }
 
     @Override

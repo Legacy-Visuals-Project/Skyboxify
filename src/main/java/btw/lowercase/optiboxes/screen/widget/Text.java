@@ -9,26 +9,31 @@ public class Text extends Gidget implements TextHolder {
     private final Font font;
     private final Component text;
     private final int color;
-    private final boolean centered;
+    private final Positioned positioned;
     private final boolean shadow;
 
-    public Text(Font font, Component text, int x, int y, int color, boolean centered, boolean shadow) {
+    public Text(Font font, Component text, int x, int y, int color, Positioned positioned, boolean shadow) {
         super(x, y, font.width(text.getString()), font.lineHeight);
         this.font = font;
         this.text = text;
         this.color = color;
-        this.centered = centered;
+        this.positioned = positioned;
         this.shadow = shadow;
     }
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        int finalX = this.x;
-        if (this.centered) {
-            finalX -= this.width / 2;
+        int finalX = this.x();
+        if (this.positioned == Positioned.BOTH || this.positioned == Positioned.CENTER_HORIZONTAL) {
+            finalX -= this.width() / 2;
         }
 
-        guiGraphics.drawString(this.font, this.text, finalX, this.y, this.color, this.shadow);
+        int finalY = this.y();
+        if (this.positioned == Positioned.BOTH || this.positioned == Positioned.CENTER_VERTICAL) {
+            finalY -= this.height() / 2;
+        }
+
+        guiGraphics.drawString(this.font, this.text, finalX, finalY, this.color, this.shadow);
     }
 
     @Override
@@ -40,8 +45,8 @@ public class Text extends Gidget implements TextHolder {
         return this.color;
     }
 
-    public boolean isCentered() {
-        return this.centered;
+    public Positioned getPositioned() {
+        return this.positioned;
     }
 
     public boolean hasShadow() {
@@ -54,7 +59,7 @@ public class Text extends Gidget implements TextHolder {
         private final int y;
 
         private int color = ARGB.white(1.0F);
-        private boolean centered = false;
+        private Positioned positioned = Positioned.NONE;
         private boolean shadow = true;
 
         public Builder(Component text, int x, int y) {
@@ -77,13 +82,25 @@ public class Text extends Gidget implements TextHolder {
             return this;
         }
 
+        public Builder positioned(Positioned positioned) {
+            this.positioned = positioned;
+            return this;
+        }
+
         public Builder centered() {
-            this.centered = true;
+            this.positioned = Positioned.CENTER_HORIZONTAL;
             return this;
         }
 
         public Text build(Font font) {
-            return new Text(font, this.text, this.x, this.y, this.color, this.centered, this.shadow);
+            return new Text(font, this.text, this.x, this.y, this.color, this.positioned, this.shadow);
         }
+    }
+
+    public enum Positioned {
+        CENTER_VERTICAL,
+        CENTER_HORIZONTAL,
+        BOTH,
+        NONE
     }
 }
