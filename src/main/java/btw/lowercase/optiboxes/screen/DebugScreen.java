@@ -1,6 +1,5 @@
 package btw.lowercase.optiboxes.screen;
 
-import btw.lowercase.optiboxes.screen.widget.Clickable;
 import btw.lowercase.optiboxes.screen.widget.Gidget;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
@@ -37,12 +36,25 @@ public class DebugScreen extends Screen {
     @Override
     public boolean mouseClicked(@NotNull MouseButtonEvent event, boolean isDoubleClick) {
         for (Gidget gidget : this.gidgets) {
-            if (gidget instanceof Clickable clickable && gidget.isInside(event.x(), event.y())) {
-                clickable.click(event.x(), event.y());
+            if (gidget.isInside(event.x(), event.y())) {
+                gidget.onMouseClicked(event.x(), event.y());
             }
         }
 
         return super.mouseClicked(event, isDoubleClick);
+    }
+
+    @Override
+    public void mouseMoved(double mouseX, double mouseY) {
+        for (Gidget gidget : this.gidgets) {
+            if (gidget.isInside(mouseX, mouseY)) {
+                gidget.onMouseEnter(mouseX, mouseY);
+            } else if (gidget.hovered()) {
+                gidget.onMouseLeave(mouseX, mouseY);
+            }
+        }
+
+        super.mouseMoved(mouseX, mouseY);
     }
 
     @Override

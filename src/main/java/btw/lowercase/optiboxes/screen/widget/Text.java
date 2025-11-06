@@ -8,17 +8,17 @@ import net.minecraft.util.ARGB;
 public class Text extends Gidget implements TextHolder {
     private final Font font;
     private final Component text;
-    private final int color;
-    private final Positioned positioned;
-    private final boolean shadow;
+    private Positioned positioned;
+    private boolean shadow;
+    private int color;
 
-    public Text(Font font, Component text, int x, int y, int color, Positioned positioned, boolean shadow) {
+    public Text(Font font, Component text, int x, int y, Positioned positioned, boolean shadow, int color) {
         super(x, y, font.width(text.getString()), font.lineHeight);
         this.font = font;
         this.text = text;
-        this.color = color;
         this.positioned = positioned;
         this.shadow = shadow;
+        this.color = color;
     }
 
     @Override
@@ -36,17 +36,36 @@ public class Text extends Gidget implements TextHolder {
         guiGraphics.drawString(this.font, this.text, finalX, finalY, this.color, this.shadow);
     }
 
+    public Builder builder() {
+        return new Builder(this.text, this.x(), this.y())
+                .withColor(this.color)
+                .positioned(this.positioned)
+                .withShadow(this.shadow);
+    }
+
     @Override
     public Component getText() {
         return this.text;
+    }
+
+    public void setColor(int color) {
+        this.color = color;
     }
 
     public int getColor() {
         return this.color;
     }
 
+    public void setPositioned(Positioned positioned) {
+        this.positioned = positioned;
+    }
+
     public Positioned getPositioned() {
         return this.positioned;
+    }
+
+    public void setShadow(boolean shadow) {
+        this.shadow = shadow;
     }
 
     public boolean hasShadow() {
@@ -93,7 +112,7 @@ public class Text extends Gidget implements TextHolder {
         }
 
         public Text build(Font font) {
-            return new Text(font, this.text, this.x, this.y, this.color, this.positioned, this.shadow);
+            return new Text(font, this.text, this.x, this.y, this.positioned, this.shadow, this.color);
         }
     }
 

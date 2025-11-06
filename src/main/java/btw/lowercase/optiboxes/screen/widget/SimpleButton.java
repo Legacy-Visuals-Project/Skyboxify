@@ -1,7 +1,6 @@
 package btw.lowercase.optiboxes.screen.widget;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -11,42 +10,36 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
-public class SimpleButton extends Gidget implements Clickable, TextHolder {
+public class SimpleButton extends Gidget implements TextHolder {
     public static final int DEFAULT_WIDTH = 200;
     public static final int DEFAULT_HEIGHT = 20;
 
-    private final Component text;
+    private final Text text;
     private final Consumer<? super SimpleButton> onClick;
 
     public SimpleButton(Component text, int x, int y, Consumer<? super SimpleButton> onClick) {
         super(x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT);
-        this.text = text;
+        this.text = new Text.Builder(text, this.x() + (this.width() / 2), this.y() + (this.height() / 2))
+                .positioned(Text.Positioned.BOTH)
+                .build(Minecraft.getInstance().font);
         this.onClick = onClick;
     }
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        boolean hovered = this.isInside(mouseX, mouseY);
-
-        int backgroundColor = hovered ? ARGB.white(0.7F) : ARGB.white(0.58F);
-        guiGraphics.fill(this.x(), this.y(), this.x() + this.width(), this.y() + this.height(), backgroundColor);
-
-        Font font = Minecraft.getInstance().font;
-        Text text = new Text.Builder(this.text, this.x() + (this.width() / 2), this.y() + (this.height() / 2))
-                .withColor(hovered ? ARGB.color(1.0F, 0xFFFFA0) : ARGB.color(1.0F, 0xE0E0E0))
-                .positioned(Text.Positioned.BOTH)
-                .build(font);
+        this.renderBackground(guiGraphics);
+        text.setColor(this.hovered() ? ARGB.color(1.0F, 0xFFFFA0) : ARGB.color(1.0F, 0xE0E0E0));
         text.render(guiGraphics, mouseX, mouseY);
     }
 
     @Override
-    public void click(double mouseX, double mouseY) {
+    public void onMouseClicked(double mouseX, double mouseY) {
         this.onClick.accept(this);
     }
 
     @Override
     public Component getText() {
-        return this.text;
+        return this.text.getText();
     }
 
     public static class Storage extends SimpleButton {
