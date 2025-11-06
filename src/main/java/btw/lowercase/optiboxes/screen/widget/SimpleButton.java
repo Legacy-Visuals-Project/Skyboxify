@@ -13,6 +13,7 @@ import java.util.function.Consumer;
 public class SimpleButton extends Gidget implements TextHolder {
     public static final int DEFAULT_WIDTH = 200;
     public static final int DEFAULT_HEIGHT = 20;
+    public static final int DEFAULT_PADDING = 8;
 
     private final Text text;
     private final Consumer<? super SimpleButton> onClick;
@@ -22,6 +23,7 @@ public class SimpleButton extends Gidget implements TextHolder {
         this.text = new Text.Builder(text, this.x() + (this.width() / 2), this.y() + (this.height() / 2))
                 .positioned(Text.Positioned.BOTH)
                 .build(Minecraft.getInstance().font);
+        this.resize(Math.max(this.text.width() + DEFAULT_PADDING, DEFAULT_WIDTH), this.height());
         this.onClick = onClick;
     }
 
@@ -35,6 +37,12 @@ public class SimpleButton extends Gidget implements TextHolder {
     @Override
     public void onMouseClicked(double mouseX, double mouseY) {
         this.onClick.accept(this);
+    }
+
+    @Override
+    public void reposition(int x, int y) {
+        super.reposition(x, y);
+        this.text.reposition(this.x() + (this.width() / 2), this.y() + (this.height() / 2));
     }
 
     @Override

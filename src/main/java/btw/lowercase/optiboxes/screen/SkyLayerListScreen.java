@@ -29,7 +29,7 @@ public class SkyLayerListScreen extends DebugScreen {
             this.gidgets.add(new SimpleButton(
                     Component.literal(index + " - " + skyLayer.source()),
                     (this.width / 2) - (SimpleButton.DEFAULT_WIDTH / 2),
-                    36 + ((SimpleButton.DEFAULT_HEIGHT + 8) * index),
+                    36 + ((SimpleButton.DEFAULT_HEIGHT + SimpleButton.DEFAULT_PADDING) * index),
                     (button) -> this.minecraft.setScreen(new SkyLayerInfoScreen(this, skyLayer, cidx))
             ));
             index++;

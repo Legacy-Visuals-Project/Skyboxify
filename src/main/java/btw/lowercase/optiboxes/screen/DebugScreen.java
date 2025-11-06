@@ -47,11 +47,7 @@ public class DebugScreen extends Screen {
     @Override
     public void mouseMoved(double mouseX, double mouseY) {
         for (Gidget gidget : this.gidgets) {
-            if (gidget.isInside(mouseX, mouseY)) {
-                gidget.onMouseEnter(mouseX, mouseY);
-            } else if (gidget.hovered()) {
-                gidget.onMouseLeave(mouseX, mouseY);
-            }
+            gidget.onMouseMove(mouseX, mouseY);
         }
 
         super.mouseMoved(mouseX, mouseY);

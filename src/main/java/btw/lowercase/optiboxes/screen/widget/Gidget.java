@@ -4,10 +4,10 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.util.ARGB;
 
 public abstract class Gidget {
-    private final int x;
-    private final int y;
-    private final int width;
-    private final int height;
+    private int x;
+    private int y;
+    private int width;
+    private int height;
     private boolean hovered = false;
 
     public Gidget(int x, int y, int width, int height) {
@@ -24,11 +24,7 @@ public abstract class Gidget {
         guiGraphics.fill(this.x(), this.y(), this.x() + this.width(), this.y() + this.height(), backgroundColor);
     }
 
-    public void onMouseEnter(double mouseX, double mouseY) {
-        this.hovered = this.isInside(mouseX, mouseY);
-    }
-
-    public void onMouseLeave(double mouseX, double mouseY) {
+    public void onMouseMove(double mouseX, double mouseY) {
         this.hovered = this.isInside(mouseX, mouseY);
     }
 
@@ -37,6 +33,16 @@ public abstract class Gidget {
 
     public boolean isInside(double x, double y) {
         return (x >= this.x && x <= this.x + this.width) && (y >= this.y && y <= this.y + this.height);
+    }
+
+    public void reposition(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    public void resize(int width, int height) {
+        this.width = width;
+        this.height = height;
     }
 
     public int x() {
