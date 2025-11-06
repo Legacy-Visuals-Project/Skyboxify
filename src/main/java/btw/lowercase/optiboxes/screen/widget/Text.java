@@ -5,7 +5,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.ARGB;
 
-public class Text extends Gidget {
+public class Text extends Gidget implements TextHolder {
     private final Font font;
     private final Component text;
     private final int color;
@@ -31,6 +31,7 @@ public class Text extends Gidget {
         guiGraphics.drawString(this.font, this.text, finalX, this.y, this.color, this.shadow);
     }
 
+    @Override
     public Component getText() {
         return this.text;
     }
@@ -48,7 +49,6 @@ public class Text extends Gidget {
     }
 
     public static class Builder {
-        private final Font font;
         private final Component text;
         private final int x;
         private final int y;
@@ -57,15 +57,14 @@ public class Text extends Gidget {
         private boolean centered = false;
         private boolean shadow = true;
 
-        public Builder(Font font, Component text, int x, int y) {
-            this.font = font;
+        public Builder(Component text, int x, int y) {
             this.text = text;
             this.x = x;
             this.y = y;
         }
 
-        public Builder(Font font, String text, int x, int y) {
-            this(font, Component.literal(text), x, y);
+        public Builder(String text, int x, int y) {
+            this(Component.literal(text), x, y);
         }
 
         public Builder withColor(int color) {
@@ -83,8 +82,8 @@ public class Text extends Gidget {
             return this;
         }
 
-        public Text build() {
-            return new Text(this.font, this.text, this.x, this.y, this.color, this.centered, this.shadow);
+        public Text build(Font font) {
+            return new Text(font, this.text, this.x, this.y, this.color, this.centered, this.shadow);
         }
     }
 }

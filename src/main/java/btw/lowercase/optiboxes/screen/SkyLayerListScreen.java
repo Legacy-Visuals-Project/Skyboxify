@@ -4,7 +4,6 @@ import btw.lowercase.optiboxes.screen.widget.SimpleButton;
 import btw.lowercase.optiboxes.screen.widget.Text;
 import btw.lowercase.optiboxes.skybox.OptiFineSkyLayer;
 import btw.lowercase.optiboxes.skybox.OptiFineSkybox;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -21,8 +20,8 @@ public class SkyLayerListScreen extends DebugScreen {
     protected void init() {
         super.init();
 
-        this.gidgets.add(new Text.Builder(this.font, this.title, this.width / 2, 12).centered().build());
-        this.gidgets.add(new Text.Builder(this.font, this.skybox.getLayers().size() + " layers", this.width / 2, 12 + this.font.lineHeight).centered().build());
+        this.gidgets.add(new Text.Builder(this.title, this.width / 2, 12).centered().build(this.font));
+        this.gidgets.add(new Text.Builder(this.skybox.getLayers().size() + " layers", this.width / 2, 12 + this.font.lineHeight).centered().build(this.font));
 
         int index = 0;
         for (OptiFineSkyLayer skyLayer : this.skybox.getLayers()) {
@@ -36,9 +35,12 @@ public class SkyLayerListScreen extends DebugScreen {
             index++;
         }
 
-        this.addRenderableWidget(Button.builder(CommonComponents.GUI_BACK, (button) -> this.onClose())
-                .pos((this.width / 2) - (Button.DEFAULT_WIDTH / 2), this.height - Button.DEFAULT_HEIGHT - 4)
-                .build());
+        this.gidgets.add(new SimpleButton(
+                CommonComponents.GUI_BACK,
+                (this.width / 2) - (SimpleButton.DEFAULT_WIDTH / 2),
+                this.height - SimpleButton.DEFAULT_HEIGHT - 4,
+                (button) -> this.onClose()
+        ));
     }
 }
 

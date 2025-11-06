@@ -5,12 +5,13 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.ARGB;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
-public class SimpleButton extends Gidget implements Clickable {
+public class SimpleButton extends Gidget implements Clickable, TextHolder {
     public static final int DEFAULT_WIDTH = 200;
     public static final int DEFAULT_HEIGHT = 20;
 
@@ -26,11 +27,14 @@ public class SimpleButton extends Gidget implements Clickable {
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         boolean hovered = this.isInside(mouseX, mouseY);
-        guiGraphics.fill(this.x, this.y, this.x + this.width, this.y + this.height, hovered ? 0xFF00FF00 : 0xFF00FFFF);
+
+        int backgroundColor = hovered ? ARGB.color(0.7F, 0xFFFFFF) : ARGB.color(0.58F, 0xFFFFFF);
+        guiGraphics.fill(this.x, this.y, this.x + this.width, this.y + this.height, backgroundColor);
 
         Font font = Minecraft.getInstance().font;
         int textWidth = font.width(this.text.getString());
-        guiGraphics.drawString(font, this.text, this.x + ((this.width / 2) - (textWidth / 2)), this.y + ((this.height / 2) - (font.lineHeight / 2)), 0xFFFFFFFF);
+        int textColor = hovered ? ARGB.color(1.0F, 0xFFFFA0) : ARGB.color(1.0F, 0xE0E0E0);
+        guiGraphics.drawString(font, this.text, this.x + ((this.width / 2) - (textWidth / 2)), this.y + ((this.height / 2) - (font.lineHeight / 2)), textColor);
     }
 
     @Override
@@ -38,6 +42,7 @@ public class SimpleButton extends Gidget implements Clickable {
         this.onClick.accept(this);
     }
 
+    @Override
     public Component getText() {
         return this.text;
     }
