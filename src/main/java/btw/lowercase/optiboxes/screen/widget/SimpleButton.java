@@ -33,7 +33,7 @@ public class SimpleButton extends Gidget {
         guiGraphics.drawString(font, this.text, this.x + ((this.width / 2) - (textWidth / 2)), this.y + ((this.height / 2) - (font.lineHeight / 2)), 0xFFFFFFFF);
     }
 
-    public Component text() {
+    public Component getText() {
         return this.text;
     }
 
@@ -41,15 +41,15 @@ public class SimpleButton extends Gidget {
         return this.onClick;
     }
 
-    public static class DataHolder<T> extends SimpleButton {
-        private final Map<Identifier, T> data;
+    public static class Storage extends SimpleButton {
+        private final Map<Identifier, Object> data;
 
-        public DataHolder(Component text, int x, int y, Consumer<SimpleButton> onClick) {
+        public Storage(Component text, int x, int y, Consumer<SimpleButton> onClick) {
             super(text, x, y, onClick);
             this.data = new HashMap<>();
         }
 
-        public void put(Identifier location, T data) {
+        public void put(Identifier location, Object data) {
             this.data.put(location, data);
         }
 
@@ -57,8 +57,8 @@ public class SimpleButton extends Gidget {
             return this.data.containsKey(location);
         }
 
-        public T get(Identifier location) {
-            return this.data.get(location);
+        public <T> T get(Identifier location) {
+            return (T) this.data.get(location);
         }
     }
 }
