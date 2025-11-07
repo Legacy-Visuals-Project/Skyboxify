@@ -3,8 +3,10 @@ package btw.lowercase.optiboxes.skybox;
 import btw.lowercase.optiboxes.OptiBoxesClient;
 import btw.lowercase.optiboxes.skybox.components.Range;
 import btw.lowercase.optiboxes.utils.CommonUtils;
+import com.azure.json.models.JsonNumber;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.mojang.serialization.JsonOps;
 import net.minecraft.IdentifierException;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
@@ -77,13 +79,13 @@ public final class SkyboxParser {
         }
 
         // Rotation
-        if (properties.containsKey("rotate")) {
-            output.addProperty("rotate", CommonUtils.safeParseBoolean(properties.getProperty("rotate"), true));
+        if (properties.containsKey("rotate") && properties.get("rotate") instanceof JsonPrimitive primitive && primitive.isBoolean()) {
+            output.addProperty("rotate", primitive.getAsBoolean());
         }
 
         // Transition
-        if (properties.containsKey("transition")) {
-            output.addProperty("transition", CommonUtils.safeParseFloat(properties.getProperty("transition"), 1.0F));
+        if (properties.containsKey("transition") && properties.get("transition") instanceof JsonNumber number) {
+            output.addProperty("transition", number.getValue().intValue());
         }
 
         // Axis

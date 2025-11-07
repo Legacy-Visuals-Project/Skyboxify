@@ -1,19 +1,18 @@
 package btw.lowercase.optiboxes.skybox.components;
 
 import com.mojang.serialization.Codec;
+import net.minecraft.util.StringRepresentable;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-
-public enum Weather {
+public enum Weather implements StringRepresentable {
     CLEAR,
     RAIN,
-    RAIN_BIOME,
-    SNOW,
     THUNDER;
 
-    public static final Codec<Weather> CODEC = Codec.STRING.xmap(Weather::byName, Weather::toString);
+    public static final Codec<Weather> CODEC = StringRepresentable.fromEnum(Weather::values);
 
-    public static Weather byName(String name) {
-        return Arrays.stream(Weather.values()).filter(weather -> weather.toString().toLowerCase().equals(name)).findFirst().orElse(null);
+    @Override
+    public @NotNull String getSerializedName() {
+        return this.name().toLowerCase();
     }
 }

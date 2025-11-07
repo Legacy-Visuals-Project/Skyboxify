@@ -32,7 +32,7 @@ public record OptiFineSkyLayer(
         /*Vector3f axis,
          *///?}
         Loop loop,
-        float transition,
+        int transition,
         List<Weather> weatherConditions
 ) {
     public static final Codec<OptiFineSkyLayer> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -42,11 +42,11 @@ public record OptiFineSkyLayer(
             Range.CODEC.listOf().optionalFieldOf("heights", ImmutableList.of()).forGetter(OptiFineSkyLayer::heights),
             Blend.CODEC.optionalFieldOf("blend", Blend.ADD).forGetter(OptiFineSkyLayer::blend),
             Fade.CODEC.optionalFieldOf("fade", Fade.DEFAULT).forGetter(OptiFineSkyLayer::fade),
-            Codec.BOOL.optionalFieldOf("rotate", false).forGetter(OptiFineSkyLayer::rotate),
+            Codec.BOOL.optionalFieldOf("rotate", true).forGetter(OptiFineSkyLayer::rotate),
             Codec.FLOAT.optionalFieldOf("speed", 1.0F).forGetter(OptiFineSkyLayer::speed),
             ExtraCodecs.VECTOR3F.optionalFieldOf("axis", new Vector3f(1.0F, 0.0F, 0.0F)).forGetter(OptiFineSkyLayer::axis),
             Loop.CODEC.optionalFieldOf("loop", Loop.DEFAULT).forGetter(OptiFineSkyLayer::loop),
-            Codec.FLOAT.optionalFieldOf("transition", 1.0F).forGetter(OptiFineSkyLayer::transition),
+            Codec.INT.optionalFieldOf("transition", 1).forGetter(OptiFineSkyLayer::transition),
             Weather.CODEC.listOf().optionalFieldOf("weather", ImmutableList.of(Weather.CLEAR)).forGetter(OptiFineSkyLayer::weatherConditions)
     ).apply(instance, OptiFineSkyLayer::new));
 
@@ -64,8 +64,8 @@ public record OptiFineSkyLayer(
             }
 
             if (!(this.biomeInclusion && this.biomes.contains(level.getBiome(cameraEntity.blockPosition()).unwrapKey().orElseThrow()
-                    //? >=1.21.11 {
-                    .identifier()
+                            //? >=1.21.11 {
+                            .identifier()
                     //?} else {
                     /*.location()
                      *///?}
@@ -83,7 +83,7 @@ public record OptiFineSkyLayer(
         } else if (conditionAlpha == -1.0F) {
             return this.getConditionCheck(level) ? 1.0F : 0.0F;
         } else {
-            return CommonUtils.calculateConditionAlphaValue(1.0F, 0.0F, conditionAlpha, (int) (this.transition * 20), this.getConditionCheck(level));
+            return CommonUtils.calculateConditionAlphaValue(1.0F, 0.0F, conditionAlpha, this.transition * 20, this.getConditionCheck(level));
         }
     }
 
@@ -98,6 +98,7 @@ public record OptiFineSkyLayer(
 
             final int daysPassed = (int) (adjustedTime / 24000L);
             final int currentDay = daysPassed % this.loop.days();
+            // TODO/NOTE: "Days are numbered from 0 to daysLoop-1"
             return CommonUtils.checkRanges(currentDay, this.loop.ranges());
         } else {
             return true;
