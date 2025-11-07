@@ -31,6 +31,15 @@ public abstract class Gidget {
     public void onMouseClicked(double mouseX, double mouseY) {
     }
 
+    public void onMouseScrolled(double amount) {
+    }
+
+    public void onKeyDown(int scancode, int keycode) {
+    }
+
+    public void onKeyUp(int scancode, int keycode) {
+    }
+
     public boolean isInside(double x, double y) {
         return (x >= this.x && x <= this.x + this.width) && (y >= this.y && y <= this.y + this.height);
     }

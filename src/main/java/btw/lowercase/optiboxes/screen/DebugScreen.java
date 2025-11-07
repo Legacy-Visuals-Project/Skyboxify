@@ -3,6 +3,7 @@ package btw.lowercase.optiboxes.screen;
 import btw.lowercase.optiboxes.screen.widget.Gidget;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
@@ -51,6 +52,21 @@ public class DebugScreen extends Screen {
         }
 
         super.mouseMoved(mouseX, mouseY);
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+    }
+
+    @Override
+    public boolean keyPressed(@NotNull KeyEvent event) {
+        return super.keyPressed(event);
+    }
+
+    @Override
+    public boolean keyReleased(@NotNull KeyEvent event) {
+        return super.keyReleased(event);
     }
 
     @Override
