@@ -1,11 +1,12 @@
 package btw.lowercase.optiboxes.screen.widget;
 
+import btw.lowercase.optiboxes.screen.widget.components.Box;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.ARGB;
 
-public class Text extends Gidget implements TextHolder {
+public class Text extends Gidget {
     private final Font font;
     private final Component text;
     private Positioned positioned;
@@ -13,7 +14,7 @@ public class Text extends Gidget implements TextHolder {
     private int color;
 
     public Text(Font font, Component text, int x, int y, Positioned positioned, boolean shadow, int color) {
-        super(x, y, font.width(text.getString()), font.lineHeight);
+        super(new Box(x, y, font.width(text.getString()), font.lineHeight));
         this.font = font;
         this.text = text;
         this.positioned = positioned;
@@ -23,27 +24,26 @@ public class Text extends Gidget implements TextHolder {
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        int finalX = this.x();
+        int finalX = this.box().x();
         if (this.positioned == Positioned.BOTH || this.positioned == Positioned.CENTER_HORIZONTAL) {
-            finalX -= this.width() / 2;
+            finalX -= this.box().width() / 2;
         }
 
-        int finalY = this.y();
+        int finalY = this.box().y();
         if (this.positioned == Positioned.BOTH || this.positioned == Positioned.CENTER_VERTICAL) {
-            finalY -= this.height() / 2;
+            finalY -= this.box().height() / 2;
         }
 
         guiGraphics.drawString(this.font, this.text, finalX, finalY, this.color, this.shadow);
     }
 
     public Builder builder() {
-        return new Builder(this.text, this.x(), this.y())
+        return new Builder(this.text, this.box().x(), this.box().y())
                 .withColor(this.color)
                 .positioned(this.positioned)
                 .withShadow(this.shadow);
     }
 
-    @Override
     public Component getText() {
         return this.text;
     }

@@ -37,7 +37,7 @@ public class DebugScreen extends Screen {
     @Override
     public boolean mouseClicked(@NotNull MouseButtonEvent event, boolean isDoubleClick) {
         for (Gidget gidget : this.gidgets) {
-            if (gidget.isInside(event.x(), event.y())) {
+            if (gidget.box().contains((int) event.x(), (int) event.y())) {
                 gidget.onMouseClicked(event.x(), event.y());
             }
         }
@@ -56,16 +56,30 @@ public class DebugScreen extends Screen {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        for (Gidget gidget : this.gidgets) {
+            if (gidget.box().contains((int) mouseX, (int) mouseY)) {
+                gidget.onMouseScrolled(mouseX, mouseY, scrollX, scrollY);
+            }
+        }
+
         return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
     }
 
     @Override
     public boolean keyPressed(@NotNull KeyEvent event) {
+        for (Gidget gidget : this.gidgets) {
+            gidget.onKeyDown(event.scancode(), event.key(), event.modifiers());
+        }
+
         return super.keyPressed(event);
     }
 
     @Override
     public boolean keyReleased(@NotNull KeyEvent event) {
+        for (Gidget gidget : this.gidgets) {
+            gidget.onKeyUp(event.scancode(), event.key(), event.modifiers());
+        }
+
         return super.keyReleased(event);
     }
 
