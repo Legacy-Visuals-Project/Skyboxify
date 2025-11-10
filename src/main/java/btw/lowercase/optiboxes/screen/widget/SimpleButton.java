@@ -18,7 +18,7 @@ public class SimpleButton extends Gidget {
 
     public SimpleButton(Component text, int x, int y, Consumer<? super SimpleButton> onClick) {
         super(new Box(x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT));
-        this.text = new Text.Builder(text, this.box().x() + (this.box().width() / 2), this.box().y() + (this.box().height() / 2))
+        this.text = new Text.Builder(text, this.box().left() + (this.box().width() / 2), this.box().top() + (this.box().height() / 2))
                 .positioned(Text.Positioned.BOTH)
                 .build(Minecraft.getInstance().font);
         this.resize(Math.max(this.text.box().width() + DEFAULT_PADDING, DEFAULT_WIDTH), this.box().height());
@@ -40,7 +40,7 @@ public class SimpleButton extends Gidget {
     @Override
     public void move(int x, int y) {
         super.move(x, y);
-        this.text.move(this.box().x() + (this.box().width() / 2), this.box().y() + (this.box().height() / 2));
+        this.text.move(this.box().left() + (this.box().width() / 2), this.box().top() + (this.box().height() / 2));
     }
 
     public Component getText() {

@@ -24,12 +24,12 @@ public class Text extends Gidget {
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        int finalX = this.box().x();
+        int finalX = this.box().left();
         if (this.positioned == Positioned.BOTH || this.positioned == Positioned.CENTER_HORIZONTAL) {
             finalX -= this.box().width() / 2;
         }
 
-        int finalY = this.box().y();
+        int finalY = this.box().top();
         if (this.positioned == Positioned.BOTH || this.positioned == Positioned.CENTER_VERTICAL) {
             finalY -= this.box().height() / 2;
         }
@@ -38,7 +38,7 @@ public class Text extends Gidget {
     }
 
     public Builder builder() {
-        return new Builder(this.text, this.box().x(), this.box().y())
+        return new Builder(this.text, this.box().left(), this.box().top())
                 .withColor(this.color)
                 .positioned(this.positioned)
                 .withShadow(this.shadow);

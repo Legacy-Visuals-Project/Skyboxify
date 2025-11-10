@@ -27,12 +27,20 @@ public class Box {
         this.height = height;
     }
 
-    public int x() {
+    public int top() {
+        return this.y;
+    }
+
+    public int bottom() {
+        return this.y + this.height;
+    }
+
+    public int left() {
         return this.x;
     }
 
-    public int y() {
-        return this.y;
+    public int right() {
+        return this.x + this.width;
     }
 
     public int width() {

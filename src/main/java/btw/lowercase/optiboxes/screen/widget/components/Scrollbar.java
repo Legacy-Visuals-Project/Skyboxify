@@ -23,7 +23,7 @@ public class Scrollbar extends Gidget {
 
     @Override
     public void renderBackground(GuiGraphics guiGraphics) {
-        guiGraphics.fill(this.box().x(), this.box().y(), this.box().x() + this.box().width(), this.box().y() + this.box().height(), ARGB.color(0.5F, 0x00FF95));
+        guiGraphics.fill(this.box().left(), this.box().top(), this.box().right(), this.box().bottom(), ARGB.color(0.5F, 0x00FF95));
     }
 
     public void setScrollY(double scrollY) {
@@ -42,7 +42,7 @@ public class Scrollbar extends Gidget {
 
         @Override
         public void renderBackground(GuiGraphics guiGraphics) {
-            guiGraphics.fill(this.box().x(), this.box().y(), this.box().x() + this.box().width(), this.box().y() + this.box().height(), ARGB.color(1.0F, 0xAAFE00));
+            guiGraphics.fill(this.box().left(), this.box().top(), this.box().right(), this.box().bottom(), ARGB.color(1.0F, 0xAAFE00));
         }
     }
 }

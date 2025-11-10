@@ -17,7 +17,7 @@ public class ScrollableList extends Gidget {
         this.scrollbar = new Scrollbar(width - Scrollbar.DEFAULT_WIDTH - 8, y, height);
         for (Gidget gidget : this.gidgets) {
             // TODO: scrollY
-            gidget.move(this.box().x() + gidget.box().x(), this.box().y() + gidget.box().y() + 4);
+            gidget.move(this.box().left() + gidget.box().left(), this.box().top() + gidget.box().top() + 4);
         }
     }
 
@@ -25,7 +25,7 @@ public class ScrollableList extends Gidget {
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         super.render(guiGraphics, mouseX, mouseY);
         this.scrollbar.render(guiGraphics, mouseX, mouseY);
-        guiGraphics.enableScissor(this.box().x(), this.box().y(), this.box().x() + this.box().width(), this.box().y() + this.box().height());
+        guiGraphics.enableScissor(this.box().left(), this.box().top(), this.box().right(), this.box().bottom());
         for (Gidget gidget : this.gidgets) {
             // TODO: scrollY
             gidget.render(guiGraphics, mouseX, mouseY);
@@ -35,10 +35,10 @@ public class ScrollableList extends Gidget {
 
     @Override
     public void renderBackground(GuiGraphics guiGraphics) {
-        guiGraphics.fill(this.box().x(), this.box().y(), this.box().x() + this.box().width(), this.box().y() + this.box().height(), ARGB.color(0.3F, 0));
+        guiGraphics.fill(this.box().left(), this.box().top(), this.box().right(), this.box().bottom(), ARGB.color(0.3F, 0));
         final int lineColor = ARGB.color(0.67F, 0xA0A0A0);
-        guiGraphics.hLine(this.box().x(), this.box().x() + this.box().width(), this.box().y(), lineColor);
-        guiGraphics.hLine(this.box().x(), this.box().x() + this.box().width(), this.box().y() + this.box().height(), lineColor);
+        guiGraphics.hLine(this.box().left(), this.box().right(), this.box().top(), lineColor);
+        guiGraphics.hLine(this.box().left(), this.box().right(), this.box().top() + this.box().height(), lineColor);
     }
 
     @Override

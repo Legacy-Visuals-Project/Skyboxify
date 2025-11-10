@@ -11,6 +11,7 @@ import java.util.Map;
 public abstract class Gidget {
     private final Box box;
     private boolean hovered = false;
+    private boolean focused = false;
     private final Map<Identifier, Object> data;
 
     public Gidget(Box box) {
@@ -24,7 +25,7 @@ public abstract class Gidget {
 
     public void renderBackground(GuiGraphics guiGraphics) {
         final int backgroundColor = this.hovered ? ARGB.white(0.7F) : ARGB.white(0.58F);
-        guiGraphics.fill(this.box.x(), this.box.y(), this.box.x() + this.box.width(), this.box.y() + this.box.height(), backgroundColor);
+        guiGraphics.fill(this.box.left(), this.box.top(), this.box.right(), this.box.bottom(), backgroundColor);
     }
 
     public void onMouseMove(double mouseX, double mouseY) {
