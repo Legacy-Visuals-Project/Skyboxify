@@ -30,9 +30,13 @@ public final class SkyboxParser {
     public static @Nullable JsonObject parseSkyProperties(Properties properties, Identifier propertiesIdentifier) {
         JsonObject output = new JsonObject();
 
-        Optional<Identifier> sourceTexture = Optional.ofNullable(parseSourceTexture(properties.getProperty("source", null), propertiesIdentifier));
-        if (sourceTexture.isEmpty() && OptiBoxesClient.getConfig().ignoreBrokenSkies.isEnabled()) {
-            return null;
+        final String source = properties.getProperty("source", null);
+        Optional<Identifier> sourceTexture = Optional.ofNullable(parseSourceTexture(source, propertiesIdentifier));
+        if (sourceTexture.isEmpty()) {
+            LOGGER.warn("Failed to load source texture \"{}\"", source);
+            if (OptiBoxesClient.getConfig().ignoreBrokenSkies.isEnabled()) {
+                return null;
+            }
         }
 
         output.addProperty("source", sourceTexture.orElse(MissingTextureAtlasSprite.getLocation()).toString());
@@ -178,6 +182,7 @@ public final class SkyboxParser {
                         namespace = location.getNamespace();
                         path = location.getPath();
                     } else {
+                        LOGGER.error("Failed to read location of source as resource location");
                         return null;
                     }
                 }
@@ -186,7 +191,7 @@ public final class SkyboxParser {
 
         try {
             textureId = Identifier.fromNamespaceAndPath(namespace, path);
-        } catch (IdentifierException e) {
+        } catch (IdentifierException ignored) {
             LOGGER.error("Failed to read texture path '{}:{}' as resource location", namespace, path);
             return null;
         }
