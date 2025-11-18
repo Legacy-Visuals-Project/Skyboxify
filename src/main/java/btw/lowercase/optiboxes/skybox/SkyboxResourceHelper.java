@@ -15,7 +15,7 @@ public class SkyboxResourceHelper implements
         net.minecraft.server.packs.resources.PreparableReloadListener
         //? } else {
         /*net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener
-        *///? }
+         *///? }
 {
     private ResourceManager resourceManager;
 
@@ -33,11 +33,11 @@ public class SkyboxResourceHelper implements
             @NotNull Executor gameExecutor
     ) {
         this.resourceManager =
-            //? >=1.21.9 {
-            sharedState.resourceManager();
-            //?} else {
-            /*resourceManager;
-            *///?}
+                //? >=1.21.9 {
+                sharedState.resourceManager();
+        //?} else {
+        /*resourceManager;
+         *///?}
         return CompletableFuture.runAsync(() -> {
             SkyboxManager.INSTANCE.clearSkyboxes();
             if (OptiBoxesClient.getConfig().enabled.isEnabled()) {
@@ -61,7 +61,8 @@ public class SkyboxResourceHelper implements
     public InputStream getInputStream(Identifier resourceLocation) {
         try {
             return this.resourceManager.getResource(resourceLocation).orElseThrow().open();
-        } catch (Exception ignored) {
+        } catch (Exception exception) {
+            exception.printStackTrace();
             return null;
         }
     }

@@ -191,8 +191,9 @@ public final class SkyboxParser {
 
         try {
             textureId = Identifier.fromNamespaceAndPath(namespace, path);
-        } catch (IdentifierException ignored) {
+        } catch (IdentifierException exception) {
             LOGGER.error("Failed to read texture path '{}:{}' as resource location", namespace, path);
+            exception.printStackTrace();
             return null;
         }
 
