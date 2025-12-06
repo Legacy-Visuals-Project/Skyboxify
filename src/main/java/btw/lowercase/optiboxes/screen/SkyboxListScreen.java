@@ -32,7 +32,13 @@ public class SkyboxListScreen extends DebugScreen {
         int index = 0;
         for (OptiFineSkybox skybox : this.skyboxes) {
             scrollableListGidgets.add(new SimpleButton(
-                    Component.literal(skybox.getWorldResourceKey().identifier().toString()),
+                    Component.literal(
+                            //? >=1.21.11 {
+                            skybox.getWorldResourceKey().identifier().toString()
+                            //?} else {
+                            /*skybox.getWorldResourceKey().location().toString()
+                             *///?}
+                    ),
                     (this.width / 2) - (SimpleButton.DEFAULT_WIDTH / 2),
                     ((SimpleButton.DEFAULT_HEIGHT + SimpleButton.DEFAULT_PADDING) * index),
                     (button) -> this.minecraft.setScreen(new SkyLayerListScreen(this, skybox))

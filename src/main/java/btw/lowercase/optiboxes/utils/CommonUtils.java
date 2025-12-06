@@ -2,14 +2,13 @@ package btw.lowercase.optiboxes.utils;
 
 import btw.lowercase.optiboxes.skybox.components.Range;
 import btw.lowercase.optiboxes.skybox.components.Weather;
+import lombok.experimental.UtilityClass;
 import net.minecraft.util.Mth;
 
 import java.util.List;
 
+@UtilityClass
 public final class CommonUtils {
-    private CommonUtils() {
-    }
-
     public static int normalizeTickTime(int tickTime) {
         int result = tickTime % 24000;
         if (result < 0) {
@@ -100,14 +99,6 @@ public final class CommonUtils {
     public static float safeParseFloat(String value, float defaultValue) {
         try {
             return Float.parseFloat(value.trim());
-        } catch (NumberFormatException exception) {
-            return defaultValue;
-        }
-    }
-
-    public static boolean safeParseBoolean(String value, boolean defaultValue) {
-        try {
-            return Boolean.parseBoolean(value.trim());
         } catch (NumberFormatException exception) {
             return defaultValue;
         }

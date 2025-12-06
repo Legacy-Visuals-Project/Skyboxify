@@ -229,8 +229,8 @@ public final class OptiFineSkyRenderer {
         double frac = Mth.frac(fixedTime / 24000.0 - 0.25);
         double mul = 0.5 - Math.cos(frac * Math.PI) / 2.0;
         return (float)(frac * 2.0 + mul) / 3.0F;
-        //? } else {
+        //?} else {
         /*return level.getTimeOfDay(1.0F);
-        *///? }
+        *///?}
     }
 }

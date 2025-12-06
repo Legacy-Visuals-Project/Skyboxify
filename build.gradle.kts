@@ -22,11 +22,9 @@ class ModData {
     val modrinth = property("mod.modrinth")
     val curseforge = property("mod.curseforge")
     val discord = property("mod.discord")
-
-    val stable = parseBoolean(property("mod.stable").toString())
-
-    val mcVersion = property("mod.mc_version")
-    val mcVersionRange = property("mod.mc_version_range").toString()
+    val obfuscated = parseBoolean(property("mod.obfuscated").toString())
+    val minecraftVersion = property("mod.minecraft_version") as String
+    val minecraftVersionRange = property("mod.minecraft_version_range") as String
 }
 
 class Dependencies {
@@ -35,7 +33,8 @@ class Dependencies {
     val fabricApiVersion = property("deps.fabric_api_version").toString()
     val mixinconstraintsVersion = property("deps.mixinconstraints_version")
     val mixinsquaredVersion = property("deps.mixinsquared_version")
-    val lightConfigVersion = property("deps.lightconfig")
+    val lombokVersion = property("deps.lombok_version")
+    val lightConfigVersion = property("deps.lightconfig_version")
 }
 
 class LoaderData {
@@ -48,13 +47,11 @@ val mod = ModData()
 val deps = Dependencies()
 val loader = LoaderData()
 
-version = "${mod.version}+${mod.mcVersion}-${loader.loader}"
+version = "${mod.version}+${mod.minecraftVersion}-${loader.loader}"
 group = mod.group
 base { archivesName.set(mod.id) }
 
 stonecutter {
-    constants["fabric"] = loader.isFabric
-    constants["neoforge"] = loader.isNeoforge
     replacements.string {
         direction = eval(current.version, ">=1.21.11")
         replace("ResourceLocation", "Identifier")
@@ -63,6 +60,7 @@ stonecutter {
 
 blossom {
     replaceToken("@MODID@", mod.id)
+    replaceToken("@VERSION@", mod.version)
 }
 
 loom {
@@ -112,7 +110,7 @@ repositories {
 }
 
 dependencies {
-    minecraft("com.mojang:minecraft:${mod.mcVersion}")
+    minecraft("com.mojang:minecraft:${mod.minecraftVersion}")
 
     @Suppress("UnstableApiUsage")
     mappings(loom.layered {
@@ -120,10 +118,12 @@ dependencies {
         officialMojangMappings()
         // Parchment mappings (it adds parameter mappings & javadoc)
         optionalProp("deps.parchment_version") {
-            var snapshot = !mod.mcVersion.toString().contains(".")
-            parchment("org.parchmentmc.data:parchment-${if (snapshot) "1.21.10" else mod.mcVersion}:$it@zip")
+            parchment("org.parchmentmc.data:parchment-${mod.minecraftVersion}:$it@zip")
         }
     })
+
+    compileOnly("org.projectlombok:lombok:${deps.lombokVersion}")
+    annotationProcessor("org.projectlombok:lombok:${deps.lombokVersion}")
 
     // LightConfig
     include(modImplementation("com.github.Legacy-Visuals-Project:LightConfig:${deps.lightConfigVersion}")!!)
@@ -153,16 +153,12 @@ val curseforgeId = findProperty("publish.curseforge")?.toString()?.takeIf { it.i
 // modrinth.token=
 // curseforge.token=
 publishMods {
-    if (!mod.stable) {
-        return@publishMods
-    }
-
     file = project.tasks.remapJar.get().archiveFile
-    val niceVersionRangeTitle = if (mod.stable && mod.mcVersionRange.contains(' ')) {
-        val parts = mod.mcVersionRange.trim().split(' ')
+    val niceVersionRangeTitle = if (mod.minecraftVersionRange.contains(' ')) {
+        val parts = mod.minecraftVersionRange.trim().split(' ')
         parts.first() + '-' + parts.last()
     } else {
-        mod.mcVersionRange
+        mod.minecraftVersionRange
     }
 
     displayName = "Release ${mod.version} for $niceVersionRangeTitle"
@@ -176,7 +172,7 @@ publishMods {
         modrinth {
             projectId = property("publish.modrinth").toString()
             accessToken = findProperty("modrinth.token").toString()
-            minecraftVersions.addAll(mod.mcVersionRange.split(' '))
+            minecraftVersions.addAll(mod.minecraftVersionRange.split(' '))
             if (loader.isFabric) {
                 requires("fabric-api")
                 optional("modmenu")
@@ -188,7 +184,7 @@ publishMods {
         curseforge {
             projectId = property("publish.curseforge").toString()
             accessToken = findProperty("curseforge.token").toString()
-            minecraftVersions.addAll(mod.mcVersionRange.split(' '))
+            minecraftVersions.addAll(mod.minecraftVersionRange.split(' '))
             if (loader.isFabric) {
                 requires("fabric-api")
                 optional("modmenu")
@@ -202,50 +198,59 @@ java {
     targetCompatibility = JavaVersion.VERSION_21
 }
 
-tasks.processResources {
-    val props = buildMap {
-        put("id", mod.id)
-        put("name", mod.name)
-        put("version", mod.version)
-        put("description", mod.description)
-        put("source", mod.source)
-        put("issues", mod.issues)
-        put("license", mod.license)
-        put("modrinth", mod.modrinth)
-        put("curseforge", mod.curseforge)
-        put("discord", mod.discord)
+tasks {
+    processResources {
+        val props = buildMap {
+            put("id", mod.id)
+            put("name", mod.name)
+            put("version", mod.version)
+            put("description", mod.description)
+            put("source", mod.source)
+            put("issues", mod.issues)
+            put("license", mod.license)
+            put("modrinth", mod.modrinth)
+            put("curseforge", mod.curseforge)
+            put("discord", mod.discord)
+            if (loader.isFabric) {
+                put("fabric_loader_version", deps.fabricLoaderVersion)
+            }
+
+            if (loader.isNeoforge) {
+                put("neoforge_version", deps.neoForgeVersion)
+            }
+
+            val minecraftVersionRange = if (mod.minecraftVersionRange.contains(' ')) {
+                val parts = mod.minecraftVersionRange.trim().split(' ')
+                ">=" + parts.first() + ' ' + "<=" + parts.last()
+            } else {
+                mod.minecraftVersionRange
+            }
+
+            put("minecraft_version_range", minecraftVersionRange)
+        }
+
+        props.forEach(inputs::property)
+        filesMatching("**/lang/en_us.json") { // Defaults description to English translation
+            expand(props)
+            filteringCharset = "UTF-8"
+        }
+
         if (loader.isFabric) {
-            put("fabric_loader_version", deps.fabricLoaderVersion)
+            filesMatching("fabric.mod.json") { expand(props) }
+            exclude(listOf("META-INF/neoforge.mods.toml"))
         }
 
         if (loader.isNeoforge) {
-            put("forge_version", deps.neoForgeVersion)
+            filesMatching("META-INF/neoforge.mods.toml") { expand(props) }
+            exclude("fabric.mod.json")
         }
-
-        val mcVersionRange = if (mod.stable && mod.mcVersionRange.contains(' ')) {
-            val parts = mod.mcVersionRange.trim().split(' ')
-            ">=" + parts.first() + ' ' + "<=" + parts.last()
-        } else {
-            mod.mcVersionRange
-        }
-
-        put("minecraft_version_range", mcVersionRange)
     }
 
-    props.forEach(inputs::property)
-    filesMatching("**/lang/en_us.json") { // Defaults description to English translation
-        expand(props)
-        filteringCharset = "UTF-8"
-    }
-
-    if (loader.isFabric) {
-        filesMatching("fabric.mod.json") { expand(props) }
-        exclude(listOf("META-INF/neoforge.mods.toml"))
-    }
-
-    if (loader.isNeoforge) {
-        filesMatching("META-INF/neoforge.mods.toml") { expand(props) }
-        exclude("fabric.mod.json")
+    register<Copy>("buildAndCollect") {
+        group = "build"
+        from(remapJar.map { it.archiveFile }, remapSourcesJar.map { it.archiveFile })
+        into(rootProject.layout.buildDirectory.file("libs/${project.property("mod.version")}"))
+        dependsOn("build")
     }
 }
 

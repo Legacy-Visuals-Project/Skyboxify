@@ -2,6 +2,7 @@ package btw.lowercase.optiboxes.skybox.components;
 
 import btw.lowercase.optiboxes.utils.BlendFunction;
 import com.mojang.serialization.Codec;
+import lombok.Getter;
 import net.minecraft.util.StringRepresentable;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector4f;
@@ -23,6 +24,7 @@ public enum Blend implements StringRepresentable {
     public static final Codec<Blend> CODEC = StringRepresentable.fromEnum(Blend::values);
 
     private final Function<Float, Vector4f> blendConsumer;
+    @Getter
     private final BlendFunction blendFunction;
 
     Blend(Function<Float, Vector4f> blendConsumer, BlendFunction blendFunction) {
@@ -46,10 +48,6 @@ public enum Blend implements StringRepresentable {
         }
     }
     *///?}
-
-    public BlendFunction getBlendFunction() {
-        return this.blendFunction;
-    }
 
     @Override
     public @NotNull String getSerializedName() {

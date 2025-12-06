@@ -14,7 +14,7 @@ public interface RenderPipelinesAccessor {
             "MATRICES_PROJECTION_SNIPPET"
             //?} else {
             /*"MATRICES_COLOR_FOG_SNIPPET"
-            *///? }
+            *///?}
     )
     static com.mojang.blaze3d.pipeline.RenderPipeline.Snippet optiboxes$getMatricesProjectionSnippet() {
         return null;

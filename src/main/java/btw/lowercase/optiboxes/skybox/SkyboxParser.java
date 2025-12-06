@@ -3,7 +3,6 @@ package btw.lowercase.optiboxes.skybox;
 import btw.lowercase.optiboxes.OptiBoxesClient;
 import btw.lowercase.optiboxes.skybox.components.Range;
 import btw.lowercase.optiboxes.utils.CommonUtils;
-import com.azure.json.models.JsonNumber;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
@@ -88,8 +87,8 @@ public final class SkyboxParser {
         }
 
         // Transition
-        if (properties.containsKey("transition") && properties.get("transition") instanceof JsonNumber number) {
-            output.addProperty("transition", number.getValue().intValue());
+        if (properties.containsKey("transition") && properties.get("transition") instanceof JsonPrimitive primitive && primitive.isNumber()) {
+            output.addProperty("transition", primitive.getAsNumber().intValue());
         }
 
         // Axis

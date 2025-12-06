@@ -13,9 +13,9 @@ import java.util.stream.Stream;
 public class SkyboxResourceHelper implements
         //? >=1.21.10 {
         net.minecraft.server.packs.resources.PreparableReloadListener
-        //? } else {
+        //?} else {
         /*net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener
-         *///? }
+         *///?}
 {
     private ResourceManager resourceManager;
 
@@ -52,7 +52,7 @@ public class SkyboxResourceHelper implements
     public Identifier getFabricId() {
         return OptiBoxesClient.locationOrNull("skybox_reader");
     }
-    *///? }
+    *///?}
 
     public Stream<Identifier> searchIn(String parent) {
         return this.resourceManager.listResources(parent, path -> true).keySet().stream();

@@ -64,9 +64,9 @@ public final class OptiBoxesClient implements ClientModInitializer {
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(new OptiboxesCommand()));
         //? >=1.21.10 {
         net.fabricmc.fabric.api.resource.v1.ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloader(locationOrNull("skybox_reader"), new SkyboxResourceHelper());
-        //? } else {
+        //?} else {
         /*net.fabricmc.fabric.api.resource.ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new SkyboxResourceHelper());
-        *///? }
+        *///?}
     }
 
     public static void convert(SkyboxResourceHelper skyboxResourceHelper) {

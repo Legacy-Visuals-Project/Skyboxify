@@ -64,8 +64,8 @@ public record OptiFineSkyLayer(
             }
 
             if (!(this.biomeInclusion && this.biomes.contains(level.getBiome(cameraEntity.blockPosition()).unwrapKey().orElseThrow()
-                            //? >=1.21.11 {
-                            .identifier()
+                    //? >=1.21.11 {
+                    .identifier()
                     //?} else {
                     /*.location()
                      *///?}

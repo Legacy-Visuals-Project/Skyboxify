@@ -2,10 +2,12 @@ package btw.lowercase.optiboxes.skybox;
 
 import btw.lowercase.optiboxes.OptiBoxesClient;
 import com.google.common.base.Preconditions;
+import lombok.Getter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -13,8 +15,8 @@ import java.util.List;
 
 public final class SkyboxManager {
     public static final SkyboxManager INSTANCE = new SkyboxManager();
-
     private final List<OptiFineSkybox> loadedSkyboxes = new ArrayList<>();
+    @Getter
     private final List<OptiFineSkybox> activeSkyboxes = new LinkedList<>();
 
     private SkyboxManager() {
@@ -48,15 +50,11 @@ public final class SkyboxManager {
         return OptiBoxesClient.getConfig().enabled.isEnabled() && !activeSkyboxes.isEmpty() && level != null;
     }
 
-    public List<OptiFineSkybox> getSkiesFor(ResourceKey<Level> resourceKey) {
+    public List<OptiFineSkybox> getSkiesFor(ResourceKey<@NotNull Level> resourceKey) {
         return getActiveSkyboxes().stream().filter(skybox -> resourceKey.equals(skybox.getWorldResourceKey())).toList();
     }
 
-    public boolean containsEnabled(ResourceKey<Level> resourceKey) {
+    public boolean containsEnabled(ResourceKey<@NotNull Level> resourceKey) {
         return !getSkiesFor(resourceKey).isEmpty();
-    }
-
-    public List<OptiFineSkybox> getActiveSkyboxes() {
-        return this.activeSkyboxes;
     }
 }

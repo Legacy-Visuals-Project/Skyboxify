@@ -17,7 +17,13 @@ public class SkyLayerListScreen extends DebugScreen {
     private final OptiFineSkybox skybox;
 
     public SkyLayerListScreen(Screen parent, OptiFineSkybox skybox) {
-        super(Component.literal(skybox.getWorldResourceKey().identifier().toString()), parent);
+        super(Component.literal(
+                //? >=1.21.11 {
+                skybox.getWorldResourceKey().identifier().toString()
+                //?} else {
+                /*skybox.getWorldResourceKey().location().toString()
+                 *///?}
+        ), parent);
         this.skybox = skybox;
     }
 

@@ -4,9 +4,11 @@ import btw.lowercase.optiboxes.OptiBoxesClient;
 import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import lombok.Getter;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.List;
@@ -18,10 +20,12 @@ public class OptiFineSkybox {
             Level.RESOURCE_KEY_CODEC.fieldOf("world").forGetter(OptiFineSkybox::getWorldResourceKey)
     ).apply(instance, OptiFineSkybox::new));
 
+    @Getter
     private final List<OptiFineSkyLayer> layers;
-    private final ResourceKey<Level> worldResourceKey;
-
+    @Getter
+    private final ResourceKey<@NotNull Level> worldResourceKey;
     private final Map<OptiFineSkyLayer, Float> optiFineSkyLayerAlphaMap = new HashMap<>();
+    @Getter
     private boolean active = true;
 
     public OptiFineSkybox(List<OptiFineSkyLayer> layers, ResourceKey<Level> worldResourceKey) {
@@ -39,19 +43,7 @@ public class OptiFineSkybox {
         }
     }
 
-    public boolean isActive() {
-        return this.active;
-    }
-
     public float getConditionAlphaFor(OptiFineSkyLayer optiFineSkyLayer) {
         return this.optiFineSkyLayerAlphaMap.getOrDefault(optiFineSkyLayer, -1.0F);
-    }
-
-    public List<OptiFineSkyLayer> getLayers() {
-        return this.layers;
-    }
-
-    public ResourceKey<Level> getWorldResourceKey() {
-        return this.worldResourceKey;
     }
 }
