@@ -1,0 +1,16 @@
+{
+	"required": true,
+	"minVersion": "0.8",
+	"package": "btw.lowercase.skyboxify.mixins",
+	"compatibilityLevel": "JAVA_21",
+	"client": [
+		"MixinClientLevel",
+		"MixinGameRenderer",
+		"MixinLevelRenderer",
+		"MixinSkyRenderer",
+		"RenderPipelinesAccessor"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

@@ -43,4 +43,4 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "optiboxes"
+rootProject.name = "Skyboxify"
