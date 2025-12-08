@@ -23,27 +23,35 @@
 
 package btw.lowercase.skyboxify.events;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
-public class EventManager {
-    private final Map<Class<? extends Event>, List<Consumer<? extends Event>>> listeners = new HashMap<>();
+public final class EventManager {
+    private final Map<Class<?>, List<Consumer<? super Event>>> listeners = new ConcurrentHashMap<>();
 
-    public <T extends Event> void listen(Class<T> eventClass, Consumer<T> consumer) {
-        listeners.computeIfAbsent(eventClass, __ -> new ArrayList<>()).add(consumer);
+    public <T extends Event> void listen(Class<T> eventClass, Consumer<? super T> consumer) {
+        listeners.computeIfAbsent(eventClass, __ -> new CopyOnWriteArrayList<>()).add((Consumer<? super Event>) consumer);
     }
 
     public <T extends Event> T dispatch(T event) {
-        final Class<? extends Event> eventClass = event.getClass();
-        if (listeners.containsKey(eventClass)) {
-            for (Consumer<? extends Event> consumer : listeners.get(eventClass)) {
-                ((Consumer<Event>) consumer).accept(event);
+        final Class<?> eventClass = event.getClass();
+        for (var entry : listeners.entrySet()) {
+            if (!entry.getKey().isAssignableFrom(eventClass)) {
+                continue;
+            }
+
+            for (Consumer<? super Event> consumer : entry.getValue()) {
+                consumer.accept(event);
+                if (event instanceof CancellableEvent cancellableEvent && cancellableEvent.isCancelled()) {
+                    return event;
+                }
             }
         }
 
         return event;
     }
 }
+

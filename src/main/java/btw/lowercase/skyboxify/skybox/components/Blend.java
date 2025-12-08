@@ -44,7 +44,7 @@ public enum Blend implements StringRepresentable {
     OVERLAY(alpha -> new Vector4f(alpha, alpha, alpha, 1.0F), new BlendFunction(GL11.GL_DST_COLOR, GL11.GL_SRC_COLOR)),
     ALPHA(alpha -> new Vector4f(1.0F, 1.0F, 1.0F, alpha), new BlendFunction(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA));
 
-    public static final Codec<Blend> CODEC = StringRepresentable.fromEnum(Blend::values);
+    public static final Codec<Blend> CODEC = StringRepresentable.fromEnum(Blend::values).orElse(Blend.ADD);
 
     private final Function<Float, Vector4f> blendConsumer;
     @Getter

@@ -37,8 +37,8 @@ import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
@@ -201,9 +201,9 @@ public class Skyboxify {
                         "world",
                         //? >=1.21.11 {
                         /*resourceKey.identifier().toString()
-                        *///?} else {
+                         *///?} else {
                         resourceKey.location().toString()
-                         //?}
+                        //?}
                 );
                 SkyboxManager.INSTANCE.addSkybox(OptiFineSkybox.CODEC.decode(JsonOps.INSTANCE, skyJson).getOrThrow().getFirst());
             }
