@@ -37,8 +37,8 @@ import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
@@ -69,8 +69,8 @@ public class Skyboxify {
     private final String MCPATCHER_SKY_PARENT = "mcpatcher/sky";
     private final Pattern MCPATCHER_SKY_PATTERN = Pattern.compile(MCPATCHER_SKY_PARENT + "/" + SKY_PATTERN_ENDING);
 
-    public Identifier locationOrNull(String path) {
-        return Identifier.tryBuild(MOD_ID, path);
+    public ResourceLocation locationOrNull(String path) {
+        return ResourceLocation.tryBuild(MOD_ID, path);
     }
 
     public void initialize() {
@@ -133,7 +133,7 @@ public class Skyboxify {
         layers.put("world0", new JsonArray()); // Overworld
         layers.put("world-1", new JsonArray()); // Nether
         layers.put("world1", new JsonArray()); // The End
-        skyboxResourceHelper.searchIn(skyParent).filter(id -> id.getPath().endsWith(".properties")).sorted(Comparator.comparing(Identifier::getPath, (id1, id2) -> {
+        skyboxResourceHelper.searchIn(skyParent).filter(id -> id.getPath().endsWith(".properties")).sorted(Comparator.comparing(ResourceLocation::getPath, (id1, id2) -> {
             final Matcher matcherId1 = skyPattern.matcher(id1);
             final Matcher matcherId2 = skyPattern.matcher(id2);
             if (matcherId1.find() && matcherId2.find()) {
@@ -200,10 +200,10 @@ public class Skyboxify {
                 skyJson.addProperty(
                         "world",
                         //? >=1.21.11 {
-                        resourceKey.identifier().toString()
-                         //?} else {
-                        /*resourceKey.location().toString()
-                        *///?}
+                        /*resourceKey.identifier().toString()
+                        *///?} else {
+                        resourceKey.location().toString()
+                         //?}
                 );
                 SkyboxManager.INSTANCE.addSkybox(OptiFineSkybox.CODEC.decode(JsonOps.INSTANCE, skyJson).getOrThrow().getFirst());
             }

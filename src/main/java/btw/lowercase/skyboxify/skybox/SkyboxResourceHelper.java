@@ -24,7 +24,7 @@
 package btw.lowercase.skyboxify.skybox;
 
 import btw.lowercase.skyboxify.Skyboxify;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.jetbrains.annotations.NotNull;
 
@@ -72,16 +72,16 @@ public class SkyboxResourceHelper implements
 
     //? <=1.21.8 {
     /*@Override
-    public Identifier getFabricId() {
+    public ResourceLocation getFabricId() {
         return Skyboxify.locationOrNull("skybox_reader");
     }
     *///?}
 
-    public Stream<Identifier> searchIn(String parent) {
+    public Stream<ResourceLocation> searchIn(String parent) {
         return this.resourceManager.listResources(parent, path -> true).keySet().stream();
     }
 
-    public InputStream getInputStream(Identifier resourceLocation) {
+    public InputStream getInputStream(ResourceLocation resourceLocation) {
         try {
             return this.resourceManager.getResource(resourceLocation).orElseThrow().open();
         } catch (Exception exception) {

@@ -92,7 +92,7 @@ public final class OptiFineSkyRenderer {
     }
 
     //? >=1.21.5 {
-    private final java.util.Map<net.minecraft.resources.Identifier, com.mojang.blaze3d.pipeline.RenderPipeline> renderPipelineCache = new java.util.HashMap<>();
+    private final java.util.Map<net.minecraft.resources.ResourceLocation, com.mojang.blaze3d.pipeline.RenderPipeline> renderPipelineCache = new java.util.HashMap<>();
 
     public static com.mojang.blaze3d.pipeline.RenderPipeline getSkyboxPipeline(@org.jetbrains.annotations.Nullable BlendFunction blendFunction) {
         final com.mojang.blaze3d.pipeline.RenderPipeline.Builder builder = com.mojang.blaze3d.pipeline.RenderPipeline.builder(RenderPipelinesAccessor.skyboxify$getMatricesProjectionSnippet());
@@ -190,10 +190,10 @@ public final class OptiFineSkyRenderer {
                 //?}
 
                 //? >=1.21.11 {
-                renderPass.bindTexture("Sampler0", skyTexture.getTextureView(), skyTexture.getSampler());
-                 //?} else >= 1.21.6 {
-                /*renderPass.bindSampler("Sampler0", skyTexture.getTextureView());
-                *///?} else {
+                /*renderPass.bindTexture("Sampler0", skyTexture.getTextureView(), skyTexture.getSampler());
+                 *///?} else >= 1.21.6 {
+                renderPass.bindSampler("Sampler0", skyTexture.getTextureView());
+                //?} else {
                 /*renderPass.bindSampler("Sampler0", skyTexture.getTexture());
                  *///?}
 
@@ -233,7 +233,7 @@ public final class OptiFineSkyRenderer {
 
     private float getTimeOfDay(Level level) {
         //? >=1.21.11 {
-        long fixedTime = level.getDayTime();
+        /*long fixedTime = level.getDayTime();
         if (level.dimensionType().hasFixedTime()) {
             if (level.dimension().equals(Level.NETHER)) {
                 fixedTime = 18000L;
@@ -245,8 +245,8 @@ public final class OptiFineSkyRenderer {
         final double frac = Mth.frac(fixedTime / 24000.0 - 0.25);
         final double mul = 0.5 - Math.cos(frac * Math.PI) / 2.0;
         return (float)(frac * 2.0 + mul) / 3.0F;
-        //?} else {
-        /*return level.getTimeOfDay(1.0F);
-        *///?}
+        *///?} else {
+        return level.getTimeOfDay(1.0F);
+        //?}
     }
 }

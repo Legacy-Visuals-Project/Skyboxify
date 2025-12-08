@@ -26,6 +26,7 @@ package btw.lowercase.skyboxify.mixins;
 import btw.lowercase.skyboxify.Skyboxify;
 import btw.lowercase.skyboxify.events.SkyRenderEvent;
 import btw.lowercase.skyboxify.skybox.SkyboxManager;
+import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.framegraph.FrameGraphBuilder;
@@ -35,6 +36,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -43,15 +45,16 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 //? >=1.21.11 {
-import net.minecraft.world.level.dimension.DimensionType;
- //?} else {
-/*import net.minecraft.client.renderer.DimensionSpecialEffects;
-*///?}
+/*import net.minecraft.world.level.dimension.DimensionType;
+ *///?} else {
+import net.minecraft.client.renderer.DimensionSpecialEffects;
+//?}
 
 @Mixin(value = LevelRenderer.class, priority = 900)
 public abstract class MixinLevelRenderer {
     @Unique
-    private static float skyboxify$tickDelta;
+    private static float skyboxify$tickDelta = 0.0F;
+
     @Shadow
     @Nullable
     private ClientLevel level;
@@ -88,8 +91,8 @@ public abstract class MixinLevelRenderer {
             )
     )
     private
-        //? >=1.21.11
-        static
+    //? >=1.21.11
+    /*static*/
     void skyboxify$renderEndSkybox(
             net.minecraft.client.renderer.SkyRenderer instance,
             //? <=1.21.3
@@ -103,14 +106,14 @@ public abstract class MixinLevelRenderer {
         );
         Skyboxify.getEventManager().dispatch(new SkyRenderEvent.EndSky.After(
                 //? >=1.21.11 {
-                net.minecraft.client.Minecraft.getInstance().level
-                //? } else {
-                /*this.level
-                 *///? }
+                /*net.minecraft.client.Minecraft.getInstance().level
+                *///?} else {
+                this.level
+                 //?}
         ));
     }
 
-    @WrapOperation(
+    @WrapWithCondition(
             method = "method_62215",
             at = @At(
                     value = "INVOKE",
@@ -125,8 +128,8 @@ public abstract class MixinLevelRenderer {
     )
     private
     //? >=1.21.11
-    static
-    void skyboxify$endBatchSunrise(
+    /*static*/
+    boolean skyboxify$endBatchSunrise(
             net.minecraft.client.renderer.SkyRenderer instance,
             PoseStack poseStack,
             //? >=1.21.4 <1.21.9
@@ -134,41 +137,28 @@ public abstract class MixinLevelRenderer {
             //? <=1.21.3
             /*com.mojang.blaze3d.vertex.Tesselator tesselator,*/
             float sunAngle,
-            int sunriseOrSunsetColor,
-            Operation<Void> original
+            int sunriseOrSunsetColor
     ) {
-        final var event = Skyboxify.getEventManager().dispatch(new SkyRenderEvent.SunriseSunset(
+        return !Skyboxify.getEventManager().dispatch(new SkyRenderEvent.SunriseSunset(
                 //? >=1.21.11 {
-                net.minecraft.client.Minecraft.getInstance().level
-                //? } else {
-                /*this.level
-                 *///? }
+                /*net.minecraft.client.Minecraft.getInstance().level
+                *///?} else {
+                this.level
+                 //?}
                 //? >=1.21.4 <1.21.9
                 /*, bufferSource*/
-        ));
-        if (!event.isCancelled()) {
-            original.call(
-                    instance,
-                    poseStack,
-                    //? >=1.21.4 <1.21.9
-                    /*bufferSource,*/
-                    //? <=1.21.3
-                    /*tesselator,*/
-                    sunAngle,
-                    sunriseOrSunsetColor
-            );
-        }
+        )).isCancelled();
     }
 
-    @WrapOperation(
+    @WrapWithCondition(
             method = "method_62215",
             at = @At(
                     value = "INVOKE",
                     //? >=1.21.11 {
-                    target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunMoonAndStars(Lcom/mojang/blaze3d/vertex/PoseStack;FFFLnet/minecraft/world/level/MoonPhase;FF)V"
-                    //?} else >=1.21.9 {
-                    /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunMoonAndStars(Lcom/mojang/blaze3d/vertex/PoseStack;FIFF)V"
-                    *///?} else >=1.21.6 {
+                    /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunMoonAndStars(Lcom/mojang/blaze3d/vertex/PoseStack;FFFLnet/minecraft/world/level/MoonPhase;FF)V"
+                    *///?} else >=1.21.9 {
+                    target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunMoonAndStars(Lcom/mojang/blaze3d/vertex/PoseStack;FIFF)V"
+                    //?} else >=1.21.6 {
                     /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunMoonAndStars(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;FIFF)V"
                     *///?} else >=1.21.4 {
                     /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunMoonAndStars(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;FIFFLnet/minecraft/client/renderer/FogParameters;)V"
@@ -178,9 +168,9 @@ public abstract class MixinLevelRenderer {
             )
     )
     private
-        //? >=1.21.11
-        static
-    void skyboxify$renderSkyboxes(
+    //? >=1.21.11
+    /*static*/
+    boolean skyboxify$renderSkyboxes(
             net.minecraft.client.renderer.SkyRenderer instance,
             PoseStack poseStack,
             //? >=1.21.4 <1.21.9
@@ -189,70 +179,50 @@ public abstract class MixinLevelRenderer {
             /*com.mojang.blaze3d.vertex.Tesselator tesselator,*/
             float timeOfDay,
             //? <=1.21.10 {
-            /*int moonPhase,
-            *///?}
-            float moonAngle,
-            float starAngle,
-            //? >=1.21.11 {
-            net.minecraft.world.level.MoonPhase moonPhase,
-            float rainBrightness,
-            float starBrightness,
+            int moonPhase,
             //?}
+            float moonAngle,
+            float starAngle
+            //? >=1.21.11 {
+            /*,net.minecraft.world.level.MoonPhase moonPhase,
+            float rainBrightness,
+            float starBrightness
+            *///?}
             //? <1.21.6
-            /*net.minecraft.client.renderer.FogParameters fog,*/
-            Operation<Void> original
+            /*,net.minecraft.client.renderer.FogParameters fog*/
     ) {
-        final var event = Skyboxify.getEventManager().dispatch(new SkyRenderEvent.SunMoonStars(
+        return !Skyboxify.getEventManager().dispatch(new SkyRenderEvent.SunMoonStars(
                 //? >=1.21.11 {
-                net.minecraft.client.Minecraft.getInstance().level,
-                //? } else {
-                /*this.level,
-                 *///? }
+                /*net.minecraft.client.Minecraft.getInstance().level,
+                *///?} else {
+                this.level,
+                 //?}
                 skyboxify$tickDelta
-        ));
-        if (!event.isCancelled()) {
-            original.call(
-                    instance,
-                    poseStack,
-                    //? >=1.21.4 <1.21.9
-                    /*bufferSource,*/
-                    //? <=1.21.3
-                    /*tesselator,*/
-                    timeOfDay,
-                    //? <=1.21.10
-                    /*moonPhase,*/
-                    moonAngle,
-                    starAngle
-                    //? >=1.21.11 {
-                    , moonPhase, rainBrightness, starBrightness
-                     //?}
-                    //? <1.21.6
-                    /*, fog*/
-            );
-        }
+        )).isCancelled();
     }
 
     @WrapOperation(
             method = "addSkyPass",
             at = @At(
                     //? >=1.21.11 {
-                    value = "FIELD",
-                    target = "Lnet/minecraft/client/renderer/state/SkyRenderState;skybox:Lnet/minecraft/world/level/dimension/DimensionType$Skybox;"
-                    //?} else >=1.21.10 {
                     /*value = "FIELD",
-                    target = "Lnet/minecraft/client/renderer/state/SkyRenderState;skyType:Lnet/minecraft/client/renderer/DimensionSpecialEffects$SkyType;"
-                    *///?} else {
+                    target = "Lnet/minecraft/client/renderer/state/SkyRenderState;skybox:Lnet/minecraft/world/level/dimension/DimensionType$Skybox;",
+                    *///?} else >=1.21.10 {
+                    value = "FIELD",
+                    target = "Lnet/minecraft/client/renderer/state/SkyRenderState;skyType:Lnet/minecraft/client/renderer/DimensionSpecialEffects$SkyType;",
+                    //?} else {
                     /*value = "INVOKE",
-                    target = "Lnet/minecraft/client/renderer/DimensionSpecialEffects;skyType()Lnet/minecraft/client/renderer/DimensionSpecialEffects$SkyType;"
+                    target = "Lnet/minecraft/client/renderer/DimensionSpecialEffects;skyType()Lnet/minecraft/client/renderer/DimensionSpecialEffects$SkyType;",
                     *///?}
+                    opcode = Opcodes.GETFIELD
             )
     )
     private
-        //? >=1.21.11 {
-        DimensionType.Skybox
-         //?} else {
-    /*DimensionSpecialEffects.SkyType
-    *///?}
+    //? >=1.21.11 {
+    /*DimensionType.Skybox
+     *///?} else {
+    DimensionSpecialEffects.SkyType
+    //?}
     skyboxify$allowNetherSky(
             //? >= 1.21.9 {
             net.minecraft.client.renderer.state.SkyRenderState instance,
@@ -261,19 +231,19 @@ public abstract class MixinLevelRenderer {
             *///?}
             Operation<
                     //? >=1.21.11 {
-                    DimensionType.Skybox
-                     //?} else {
-                    /*DimensionSpecialEffects.SkyType
-                    *///?}
-                    > original
+                    /*DimensionType.Skybox
+                     *///?} else {
+                    DimensionSpecialEffects.SkyType
+                    //?}
+            > original
     ) {
         //noinspection DataFlowIssue
         if (SkyboxManager.INSTANCE.isEnabled(this.level) && SkyboxManager.INSTANCE.containsEnabled(Level.NETHER) && this.level.dimension().equals(Level.NETHER)) {
             //? >=1.21.11 {
-            return DimensionType.Skybox.OVERWORLD;
-             //?} else {
-            /*return DimensionSpecialEffects.SkyType.OVERWORLD;
-            *///?}
+            /*return DimensionType.Skybox.OVERWORLD;
+             *///?} else {
+            return DimensionSpecialEffects.SkyType.OVERWORLD;
+            //?}
         } else {
             return original.call(instance);
         }

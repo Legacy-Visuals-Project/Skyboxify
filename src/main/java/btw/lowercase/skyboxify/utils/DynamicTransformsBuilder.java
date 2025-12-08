@@ -79,13 +79,13 @@ public final class DynamicTransformsBuilder {
                 this.modelOffset.orElse(new Vector3f()),
                 this.textureMatrix.orElse(
                         //? >=1.21.11 {
-                        new org.joml.Matrix4f()
-                        //?} else {
-                        /*com.mojang.blaze3d.systems.RenderSystem.getTextureMatrix()
-                         *///?}
+                        /*new org.joml.Matrix4f()
+                        *///?} else {
+                        com.mojang.blaze3d.systems.RenderSystem.getTextureMatrix()
+                         //?}
                 )
                 //? <1.21.11
-                /*, com.mojang.blaze3d.systems.RenderSystem.getShaderLineWidth()*/
+                , com.mojang.blaze3d.systems.RenderSystem.getShaderLineWidth()
         );
     }
     //?}

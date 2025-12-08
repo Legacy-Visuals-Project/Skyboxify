@@ -30,9 +30,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mojang.serialization.JsonOps;
-import net.minecraft.IdentifierException;
+import net.minecraft.ResourceLocationException;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,11 +51,11 @@ public final class SkyboxParser {
     private SkyboxParser() {
     }
 
-    public static @Nullable JsonObject parseSkyProperties(Properties properties, Identifier propertiesIdentifier) {
+    public static @Nullable JsonObject parseSkyProperties(Properties properties, ResourceLocation propertiesResourceLocation) {
         JsonObject output = new JsonObject();
 
         final String source = properties.getProperty("source", null);
-        Optional<Identifier> sourceTexture = Optional.ofNullable(parseSourceTexture(source, propertiesIdentifier));
+        Optional<ResourceLocation> sourceTexture = Optional.ofNullable(parseSourceTexture(source, propertiesResourceLocation));
         if (sourceTexture.isEmpty()) {
             LOGGER.warn("Failed to load source texture \"{}\"", source);
             if (Skyboxify.getConfig().ignoreBrokenSkies.isEnabled()) {
@@ -145,7 +145,7 @@ public final class SkyboxParser {
             String[] biomeEntries = biomesString.trim().split(" ");
             if (biomeEntries.length > 0) {
                 JsonArray biomes = new JsonArray();
-                Arrays.stream(biomeEntries).filter(Identifier::isValidPath).forEach(biomes::add);
+                Arrays.stream(biomeEntries).filter(ResourceLocation::isValidPath).forEach(biomes::add);
                 output.add("biomes", biomes);
             }
         }
@@ -183,8 +183,8 @@ public final class SkyboxParser {
         return output;
     }
 
-    public static @Nullable Identifier parseSourceTexture(String source, Identifier propertiesId) {
-        Identifier textureId;
+    public static @Nullable ResourceLocation parseSourceTexture(String source, ResourceLocation propertiesId) {
+        ResourceLocation textureId;
         String namespace;
         String path;
         if (source == null) {
@@ -201,7 +201,7 @@ public final class SkyboxParser {
                     namespace = parts[1];
                     path = parts[2];
                 } else {
-                    final Identifier location = Identifier.tryParse(source);
+                    final ResourceLocation location = ResourceLocation.tryParse(source);
                     if (location != null) {
                         namespace = location.getNamespace();
                         path = location.getPath();
@@ -214,8 +214,8 @@ public final class SkyboxParser {
         }
 
         try {
-            textureId = Identifier.fromNamespaceAndPath(namespace, path);
-        } catch (IdentifierException exception) {
+            textureId = ResourceLocation.fromNamespaceAndPath(namespace, path);
+        } catch (ResourceLocationException exception) {
             LOGGER.error("Failed to read texture path '{}:{}' as resource location", namespace, path);
             exception.printStackTrace();
             return null;

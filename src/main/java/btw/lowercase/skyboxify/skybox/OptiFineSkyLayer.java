@@ -31,7 +31,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
@@ -41,27 +41,27 @@ import org.joml.Vector3f;
 import java.util.List;
 
 public record OptiFineSkyLayer(
-        Identifier source,
+        ResourceLocation source,
         boolean biomeInclusion,
-        List<Identifier> biomes,
+        List<ResourceLocation> biomes,
         List<Range> heights,
         Blend blend,
         Fade fade,
         boolean rotate,
         float speed,
         //? >=1.21.11 {
-        org.joml.Vector3fc axis,
-        //?} else {
-        /*Vector3f axis,
-         *///?}
+        /*org.joml.Vector3fc axis,
+        *///?} else {
+        Vector3f axis,
+         //?}
         Loop loop,
         int transition,
         List<Weather> weatherConditions
 ) {
     public static final Codec<OptiFineSkyLayer> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Identifier.CODEC.fieldOf("source").forGetter(OptiFineSkyLayer::source),
+            ResourceLocation.CODEC.fieldOf("source").forGetter(OptiFineSkyLayer::source),
             Codec.BOOL.optionalFieldOf("biomeInclusion", true).forGetter(OptiFineSkyLayer::biomeInclusion),
-            Identifier.CODEC.listOf().optionalFieldOf("biomes", ImmutableList.of()).forGetter(OptiFineSkyLayer::biomes),
+            ResourceLocation.CODEC.listOf().optionalFieldOf("biomes", ImmutableList.of()).forGetter(OptiFineSkyLayer::biomes),
             Range.CODEC.listOf().optionalFieldOf("heights", ImmutableList.of()).forGetter(OptiFineSkyLayer::heights),
             Blend.CODEC.optionalFieldOf("blend", Blend.ADD).forGetter(OptiFineSkyLayer::blend),
             Fade.CODEC.optionalFieldOf("fade", Fade.DEFAULT).forGetter(OptiFineSkyLayer::fade),
@@ -88,10 +88,10 @@ public record OptiFineSkyLayer(
 
             if (!(this.biomeInclusion && this.biomes.contains(level.getBiome(cameraEntity.blockPosition()).unwrapKey().orElseThrow()
                             //? >=1.21.11 {
-                            .identifier()
-                    //?} else {
-                    /*.location()
-                     *///?}
+                            /*.identifier()
+                    *///?} else {
+                    .location()
+                     //?}
             ))) {
                 return false;
             }

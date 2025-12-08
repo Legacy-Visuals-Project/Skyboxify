@@ -65,8 +65,5 @@ public class SkyRenderEvent {
             MOON,
             STARS
         }
-
-        public static class BatchEnd extends CancellableEvent {
-        }
     }
 }

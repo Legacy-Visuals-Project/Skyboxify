@@ -56,10 +56,10 @@ public class SkyboxListScreen extends DebugScreen {
             scrollableListGidgets.add(new SimpleButton(
                     Component.literal(
                             //? >=1.21.11 {
-                            skybox.getWorldResourceKey().identifier().toString()
-                             //?} else {
-                            /*skybox.getWorldResourceKey().location().toString()
-                            *///?}
+                            /*skybox.getWorldResourceKey().identifier().toString()
+                             *///?} else {
+                            skybox.getWorldResourceKey().location().toString()
+                            //?}
                     ),
                     (this.width / 2) - (SimpleButton.DEFAULT_WIDTH / 2),
                     ((SimpleButton.DEFAULT_HEIGHT + SimpleButton.DEFAULT_PADDING) * index),
