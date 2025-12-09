@@ -59,8 +59,6 @@ public class SkyLayerInfoScreen extends DebugScreen {
         y += this.font.lineHeight + 2;
         this.gidgets.add(new Text.Builder("    Loop: " + this.skyLayer.loop(), this.width / 2, y).centered().build(this.font));
         y += this.font.lineHeight + 2;
-        this.gidgets.add(new Text.Builder("    Include Biome: " + this.skyLayer.biomeInclusion(), this.width / 2, y).centered().build(this.font));
-        y += this.font.lineHeight + 2;
         this.gidgets.add(new Text.Builder("    Biomes: " + this.skyLayer.biomes(), this.width / 2, y).centered().build(this.font));
         y += this.font.lineHeight + 2;
         this.gidgets.add(new Text.Builder("    Heights: " + this.skyLayer.heights(), this.width / 2, y).centered().build(this.font));

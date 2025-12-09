@@ -23,9 +23,9 @@
 
 package btw.lowercase.skyboxify.skybox;
 
-import btw.lowercase.skyboxify.utils.*;
 import btw.lowercase.skyboxify.mixins.RenderPipelinesAccessor;
 import btw.lowercase.skyboxify.skybox.components.UVRange;
+import btw.lowercase.skyboxify.utils.*;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.Minecraft;
@@ -34,7 +34,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import org.joml.AxisAngle4f;
 import org.joml.Matrix4f;
-import org.joml.Matrix4fStack;
 import org.joml.Quaternionf;
 
 public final class OptiFineSkyRenderer {
@@ -110,29 +109,31 @@ public final class OptiFineSkyRenderer {
     }
     //?}
 
-    public void renderSkybox(OptiFineSkybox optiFineSkybox, Matrix4f modelViewMatrix, ClientLevel level, float tickDelta) {
-        final long dayTime = level.getDayTime();
-        final int clampedTimeOfDay = (int) (dayTime % 24000L);
-        final float skyAngle = getTimeOfDay(level);
-        final float rainLevel = level.getRainLevel(tickDelta);
-        float thunderLevel = level.getThunderLevel(tickDelta);
-        if (rainLevel > 0.0F) {
-            thunderLevel /= rainLevel;
-        }
+    public void renderSkybox(final OptiFineSkybox optiFineSkybox, final Matrix4f modelViewMatrix, final ClientLevel level, final float tickDelta) {
+     	if (this.skyBuffer != null) {
+			final long dayTime = level.getDayTime();
+			final int clampedTimeOfDay = (int) (dayTime % 24000L);
+			final float skyAngle = getTimeOfDay(level);
+			final float rainLevel = level.getRainLevel(tickDelta);
+			float thunderLevel = level.getThunderLevel(tickDelta);
+			if (rainLevel > 0.0F) {
+				thunderLevel /= rainLevel;
+			}
 
-        for (OptiFineSkyLayer optiFineSkyLayer : optiFineSkybox.getLayers().stream().filter(layer -> layer.isActive(dayTime, clampedTimeOfDay)).toList()) {
-            renderSkyLayer(optiFineSkyLayer, modelViewMatrix, level, clampedTimeOfDay, skyAngle, rainLevel, thunderLevel, optiFineSkybox.getConditionAlphaFor(optiFineSkyLayer));
-        }
+			for (final OptiFineSkyLayer optiFineSkyLayer : optiFineSkybox.getLayers().stream().filter(layer -> layer.isActive(dayTime, clampedTimeOfDay)).toList()) {
+				renderSkyLayer(optiFineSkyLayer, new Matrix4f(modelViewMatrix), level, clampedTimeOfDay, skyAngle, rainLevel, thunderLevel, optiFineSkybox.getConditionAlphaFor(optiFineSkyLayer));
+			}
+		}
     }
 
-    public void renderSkyLayer(OptiFineSkyLayer optiFineSkyLayer, Matrix4f modelViewMatrix, Level level, int timeOfDay, float skyAngle, float rainLevel, float thunderLevel, float conditionAlpha) {
+    private void renderSkyLayer(final OptiFineSkyLayer optiFineSkyLayer, final Matrix4f modelViewMatrix, final Level level, final int timeOfDay, final float skyAngle, float rainLevel, float thunderLevel, float conditionAlpha) {
         final float weatherAlpha = CommonUtils.getWeatherAlpha(optiFineSkyLayer.weatherConditions(), rainLevel, thunderLevel);
         final float fadeAlpha = optiFineSkyLayer.fade().getAlpha(timeOfDay);
         final float finalAlpha = Mth.clamp(conditionAlpha * weatherAlpha * fadeAlpha, 0.0F, 1.0F);
-        if (!(finalAlpha < 1.0E-4F) && this.skyBuffer != null) {
+        if (!(finalAlpha < 1.0E-4F)) {
             if (optiFineSkyLayer.rotate()) {
                 // NOTE: Using `mulPose` directly gives a different result.
-                modelViewMatrix.rotate(new Quaternionf(new AxisAngle4f(this.getAngle(level, skyAngle, optiFineSkyLayer.speed()), optiFineSkyLayer.axis())));
+				modelViewMatrix.rotate(new Quaternionf(new AxisAngle4f(this.getAngle(level, skyAngle, optiFineSkyLayer.speed()), optiFineSkyLayer.axis())));
             }
 
             //? <=1.21.4 {
@@ -213,7 +214,7 @@ public final class OptiFineSkyRenderer {
         }
     }
 
-    private float getAngle(Level level, float skyAngle, float speed) {
+    private float getAngle(final Level level, final float skyAngle, final float speed) {
         float angleDayStart = 0.0F;
         if (speed != (float) Math.round(speed)) {
             final long currentWorldDay = (level.getDayTime() + 18000L) / 24000L;
@@ -231,7 +232,7 @@ public final class OptiFineSkyRenderer {
         //?}
     }
 
-    private float getTimeOfDay(Level level) {
+    private float getTimeOfDay(final Level level) {
         //? >=1.21.11 {
         /*long fixedTime = level.getDayTime();
         if (level.dimensionType().hasFixedTime()) {

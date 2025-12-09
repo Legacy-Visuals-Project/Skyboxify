@@ -109,21 +109,4 @@ public final class CommonUtils {
 
         return Mth.clamp(weatherAlpha, 0.0F, 1.0F);
     }
-
-    // Safety
-    public static int safeParseInteger(String input, int defaultValue) {
-        try {
-            return Integer.parseInt(input.trim());
-        } catch (NumberFormatException exception) {
-            return defaultValue;
-        }
-    }
-
-    public static float safeParseFloat(String value, float defaultValue) {
-        try {
-            return Float.parseFloat(value.trim());
-        } catch (NumberFormatException exception) {
-            return defaultValue;
-        }
-    }
 }
