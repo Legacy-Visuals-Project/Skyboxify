@@ -24,12 +24,12 @@
 package btw.lowercase.skyboxify.utils;
 
 //? >=1.21.5 {
-import org.lwjgl.opengl.GL11;
-//?}
+/*import org.lwjgl.opengl.GL11;
+*///?}
 
 public record BlendFunction(int srcFactor, int dstFactor) {
     //? >=1.21.5 {
-    public com.mojang.blaze3d.pipeline.BlendFunction toNative() {
+    /*public com.mojang.blaze3d.pipeline.BlendFunction toNative() {
         // TODO: Improve
         return new com.mojang.blaze3d.pipeline.BlendFunction(
                 switch (this.srcFactor) {
@@ -60,5 +60,5 @@ public record BlendFunction(int srcFactor, int dstFactor) {
                     default -> throw new RuntimeException("Unknown blend dest factor " + this.dstFactor);
                 });
     }
-    //?}
+    *///?}
 }

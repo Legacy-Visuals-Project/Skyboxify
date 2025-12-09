@@ -26,16 +26,16 @@ package btw.lowercase.skyboxify.utils;
 import lombok.experimental.UtilityClass;
 
 //? >=1.21.5 {
-import com.mojang.blaze3d.pipeline.RenderPipeline;
+/*import com.mojang.blaze3d.pipeline.RenderPipeline;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
-//?}
+*///?}
 
 @UtilityClass
 public final class IrisUtil {
     //? >=1.21.5 {
-    private static Object IRIS_INSTANCE = null;
+    /*private static Object IRIS_INSTANCE = null;
     private static Method IRIS_ASSIGN_PIPELINE_METHOD = null;
 
     static {
@@ -67,5 +67,5 @@ public final class IrisUtil {
             assignPipeline(pipeline, program);
         }
     }
-    //?}
+    *///?}
 }
