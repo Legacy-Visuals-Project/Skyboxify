@@ -42,9 +42,9 @@ public class SkyRenderEvent {
         @Getter
         private final Level level;
         //? >=1.21.4 <1.21.9 {
-        /*@Getter
+        @Getter
         private final net.minecraft.client.renderer.MultiBufferSource.BufferSource bufferSource;
-        *///?}
+        //?}
     }
 
     @RequiredArgsConstructor

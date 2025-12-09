@@ -46,10 +46,10 @@ public abstract class MixinSkyRenderer {
             at = @At(
                     value = "INVOKE",
                     //? >=1.21.9 {
-                    target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSun(FLcom/mojang/blaze3d/vertex/PoseStack;)V"
-                    //?} else >=1.21.4 {
-                    /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSun(FLnet/minecraft/client/renderer/MultiBufferSource;Lcom/mojang/blaze3d/vertex/PoseStack;)V"
-                    *///?} else {
+                    /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSun(FLcom/mojang/blaze3d/vertex/PoseStack;)V"
+                    *///?} else >=1.21.4 {
+                    target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSun(FLnet/minecraft/client/renderer/MultiBufferSource;Lcom/mojang/blaze3d/vertex/PoseStack;)V"
+                    //?} else {
                     /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSun(FLcom/mojang/blaze3d/vertex/Tesselator;Lcom/mojang/blaze3d/vertex/PoseStack;)V"
                     *///?}
             )
@@ -58,12 +58,12 @@ public abstract class MixinSkyRenderer {
             SkyRenderer instance,
             float rainLevel,
             //? <1.21.9 {
-            /*//? >=1.21.4 {
+            //? >=1.21.4 {
             net.minecraft.client.renderer.MultiBufferSource multiBufferSource,
             //?} else {
-            /^com.mojang.blaze3d.vertex.Tesselator tesselator,
-             ^///?}
-            *///?}
+            /*com.mojang.blaze3d.vertex.Tesselator tesselator,
+             *///?}
+            //?}
             PoseStack poseStack
     ) {
         return !Skyboxify.getEventManager().dispatch(new SkyRenderEvent.Celestial(SkyRenderEvent.Celestial.Type.SUN)).isCancelled();
@@ -76,10 +76,10 @@ public abstract class MixinSkyRenderer {
                     //? >=1.21.11 {
                     /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderMoon(Lnet/minecraft/world/level/MoonPhase;FLcom/mojang/blaze3d/vertex/PoseStack;)V"
                     *///?} else >=1.21.9 {
-                    target = "Lnet/minecraft/client/renderer/SkyRenderer;renderMoon(IFLcom/mojang/blaze3d/vertex/PoseStack;)V"
-                    //?} else >=1.21.4 {
-                    /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderMoon(IFLnet/minecraft/client/renderer/MultiBufferSource;Lcom/mojang/blaze3d/vertex/PoseStack;)V"
-                    *///?} else {
+                    /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderMoon(IFLcom/mojang/blaze3d/vertex/PoseStack;)V"
+                    *///?} else >=1.21.4 {
+                    target = "Lnet/minecraft/client/renderer/SkyRenderer;renderMoon(IFLnet/minecraft/client/renderer/MultiBufferSource;Lcom/mojang/blaze3d/vertex/PoseStack;)V"
+                    //?} else {
                     /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderMoon(IFLcom/mojang/blaze3d/vertex/Tesselator;Lcom/mojang/blaze3d/vertex/PoseStack;)V"
                     *///?}
             )
@@ -93,12 +93,12 @@ public abstract class MixinSkyRenderer {
             //?}
             float rainLevel,
             //? <1.21.9 {
-            /*//? >=1.21.4 {
+            //? >=1.21.4 {
             net.minecraft.client.renderer.MultiBufferSource multiBufferSource,
             //?} else {
-            /^com.mojang.blaze3d.vertex.Tesselator tesselator,
-             ^///?}
-            *///?}
+            /*com.mojang.blaze3d.vertex.Tesselator tesselator,
+             *///?}
+            //?}
             PoseStack poseStack
     ) {
         return !Skyboxify.getEventManager().dispatch(new SkyRenderEvent.Celestial(SkyRenderEvent.Celestial.Type.MOON)).isCancelled();
@@ -109,16 +109,16 @@ public abstract class MixinSkyRenderer {
             at = @At(
                     value = "INVOKE",
                     //? >=1.21.6 {
-                    target = "Lnet/minecraft/client/renderer/SkyRenderer;renderStars(FLcom/mojang/blaze3d/vertex/PoseStack;)V"
-                    //?} else {
-                    /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderStars(Lnet/minecraft/client/renderer/FogParameters;FLcom/mojang/blaze3d/vertex/PoseStack;)V"
-                    *///?}
+                    /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderStars(FLcom/mojang/blaze3d/vertex/PoseStack;)V"
+                    *///?} else {
+                    target = "Lnet/minecraft/client/renderer/SkyRenderer;renderStars(Lnet/minecraft/client/renderer/FogParameters;FLcom/mojang/blaze3d/vertex/PoseStack;)V"
+                    //?}
             )
     )
     private boolean skyboxify$toggleStars(
             SkyRenderer instance,
             //? <1.21.6
-            /*net.minecraft.client.renderer.FogParameters fog,*/
+            net.minecraft.client.renderer.FogParameters fog,
             float starBrightness,
             PoseStack poseStack
     ) {

@@ -38,20 +38,20 @@ import java.util.List;
 
 public final class SkyboxManager {
     public static final SkyboxManager INSTANCE = new SkyboxManager();
-    private final List<OptiFineSkybox> loadedSkyboxes = new ArrayList<>();
+    private final List<Skybox> loadedSkyboxes = new ArrayList<>();
     @Getter
-    private final List<OptiFineSkybox> activeSkyboxes = new LinkedList<>();
+    private final List<Skybox> activeSkyboxes = new LinkedList<>();
 
     private SkyboxManager() {
     }
 
-    public void addSkybox(OptiFineSkybox optiFineSkybox) {
-        Preconditions.checkNotNull(optiFineSkybox, "Skybox was null");
-        this.loadedSkyboxes.add(optiFineSkybox);
+    public void addSkybox(Skybox skybox) {
+        Preconditions.checkNotNull(skybox, "Skybox was null");
+        this.loadedSkyboxes.add(skybox);
     }
 
     public void clearSkyboxes() {
-        Minecraft.getInstance().execute(OptiFineSkyRenderer.INSTANCE::clearCache);
+        Minecraft.getInstance().execute(SkyboxSkyRenderer.INSTANCE::clearCache);
         this.loadedSkyboxes.clear();
         this.activeSkyboxes.clear();
     }
@@ -61,14 +61,14 @@ public final class SkyboxManager {
             return;
         }
 
-        for (OptiFineSkybox optiFineSkybox : this.loadedSkyboxes) {
-            optiFineSkybox.tick(level);
+        for (Skybox skybox : this.loadedSkyboxes) {
+            skybox.tick(level);
         }
 
         this.activeSkyboxes.removeIf(optiFineSkybox -> !optiFineSkybox.isActive());
-        for (OptiFineSkybox optiFineSkybox : this.loadedSkyboxes) {
-            if (!this.activeSkyboxes.contains(optiFineSkybox) && optiFineSkybox.isActive()) {
-                this.activeSkyboxes.add(optiFineSkybox);
+        for (Skybox skybox : this.loadedSkyboxes) {
+            if (!this.activeSkyboxes.contains(skybox) && skybox.isActive()) {
+                this.activeSkyboxes.add(skybox);
             }
         }
     }
@@ -77,7 +77,7 @@ public final class SkyboxManager {
         return Skyboxify.getConfig().enabled.isEnabled() && !activeSkyboxes.isEmpty() && level != null;
     }
 
-    public List<OptiFineSkybox> getSkiesFor(ResourceKey<@NotNull Level> resourceKey) {
+    public List<Skybox> getSkiesFor(ResourceKey<@NotNull Level> resourceKey) {
         return getActiveSkyboxes().stream().filter(skybox -> resourceKey.equals(skybox.getWorldResourceKey())).toList();
     }
 

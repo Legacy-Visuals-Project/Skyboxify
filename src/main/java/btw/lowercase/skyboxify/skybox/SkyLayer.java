@@ -41,7 +41,7 @@ import org.joml.Vector3fc;
 
 import java.util.List;
 
-public record OptiFineSkyLayer(
+public record SkyLayer(
 		ResourceLocation source,
 		Biomes biomes,
 		List<Range> heights,
@@ -54,19 +54,19 @@ public record OptiFineSkyLayer(
 		int transition,
 		List<Weather> weatherConditions
 ) {
-	public static final Codec<OptiFineSkyLayer> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-			ResourceLocation.CODEC.fieldOf("source").forGetter(OptiFineSkyLayer::source),
-			Biomes.CODEC.optionalFieldOf("biomes", Biomes.DEFAULT).forGetter(OptiFineSkyLayer::biomes),
-			Range.CODEC.listOf().optionalFieldOf("heights", ImmutableList.of()).forGetter(OptiFineSkyLayer::heights),
-			Blend.CODEC.optionalFieldOf("blend", Blend.ADD).forGetter(OptiFineSkyLayer::blend),
-			Fade.CODEC.optionalFieldOf("fade", Fade.DEFAULT).forGetter(OptiFineSkyLayer::fade),
-			Codec.BOOL.optionalFieldOf("rotate", true).forGetter(OptiFineSkyLayer::rotate),
-			Codec.FLOAT.optionalFieldOf("speed", 1.0F).forGetter(OptiFineSkyLayer::speed),
-			ParserCodecs.AXIS.optionalFieldOf("axis", Mth.X_AXIS).forGetter(OptiFineSkyLayer::axis),
-			Loop.CODEC.optionalFieldOf("loop", Loop.DEFAULT).forGetter(OptiFineSkyLayer::loop),
-			Codec.INT.optionalFieldOf("transition", 1).forGetter(OptiFineSkyLayer::transition),
-			ParserCodecs.WEATHER.optionalFieldOf("weather", ImmutableList.of(Weather.CLEAR)).forGetter(OptiFineSkyLayer::weatherConditions)
-	).apply(instance, OptiFineSkyLayer::new));
+	public static final Codec<SkyLayer> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+			ResourceLocation.CODEC.fieldOf("source").forGetter(SkyLayer::source),
+			Biomes.CODEC.optionalFieldOf("biomes", Biomes.DEFAULT).forGetter(SkyLayer::biomes),
+			Range.CODEC.listOf().optionalFieldOf("heights", ImmutableList.of()).forGetter(SkyLayer::heights),
+			Blend.CODEC.optionalFieldOf("blend", Blend.ADD).forGetter(SkyLayer::blend),
+			Fade.CODEC.optionalFieldOf("fade", Fade.DEFAULT).forGetter(SkyLayer::fade),
+			Codec.BOOL.optionalFieldOf("rotate", true).forGetter(SkyLayer::rotate),
+			Codec.FLOAT.optionalFieldOf("speed", 1.0F).forGetter(SkyLayer::speed),
+			ParserCodecs.AXIS.optionalFieldOf("axis", Mth.X_AXIS).forGetter(SkyLayer::axis),
+			Loop.CODEC.optionalFieldOf("loop", Loop.DEFAULT).forGetter(SkyLayer::loop),
+			Codec.INT.optionalFieldOf("transition", 1).forGetter(SkyLayer::transition),
+			ParserCodecs.WEATHER.optionalFieldOf("weather", ImmutableList.of(Weather.CLEAR)).forGetter(SkyLayer::weatherConditions)
+	).apply(instance, SkyLayer::new));
 
 	private boolean getConditionCheck(Level level) {
 		final Entity cameraEntity = Minecraft.getInstance().getCameraEntity();

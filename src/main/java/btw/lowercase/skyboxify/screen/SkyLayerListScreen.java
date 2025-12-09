@@ -27,8 +27,8 @@ import btw.lowercase.skyboxify.screen.widget.Gidget;
 import btw.lowercase.skyboxify.screen.widget.ScrollableList;
 import btw.lowercase.skyboxify.screen.widget.SimpleButton;
 import btw.lowercase.skyboxify.screen.widget.Text;
-import btw.lowercase.skyboxify.skybox.OptiFineSkyLayer;
-import btw.lowercase.skyboxify.skybox.OptiFineSkybox;
+import btw.lowercase.skyboxify.skybox.SkyLayer;
+import btw.lowercase.skyboxify.skybox.Skybox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -37,9 +37,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SkyLayerListScreen extends DebugScreen {
-    private final OptiFineSkybox skybox;
+    private final Skybox skybox;
 
-    public SkyLayerListScreen(Screen parent, OptiFineSkybox skybox) {
+    public SkyLayerListScreen(Screen parent, Skybox skybox) {
         super(Component.literal(
                 //? >=1.21.11 {
                 /*skybox.getWorldResourceKey().identifier().toString()
@@ -58,7 +58,7 @@ public class SkyLayerListScreen extends DebugScreen {
 
         List<Gidget> scrollableListGidgets = new ArrayList<>();
         int index = 0;
-        for (OptiFineSkyLayer skyLayer : this.skybox.getLayers()) {
+        for (SkyLayer skyLayer : this.skybox.getLayers()) {
             int cidx = index;
             scrollableListGidgets.add(new SimpleButton(
                     Component.literal(index + " - " + skyLayer.source()),

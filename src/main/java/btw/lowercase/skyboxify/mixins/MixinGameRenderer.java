@@ -38,10 +38,10 @@ import org.spongepowered.asm.mixin.injection.At;
 //?}
 
 //? >=1.21.6 {
-@Mixin(net.minecraft.client.renderer.GameRenderer.class)
-//?} else {
-/*@Mixin(net.minecraft.client.renderer.LevelRenderer.class)
- *///?}
+/*@Mixin(net.minecraft.client.renderer.GameRenderer.class)
+*///?} else {
+@Mixin(net.minecraft.client.renderer.LevelRenderer.class)
+ //?}
 public abstract class MixinGameRenderer {
     //? <=1.21.10 {
     @Shadow

@@ -91,12 +91,12 @@ public class Skyboxify {
 		});
 
 		//? >=1.21.4 <1.21.9 {
-        /*eventManager.listen(SkyRenderEvent.SunriseSunset.class, event -> {
+        eventManager.listen(SkyRenderEvent.SunriseSunset.class, event -> {
             if (SkyboxManager.INSTANCE.isEnabled(event.getLevel())) {
                 event.getBufferSource().endBatch();
             }
         });
-        *///?}
+        //?}
 
 		eventManager.listen(SkyRenderEvent.EndSky.After.class, event -> renderSkyboxes(event.getLevel(), 0.0F));
 
@@ -113,8 +113,8 @@ public class Skyboxify {
 	private void renderSkyboxes(ClientLevel clientLevel, float tickDelta) {
 		if (SkyboxManager.INSTANCE.isEnabled(clientLevel)) {
 			final Matrix4f modelViewMatrix = new Matrix4f(RenderSystem.getModelViewStack()).rotate(Axis.YP.rotationDegrees(-90.0F));
-			for (OptiFineSkybox optiFineSkybox : SkyboxManager.INSTANCE.getActiveSkyboxes()) {
-				OptiFineSkyRenderer.INSTANCE.renderSkybox(optiFineSkybox, modelViewMatrix, clientLevel, tickDelta);
+			for (Skybox skybox : SkyboxManager.INSTANCE.getActiveSkyboxes()) {
+				SkyboxSkyRenderer.INSTANCE.renderSkybox(skybox, modelViewMatrix, clientLevel, tickDelta);
 			}
 		}
 	}
@@ -206,7 +206,7 @@ public class Skyboxify {
 						resourceKey.location().toString()
 						//?}
 				);
-				SkyboxManager.INSTANCE.addSkybox(OptiFineSkybox.CODEC.decode(JsonOps.INSTANCE, skyJson).getOrThrow().getFirst());
+				SkyboxManager.INSTANCE.addSkybox(Skybox.CODEC.decode(JsonOps.INSTANCE, skyJson).getOrThrow().getFirst());
 			}
 		}
 	}

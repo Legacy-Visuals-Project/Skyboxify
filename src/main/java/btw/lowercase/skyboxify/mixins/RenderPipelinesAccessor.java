@@ -34,10 +34,10 @@ public interface RenderPipelinesAccessor {
     //? >= 1.21.5 {
     @org.spongepowered.asm.mixin.gen.Accessor(
             //? >=1.21.6 {
-            "MATRICES_PROJECTION_SNIPPET"
-            //?} else {
-            /*"MATRICES_COLOR_FOG_SNIPPET"
-            *///?}
+            /*"MATRICES_PROJECTION_SNIPPET"
+            *///?} else {
+            "MATRICES_COLOR_FOG_SNIPPET"
+            //?}
     )
     static com.mojang.blaze3d.pipeline.RenderPipeline.Snippet skyboxify$getMatricesProjectionSnippet() {
         return null;

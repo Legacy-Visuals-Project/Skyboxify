@@ -25,15 +25,15 @@ package btw.lowercase.skyboxify.screen;
 
 import btw.lowercase.skyboxify.screen.widget.SimpleButton;
 import btw.lowercase.skyboxify.screen.widget.Text;
-import btw.lowercase.skyboxify.skybox.OptiFineSkyLayer;
+import btw.lowercase.skyboxify.skybox.SkyLayer;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 
 public class SkyLayerInfoScreen extends DebugScreen {
-    private final OptiFineSkyLayer skyLayer;
+    private final SkyLayer skyLayer;
 
-    public SkyLayerInfoScreen(Screen parent, OptiFineSkyLayer skyLayer, int index) {
+    public SkyLayerInfoScreen(Screen parent, SkyLayer skyLayer, int index) {
         super(Component.literal(index + " - " + skyLayer.source().toString()), parent);
         this.skyLayer = skyLayer;
     }

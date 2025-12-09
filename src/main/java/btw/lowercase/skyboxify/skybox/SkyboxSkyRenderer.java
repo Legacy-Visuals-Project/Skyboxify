@@ -35,9 +35,10 @@ import net.minecraft.world.level.Level;
 import org.joml.AxisAngle4f;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
+import org.joml.Vector4f;
 
-public final class OptiFineSkyRenderer {
-    public static final OptiFineSkyRenderer INSTANCE = new OptiFineSkyRenderer();
+public final class SkyboxSkyRenderer {
+    public static final SkyboxSkyRenderer INSTANCE = new SkyboxSkyRenderer();
 
     //? >=1.21.5 {
     private com.mojang.blaze3d.buffers.GpuBuffer skyBuffer;
@@ -47,7 +48,7 @@ public final class OptiFineSkyRenderer {
     /*private com.mojang.blaze3d.vertex.VertexBuffer skyBuffer;
      *///?}
 
-    private OptiFineSkyRenderer() {
+    private SkyboxSkyRenderer() {
         Minecraft.getInstance().schedule(this::buildSky);
     }
 
@@ -74,10 +75,10 @@ public final class OptiFineSkyRenderer {
                 skyBuffer = RenderSystem.getDevice().createBuffer(
                         () -> "OptiFine Skybox",
                         //? >=1.21.6 {
-                        com.mojang.blaze3d.buffers.GpuBuffer.USAGE_COPY_DST,
-                        //?} else {
-                        /*com.mojang.blaze3d.buffers.BufferType.VERTICES, com.mojang.blaze3d.buffers.BufferUsage.STATIC_WRITE,
-                         *///?}
+                        /*com.mojang.blaze3d.buffers.GpuBuffer.USAGE_COPY_DST,
+                        *///?} else {
+                        com.mojang.blaze3d.buffers.BufferType.VERTICES, com.mojang.blaze3d.buffers.BufferUsage.STATIC_WRITE,
+                         //?}
                         meshData.vertexBuffer()
                 );
                 //?} else {
@@ -109,7 +110,7 @@ public final class OptiFineSkyRenderer {
     }
     //?}
 
-    public void renderSkybox(final OptiFineSkybox optiFineSkybox, final Matrix4f modelViewMatrix, final ClientLevel level, final float tickDelta) {
+    public void renderSkybox(final Skybox skybox, final Matrix4f modelViewMatrix, final ClientLevel level, final float tickDelta) {
      	if (this.skyBuffer != null) {
 			final long dayTime = level.getDayTime();
 			final int clampedTimeOfDay = (int) (dayTime % 24000L);
@@ -120,62 +121,66 @@ public final class OptiFineSkyRenderer {
 				thunderLevel /= rainLevel;
 			}
 
-			for (final OptiFineSkyLayer optiFineSkyLayer : optiFineSkybox.getLayers().stream().filter(layer -> layer.isActive(dayTime, clampedTimeOfDay)).toList()) {
-				renderSkyLayer(optiFineSkyLayer, new Matrix4f(modelViewMatrix), level, clampedTimeOfDay, skyAngle, rainLevel, thunderLevel, optiFineSkybox.getConditionAlphaFor(optiFineSkyLayer));
+			for (final SkyLayer skyLayer : skybox.getLayers().stream().filter(layer -> layer.isActive(dayTime, clampedTimeOfDay)).toList()) {
+				renderSkyLayer(skyLayer, new Matrix4f(modelViewMatrix), level, clampedTimeOfDay, skyAngle, rainLevel, thunderLevel, skybox.getConditionAlphaFor(skyLayer));
 			}
 		}
     }
 
-    private void renderSkyLayer(final OptiFineSkyLayer optiFineSkyLayer, final Matrix4f modelViewMatrix, final Level level, final int timeOfDay, final float skyAngle, float rainLevel, float thunderLevel, float conditionAlpha) {
-        final float weatherAlpha = CommonUtils.getWeatherAlpha(optiFineSkyLayer.weatherConditions(), rainLevel, thunderLevel);
-        final float fadeAlpha = optiFineSkyLayer.fade().getAlpha(timeOfDay);
+    private void renderSkyLayer(final SkyLayer skyLayer, final Matrix4f modelViewMatrix, final Level level, final int timeOfDay, final float skyAngle, float rainLevel, float thunderLevel, float conditionAlpha) {
+        final float weatherAlpha = CommonUtils.getWeatherAlpha(skyLayer.weatherConditions(), rainLevel, thunderLevel);
+        final float fadeAlpha = skyLayer.fade().getAlpha(timeOfDay);
         final float finalAlpha = Mth.clamp(conditionAlpha * weatherAlpha * fadeAlpha, 0.0F, 1.0F);
         if (!(finalAlpha < 1.0E-4F)) {
-            if (optiFineSkyLayer.rotate()) {
+            if (skyLayer.rotate()) {
                 // NOTE: Using `mulPose` directly gives a different result.
-				modelViewMatrix.rotate(new Quaternionf(new AxisAngle4f(this.getAngle(level, skyAngle, optiFineSkyLayer.speed()), optiFineSkyLayer.axis())));
+				modelViewMatrix.rotate(new Quaternionf(new AxisAngle4f(this.getAngle(level, skyAngle, skyLayer.speed()), skyLayer.axis())));
             }
 
             //? <=1.21.4 {
-            /*RenderSystem.setShaderTexture(0, optiFineSkyLayer.source());
+            /*RenderSystem.setShaderTexture(0, skyLayer.source());
             RenderSystem.setShader(net.minecraft.client.renderer.CoreShaders.POSITION_TEX);
             RenderSystem.depthMask(false);
-            optiFineSkyLayer.blend().apply(finalAlpha);
+            skyLayer.blend().apply(finalAlpha);
             *///?}
 
             //? >=1.21.5 {
-            //? >=1.21.6 {
-            com.mojang.blaze3d.buffers.GpuBufferSlice transforms = DynamicTransformsBuilder.of()
-                    .withModelViewMatrix(modelViewMatrix)
-                    .withShaderColor(optiFineSkyLayer.blend().getShaderColor(finalAlpha))
-                    .build();
-            //?}
+			final Vector4f shaderColor = skyLayer.blend().getShaderColor(finalAlpha);
 
-            com.mojang.blaze3d.pipeline.RenderPipeline renderPipeline = this.renderPipelineCache.computeIfAbsent(optiFineSkyLayer.source(), (resourceLocation) -> {
-                com.mojang.blaze3d.pipeline.RenderPipeline pipeline = getSkyboxPipeline(optiFineSkyLayer.blend().getBlendFunction());
+            //? >=1.21.6 {
+			/*final com.mojang.blaze3d.buffers.GpuBufferSlice transforms = DynamicTransformsBuilder.of()
+                    .withModelViewMatrix(modelViewMatrix)
+                    .withShaderColor(shaderColor)
+                    .build();
+            *///?} else {
+			RenderSystem.setShaderColor(shaderColor.x, shaderColor.y, shaderColor.z, shaderColor.w);
+			//?}
+
+			final com.mojang.blaze3d.pipeline.RenderPipeline renderPipeline = this.renderPipelineCache.computeIfAbsent(skyLayer.source(), (resourceLocation) -> {
+                com.mojang.blaze3d.pipeline.RenderPipeline pipeline = getSkyboxPipeline(skyLayer.blend().getBlendFunction());
                 IrisUtil.assignPipeline(pipeline, IrisPipeline.SKY_TEXTURED);
                 return pipeline;
             });
 
-            Minecraft minecraft = Minecraft.getInstance();
+            final Minecraft minecraft = Minecraft.getInstance();
 
-            com.mojang.blaze3d.pipeline.RenderTarget renderTarget = minecraft.getMainRenderTarget();
-            net.minecraft.client.renderer.texture.AbstractTexture skyTexture = minecraft.getTextureManager().getTexture(optiFineSkyLayer.source());
+            final com.mojang.blaze3d.pipeline.RenderTarget renderTarget = minecraft.getMainRenderTarget();
+            final net.minecraft.client.renderer.texture.AbstractTexture skyTexture = minecraft.getTextureManager().getTexture(skyLayer.source());
 
             //? >=1.21.6 {
-            com.mojang.blaze3d.textures.GpuTextureView colorTexture = renderTarget.getColorTextureView();
-            com.mojang.blaze3d.textures.GpuTextureView depthTexture = renderTarget.getDepthTextureView();
-            //?} else {
-            /*com.mojang.blaze3d.textures.GpuTexture colorTexture = renderTarget.getColorTexture();
-            com.mojang.blaze3d.textures.GpuTexture depthTexture = renderTarget.getDepthTexture();
-            *///?}
+            /*final com.mojang.blaze3d.textures.GpuTextureView colorTexture = renderTarget.getColorTextureView();
+            final com.mojang.blaze3d.textures.GpuTextureView depthTexture = renderTarget.getDepthTextureView();
+            *///?} else {
+            final com.mojang.blaze3d.textures.GpuTexture colorTexture = renderTarget.getColorTexture();
+            final com.mojang.blaze3d.textures.GpuTexture depthTexture = renderTarget.getDepthTexture();
+            //?}
 
             com.mojang.blaze3d.buffers.GpuBuffer indexBuffer = this.skyBufferIndices.getBuffer(this.skyBufferIndexCount);
             try (com.mojang.blaze3d.systems.RenderPass renderPass = RenderSystem.getDevice()
                     .createCommandEncoder()
                     .createRenderPass(
                             //? >=1.21.6
-                            () -> "Custom Sky Rendering",
+                            /*() -> "Custom Sky Rendering",*/
                             colorTexture,
                             java.util.OptionalInt.empty(),
                             depthTexture,
@@ -186,23 +191,23 @@ public final class OptiFineSkyRenderer {
                 renderPass.setIndexBuffer(indexBuffer, this.skyBufferIndices.type());
 
                 //? >=1.21.6 {
-                RenderSystem.bindDefaultUniforms(renderPass);
+                /*RenderSystem.bindDefaultUniforms(renderPass);
                 renderPass.setUniform("DynamicTransforms", transforms);
-                //?}
+                *///?}
 
                 //? >=1.21.11 {
                 /*renderPass.bindTexture("Sampler0", skyTexture.getTextureView(), skyTexture.getSampler());
                  *///?} else >= 1.21.6 {
-                renderPass.bindSampler("Sampler0", skyTexture.getTextureView());
-                //?} else {
-                /*renderPass.bindSampler("Sampler0", skyTexture.getTexture());
-                 *///?}
+                /*renderPass.bindSampler("Sampler0", skyTexture.getTextureView());
+                *///?} else {
+                renderPass.bindSampler("Sampler0", skyTexture.getTexture());
+                 //?}
 
                 //? >=1.21.6 {
-                renderPass.drawIndexed(0, 0, this.skyBufferIndexCount, 1);
-                //?} else {
-                /*renderPass.drawIndexed(0, this.skyBufferIndexCount);
-                 *///?}
+                /*renderPass.drawIndexed(0, 0, this.skyBufferIndexCount, 1);
+                *///?} else {
+                renderPass.drawIndexed(0, this.skyBufferIndexCount);
+                 //?}
             }
             //?} else {
             /*this.skyBuffer.bind();
@@ -211,6 +216,10 @@ public final class OptiFineSkyRenderer {
             RenderSystem.disableBlend();
             RenderSystem.defaultBlendFunc();
             *///?}
+
+			//? <1.21.6 {
+			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+			//?}
         }
     }
 

@@ -27,7 +27,7 @@ import btw.lowercase.skyboxify.screen.widget.Gidget;
 import btw.lowercase.skyboxify.screen.widget.ScrollableList;
 import btw.lowercase.skyboxify.screen.widget.SimpleButton;
 import btw.lowercase.skyboxify.screen.widget.Text;
-import btw.lowercase.skyboxify.skybox.OptiFineSkybox;
+import btw.lowercase.skyboxify.skybox.Skybox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -36,9 +36,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SkyboxListScreen extends DebugScreen {
-    private final List<OptiFineSkybox> skyboxes;
+    private final List<Skybox> skyboxes;
 
-    public SkyboxListScreen(Screen parent, List<OptiFineSkybox> skyboxes) {
+    public SkyboxListScreen(Screen parent, List<Skybox> skyboxes) {
         super(Component.literal(skyboxes.isEmpty() ? "No skies enabled..." : skyboxes.size() + " Total Active Skyboxes"), parent);
         this.skyboxes = skyboxes;
     }
@@ -52,7 +52,7 @@ public class SkyboxListScreen extends DebugScreen {
 
         List<Gidget> scrollableListGidgets = new ArrayList<>();
         int index = 0;
-        for (OptiFineSkybox skybox : this.skyboxes) {
+        for (Skybox skybox : this.skyboxes) {
             scrollableListGidgets.add(new SimpleButton(
                     Component.literal(
                             //? >=1.21.11 {

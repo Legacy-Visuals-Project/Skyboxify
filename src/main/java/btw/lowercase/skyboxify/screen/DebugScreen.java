@@ -64,18 +64,18 @@ public class DebugScreen extends Screen {
     }
 
     //? >=1.21.9 {
-    @Override
+    /*@Override
     public boolean mouseClicked(net.minecraft.client.input.MouseButtonEvent event, boolean isDoubleClick) {
         this.mouseClickedInternal(event.x(), event.y());
         return super.mouseClicked(event, isDoubleClick);
     }
-    //?} else {
-    /*@Override
+    *///?} else {
+    @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         this.mouseClickedInternal(mouseX, mouseY);
         return super.mouseClicked(mouseX, mouseY, button);
     }
-    *///?}
+    //?}
 
     @Override
     public void mouseMoved(double mouseX, double mouseY) {
@@ -104,18 +104,18 @@ public class DebugScreen extends Screen {
     }
 
     //? >=1.21.9 {
-    @Override
+    /*@Override
     public boolean keyPressed(net.minecraft.client.input.KeyEvent event) {
         this.keyPressedInternal(event.key(), event.scancode(), event.modifiers());
         return super.keyPressed(event);
     }
-    //?} else {
-    /*@Override
+    *///?} else {
+    @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         this.keyPressedInternal(keyCode, scanCode, modifiers);
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
-    *///?}
+    //?}
 
     private void keyReleasedInternal(int keyCode, int scanCode, int modifiers) {
         for (Gidget gidget : this.gidgets) {
@@ -124,18 +124,18 @@ public class DebugScreen extends Screen {
     }
 
     //? >=1.21.9 {
-    @Override
+    /*@Override
     public boolean keyReleased(net.minecraft.client.input.KeyEvent event) {
         this.keyPressedInternal(event.key(), event.scancode(), event.modifiers());
         return super.keyReleased(event);
     }
-    //?} else {
-    /*@Override
+    *///?} else {
+    @Override
     public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
         this.keyPressedInternal(keyCode, scanCode, modifiers);
         return super.keyReleased(keyCode, scanCode, modifiers);
     }
-    *///?}
+    //?}
 
     @Override
     public void onClose() {
