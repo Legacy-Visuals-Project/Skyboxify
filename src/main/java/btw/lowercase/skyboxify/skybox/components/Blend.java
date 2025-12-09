@@ -60,7 +60,7 @@ public enum Blend implements StringRepresentable {
     }
 
     //? <=1.21.4 {
-    public void apply(float value) {
+    /*public void apply(float value) {
         final Vector4f shaderColor = getShaderColor(value);
         com.mojang.blaze3d.systems.RenderSystem.setShaderColor(shaderColor.x, shaderColor.y, shaderColor.z, shaderColor.w);
         if (this.blendFunction != null) {
@@ -70,7 +70,7 @@ public enum Blend implements StringRepresentable {
             com.mojang.blaze3d.systems.RenderSystem.disableBlend();
         }
     }
-    //?}
+    *///?}
 
     @Override
     public @NotNull String getSerializedName() {

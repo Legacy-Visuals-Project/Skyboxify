@@ -72,15 +72,15 @@ public final class DynamicTransformsBuilder {
     }
 
     //? >=1.21.6 {
-    /*public com.mojang.blaze3d.buffers.GpuBufferSlice build() {
+    public com.mojang.blaze3d.buffers.GpuBufferSlice build() {
         return com.mojang.blaze3d.systems.RenderSystem.getDynamicUniforms().writeTransform(
                 this.modelViewMatrix.orElse(com.mojang.blaze3d.systems.RenderSystem.getModelViewMatrix()),
                 this.colorModulator.orElse(new Vector4f(1.0F, 1.0F, 1.0F, 1.0F)),
                 this.modelOffset.orElse(new Vector3f()),
                 this.textureMatrix.orElse(
                         //? >=1.21.11 {
-                        /^new org.joml.Matrix4f()
-                        ^///?} else {
+                        /*new org.joml.Matrix4f()
+                        *///?} else {
                         com.mojang.blaze3d.systems.RenderSystem.getTextureMatrix()
                          //?}
                 )
@@ -88,5 +88,5 @@ public final class DynamicTransformsBuilder {
                 , com.mojang.blaze3d.systems.RenderSystem.getShaderLineWidth()
         );
     }
-    *///?}
+    //?}
 }

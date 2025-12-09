@@ -91,12 +91,12 @@ public class Skyboxify {
 		});
 
 		//? >=1.21.4 <1.21.9 {
-        eventManager.listen(SkyRenderEvent.SunriseSunset.class, event -> {
-            if (SkyboxManager.INSTANCE.isEnabled(event.getLevel())) {
-                event.getBufferSource().endBatch();
-            }
-        });
-        //?}
+		/*eventManager.listen(SkyRenderEvent.SunriseSunset.After.class, event -> {
+			if (SkyboxManager.INSTANCE.isEnabled(event.getLevel())) {
+				event.getBufferSource().endBatch();
+			}
+		});
+		*///?}
 
 		eventManager.listen(SkyRenderEvent.EndSky.After.class, event -> renderSkyboxes(event.getLevel(), 0.0F));
 

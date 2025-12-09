@@ -35,32 +35,32 @@ import java.util.stream.Stream;
 
 public class SkyboxResourceHelper implements
         //? >=1.21.10 {
-        /*net.minecraft.server.packs.resources.PreparableReloadListener
-        *///?} else {
-        net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener
-         //?}
+        net.minecraft.server.packs.resources.PreparableReloadListener
+        //?} else {
+        /*net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener
+         *///?}
 {
     private ResourceManager resourceManager;
 
     @Override
     public @NotNull CompletableFuture<Void> reload(
             //? >=1.21.9
-            /*SharedState sharedState,*/
+            SharedState sharedState,
             //? <1.21.9
-            PreparationBarrier preparationBarrier,
+            /*PreparationBarrier preparationBarrier,*/
             //? <1.21.9
-            ResourceManager resourceManager,
+            /*ResourceManager resourceManager,*/
             @NotNull Executor backgroundExecutor,
             //? >=1.21.9
-            /*PreparationBarrier preparationBarrier,*/
+            PreparationBarrier preparationBarrier,
             @NotNull Executor gameExecutor
     ) {
         this.resourceManager =
                 //? >=1.21.9 {
-                /*sharedState.resourceManager();
-        *///?} else {
-        resourceManager;
-         //?}
+                sharedState.resourceManager();
+        //?} else {
+        /*resourceManager;
+         *///?}
         return CompletableFuture.runAsync(() -> {
             SkyboxManager.INSTANCE.clearSkyboxes();
             if (Skyboxify.getConfig().enabled.isEnabled()) {
@@ -71,11 +71,11 @@ public class SkyboxResourceHelper implements
     }
 
     //? <=1.21.8 {
-    @Override
+    /*@Override
     public ResourceLocation getFabricId() {
         return Skyboxify.locationOrNull("skybox_reader");
     }
-    //?}
+    *///?}
 
     public Stream<ResourceLocation> searchIn(String parent) {
         return this.resourceManager.listResources(parent, path -> true).keySet().stream();

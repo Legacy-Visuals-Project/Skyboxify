@@ -29,41 +29,44 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.world.level.Level;
 
 public class SkyRenderEvent {
-    public static class EndSky {
-        @RequiredArgsConstructor
-        public static class After extends Event {
-            @Getter
-            private final ClientLevel level;
-        }
-    }
+	public static class EndSky {
+		@RequiredArgsConstructor
+		public static class After extends Event {
+			@Getter
+			private final ClientLevel level;
+		}
+	}
 
-    @RequiredArgsConstructor
-    public static class SunriseSunset extends CancellableEvent {
-        @Getter
-        private final Level level;
-        //? >=1.21.4 <1.21.9 {
-        @Getter
-        private final net.minecraft.client.renderer.MultiBufferSource.BufferSource bufferSource;
-        //?}
-    }
+	@RequiredArgsConstructor
+	public static class SunriseSunset extends CancellableEvent {
+		@RequiredArgsConstructor
+		public static class After extends Event {
+			@Getter
+			private final Level level;
+			//? >=1.21.4 <1.21.9 {
+			/*@Getter
+			private final net.minecraft.client.renderer.MultiBufferSource.BufferSource bufferSource;
+			*///?}
+		}
+	}
 
-    @RequiredArgsConstructor
-    public static class SunMoonStars extends CancellableEvent {
-        @Getter
-        private final ClientLevel level;
-        @Getter
-        private final float tickDelta;
-    }
+	@RequiredArgsConstructor
+	public static class SunMoonStars extends CancellableEvent {
+		@Getter
+		private final ClientLevel level;
+		@Getter
+		private final float tickDelta;
+	}
 
-    @RequiredArgsConstructor
-    public static class Celestial extends CancellableEvent {
-        @Getter
-        private final Type type;
+	@RequiredArgsConstructor
+	public static class Celestial extends CancellableEvent {
+		@Getter
+		private final Type type;
 
-        public enum Type {
-            SUN,
-            MOON,
-            STARS
-        }
-    }
+		public enum Type {
+			SUN,
+			MOON,
+			STARS
+		}
+	}
 }

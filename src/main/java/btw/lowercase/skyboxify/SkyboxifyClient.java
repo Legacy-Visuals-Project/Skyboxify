@@ -40,9 +40,9 @@ public final class SkyboxifyClient implements ClientModInitializer {
             dispatcher.register(new SkyboxifyCommand("optiboxes")); // TODO: Remove
         });
         //? >=1.21.10 {
-        /*net.fabricmc.fabric.api.resource.v1.ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloader(Skyboxify.locationOrNull("skybox_reader"), new SkyboxResourceHelper());
-         *///?} else {
-        net.fabricmc.fabric.api.resource.ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new SkyboxResourceHelper());
-        //?}
+        net.fabricmc.fabric.api.resource.v1.ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloader(Skyboxify.locationOrNull("skybox_reader"), new SkyboxResourceHelper());
+         //?} else {
+        /*net.fabricmc.fabric.api.resource.ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new SkyboxResourceHelper());
+        *///?}
     }
 }
