@@ -46,8 +46,20 @@ public final class ParserCodecs {
 
     public static final Codec<String> TRIMMED_STRING = Codec.STRING.xmap(String::trim, ParserCodecs::emptyCodecString);
     public static final Codec<List<String>> SPLIT_SPACE_TRIMMED = TRIMMED_STRING.xmap(input -> Arrays.stream(input.split(" ")).map(String::trim).filter(s -> !s.isEmpty()).toList(), ParserCodecs::emptyCodecString);
-    public static final Codec<Float> SAFE_FLOAT = TRIMMED_STRING.xmap(Float::parseFloat, String::valueOf);
-    public static final Codec<Integer> SAFE_INTEGER = TRIMMED_STRING.xmap(Integer::parseInt, String::valueOf);
+	public static final Codec<Float> SAFE_FLOAT = TRIMMED_STRING.comapFlatMap(input -> {
+		try {
+			return DataResult.success(Float.parseFloat(input));
+		} catch (NumberFormatException exception) {
+			return DataResult.error(exception::getMessage);
+		}
+	}, String::valueOf);
+	public static final Codec<Integer> SAFE_INTEGER = TRIMMED_STRING.comapFlatMap(input -> {
+		try {
+			return DataResult.success(Integer.parseInt(input));
+		} catch (NumberFormatException exception) {
+			return DataResult.error(exception::getMessage);
+		}
+	}, String::valueOf);
 
     public static final Codec<List<Weather>> WEATHER = SPLIT_SPACE_TRIMMED.xmap(input -> {
         if (!input.isEmpty()) {
@@ -71,23 +83,23 @@ public final class ParserCodecs {
     }, ParserCodecs::emptyCodecString);
 
     private static final Codec<Range> RANGE_ENTRY = TRIMMED_STRING.xmap(input -> {
-        if (input.contains("-")) {
-            final String[] parts = input.split("-");
-            if (parts.length == 2) {
-                final int min = safeParseInteger(parts[0], -1);
-                final int max = safeParseInteger(parts[1], -1);
-                if (min >= 0 && max >= 0) {
-                    return new Range(min, max);
-                }
-            }
-        } else {
-            final int value = safeParseInteger(input, -1);
-            if (value >= 0) {
-                return new Range(value, value);
-            }
-        }
+		if (input.contains("-")) {
+			final String[] parts = input.split("-");
+			if (parts.length == 2) {
+				final int min = safeParseInteger(parts[0], -1);
+				final int max = safeParseInteger(parts[1], -1);
+				if (min >= 0 && max >= 0) {
+					return new Range(min, max);
+				}
+			}
+		} else {
+			final int value = safeParseInteger(input, -1);
+			if (value >= 0) {
+				return new Range(value, value);
+			}
+		}
 
-        return null;
+		return null;
     }, ParserCodecs::emptyCodecString);
 
     private static final Codec<Range> NEGATIVE_RANGE_ENTRY = TRIMMED_STRING.xmap(input -> {
@@ -115,11 +127,11 @@ public final class ParserCodecs {
     public static Codec<List<Range>> getRangeEntriesCodec(boolean allowNegative) {
         return TRIMMED_STRING.xmap(input -> {
             final List<Range> entries = new ArrayList<>();
-            for (String part : input.split(" ,")) {
-                final Range range = (allowNegative ? NEGATIVE_RANGE_ENTRY : RANGE_ENTRY).orElse(null).parse(JavaOps.INSTANCE, part).getOrThrow();
-                if (range != null) {
-                    entries.add(range);
-                }
+            for (String part : input.split("\\s*,\\s*|\\s+")) {
+                final Range range = (allowNegative ? NEGATIVE_RANGE_ENTRY : RANGE_ENTRY).parse(JavaOps.INSTANCE, part).getOrThrow();
+				if (range != null) {
+					entries.add(range);
+				}
             }
 
             return entries;

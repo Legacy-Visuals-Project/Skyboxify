@@ -32,21 +32,21 @@ import net.minecraft.resources.ResourceLocation;
 import java.util.List;
 
 public record Biomes(ImmutableList<ResourceLocation> locations, boolean inclusion) {
-    public static Biomes DEFAULT = new Biomes(ImmutableList.of(), true);
+	public static Biomes DEFAULT = new Biomes(ImmutableList.of(), true);
 
-    public static Codec<Biomes> CODEC = ParserCodecs.TRIMMED_STRING.xmap(input -> {
-        final boolean inclusion = input.startsWith("!");
-        if (!inclusion) {
-            input = input.substring(1);
-        }
+	public static Codec<Biomes> CODEC = ParserCodecs.TRIMMED_STRING.xmap(input -> {
+		final boolean inclusion = !input.startsWith("!");
+		if (!inclusion) {
+			input = input.substring(1);
+		}
 
-        final List<String> entries = ParserCodecs.SPLIT_SPACE_TRIMMED.parse(JavaOps.INSTANCE, input).getOrThrow();
-        if (!entries.isEmpty()) {
-            final ImmutableList.Builder<ResourceLocation> builder = new ImmutableList.Builder<>();
-            builder.addAll(entries.stream().filter(ResourceLocation::isValidPath).map(ResourceLocation::parse).toList());
-            return new Biomes(builder.build(), inclusion);
-        } else {
-            return Biomes.DEFAULT;
-        }
-    }, ParserCodecs::emptyCodecString);
+		final List<String> entries = ParserCodecs.SPLIT_SPACE_TRIMMED.parse(JavaOps.INSTANCE, input).getOrThrow();
+		if (!entries.isEmpty()) {
+			final ImmutableList.Builder<ResourceLocation> builder = new ImmutableList.Builder<>();
+			builder.addAll(entries.stream().filter(ResourceLocation::isValidPath).map(ResourceLocation::parse).toList());
+			return new Biomes(builder.build(), inclusion);
+		} else {
+			return Biomes.DEFAULT;
+		}
+	}, ParserCodecs::emptyCodecString);
 }

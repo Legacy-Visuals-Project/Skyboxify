@@ -30,7 +30,6 @@ import org.lwjgl.opengl.GL11;
 public record BlendFunction(int srcFactor, int dstFactor) {
     //? >=1.21.5 {
     public com.mojang.blaze3d.pipeline.BlendFunction toNative() {
-        // TODO: Improve
         return new com.mojang.blaze3d.pipeline.BlendFunction(
                 switch (this.srcFactor) {
                     case GL11.GL_SRC_COLOR -> com.mojang.blaze3d.platform.SourceFactor.SRC_COLOR;

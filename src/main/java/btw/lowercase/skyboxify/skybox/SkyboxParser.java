@@ -166,12 +166,13 @@ public final class SkyboxParser {
 	private static void parseDaysLoop(String days, String daysLoop, JsonObject output) {
 		final List<Range> rangeEntries = ParserCodecs.getRangeEntriesCodec(false).orElse(List.of()).parse(JavaOps.INSTANCE, days).getOrThrow();
 		if (!rangeEntries.isEmpty()) {
+			final JsonObject loop = new JsonObject();
+			loop.addProperty("days", daysLoop == null ? 8 : ParserCodecs.safeParseInteger(daysLoop, 8));
+
 			final JsonArray ranges = new JsonArray();
 			rangeEntries.stream().map(range -> Range.CODEC.encode(range, JsonOps.INSTANCE, new JsonObject()).getOrThrow()).forEach(ranges::add);
-
-			final JsonObject loop = new JsonObject();
-			loop.addProperty("days", ParserCodecs.safeParseInteger(daysLoop, 8));
 			loop.add("ranges", ranges);
+
 			output.add("loop", loop);
 		}
 	}
