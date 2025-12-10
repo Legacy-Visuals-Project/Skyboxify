@@ -1,1 +1,5 @@
-- Improved Performance Slightly
+- Rebranded to Skyboxify
+- Added Skyboxes Debug Screen to view all active skyboxes data/each layer (Accessible via ``/skyboxify debug``)
+- Reworked sky loading/handling
+- Reworked rendering/mixins code a bit
+- Fixed many bugs w/ loading/rendering
