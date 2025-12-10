@@ -55,11 +55,11 @@ public class SkyboxifyConfigScreen extends InternalConfigScreen {
         // Didn't iterate fields here because I wanted custom order
         rowHelper.addChild(skyboxifyConfig.enabled.createWidget());
         rowHelper.addChild(skyboxifyConfig.showOverworldForUnknownDimension.createWidget());
-        rowHelper.addChild(skyboxifyConfig.processOptiFine.createWidget(this.minecraft::reloadResourcePacks));
-        rowHelper.addChild(skyboxifyConfig.processMCPatcher.createWidget(this.minecraft::reloadResourcePacks));
+        rowHelper.addChild(skyboxifyConfig.processOptiFine.createWidget());
+        rowHelper.addChild(skyboxifyConfig.processMCPatcher.createWidget());
         rowHelper.addChild(skyboxifyConfig.renderSunMoon.createWidget());
         rowHelper.addChild(skyboxifyConfig.renderStars.createWidget());
-        rowHelper.addChild(skyboxifyConfig.ignoreBrokenSkies.createWidget(this.minecraft::reloadResourcePacks));
+        rowHelper.addChild(skyboxifyConfig.ignoreBrokenSkies.createWidget());
         layout.addToContents(gridLayout);
 
         GridLayout footerGridLayout = new GridLayout();

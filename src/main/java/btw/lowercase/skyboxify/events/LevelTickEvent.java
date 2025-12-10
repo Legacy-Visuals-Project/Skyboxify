@@ -26,11 +26,12 @@ package btw.lowercase.skyboxify.events;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.client.multiplayer.ClientLevel;
+import org.visuals.legacy.lightconfig.lib.v1.events.Event;
 
 public class LevelTickEvent extends Event {
-    @RequiredArgsConstructor
-    public static class Client extends LevelTickEvent {
-        @Getter
-        private final ClientLevel level;
-    }
+	@RequiredArgsConstructor
+	public static class Client extends LevelTickEvent {
+		@Getter
+		private final ClientLevel level;
+	}
 }

@@ -24,7 +24,6 @@
 package btw.lowercase.skyboxify;
 
 import btw.lowercase.skyboxify.config.SkyboxifyConfig;
-import btw.lowercase.skyboxify.events.EventManager;
 import btw.lowercase.skyboxify.events.LevelTickEvent;
 import btw.lowercase.skyboxify.events.SkyRenderEvent;
 import btw.lowercase.skyboxify.skybox.*;
@@ -36,18 +35,19 @@ import com.mojang.math.Axis;
 import com.mojang.serialization.JsonOps;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.visuals.legacy.lightconfig.lib.v1.events.EventManager;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -62,20 +62,21 @@ public class Skyboxify {
 	private final Logger logger = LoggerFactory.getLogger(Skyboxify.class);
 	@Getter
 	private final EventManager eventManager = new EventManager();
-	@Getter
-	private final SkyboxifyConfig config = new SkyboxifyConfig(FabricLoader.getInstance().getModContainer(MOD_ID).orElseThrow(() -> new RuntimeException("Mod metadata container was null.")), FabricLoader.getInstance().getConfigDir().resolve("optiboxes.json")); // TODO: Update LightConfig to not need fabric related apis
 	private final String OPTIFINE_SKY_PARENT = "optifine/sky";
 	private final String SKY_PATTERN_ENDING = "(?<world>[\\w-]+)/(?<name>\\w+).properties$";
 	private final Pattern OPTIFINE_SKY_PATTERN = Pattern.compile(OPTIFINE_SKY_PARENT + "/" + SKY_PATTERN_ENDING);
 	private final String MCPATCHER_SKY_PARENT = "mcpatcher/sky";
 	private final Pattern MCPATCHER_SKY_PATTERN = Pattern.compile(MCPATCHER_SKY_PARENT + "/" + SKY_PATTERN_ENDING);
+	@Getter
+	private SkyboxifyConfig config;
 
 	public ResourceLocation locationOrNull(String path) {
 		return ResourceLocation.tryBuild(MOD_ID, path);
 	}
 
-	public void initialize() {
-		Skyboxify.getConfig().load();
+	public void initialize(final Path configPath) {
+		config = new SkyboxifyConfig(configPath);
+		config.load();
 
 		eventManager.listen(LevelTickEvent.Client.class, event -> SkyboxManager.INSTANCE.tick(event.getLevel()));
 
@@ -202,9 +203,9 @@ public class Skyboxify {
 						"world",
 						//? >=1.21.11 {
 						/*resourceKey.identifier().toString()
-						 *///?} else {
+						*///?} else {
 						resourceKey.location().toString()
-						//?}
+						 //?}
 				);
 				SkyboxManager.INSTANCE.addSkybox(Skybox.CODEC.decode(JsonOps.INSTANCE, skyJson).getOrThrow().getFirst());
 			}
