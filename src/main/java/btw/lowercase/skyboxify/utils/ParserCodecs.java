@@ -127,7 +127,7 @@ public final class ParserCodecs {
     }
 
 	public static Codec<ResourceLocation> getSourceTextureCodec(final ResourceLocation propertiesLocation) {
-		return Codec.STRING.flatXmap(input -> {
+		return Codec.STRING.comapFlatMap(input -> {
 			if (input == null) {
 				return DataResult.success(propertiesLocation.withPath(propertiesLocation.getPath().replace(".properties", ".png")));
 			} else if (input.startsWith("./")) {
@@ -146,7 +146,7 @@ public final class ParserCodecs {
 					}
 				}
 			}
-		}, ParserCodecs::emptyCodecResult);
+		}, ParserCodecs::emptyCodecString);
 	}
 
     public static float safeParseFloat(String value, float defaultValue) {
@@ -157,11 +157,7 @@ public final class ParserCodecs {
         return SAFE_INTEGER.orElse(defaultValue).parse(JavaOps.INSTANCE, value).getOrThrow();
     }
 
-	public static <T> String emptyCodecString(T in) {
+	public static <T> String emptyCodecString(T output) {
 		return "";
-	}
-
-	public static <T> DataResult<String> emptyCodecResult(T in) {
-		return DataResult.success("");
 	}
 }

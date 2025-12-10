@@ -43,13 +43,14 @@ public class SkyboxifyConfig extends Config {
 
 	public SkyboxifyConfig(final Path path) {
 		super(Skyboxify.MOD_ID, path);
-		this.processOptiFine.onValueChanged((oldVal, newVal) -> Minecraft.getInstance().reloadResourcePacks());
-		this.processMCPatcher.onValueChanged((oldVal, newVal) -> Minecraft.getInstance().reloadResourcePacks());
-		this.ignoreBrokenSkies.onValueChanged((oldVal, newVal) -> Minecraft.getInstance().reloadResourcePacks());
+		final Minecraft minecraft = Minecraft.getInstance();
+		this.processOptiFine.onValueChanged((oldVal, newVal) -> minecraft.reloadResourcePacks());
+		this.processMCPatcher.onValueChanged((oldVal, newVal) -> minecraft.reloadResourcePacks());
+		this.ignoreBrokenSkies.onValueChanged((oldVal, newVal) -> minecraft.reloadResourcePacks());
 	}
 
 	@Override
 	public Screen getConfigScreen(Screen parent) {
-		return new SkyboxifyConfigScreen(Component.translatable("options.skyboxify.title"), this, parent);
+		return new SkyboxifyConfigScreen(Component.translatable("options." + Skyboxify.MOD_ID + ".title"), this, parent);
 	}
 }

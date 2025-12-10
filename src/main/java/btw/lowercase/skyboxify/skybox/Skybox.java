@@ -47,7 +47,7 @@ public class Skybox {
 	private final List<SkyLayer> layers;
 	@Getter
 	private final ResourceKey<@NotNull Level> worldResourceKey;
-	private final Map<SkyLayer, Float> optiFineSkyLayerAlphaMap = new HashMap<>();
+	private final Map<SkyLayer, Float> alphaMap = new HashMap<>();
 	@Getter
 	private boolean active = true;
 
@@ -58,15 +58,17 @@ public class Skybox {
 
 	public void tick(ClientLevel level) {
 		this.active = true;
-		if (level.dimension().equals(this.worldResourceKey) || (Skyboxify.getConfig().showOverworldForUnknownDimension.isEnabled() && this.worldResourceKey.equals(Level.OVERWORLD) && !level.dimension().equals(Level.NETHER) && !level.dimension().equals(Level.END))) {
-			this.layers.forEach(layer -> optiFineSkyLayerAlphaMap.put(layer, layer.getPositionBrightness(level, this.getConditionAlphaFor(layer))));
+
+		final boolean allowOtherDimensions = Skyboxify.getConfig().showOverworldForUnknownDimension.isEnabled() && this.worldResourceKey.equals(Level.OVERWORLD) && !level.dimension().equals(Level.NETHER) && !level.dimension().equals(Level.END);
+		if (level.dimension().equals(this.worldResourceKey) || allowOtherDimensions) {
+			this.layers.forEach(layer -> alphaMap.put(layer, layer.getPositionBrightness(level, this.getConditionAlphaFor(layer))));
 		} else {
-			this.layers.forEach(layer -> optiFineSkyLayerAlphaMap.put(layer, -1.0F));
+			this.layers.forEach(layer -> alphaMap.put(layer, -1.0F));
 			this.active = false;
 		}
 	}
 
 	public float getConditionAlphaFor(SkyLayer skyLayer) {
-		return this.optiFineSkyLayerAlphaMap.getOrDefault(skyLayer, -1.0F);
+		return this.alphaMap.getOrDefault(skyLayer, -1.0F);
 	}
 }

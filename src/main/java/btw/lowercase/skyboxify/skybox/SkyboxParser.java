@@ -62,6 +62,81 @@ public final class SkyboxParser {
 		output.addProperty("source", sourceResult.result().orElse(MissingTextureAtlasSprite.getLocation()).toString());
 
 		// Convert fade
+		parseFade(properties, output);
+
+		// Speed
+		if (properties.containsKey("speed")) {
+			final float value = ParserCodecs.safeParseFloat(properties.getProperty("speed", null), 1.0F);
+			if (value != Float.MIN_VALUE) {
+				output.addProperty("speed", value);
+			} else {
+				LOGGER.warn("Invalid speed provided in skybox.");
+			}
+		}
+
+		// Heights
+		if (properties.containsKey("heights")) {
+			parseHeights(properties.getProperty("heights"), output);
+		}
+
+		// Days Loop -> Loop
+		if (properties.containsKey("days")) {
+			parseDaysLoop(properties.getProperty("days"), properties.getProperty("daysLoop", null), output);
+		}
+
+		// Blend
+		if (properties.containsKey("blend")) {
+			output.addProperty("blend", String.valueOf(properties.getProperty("blend")));
+		}
+
+		// Rotation
+		if (properties.containsKey("rotate")) {
+			output.addProperty("rotate", Boolean.parseBoolean(properties.getProperty("rotate")));
+		}
+
+		// Transition
+		if (properties.containsKey("transition")) {
+			output.addProperty("transition", Integer.parseInt(properties.getProperty("transition")));
+		}
+
+		// Axis
+		if (properties.containsKey("axis")) {
+			output.addProperty("axis", properties.getProperty("axis"));
+		}
+
+		// Weather
+		if (properties.containsKey("weather")) {
+			output.addProperty("weather", String.valueOf(properties.getProperty("weather")));
+		}
+
+		// Biomes
+		if (properties.containsKey("biomes")) {
+			output.addProperty("biomes", String.valueOf(properties.getProperty("biomes")));
+		}
+
+		return output;
+	}
+
+	private static int toTickTime(String time) {
+		final String[] parts = time.trim().split(":");
+		if (parts.length == 2) {
+			final int m = ParserCodecs.safeParseInteger(parts[1], -1);
+			int h = ParserCodecs.safeParseInteger(parts[0], -1);
+			if (h >= 0 && h <= 23 && m >= 0 && m <= 59) {
+				h -= 6;
+				if (h < 0) {
+					h += 24;
+				}
+
+				return h * 1000 + (int) (m / 60.0F * 1000.0F);
+			}
+		}
+
+		LOGGER.warn("Invalid time: \"{}\" in skybox.", time);
+		return -1;
+	}
+
+	private static void parseFade(Properties properties, JsonObject output) {
 		final JsonObject fade = new JsonObject();
 		if (properties.containsKey("startFadeIn") && properties.containsKey("endFadeIn") && properties.containsKey("endFadeOut")) {
 			final int startFadeIn = toTickTime(properties.getProperty("startFadeIn"));
@@ -86,89 +161,27 @@ public final class SkyboxParser {
 		}
 
 		output.add("fade", fade);
-
-		// Speed
-		if (properties.containsKey("speed")) {
-			final float value = ParserCodecs.safeParseFloat(properties.getProperty("speed"), 1.0F);
-			if (value != Float.MIN_VALUE) {
-				output.addProperty("speed", value);
-			} else {
-				LOGGER.warn("Invalid speed provided in skybox.");
-			}
-		}
-
-		// Heights
-		if (properties.containsKey("heights")) {
-			final List<Range> rangeEntries = ParserCodecs.getRangeEntriesCodec(true).orElse(List.of()).parse(JavaOps.INSTANCE, properties.getProperty("heights")).getOrThrow();
-			if (!rangeEntries.isEmpty()) {
-				final JsonArray heights = new JsonArray();
-				rangeEntries.stream().map(range -> Range.CODEC.encode(range, JsonOps.INSTANCE, new JsonObject()).getOrThrow()).forEach(heights::add);
-				output.add("heights", heights);
-			}
-		}
-
-		// Days Loop -> Loop
-		if (properties.containsKey("days")) {
-			final List<Range> rangeEntries = ParserCodecs.getRangeEntriesCodec(false).orElse(List.of()).parse(JavaOps.INSTANCE, properties.getProperty("days")).getOrThrow();
-			if (!rangeEntries.isEmpty()) {
-				final JsonArray ranges = new JsonArray();
-				rangeEntries.stream().map(range -> Range.CODEC.encode(range, JsonOps.INSTANCE, new JsonObject()).getOrThrow()).forEach(ranges::add);
-				final JsonObject loop = new JsonObject();
-				loop.addProperty("days", properties.containsKey("daysLoop") ? ParserCodecs.safeParseInteger(properties.getProperty("daysLoop"), 8) : 8);
-				loop.add("ranges", ranges);
-				output.add("loop", loop);
-			}
-		}
-
-		// Blend
-		if (properties.containsKey("blend")) {
-			output.addProperty("blend", properties.getProperty("blend"));
-		}
-
-		// Rotation
-		if (properties.containsKey("rotate")) {
-			output.addProperty("rotate", Boolean.parseBoolean(properties.getProperty("rotate")));
-		}
-
-		// Transition
-		if (properties.containsKey("transition")) {
-			output.addProperty("transition", Integer.parseInt(properties.getProperty("transition")));
-		}
-
-		// Axis
-		if (properties.containsKey("axis")) {
-			output.addProperty("axis", properties.getProperty("axis"));
-		}
-
-		// Weather
-		if (properties.containsKey("weather")) {
-			output.addProperty("weather", properties.getProperty("weather"));
-		}
-
-		// Biomes
-		if (properties.containsKey("biomes")) {
-			output.addProperty("biomes", properties.getProperty("biomes"));
-		}
-
-		return output;
 	}
 
-	public static int toTickTime(String time) {
-		final String[] parts = time.trim().split(":");
-		if (parts.length == 2) {
-			final int m = ParserCodecs.safeParseInteger(parts[1], -1);
-			int h = ParserCodecs.safeParseInteger(parts[0], -1);
-			if (h >= 0 && h <= 23 && m >= 0 && m <= 59) {
-				h -= 6;
-				if (h < 0) {
-					h += 24;
-				}
+	private static void parseDaysLoop(String days, String daysLoop, JsonObject output) {
+		final List<Range> rangeEntries = ParserCodecs.getRangeEntriesCodec(false).orElse(List.of()).parse(JavaOps.INSTANCE, days).getOrThrow();
+		if (!rangeEntries.isEmpty()) {
+			final JsonArray ranges = new JsonArray();
+			rangeEntries.stream().map(range -> Range.CODEC.encode(range, JsonOps.INSTANCE, new JsonObject()).getOrThrow()).forEach(ranges::add);
 
-				return h * 1000 + (int) (m / 60.0F * 1000.0F);
-			}
+			final JsonObject loop = new JsonObject();
+			loop.addProperty("days", ParserCodecs.safeParseInteger(daysLoop, 8));
+			loop.add("ranges", ranges);
+			output.add("loop", loop);
 		}
+	}
 
-		LOGGER.warn("Invalid time: \"{}\" in skybox.", time);
-		return -1;
+	private static void parseHeights(String input, JsonObject output) {
+		final List<Range> rangeEntries = ParserCodecs.getRangeEntriesCodec(true).orElse(List.of()).parse(JavaOps.INSTANCE, input).getOrThrow();
+		if (!rangeEntries.isEmpty()) {
+			final JsonArray heights = new JsonArray();
+			rangeEntries.stream().map(range -> Range.CODEC.encode(range, JsonOps.INSTANCE, new JsonObject()).getOrThrow()).forEach(heights::add);
+			output.add("heights", heights);
+		}
 	}
 }

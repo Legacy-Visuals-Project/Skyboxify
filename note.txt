@@ -1,0 +1,3 @@
+Codec#comapFlatMap (comap/flat map):      Deserialize into a DataResult instead.
+Codec#flatComapMap (flat comap/map):      Serialize into a DataResult instead.
+Codec#flatXmap     (flat comap/flat map): Two-way flatmapping with DataResults.
