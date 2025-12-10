@@ -82,53 +82,35 @@ public final class ParserCodecs {
         return Mth.X_AXIS;
     }, ParserCodecs::emptyCodecString);
 
-    private static final Codec<Range> RANGE_ENTRY = TRIMMED_STRING.xmap(input -> {
-		if (input.contains("-")) {
-			final String[] parts = input.split("-");
-			if (parts.length == 2) {
-				final int min = safeParseInteger(parts[0], -1);
-				final int max = safeParseInteger(parts[1], -1);
-				if (min >= 0 && max >= 0) {
-					return new Range(min, max);
+	private static Codec<Range> getRangeEntryCodec(final boolean allowNegative) {
+		final int minValue = allowNegative ? Integer.MIN_VALUE : -1;
+		return TRIMMED_STRING.xmap(input -> {
+			if (input.contains("-")) {
+				final String[] parts = input.split("-");
+				if (parts.length == 2) {
+					final int min = safeParseInteger(parts[0], minValue);
+					final int max = safeParseInteger(parts[1], minValue);
+					if (!allowNegative ? (min >= 0 && max >= 0) : (min != Integer.MIN_VALUE && max != Integer.MIN_VALUE)) {
+						return new Range(min, max);
+					}
+				}
+			} else {
+				final String croppedInput = allowNegative ? (input.startsWith("(") && input.endsWith(")") ? input.substring(1, input.length() - 1) : input) : input;
+				final int value = safeParseInteger(croppedInput, minValue);
+				if (!allowNegative ? (value >= 0) : (value != Integer.MIN_VALUE)) {
+					return new Range(value, value);
 				}
 			}
-		} else {
-			final int value = safeParseInteger(input, -1);
-			if (value >= 0) {
-				return new Range(value, value);
-			}
-		}
 
-		return null;
-    }, ParserCodecs::emptyCodecString);
+			return null;
+		}, ParserCodecs::emptyCodecString);
+	}
 
-    private static final Codec<Range> NEGATIVE_RANGE_ENTRY = TRIMMED_STRING.xmap(input -> {
-        final String mapped = OPTIFINE_RANGE_SEPARATOR.matcher(input).replaceAll("$1=$2");
-        if (mapped.contains("=")) {
-            final String[] parts = mapped.split("=");
-            if (parts.length == 2) {
-                final int j = safeParseInteger(parts[0], Integer.MIN_VALUE);
-                final int k = safeParseInteger(parts[1], Integer.MIN_VALUE);
-                if (j != Integer.MIN_VALUE && k != Integer.MIN_VALUE) {
-                    return new Range(Math.min(j, k), Math.max(j, k));
-                }
-            }
-        } else {
-            final String strippedBracketsInput = input.startsWith("(") && input.endsWith(")") ? input.substring(1, input.length() - 1) : input;
-            final int i = safeParseInteger(strippedBracketsInput, Integer.MIN_VALUE);
-            if (i != Integer.MIN_VALUE) {
-                return new Range(i, i);
-            }
-        }
-
-        return null;
-    }, ParserCodecs::emptyCodecString);
-
-    public static Codec<List<Range>> getRangeEntriesCodec(boolean allowNegative) {
+    public static Codec<List<Range>> getRangeEntriesCodec(final boolean allowNegative) {
         return TRIMMED_STRING.xmap(input -> {
             final List<Range> entries = new ArrayList<>();
             for (String part : input.split("\\s*,\\s*|\\s+")) {
-                final Range range = (allowNegative ? NEGATIVE_RANGE_ENTRY : RANGE_ENTRY).parse(JavaOps.INSTANCE, part).getOrThrow();
+                final Range range = getRangeEntryCodec(allowNegative).parse(JavaOps.INSTANCE, part).getOrThrow();
 				if (range != null) {
 					entries.add(range);
 				}
