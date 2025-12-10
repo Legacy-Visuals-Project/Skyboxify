@@ -31,45 +31,44 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 
 public class SkyLayerInfoScreen extends DebugScreen {
-    private final SkyLayer skyLayer;
+	private final SkyLayer skyLayer;
 
-    public SkyLayerInfoScreen(Screen parent, SkyLayer skyLayer, int index) {
-        super(Component.literal(index + " - " + skyLayer.source().toString()), parent);
-        this.skyLayer = skyLayer;
-    }
+	public SkyLayerInfoScreen(Screen parent, SkyLayer skyLayer, int index) {
+		super(Component.literal(index + " - " + skyLayer.source().toString()), parent);
+		this.skyLayer = skyLayer;
+	}
 
-    @Override
-    protected void init() {
-        super.init();
+	@Override
+	protected void init() {
+		super.init();
 
-        this.gidgets.add(new Text.Builder(this.title, this.width / 2, 12).centered().build(this.font));
+		this.gidgets.add(Text.builder(this.title)
+				.position(this.width / 2, 12)
+				.centered()
+				.build(this.font));
 
-        int y = 12 + (this.font.lineHeight * 3);
-        this.gidgets.add(new Text.Builder("    Rotate: " + this.skyLayer.rotate(), this.width / 2, y).centered().build(this.font));
-        y += this.font.lineHeight + 2;
-        this.gidgets.add(new Text.Builder("    Axis: " + this.skyLayer.axis(), this.width / 2, y).centered().build(this.font));
-        y += this.font.lineHeight + 2;
-        this.gidgets.add(new Text.Builder("    Blend: " + this.skyLayer.blend(), this.width / 2, y).centered().build(this.font));
-        y += this.font.lineHeight + 2;
-        this.gidgets.add(new Text.Builder("    Speed: " + this.skyLayer.speed(), this.width / 2, y).centered().build(this.font));
-        y += this.font.lineHeight + 2;
-        this.gidgets.add(new Text.Builder("    Transition: " + this.skyLayer.transition(), this.width / 2, y).centered().build(this.font));
-        y += this.font.lineHeight + 2;
-        this.gidgets.add(new Text.Builder("    Fade: " + this.skyLayer.fade(), this.width / 2, y).centered().build(this.font));
-        y += this.font.lineHeight + 2;
-        this.gidgets.add(new Text.Builder("    Loop: " + this.skyLayer.loop(), this.width / 2, y).centered().build(this.font));
-        y += this.font.lineHeight + 2;
-        this.gidgets.add(new Text.Builder("    Biomes: " + this.skyLayer.biomes(), this.width / 2, y).centered().build(this.font));
-        y += this.font.lineHeight + 2;
-        this.gidgets.add(new Text.Builder("    Heights: " + this.skyLayer.heights(), this.width / 2, y).centered().build(this.font));
-        y += this.font.lineHeight + 2;
-        this.gidgets.add(new Text.Builder("    Weather Conditions: " + this.skyLayer.weatherConditions(), this.width / 2, y).centered().build(this.font));
+		addLine(Text.builder("Rotate: " + this.skyLayer.rotate()).centered().build(this.font));
+		addLine(Text.builder("Axis: " + this.skyLayer.axis()).centered().build(this.font));
+		addLine(Text.builder("Blend: " + this.skyLayer.blend()).centered().build(this.font));
+		addLine(Text.builder("Speed: " + this.skyLayer.speed()).centered().build(this.font));
+		addLine(Text.builder("Transition: " + this.skyLayer.transition()).centered().build(this.font));
+		addLine(Text.builder("Fade: " + this.skyLayer.fade()).centered().build(this.font));
+		addLine(Text.builder("Loop: " + this.skyLayer.loop()).centered().build(this.font));
+		addLine(Text.builder("Biomes: " + this.skyLayer.biomes()).centered().build(this.font));
+		addLine(Text.builder("Heights: " + this.skyLayer.heights()).centered().build(this.font));
+		addLine(Text.builder("Weather Conditions: " + this.skyLayer.weatherConditions()).centered().build(this.font));
 
-        this.gidgets.add(new SimpleButton(
-                CommonComponents.GUI_BACK,
-                (this.width / 2) - (SimpleButton.DEFAULT_WIDTH / 2),
-                this.height - SimpleButton.DEFAULT_HEIGHT - 4,
-                (button) -> this.onClose()
-        ));
-    }
+		this.gidgets.add(new SimpleButton(
+				CommonComponents.GUI_BACK,
+				(this.width / 2) - (SimpleButton.DEFAULT_WIDTH / 2),
+				this.height - SimpleButton.DEFAULT_HEIGHT - 4,
+				(button) -> this.onClose()
+		));
+	}
+
+	private void addLine(final Text text) {
+		text.move(this.width / 2, 12 + (this.font.lineHeight * 3) + ((this.font.lineHeight + 2) * (this.gidgets.size() - 1)));
+		text.setText(Component.literal("    " + text.getText().getString()));
+		this.gidgets.add(text);
+	}
 }

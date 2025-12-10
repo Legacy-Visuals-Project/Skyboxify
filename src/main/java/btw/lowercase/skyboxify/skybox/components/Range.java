@@ -25,7 +25,6 @@ package btw.lowercase.skyboxify.skybox.components;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.jetbrains.annotations.NotNull;
 
 public record Range(float min, float max) {
@@ -42,6 +41,6 @@ public record Range(float min, float max) {
 
     @Override
     public @NotNull String toString() {
-        return ToStringBuilder.reflectionToString(this);
+        return String.format("%s-%s", min, max);
     }
 }

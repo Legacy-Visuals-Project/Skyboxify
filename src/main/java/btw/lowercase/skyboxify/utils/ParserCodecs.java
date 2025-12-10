@@ -38,14 +38,12 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Pattern;
 
 public final class ParserCodecs {
     private static final Logger LOGGER = LoggerFactory.getLogger(ParserCodecs.class);
-    private static final Pattern OPTIFINE_RANGE_SEPARATOR = Pattern.compile("(\\d|\\))-(\\d|\\()");
 
-    public static final Codec<String> TRIMMED_STRING = Codec.STRING.xmap(String::trim, ParserCodecs::emptyCodecString);
-    public static final Codec<List<String>> SPLIT_SPACE_TRIMMED = TRIMMED_STRING.xmap(input -> Arrays.stream(input.split(" ")).map(String::trim).filter(s -> !s.isEmpty()).toList(), ParserCodecs::emptyCodecString);
+    public static final Codec<String> TRIMMED_STRING = Codec.STRING.xmap(String::trim, String::valueOf);
+    public static final Codec<List<String>> SPLIT_SPACE_TRIMMED = TRIMMED_STRING.xmap(input -> Arrays.stream(input.split(" ")).map(String::trim).filter(s -> !s.isEmpty()).toList(), list -> Arrays.toString(list.toArray()));
 	public static final Codec<Float> SAFE_FLOAT = TRIMMED_STRING.comapFlatMap(input -> {
 		try {
 			return DataResult.success(Float.parseFloat(input));
@@ -80,7 +78,7 @@ public final class ParserCodecs {
 
         LOGGER.warn("Invalid axis provided in skybox, returning default axis (Mth.X_AXIS).");
         return Mth.X_AXIS;
-    }, ParserCodecs::emptyCodecString);
+    }, output -> String.format("%s %s %s", output.x(), output.y(), output.z()));
 
 	private static Codec<Range> getRangeEntryCodec(final boolean allowNegative) {
 		final int minValue = allowNegative ? Integer.MIN_VALUE : -1;
@@ -95,7 +93,7 @@ public final class ParserCodecs {
 					}
 				}
 			} else {
-				final String croppedInput = allowNegative ? (input.startsWith("(") && input.endsWith(")") ? input.substring(1, input.length() - 1) : input) : input;
+				final String croppedInput = !allowNegative ? input : (input.startsWith("(") && input.endsWith(")") ? input.substring(1, input.length() - 1) : input);
 				final int value = safeParseInteger(croppedInput, minValue);
 				if (!allowNegative ? (value >= 0) : (value != Integer.MIN_VALUE)) {
 					return new Range(value, value);
@@ -103,7 +101,7 @@ public final class ParserCodecs {
 			}
 
 			return null;
-		}, ParserCodecs::emptyCodecString);
+		}, Range::toString);
 	}
 
     public static Codec<List<Range>> getRangeEntriesCodec(final boolean allowNegative) {
@@ -117,7 +115,7 @@ public final class ParserCodecs {
             }
 
             return entries;
-        }, ParserCodecs::emptyCodecString);
+        }, output -> Arrays.toString(output.stream().map(Range::toString).toArray()));
     }
 
 	public static Codec<ResourceLocation> getSourceTextureCodec(final ResourceLocation propertiesLocation) {
@@ -140,7 +138,7 @@ public final class ParserCodecs {
 					}
 				}
 			}
-		}, ParserCodecs::emptyCodecString);
+		}, ResourceLocation::toString);
 	}
 
     public static float safeParseFloat(String value, float defaultValue) {

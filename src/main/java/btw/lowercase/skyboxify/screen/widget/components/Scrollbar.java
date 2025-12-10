@@ -29,41 +29,55 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.util.ARGB;
 
 public class Scrollbar extends Gidget {
-    public static final int DEFAULT_WIDTH = 10;
-    private final Knob knob;
-    @Getter
-    private double scrollY;
+	public static final int DEFAULT_WIDTH = 10;
+	private final Knob knob;
+	@Getter
+	private double scrollY;
 
-    public Scrollbar(int x, int y, int height) {
-        super(new Box(x, y, DEFAULT_WIDTH, height));
-        this.knob = new Knob(x, y, Knob.DEFAULT_HEIGHT);
-        this.scrollY = 0.0;
-    }
+	public Scrollbar(int x, int y, int height) {
+		super(new Box(x, y, DEFAULT_WIDTH, height));
+		this.knob = new Knob(x, y, Knob.DEFAULT_HEIGHT);
+		this.scrollY = 0.0;
+	}
 
-    @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        super.render(guiGraphics, mouseX, mouseY);
-        this.knob.render(guiGraphics, mouseX, mouseY);
-    }
+	@Override
+	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+		super.render(guiGraphics, mouseX, mouseY);
+		this.knob.render(guiGraphics, mouseX, mouseY);
+	}
 
-    @Override
-    public void renderBackground(GuiGraphics guiGraphics) {
-        guiGraphics.fill(this.box().left(), this.box().top(), this.box().right(), this.box().bottom(), ARGB.color(128, 0x00FF95));
-    }
+	@Override
+	public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+		guiGraphics.fill(this.box().left(), this.box().top(), this.box().right(), this.box().bottom(), ARGB.color(128, 0x00FF95));
+	}
 
-    public void setScrollY(double scrollY) {
-    }
+	public void setScrollY(double scrollY) {
+		this.scrollY = Math.max(Math.min(scrollY, 1.0), 0.0);
 
-    private class Knob extends Gidget {
-        public static final int DEFAULT_HEIGHT = 30;
+		int y = (int) (this.box().height() * this.scrollY);
+		if (y < this.box().top()) {
+			y = this.box().top();
+		} else if (y > this.box().bottom()) {
+			y = this.box().bottom();
+		}
 
-        public Knob(int x, int y, int height) {
-            super(new Box(x, y, Scrollbar.this.box().width(), height));
-        }
+		this.knob.setY(y);
+	}
 
-        @Override
-        public void renderBackground(GuiGraphics guiGraphics) {
-            guiGraphics.fill(this.box().left(), this.box().top(), this.box().right(), this.box().bottom(), ARGB.color(255, 0xAAFE00));
-        }
-    }
+	private class Knob extends Gidget {
+		public static final int DEFAULT_HEIGHT = 30;
+
+		public Knob(int x, int y, int height) {
+			super(new Box(x, y, Scrollbar.this.box().width(), height));
+		}
+
+		public void setY(int y) {
+			this.move(this.box().left(), y);
+		}
+
+		@Override
+		public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+			guiGraphics.fill(this.box().left(), this.box().top(), this.box().right(), this.box().bottom(), ARGB.color(255, 0xAAFE00));
+		}
+	}
 }

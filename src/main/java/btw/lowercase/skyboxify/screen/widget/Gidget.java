@@ -32,66 +32,64 @@ import java.util.HashMap;
 import java.util.Map;
 
 public abstract class Gidget {
-    private final Box box;
-    private final Map<ResourceLocation, Object> data;
-    private boolean hovered = false;
-    private boolean focused = false;
+	private final Box box;
+	private final Map<ResourceLocation, Object> data;
 
-    public Gidget(Box box) {
-        this.box = box;
-        this.data = new HashMap<>();
-    }
+	public Gidget(Box box) {
+		this.box = box;
+		this.data = new HashMap<>();
+	}
 
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        this.renderBackground(guiGraphics);
-    }
+	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+		this.renderBackground(guiGraphics, mouseX, mouseY);
+	}
 
-    public void renderBackground(GuiGraphics guiGraphics) {
-        final int backgroundColor = this.hovered ? ARGB.white(0.7F) : ARGB.white(0.58F);
-        guiGraphics.fill(this.box.left(), this.box.top(), this.box.right(), this.box.bottom(), backgroundColor);
-    }
+	public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+		final int backgroundColor = this.box.contains(mouseX, mouseY) ? ARGB.white(0.7F) : ARGB.white(0.58F);
+		guiGraphics.fill(this.box.left(), this.box.top(), this.box.right(), this.box.bottom(), backgroundColor);
+	}
 
-    public void onMouseMove(double mouseX, double mouseY) {
-        this.hovered = this.box().contains((int) mouseX, (int) mouseY);
-    }
+	public boolean onMouseMove(double mouseX, double mouseY) {
+		return false;
+	}
 
-    public void onMouseClicked(double mouseX, double mouseY) {
-    }
+	public boolean onMouseClicked(double mouseX, double mouseY) {
+		return false;
+	}
 
-    public void onMouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
-    }
+	public boolean onMouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+		return false;
+	}
 
-    public void onKeyDown(int scancode, int key, int modifiers) {
-    }
+	public boolean onKeyDown(int scancode, int key, int modifiers) {
+		return false;
+	}
 
-    public void onKeyUp(int scancode, int key, int modifiers) {
-    }
+	public boolean onKeyUp(int scancode, int key, int modifiers) {
+		return false;
+	}
 
-    public void move(int x, int y) {
-        this.box.move(x, y);
-    }
+	public void move(int x, int y) {
+		this.box.move(x, y);
+	}
 
-    public void resize(int width, int height) {
-        this.box.resize(width, height);
-    }
+	public void resize(int width, int height) {
+		this.box.resize(width, height);
+	}
 
-    public void store(ResourceLocation location, Object data) {
-        this.data.put(location, data);
-    }
+	public void store(ResourceLocation location, Object data) {
+		this.data.put(location, data);
+	}
 
-    public boolean contains(ResourceLocation location) {
-        return this.data.containsKey(location);
-    }
+	public boolean contains(ResourceLocation location) {
+		return this.data.containsKey(location);
+	}
 
-    public <T> T get(ResourceLocation location) {
-        return (T) this.data.get(location);
-    }
+	public <T> T get(ResourceLocation location) {
+		return (T) this.data.get(location);
+	}
 
-    public Box box() {
-        return this.box;
-    }
-
-    public boolean hovered() {
-        return this.hovered;
-    }
+	public Box box() {
+		return this.box;
+	}
 }

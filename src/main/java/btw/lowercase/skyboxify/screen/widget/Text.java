@@ -32,101 +32,119 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.ARGB;
 
 public class Text extends Gidget {
-    private final Font font;
-    @Getter
-    private final Component text;
-    @Getter
-    @Setter
-    private Positioned positioned;
-    @Setter
-    private boolean shadow;
-    @Getter
-    @Setter
-    private int color;
+	private final Font font;
+	@Getter
+	private Component text;
+	@Getter
+	@Setter
+	private Alignment alignment;
+	@Setter
+	private boolean shadow;
+	@Getter
+	@Setter
+	private int color;
 
-    public Text(Font font, Component text, int x, int y, Positioned positioned, boolean shadow, int color) {
-        super(new Box(x, y, font.width(text.getString()), font.lineHeight));
-        this.font = font;
-        this.text = text;
-        this.positioned = positioned;
-        this.shadow = shadow;
-        this.color = color;
-    }
+	public Text(Font font, Component text, int x, int y, Alignment alignment, boolean shadow, int color) {
+		super(new Box(x, y, font.width(text.getString()), font.lineHeight));
+		this.font = font;
+		this.text = text;
+		this.alignment = alignment;
+		this.shadow = shadow;
+		this.color = color;
+	}
 
-    @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        int finalX = this.box().left();
-        if (this.positioned == Positioned.BOTH || this.positioned == Positioned.CENTER_HORIZONTAL) {
-            finalX -= this.box().width() / 2;
-        }
+	public static Builder builder(final Component component) {
+		return new Builder(component);
+	}
 
-        int finalY = this.box().top();
-        if (this.positioned == Positioned.BOTH || this.positioned == Positioned.CENTER_VERTICAL) {
-            finalY -= this.box().height() / 2;
-        }
+	public static Builder builder(final String text) {
+		return new Builder(text);
+	}
 
-        guiGraphics.drawString(this.font, this.text, finalX, finalY, this.color, this.shadow);
-    }
+	@Override
+	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+		int finalX = this.box().left();
+		if (this.alignment == Alignment.BOTH || this.alignment == Alignment.CENTER_HORIZONTAL) {
+			finalX -= this.box().width() / 2;
+		}
 
-    public Builder builder() {
-        return new Builder(this.text, this.box().left(), this.box().top())
-                .withColor(this.color)
-                .positioned(this.positioned)
-                .withShadow(this.shadow);
-    }
+		int finalY = this.box().top();
+		if (this.alignment == Alignment.BOTH || this.alignment == Alignment.CENTER_VERTICAL) {
+			finalY -= this.box().height() / 2;
+		}
 
-    public boolean hasShadow() {
-        return this.shadow;
-    }
+		guiGraphics.drawString(this.font, this.text, finalX, finalY, this.color, this.shadow);
+	}
 
-    public enum Positioned {
-        CENTER_VERTICAL,
-        CENTER_HORIZONTAL,
-        BOTH,
-        NONE
-    }
+	public Builder builder() {
+		return new Builder(this.text)
+				.position(this.box().left(), this.box().top())
+				.aligned(this.alignment)
+				.withColor(this.color)
+				.withShadow(this.shadow);
+	}
 
-    public static class Builder {
-        private final Component text;
-        private final int x;
-        private final int y;
+	public boolean hasShadow() {
+		return this.shadow;
+	}
 
-        private int color = ARGB.white(1.0F);
-        private Positioned positioned = Positioned.NONE;
-        private boolean shadow = true;
+	public void setText(final Component text) {
+		this.text = text;
+		this.resize(this.font.width(text.getString()), this.box().height());
+	}
 
-        public Builder(Component text, int x, int y) {
-            this.text = text;
-            this.x = x;
-            this.y = y;
-        }
+	public enum Alignment {
+		CENTER_VERTICAL,
+		CENTER_HORIZONTAL,
+		BOTH,
+		NONE
+	}
 
-        public Builder(String text, int x, int y) {
-            this(Component.literal(text), x, y);
-        }
+	public static class Builder {
+		private final Component text;
 
-        public Builder withColor(int color) {
-            this.color = color;
-            return this;
-        }
+		private int color = ARGB.white(1.0F);
+		private Alignment alignment = Alignment.NONE;
+		private boolean shadow = true;
+		private int x = 0;
+		private int y = 0;
 
-        public Builder withShadow(boolean shadow) {
-            this.shadow = shadow;
-            return this;
-        }
+		public Builder(final Component text) {
+			this.text = text;
+		}
 
-        public Builder positioned(Positioned positioned) {
-            this.positioned = positioned;
-            return this;
-        }
+		public Builder(final String text) {
+			this(Component.literal(text));
+		}
 
-        public Builder centered() {
-            this.positioned = Positioned.CENTER_HORIZONTAL;
-            return this;
-        }
+		public Builder position(int x, int y) {
+			this.x = x;
+			this.y = y;
+			return this;
+		}
 
-        public Text build(Font font) {
-            return new Text(font, this.text, this.x, this.y, this.positioned, this.shadow, this.color);
-        }
-    }
+		public Builder withColor(int color) {
+			this.color = color;
+			return this;
+		}
+
+		public Builder withShadow(boolean shadow) {
+			this.shadow = shadow;
+			return this;
+		}
+
+		public Builder aligned(Alignment alignment) {
+			this.alignment = alignment;
+			return this;
+		}
+
+		public Builder centered() {
+			this.alignment = Alignment.CENTER_HORIZONTAL;
+			return this;
+		}
+
+		public Text build(Font font) {
+			return new Text(font, this.text, this.x, this.y, this.alignment, this.shadow, this.color);
+		}
+	}
 }
