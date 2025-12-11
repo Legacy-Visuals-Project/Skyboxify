@@ -31,6 +31,7 @@ import btw.lowercase.skyboxify.skybox.Skybox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.ARGB;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,8 +39,8 @@ import java.util.List;
 public class SkyboxListScreen extends DebugScreen {
 	private final List<Skybox> skyboxes;
 
-	public SkyboxListScreen(Screen parent, List<Skybox> skyboxes) {
-		super(Component.literal(skyboxes.isEmpty() ? "No skies enabled..." : skyboxes.size() + " Total Active Skyboxes"), parent);
+	public SkyboxListScreen(final Screen parent, final List<Skybox> skyboxes) {
+		super(Component.literal(skyboxes.isEmpty() ? "No skies enabled..." : skyboxes.size() + " Total Skyboxes"), parent);
 		this.skyboxes = skyboxes;
 	}
 
@@ -47,34 +48,23 @@ public class SkyboxListScreen extends DebugScreen {
 	protected void init() {
 		super.init();
 
-		// TODO: isActive | button color
-		this.gidgets.add(Text.builder(this.title)
+		this.gidgets.add(Text.builder(this.title.copy())
 				.position(this.width / 2, 12)
 				.centered()
 				.build(this.font));
 
-		List<Gidget> scrollableListGidgets = new ArrayList<>();
-		for (Skybox skybox : this.skyboxes) {
-			scrollableListGidgets.add(SimpleButton.builder(
-					Component.literal(
-							//? >=1.21.11 {
-							/*skybox.getWorldResourceKey().identifier().toString()
-							 *///?} else {
-							skybox.getWorldResourceKey().location().toString()
-							//?}
-					),
-					button -> this.minecraft.setScreen(new SkyLayerListScreen(this, skybox)
-					)).build());
+		final List<Gidget> gidgets = new ArrayList<>();
+		for (final Skybox skybox : this.skyboxes) {
+			final Component name = Component.literal(skybox.getWorldResourceKey().location().toString())
+					.withColor(skybox.isActive() ? ARGB.color(155, 0x00FF00) : ARGB.color(155, 0xFF0000));
+			gidgets.add(SimpleButton.builder(name,button -> this.minecraft.setScreen(new SkyLayerListScreen(this, skybox))).build());
 		}
 
-		int pad = 20 + font.lineHeight;
-		this.gidgets.add(new ScrollableList(scrollableListGidgets, 0, pad, this.width, this.height - pad - SimpleButton.DEFAULT_HEIGHT - 8));
+		final int pad = 20 + this.font.lineHeight;
+		this.gidgets.add(new ScrollableList(gidgets, 0, pad, this.width, this.height - pad - SimpleButton.DEFAULT_HEIGHT - 8));
 
-		this.gidgets.add(new SimpleButton(
-				CommonComponents.GUI_DONE,
-				(this.width / 2) - (SimpleButton.DEFAULT_WIDTH / 2),
-				this.height - SimpleButton.DEFAULT_HEIGHT - 4,
-				(button) -> this.onClose()
-		));
+		this.gidgets.add(SimpleButton.builder(CommonComponents.GUI_BACK, button -> this.onClose())
+				.position((this.width / 2) - (SimpleButton.DEFAULT_WIDTH / 2), this.height - SimpleButton.DEFAULT_HEIGHT - 4)
+				.build());
 	}
 }

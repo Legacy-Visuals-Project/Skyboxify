@@ -36,10 +36,8 @@ import com.mojang.serialization.JsonOps;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -145,6 +143,7 @@ public class Skyboxify {
 					return a - b;
 				}
 			}
+
 			return 0;
 		})).forEach(id -> {
 			final Matcher matcher = skyPattern.matcher(id.getPath());
@@ -190,24 +189,17 @@ public class Skyboxify {
 		});
 
 		for (Map.Entry<String, JsonArray> entry : layers.entrySet()) {
-			final JsonObject skyJson = new JsonObject();
 			final JsonArray skyLayers = entry.getValue();
 			if (!skyLayers.isEmpty()) {
-				skyJson.add("layers", skyLayers);
-				final ResourceKey<@NotNull Level> resourceKey = switch (entry.getKey()) {
-					case "world-1" -> Level.NETHER;
-					case "world1" -> Level.END;
-					default -> Level.OVERWORLD;
-				};
-				skyJson.addProperty(
-						"world",
-						//? >=1.21.11 {
-						/*resourceKey.identifier().toString()
-						 *///?} else {
-						resourceKey.location().toString()
-						//?}
-				);
-				SkyboxManager.INSTANCE.addSkybox(Skybox.CODEC.decode(JsonOps.INSTANCE, skyJson).getOrThrow().getFirst());
+				final JsonObject skyboxJson = new JsonObject();
+				skyboxJson.add("layers", skyLayers);
+				skyboxJson.addProperty("world", switch (entry.getKey()) {
+					case "world0" -> "overworld";
+					case "world-1" -> "nether";
+					case "world1" -> "end";
+					default -> entry.getKey();
+				});
+				SkyboxManager.INSTANCE.addSkybox(Skybox.CODEC.decode(JsonOps.INSTANCE, skyboxJson).getOrThrow().getFirst());
 			}
 		}
 	}

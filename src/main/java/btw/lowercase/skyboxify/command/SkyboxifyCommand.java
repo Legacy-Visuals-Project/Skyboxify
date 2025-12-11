@@ -43,7 +43,7 @@ public class SkyboxifyCommand extends LiteralArgumentBuilder<FabricClientCommand
         });
 
         then(ClientCommandManager.literal("debug").executes((context) -> {
-            minecraft.schedule(() -> minecraft.setScreen(new SkyboxListScreen(minecraft.screen, SkyboxManager.INSTANCE.getActiveSkyboxes())));
+            minecraft.schedule(() -> minecraft.setScreen(new SkyboxListScreen(minecraft.screen, SkyboxManager.INSTANCE.getLoadedSkyboxes())));
             return Command.SINGLE_SUCCESS;
         }));
     }

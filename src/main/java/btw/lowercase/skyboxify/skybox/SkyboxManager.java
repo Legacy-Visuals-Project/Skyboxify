@@ -37,51 +37,52 @@ import java.util.LinkedList;
 import java.util.List;
 
 public final class SkyboxManager {
-    public static final SkyboxManager INSTANCE = new SkyboxManager();
-    private final List<Skybox> loadedSkyboxes = new ArrayList<>();
-    @Getter
-    private final List<Skybox> activeSkyboxes = new LinkedList<>();
+	public static final SkyboxManager INSTANCE = new SkyboxManager();
+	@Getter
+	private final List<Skybox> loadedSkyboxes = new ArrayList<>();
+	@Getter
+	private final List<Skybox> activeSkyboxes = new LinkedList<>();
 
-    private SkyboxManager() {
-    }
+	private SkyboxManager() {
+	}
 
-    public void addSkybox(Skybox skybox) {
-        Preconditions.checkNotNull(skybox, "Skybox was null");
-        this.loadedSkyboxes.add(skybox);
-    }
+	public void addSkybox(Skybox skybox) {
+		Preconditions.checkNotNull(skybox, "Skybox was null");
+		this.loadedSkyboxes.add(skybox);
+	}
 
-    public void clearSkyboxes() {
-        Minecraft.getInstance().execute(SkyboxSkyRenderer.INSTANCE::clearCache);
-        this.loadedSkyboxes.clear();
-        this.activeSkyboxes.clear();
-    }
+	public void clearSkyboxes() {
+		Minecraft.getInstance().execute(SkyboxSkyRenderer.INSTANCE::clearCache);
+		this.loadedSkyboxes.clear();
+		this.activeSkyboxes.clear();
+	}
 
-    public void tick(ClientLevel level) {
-        if (!Skyboxify.getConfig().enabled.isEnabled()) {
-            return;
-        }
+	public void tick(ClientLevel level) {
+		if (!Skyboxify.getConfig().enabled.isEnabled()) {
+			return;
+		}
 
-        for (Skybox skybox : this.loadedSkyboxes) {
-            skybox.tick(level);
-        }
+		for (Skybox skybox : this.loadedSkyboxes) {
+			skybox.tick(level);
+		}
 
-        this.activeSkyboxes.removeIf(optiFineSkybox -> !optiFineSkybox.isActive());
-        for (Skybox skybox : this.loadedSkyboxes) {
-            if (!this.activeSkyboxes.contains(skybox) && skybox.isActive()) {
-                this.activeSkyboxes.add(skybox);
-            }
-        }
-    }
+		this.activeSkyboxes.removeIf(optiFineSkybox -> !optiFineSkybox.isActive());
+		for (Skybox skybox : this.loadedSkyboxes) {
+			if (!this.activeSkyboxes.contains(skybox) && skybox.isActive()) {
+				this.activeSkyboxes.add(skybox);
+			}
+		}
+	}
 
-    public boolean isEnabled(Level level) {
-        return Skyboxify.getConfig().enabled.isEnabled() && !activeSkyboxes.isEmpty() && level != null;
-    }
+	public boolean isEnabled(Level level) {
+		return Skyboxify.getConfig().enabled.isEnabled() && !activeSkyboxes.isEmpty() && level != null;
+	}
 
-    public List<Skybox> getSkiesFor(ResourceKey<@NotNull Level> resourceKey) {
-        return getActiveSkyboxes().stream().filter(skybox -> resourceKey.equals(skybox.getWorldResourceKey())).toList();
-    }
+	public List<Skybox> getSkiesFor(ResourceKey<@NotNull Level> resourceKey) {
+		return getActiveSkyboxes().stream().filter(skybox -> resourceKey.equals(skybox.getWorldResourceKey())).toList();
+	}
 
-    public boolean containsEnabled(ResourceKey<@NotNull Level> resourceKey) {
-        return !getSkiesFor(resourceKey).isEmpty();
-    }
+	public boolean containsEnabled(ResourceKey<@NotNull Level> resourceKey) {
+		return !getSkiesFor(resourceKey).isEmpty();
+	}
 }

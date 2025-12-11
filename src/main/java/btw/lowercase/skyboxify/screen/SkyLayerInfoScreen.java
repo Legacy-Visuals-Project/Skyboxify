@@ -33,7 +33,7 @@ import net.minecraft.network.chat.Component;
 public class SkyLayerInfoScreen extends DebugScreen {
 	private final SkyLayer skyLayer;
 
-	public SkyLayerInfoScreen(Screen parent, SkyLayer skyLayer, int index) {
+	public SkyLayerInfoScreen(final Screen parent, final SkyLayer skyLayer, final int index) {
 		super(Component.literal(index + " - " + skyLayer.source().toString()), parent);
 		this.skyLayer = skyLayer;
 	}
@@ -58,12 +58,9 @@ public class SkyLayerInfoScreen extends DebugScreen {
 		addLine(Text.builder("Heights: " + this.skyLayer.heights()).centered().build(this.font));
 		addLine(Text.builder("Weather Conditions: " + this.skyLayer.weatherConditions()).centered().build(this.font));
 
-		this.gidgets.add(new SimpleButton(
-				CommonComponents.GUI_BACK,
-				(this.width / 2) - (SimpleButton.DEFAULT_WIDTH / 2),
-				this.height - SimpleButton.DEFAULT_HEIGHT - 4,
-				(button) -> this.onClose()
-		));
+		this.gidgets.add(SimpleButton.builder(CommonComponents.GUI_BACK, button -> this.onClose())
+				.position((this.width / 2) - (SimpleButton.DEFAULT_WIDTH / 2), this.height - SimpleButton.DEFAULT_HEIGHT - 4)
+				.build());
 	}
 
 	private void addLine(final Text text) {

@@ -48,7 +48,7 @@ public final class SkyboxParser {
 	}
 
 	// TODO: Finish converting to CODEC's
-	public static @Nullable JsonObject parseSkyProperties(Properties properties, ResourceLocation propertiesResourceLocation) {
+	public static @Nullable JsonObject parseSkyProperties(final Properties properties, final ResourceLocation propertiesResourceLocation) {
 		final JsonObject output = new JsonObject();
 
 		final DataResult<ResourceLocation> sourceResult = ParserCodecs.getSourceTextureCodec(propertiesResourceLocation).parse(JavaOps.INSTANCE, properties.getProperty("source", null));

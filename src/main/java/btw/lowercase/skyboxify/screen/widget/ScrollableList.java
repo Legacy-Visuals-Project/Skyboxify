@@ -114,20 +114,16 @@ public class ScrollableList extends Gidget {
 			}
 		}
 
-		// idk i don't want 1 element moving :3
-		if (this.gidgets.size() > 1) {
-			final int rowHeight = SimpleButton.DEFAULT_HEIGHT + SimpleButton.DEFAULT_PADDING;
-			final int scrollableHeight = Math.max(0, (this.gidgets.size() * rowHeight) - this.box().height());
-			final double scrollAmount = (double) rowHeight / scrollableHeight;
-			if (scrollY > 0.0) {
-				this.scrollbar.setScrollY(this.scrollbar.getScrollY() - scrollAmount);
-			} else {
-				this.scrollbar.setScrollY(this.scrollbar.getScrollY() + scrollAmount);
-			}
-
-			this.updateGidgetsPosition();
+		final int rowHeight = SimpleButton.DEFAULT_HEIGHT + SimpleButton.DEFAULT_PADDING;
+		final int scrollableHeight = Math.max(0, (this.gidgets.size() * rowHeight) - this.box().height());
+		final double scrollAmount = (double) rowHeight / scrollableHeight;
+		if (scrollY > 0.0) {
+			this.scrollbar.setScrollY(this.scrollbar.getScrollY() - scrollAmount);
+		} else {
+			this.scrollbar.setScrollY(this.scrollbar.getScrollY() + scrollAmount);
 		}
 
+		this.updateGidgetsPosition();
 		return super.onMouseScrolled(mouseX, mouseY, scrollX, scrollY);
 	}
 
