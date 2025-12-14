@@ -39,28 +39,28 @@ import java.util.Map;
 
 public class Skybox {
 	public static final Codec<Skybox> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-			SkyLayer.CODEC.listOf().optionalFieldOf("layers", ImmutableList.of()).forGetter(Skybox::getLayers),
-			Level.RESOURCE_KEY_CODEC.fieldOf("world").forGetter(Skybox::getWorldResourceKey)
+			Level.RESOURCE_KEY_CODEC.fieldOf("world").forGetter(Skybox::getWorldKey),
+			SkyLayer.CODEC.listOf().fieldOf("layers").forGetter(Skybox::getLayers)
 	).apply(instance, Skybox::new));
 
 	@Getter
 	private final List<SkyLayer> layers;
 	@Getter
-	private final ResourceKey<@NotNull Level> worldResourceKey;
+	private final ResourceKey<@NotNull Level> worldKey;
 	private final Map<SkyLayer, Float> alphaMap = new HashMap<>();
 	@Getter
 	private boolean active = true;
 
-	public Skybox(List<SkyLayer> layers, ResourceKey<@NotNull Level> worldResourceKey) {
+	public Skybox(final ResourceKey<@NotNull Level> worldKey, final List<SkyLayer> layers) {
+		this.worldKey = worldKey;
 		this.layers = layers;
-		this.worldResourceKey = worldResourceKey;
 	}
 
-	public void tick(ClientLevel level) {
+	public void tick(final ClientLevel level) {
 		this.active = true;
 
-		final boolean allowOtherDimensions = Skyboxify.getConfig().showOverworldForUnknownDimension.isEnabled() && this.worldResourceKey.equals(Level.OVERWORLD) && !level.dimension().equals(Level.NETHER) && !level.dimension().equals(Level.END);
-		if (level.dimension().equals(this.worldResourceKey) || allowOtherDimensions) {
+		final boolean allowOtherDimensions = Skyboxify.getConfig().showOverworldForUnknownDimension.isEnabled() && this.worldKey.equals(Level.OVERWORLD) && !level.dimension().equals(Level.NETHER) && !level.dimension().equals(Level.END);
+		if (level.dimension().equals(this.worldKey) || allowOtherDimensions) {
 			this.layers.forEach(layer -> alphaMap.put(layer, layer.getPositionBrightness(level, this.getConditionAlphaFor(layer))));
 		} else {
 			this.layers.forEach(layer -> alphaMap.put(layer, -1.0F));
@@ -68,7 +68,7 @@ public class Skybox {
 		}
 	}
 
-	public float getConditionAlphaFor(SkyLayer skyLayer) {
+	public float getConditionAlphaFor(final SkyLayer skyLayer) {
 		return this.alphaMap.getOrDefault(skyLayer, -1.0F);
 	}
 }

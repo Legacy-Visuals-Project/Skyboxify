@@ -46,7 +46,7 @@ public final class SkyboxManager {
 	private SkyboxManager() {
 	}
 
-	public void addSkybox(Skybox skybox) {
+	public void addSkybox(final Skybox skybox) {
 		Preconditions.checkNotNull(skybox, "Skybox was null");
 		this.loadedSkyboxes.add(skybox);
 	}
@@ -57,7 +57,7 @@ public final class SkyboxManager {
 		this.activeSkyboxes.clear();
 	}
 
-	public void tick(ClientLevel level) {
+	public void tick(final ClientLevel level) {
 		if (!Skyboxify.getConfig().enabled.isEnabled()) {
 			return;
 		}
@@ -74,15 +74,15 @@ public final class SkyboxManager {
 		}
 	}
 
-	public boolean isEnabled(Level level) {
+	public boolean isEnabled(final Level level) {
 		return Skyboxify.getConfig().enabled.isEnabled() && !activeSkyboxes.isEmpty() && level != null;
 	}
 
-	public List<Skybox> getSkiesFor(ResourceKey<@NotNull Level> resourceKey) {
-		return getActiveSkyboxes().stream().filter(skybox -> resourceKey.equals(skybox.getWorldResourceKey())).toList();
+	public List<Skybox> getSkiesFor(final ResourceKey<@NotNull Level> resourceKey) {
+		return getActiveSkyboxes().stream().filter(skybox -> resourceKey.equals(skybox.getWorldKey())).toList();
 	}
 
-	public boolean containsEnabled(ResourceKey<@NotNull Level> resourceKey) {
+	public boolean containsEnabled(final ResourceKey<@NotNull Level> resourceKey) {
 		return !getSkiesFor(resourceKey).isEmpty();
 	}
 }

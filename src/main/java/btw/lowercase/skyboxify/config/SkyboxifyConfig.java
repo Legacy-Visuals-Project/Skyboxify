@@ -34,8 +34,6 @@ import java.nio.file.Path;
 
 public class SkyboxifyConfig extends Config {
 	public final BooleanConfigField enabled = this.booleanFieldOf("enabled", true);
-	public final BooleanConfigField processOptiFine = this.booleanFieldOf("processOptiFine", true);
-	public final BooleanConfigField processMCPatcher = this.booleanFieldOf("processMCPatcher", false);
 	public final BooleanConfigField renderSunMoon = this.booleanFieldOf("renderSunMoon", true);
 	public final BooleanConfigField renderStars = this.booleanFieldOf("renderStars", true);
 	public final BooleanConfigField showOverworldForUnknownDimension = this.booleanFieldOf("showOverworldForUnknownDimension", true);
@@ -44,8 +42,6 @@ public class SkyboxifyConfig extends Config {
 	public SkyboxifyConfig(final Path path) {
 		super(Skyboxify.MOD_ID, path);
 		final Minecraft minecraft = Minecraft.getInstance();
-		this.processOptiFine.onValueChanged((oldVal, newVal) -> minecraft.reloadResourcePacks());
-		this.processMCPatcher.onValueChanged((oldVal, newVal) -> minecraft.reloadResourcePacks());
 		this.ignoreBrokenSkies.onValueChanged((oldVal, newVal) -> minecraft.reloadResourcePacks());
 	}
 
