@@ -33,7 +33,6 @@ import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.IoSupplier;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
-import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -46,7 +45,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 
 public class SkyboxResourceHelper implements
         //? >=1.21.10 {
@@ -62,8 +60,6 @@ public class SkyboxResourceHelper implements
 	private static final Pattern MCPATCHER_SKY_PATTERN = Pattern.compile(MCPATCHER_SKY_PARENT + "/" + SKY_PATTERN_ENDING);
 	private static final Logger LOGGER = LoggerFactory.getLogger(SkyboxResourceHelper.class);
 
-	private ResourceManager resourceManager;
-
 	@Override
     public @NotNull CompletableFuture<Void> reload(
             //? >=1.21.9
@@ -77,7 +73,7 @@ public class SkyboxResourceHelper implements
             PreparationBarrier preparationBarrier,
             @NotNull Executor gameExecutor
     ) {
-        this.resourceManager =
+        final ResourceManager theResourceManager =
 			//? >=1.21.9 {
 			sharedState.resourceManager();
 			//?} else {
@@ -87,15 +83,14 @@ public class SkyboxResourceHelper implements
             SkyboxManager.INSTANCE.clearSkyboxes();
             if (Skyboxify.getConfig().enabled.isEnabled()) {
 				LOGGER.info("Looking for OptiFine/MCPatcher Skies...");
-				this.resourceManager.listPacks().forEach(pack -> {
-					// TODO: Find a better cleaner way to do this bruh
-					final List<ResourceLocation> resources = new ArrayList<>();
-					final PackResources.ResourceOutput resourceOutput = (resourceLocation, inputStreamIoSupplier) -> resources.add(resourceLocation);
-					pack.listResources(PackType.CLIENT_RESOURCES, "minecraft", MCPATCHER_SKY_PARENT, resourceOutput);
-					pack.listResources(PackType.CLIENT_RESOURCES, "minecraft", OPTIFINE_SKY_PARENT, resourceOutput);
-					if (!resources.isEmpty()) {
-						this.searchAndParseSkyboxes(pack);
-					}
+				theResourceManager.listPacks().forEach(pack -> {
+					final List<ResourceLocation> optifineSkies = new ArrayList<>();
+					pack.listResources(PackType.CLIENT_RESOURCES, ResourceLocation.DEFAULT_NAMESPACE, OPTIFINE_SKY_PARENT, (resourceLocation, inputStreamIoSupplier) -> optifineSkies.add(resourceLocation));
+
+					final List<ResourceLocation> mcpatcherSkies = new ArrayList<>();
+					pack.listResources(PackType.CLIENT_RESOURCES, ResourceLocation.DEFAULT_NAMESPACE, MCPATCHER_SKY_PARENT, (resourceLocation, inputStreamIoSupplier) -> mcpatcherSkies.add(resourceLocation));
+
+					this.parseSkyboxes(pack, optifineSkies, mcpatcherSkies);
 				});
             }
         }).thenCompose(preparationBarrier::wait);
@@ -108,30 +103,25 @@ public class SkyboxResourceHelper implements
     }
     *///?}
 
-    private Stream<ResourceLocation> searchIn(final PackResources packResources, final String parent) {
-		// TODO: Find a better cleaner way to do this bruh
-		return this.resourceManager
-				.listResourceStacks(parent, path -> true)
-				.entrySet()
-				.stream()
-				.filter(entry -> entry.getValue().stream().anyMatch(resource -> resource.sourcePackId().equals(packResources.packId())))
-				.map(Map.Entry::getKey);
-	}
-
-	private void searchAndParseSkyboxes(final PackResources packResources) {
-		// TODO: Find a better cleaner way to do this bruh
-		Pattern skyPattern = OPTIFINE_SKY_PATTERN;
-		List<ResourceLocation> skies = this.searchIn(packResources, OPTIFINE_SKY_PARENT).filter(SkyboxResourceHelper::isProperties).sorted(compareLocations(skyPattern)).toList();
-		if (skies.isEmpty()) {
-			LOGGER.info("Couldn't find any skies under \"optifine\", searching for skies under \"mcpatcher\" instead...");
-			skyPattern = MCPATCHER_SKY_PATTERN;
-			skies = this.searchIn(packResources, MCPATCHER_SKY_PARENT).filter(SkyboxResourceHelper::isProperties).sorted(compareLocations(skyPattern)).toList();
+	private void parseSkyboxes(final PackResources packResources, final List<ResourceLocation> optifineSkies, final List<ResourceLocation> mcpatcherSkies) {
+		if (optifineSkies.isEmpty() && mcpatcherSkies.isEmpty()) {
+			return;
 		}
 
-		this.parseSkyboxes(packResources, skies, skyPattern);
+		Pattern skyPattern = OPTIFINE_SKY_PATTERN;
+		List<ResourceLocation> skies = optifineSkies.stream().filter(SkyboxResourceHelper::isProperties).sorted(compareLocations(skyPattern)).toList();
+		if (optifineSkies.isEmpty()) {
+			LOGGER.info("Couldn't find any skies under \"optifine\", searching for skies under \"mcpatcher\" instead...");
+			skyPattern = MCPATCHER_SKY_PATTERN;
+			skies = mcpatcherSkies.stream().filter(SkyboxResourceHelper::isProperties).sorted(compareLocations(skyPattern)).toList();
+		}
+
+		if (!skies.isEmpty()) {
+			this.parseSkyboxesInPack(packResources, skies, skyPattern);
+		}
 	}
 
-	private void parseSkyboxes(final PackResources packResources, final List<ResourceLocation> skies, final Pattern skyPattern) {
+	private void parseSkyboxesInPack(final PackResources packResources, final List<ResourceLocation> skies, final Pattern skyPattern) {
 		final Map<String, JsonArray> layers = new HashMap<>();
 		skies.forEach(id -> {
 			final Matcher matcher = skyPattern.matcher(id.getPath());
