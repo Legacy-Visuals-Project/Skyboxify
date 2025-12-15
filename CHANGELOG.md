@@ -1,5 +1,7 @@
-- Rebranded to Skyboxify
-- Added Skyboxes Debug Screen to view all active skyboxes data/each layer (Accessible via ``/skyboxify debug``)
-- Reworked sky loading/handling
-- Reworked rendering/mixins code a bit
-- Fixed many bugs w/ loading/rendering
+- NOTE: Your config will most likely reset as the file name has been changed!
+- Fix modmenu issue again
+- Fix config not loading/saving
+- Rework how MCPatcher/OptiFine skies are handled (respective config settings have been removed as its auto-handled now)
+  - If both "optifine" and "mcpatcher" folders exist in a pack and both have a sky folder, the "optifine" folder will always take priority and be the only one loaded, otherwise it'll try to load from "mcpatcher" folder instead.
+  - NOTE: Pack order does not affect any of this.
+- Updated debug screen with new scrollbar/knob texture & update cursor type in 1.21.9+

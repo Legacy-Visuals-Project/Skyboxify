@@ -98,7 +98,13 @@ public class SkyboxResourceHelper implements
 						skyPattern = MCPATCHER_SKY_PATTERN;
 					}
 
-					this.parseSkyboxesInPack(pack, (skyPattern == OPTIFINE_SKY_PATTERN ? optifineSkies : mcpatcherSkies), skyPattern);
+					final List<ResourceLocation> skies = (skyPattern == OPTIFINE_SKY_PATTERN ? optifineSkies : mcpatcherSkies);
+					if (!skies.isEmpty()) {
+						final int count = this.parseSkyboxesInPack(pack, skies, skyPattern);
+						if (count > 0) {
+							LOGGER.info("Loaded {} {} from \"{}\"!", count, (count == 1 ? "skies" : "sky"), pack.packId());
+						}
+					}
 				});
             }
         }).thenCompose(preparationBarrier::wait);
@@ -119,10 +125,9 @@ public class SkyboxResourceHelper implements
     }
     *///?}
 
-	private void parseSkyboxesInPack(final PackResources packResources, final List<ResourceLocation> skies, final Pattern skyPattern) {
-		if (skies.isEmpty()) return;
-
+	private int parseSkyboxesInPack(final PackResources packResources, final List<ResourceLocation> skies, final Pattern skyPattern) {
 		final Map<String, JsonArray> layers = new HashMap<>();
+		int count = 0;
 		skies.forEach(id -> {
 			final Matcher matcher = skyPattern.matcher(id.getPath());
 			if (!matcher.find()) {
@@ -177,8 +182,11 @@ public class SkyboxResourceHelper implements
 				});
 				skyboxJson.add("layers", skyLayers);
 				SkyboxManager.INSTANCE.addSkybox(Skybox.CODEC.decode(JsonOps.INSTANCE, skyboxJson).getOrThrow().getFirst());
+				count++;
 			}
 		}
+
+		return count;
 	}
 
 	private static Comparator<ResourceLocation> compareLocations(final Pattern pattern) {
