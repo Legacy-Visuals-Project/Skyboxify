@@ -80,21 +80,37 @@ public class SkyboxResourceHelper implements
 			/*resourceManager;
 			 *///?}
         return CompletableFuture.runAsync(() -> {
-            SkyboxManager.INSTANCE.clearSkyboxes();
             if (Skyboxify.getConfig().enabled.isEnabled()) {
+				SkyboxManager.INSTANCE.clearSkyboxes();
 				LOGGER.info("Looking for OptiFine/MCPatcher Skies...");
 				theResourceManager.listPacks().forEach(pack -> {
 					final List<ResourceLocation> optifineSkies = new ArrayList<>();
-					pack.listResources(PackType.CLIENT_RESOURCES, ResourceLocation.DEFAULT_NAMESPACE, OPTIFINE_SKY_PARENT, (resourceLocation, inputStreamIoSupplier) -> optifineSkies.add(resourceLocation));
+					pack.listResources(PackType.CLIENT_RESOURCES, ResourceLocation.DEFAULT_NAMESPACE, OPTIFINE_SKY_PARENT, filterResource(optifineSkies));
+					optifineSkies.sort(compareLocations(OPTIFINE_SKY_PATTERN));
 
 					final List<ResourceLocation> mcpatcherSkies = new ArrayList<>();
-					pack.listResources(PackType.CLIENT_RESOURCES, ResourceLocation.DEFAULT_NAMESPACE, MCPATCHER_SKY_PARENT, (resourceLocation, inputStreamIoSupplier) -> mcpatcherSkies.add(resourceLocation));
+					pack.listResources(PackType.CLIENT_RESOURCES, ResourceLocation.DEFAULT_NAMESPACE, MCPATCHER_SKY_PARENT, filterResource(mcpatcherSkies));
+					mcpatcherSkies.sort(compareLocations(MCPATCHER_SKY_PATTERN));
 
-					this.parseSkyboxes(pack, optifineSkies, mcpatcherSkies);
+					Pattern skyPattern = OPTIFINE_SKY_PATTERN;
+					if (optifineSkies.isEmpty()) {
+						LOGGER.info("Couldn't find any skies under \"optifine\", searching for skies under \"mcpatcher\" instead...");
+						skyPattern = MCPATCHER_SKY_PATTERN;
+					}
+
+					this.parseSkyboxesInPack(pack, (skyPattern == OPTIFINE_SKY_PATTERN ? optifineSkies : mcpatcherSkies), skyPattern);
 				});
             }
         }).thenCompose(preparationBarrier::wait);
     }
+
+	private static PackResources.ResourceOutput filterResource(final List<ResourceLocation> list) {
+		return (resourceLocation, streamIoSupplier) -> {
+			if (resourceLocation.getPath().endsWith(".properties")) {
+				list.add(resourceLocation);
+			}
+		};
+	}
 
     //? <=1.21.8 {
     /*@Override
@@ -103,25 +119,9 @@ public class SkyboxResourceHelper implements
     }
     *///?}
 
-	private void parseSkyboxes(final PackResources packResources, final List<ResourceLocation> optifineSkies, final List<ResourceLocation> mcpatcherSkies) {
-		if (optifineSkies.isEmpty() && mcpatcherSkies.isEmpty()) {
-			return;
-		}
-
-		Pattern skyPattern = OPTIFINE_SKY_PATTERN;
-		List<ResourceLocation> skies = optifineSkies.stream().filter(SkyboxResourceHelper::isProperties).sorted(compareLocations(skyPattern)).toList();
-		if (optifineSkies.isEmpty()) {
-			LOGGER.info("Couldn't find any skies under \"optifine\", searching for skies under \"mcpatcher\" instead...");
-			skyPattern = MCPATCHER_SKY_PATTERN;
-			skies = mcpatcherSkies.stream().filter(SkyboxResourceHelper::isProperties).sorted(compareLocations(skyPattern)).toList();
-		}
-
-		if (!skies.isEmpty()) {
-			this.parseSkyboxesInPack(packResources, skies, skyPattern);
-		}
-	}
-
 	private void parseSkyboxesInPack(final PackResources packResources, final List<ResourceLocation> skies, final Pattern skyPattern) {
+		if (skies.isEmpty()) return;
+
 		final Map<String, JsonArray> layers = new HashMap<>();
 		skies.forEach(id -> {
 			final Matcher matcher = skyPattern.matcher(id.getPath());
@@ -195,9 +195,5 @@ public class SkyboxResourceHelper implements
 
 			return 0;
 		});
-	}
-
-	private static boolean isProperties(final ResourceLocation location) {
-		return location.getPath().endsWith(".properties");
 	}
 }
