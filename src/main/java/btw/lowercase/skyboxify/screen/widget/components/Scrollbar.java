@@ -25,11 +25,8 @@ package btw.lowercase.skyboxify.screen.widget.components;
 
 import btw.lowercase.skyboxify.Skyboxify;
 import btw.lowercase.skyboxify.screen.widget.Gidget;
-import com.mojang.blaze3d.platform.cursor.CursorType;
-import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import lombok.Getter;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ARGB;
 
@@ -51,14 +48,28 @@ public class Scrollbar extends Gidget {
 	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY) {
 		super.render(guiGraphics, mouseX, mouseY);
 		this.knob.render(guiGraphics, mouseX, mouseY);
+		//? >=1.21.9 {
 		if (this.box().contains(mouseX, mouseY) && !this.knob.box().contains(mouseX, mouseY)) {
-			guiGraphics.requestCursor(CursorTypes.RESIZE_NS);
+			guiGraphics.requestCursor(com.mojang.blaze3d.platform.cursor.CursorTypes.RESIZE_NS);
 		}
+		//?}
 	}
 
 	@Override
 	public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-		guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, BAR_TEXTURE, this.box().left(), this.box().top(), this.box().width(), this.box().height(), ARGB.color(128, 0xFFFFFF));
+		guiGraphics.blitSprite(
+				//? >=1.21.6 {
+				net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED,
+				 //?} else {
+				/*net.minecraft.client.renderer.RenderType::guiTextured,
+				*///?}
+				BAR_TEXTURE,
+				this.box().left(),
+				this.box().top(),
+				this.box().width(),
+				this.box().height(),
+				ARGB.color(128, 0xFFFFFF)
+		);
 	}
 
 	public void setScrollY(double scrollY) {
@@ -89,14 +100,27 @@ public class Scrollbar extends Gidget {
 		@Override
 		public void render(GuiGraphics guiGraphics, int mouseX, int mouseY) {
 			super.render(guiGraphics, mouseX, mouseY);
+			//? >=1.21.9 {
 			if (this.box().contains(mouseX, mouseY)) {
-				guiGraphics.requestCursor(CursorTypes.RESIZE_ALL);
+				guiGraphics.requestCursor(com.mojang.blaze3d.platform.cursor.CursorTypes.RESIZE_ALL);
 			}
+			//?}
 		}
 
 		@Override
 		public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-			guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, KNOB_TEXTURE, this.box().left(), this.box().top(), this.box().width(), this.box().height());
+			guiGraphics.blitSprite(
+					//? >=1.21.6 {
+					net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED,
+					 //?} else {
+					/*net.minecraft.client.renderer.RenderType::guiTextured,
+					*///?}
+					KNOB_TEXTURE,
+					this.box().left(),
+					this.box().top(),
+					this.box().width(),
+					this.box().height()
+			);
 		}
 	}
 }

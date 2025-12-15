@@ -42,7 +42,7 @@ public class SkyLayerListScreen extends DebugScreen {
 	public SkyLayerListScreen(final Screen parent, final Skybox skybox) {
 		super(Component.literal(
 				//? >=1.21.11 {
-				/*skybox.getWorldKey().identifier().toString()
+				/*skybox.getWorldKey().location().toString()
 				 *///?} else {
 				skybox.getWorldKey().location().toString()
 				//?}
