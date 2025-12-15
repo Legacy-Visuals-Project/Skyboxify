@@ -47,25 +47,26 @@ public class SkyLayerInfoScreen extends DebugScreen {
 				.centered()
 				.build(this.font));
 
-		addLine(Text.builder("Rotate: " + this.skyLayer.rotate()).centered().build(this.font));
-		addLine(Text.builder("Axis: " + this.skyLayer.axis()).centered().build(this.font));
-		addLine(Text.builder("Blend: " + this.skyLayer.blend()).centered().build(this.font));
-		addLine(Text.builder("Speed: " + this.skyLayer.speed()).centered().build(this.font));
-		addLine(Text.builder("Transition: " + this.skyLayer.transition()).centered().build(this.font));
-		addLine(Text.builder("Fade: " + this.skyLayer.fade()).centered().build(this.font));
-		addLine(Text.builder("Loop: " + this.skyLayer.loop()).centered().build(this.font));
-		addLine(Text.builder("Biomes: " + this.skyLayer.biomes()).centered().build(this.font));
-		addLine(Text.builder("Heights: " + this.skyLayer.heights()).centered().build(this.font));
-		addLine(Text.builder("Weather Conditions: " + this.skyLayer.weatherConditions()).centered().build(this.font));
+		addLine("Rotate: " + this.skyLayer.rotate());
+		addLine("Axis: " + this.skyLayer.axis());
+		addLine("Blend: " + this.skyLayer.blend());
+		addLine("Speed: " + this.skyLayer.speed());
+		addLine("Transition: " + this.skyLayer.transition());
+		addLine("Fade: " + this.skyLayer.fade());
+		addLine("Loop: " + this.skyLayer.loop());
+		addLine("Biomes: " + this.skyLayer.biomes());
+		addLine("Heights: " + this.skyLayer.heights());
+		addLine("Weather Conditions: " + this.skyLayer.weatherConditions());
 
 		this.gidgets.add(SimpleButton.builder(CommonComponents.GUI_BACK, button -> this.onClose())
 				.position((this.width / 2) - (SimpleButton.DEFAULT_WIDTH / 2), this.height - SimpleButton.DEFAULT_HEIGHT - 4)
 				.build());
 	}
 
-	private void addLine(final Text text) {
-		text.move(this.width / 2, 12 + (this.font.lineHeight * 3) + ((this.font.lineHeight + 2) * (this.gidgets.size() - 1)));
-		text.setText(Component.literal("    " + text.getText().getString()));
-		this.gidgets.add(text);
+	private void addLine(final String text) {
+		this.gidgets.add(Text.builder(text)
+				.centered()
+				.position(this.width / 2, 12 + (this.font.lineHeight * 3) + ((this.font.lineHeight + 2) * (this.gidgets.size() - 1)))
+				.build(this.font));
 	}
 }

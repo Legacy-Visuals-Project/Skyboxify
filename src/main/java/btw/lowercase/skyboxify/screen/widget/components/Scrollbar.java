@@ -23,12 +23,19 @@
 
 package btw.lowercase.skyboxify.screen.widget.components;
 
+import btw.lowercase.skyboxify.Skyboxify;
 import btw.lowercase.skyboxify.screen.widget.Gidget;
+import com.mojang.blaze3d.platform.cursor.CursorType;
+import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import lombok.Getter;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ARGB;
 
 public class Scrollbar extends Gidget {
+	public static final ResourceLocation BAR_TEXTURE = Skyboxify.locationOrNull("widget/scrollbar/bar");
+
 	public static final int DEFAULT_WIDTH = 10;
 	private final Knob knob;
 	@Getter
@@ -44,11 +51,14 @@ public class Scrollbar extends Gidget {
 	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY) {
 		super.render(guiGraphics, mouseX, mouseY);
 		this.knob.render(guiGraphics, mouseX, mouseY);
+		if (this.box().contains(mouseX, mouseY) && !this.knob.box().contains(mouseX, mouseY)) {
+			guiGraphics.requestCursor(CursorTypes.RESIZE_NS);
+		}
 	}
 
 	@Override
 	public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-		guiGraphics.fill(this.box().left(), this.box().top(), this.box().right(), this.box().bottom(), ARGB.color(128, 0x00FF95));
+		guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, BAR_TEXTURE, this.box().left(), this.box().top(), this.box().width(), this.box().height(), ARGB.color(128, 0xFFFFFF));
 	}
 
 	public void setScrollY(double scrollY) {
@@ -65,6 +75,7 @@ public class Scrollbar extends Gidget {
 	}
 
 	private class Knob extends Gidget {
+		public static final ResourceLocation KNOB_TEXTURE = Skyboxify.locationOrNull("widget/scrollbar/knob");
 		public static final int DEFAULT_HEIGHT = 30;
 
 		public Knob(int x, int y, int height) {
@@ -76,8 +87,16 @@ public class Scrollbar extends Gidget {
 		}
 
 		@Override
+		public void render(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+			super.render(guiGraphics, mouseX, mouseY);
+			if (this.box().contains(mouseX, mouseY)) {
+				guiGraphics.requestCursor(CursorTypes.RESIZE_ALL);
+			}
+		}
+
+		@Override
 		public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-			guiGraphics.fill(this.box().left(), this.box().top(), this.box().right(), this.box().bottom(), ARGB.color(255, 0xAAFE00));
+			guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, KNOB_TEXTURE, this.box().left(), this.box().top(), this.box().width(), this.box().height());
 		}
 	}
 }

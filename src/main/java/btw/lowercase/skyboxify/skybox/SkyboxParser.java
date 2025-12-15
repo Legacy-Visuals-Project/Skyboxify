@@ -25,7 +25,6 @@ package btw.lowercase.skyboxify.skybox;
 
 import btw.lowercase.skyboxify.Skyboxify;
 import btw.lowercase.skyboxify.skybox.components.Range;
-import btw.lowercase.skyboxify.utils.CommonUtils;
 import btw.lowercase.skyboxify.utils.ParserCodecs;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -117,7 +116,7 @@ public final class SkyboxParser {
 		return output;
 	}
 
-	private static int toTickTime(String time) {
+	private static int toTickTime(final String time) {
 		final String[] parts = time.trim().split(":");
 		if (parts.length == 2) {
 			final int m = ParserCodecs.safeParseInteger(parts[1], -1);
@@ -136,7 +135,7 @@ public final class SkyboxParser {
 		return -1;
 	}
 
-	private static void parseFade(Properties properties, JsonObject output) {
+	private static void parseFade(final Properties properties, final JsonObject output) {
 		final JsonObject fade = new JsonObject();
 		if (properties.containsKey("startFadeIn") && properties.containsKey("endFadeIn") && properties.containsKey("endFadeOut")) {
 			final int startFadeIn = toTickTime(properties.getProperty("startFadeIn"));
@@ -152,10 +151,10 @@ public final class SkyboxParser {
 				}
 			}
 
-			fade.addProperty("startFadeIn", CommonUtils.normalizeTickTime(startFadeIn));
-			fade.addProperty("endFadeIn", CommonUtils.normalizeTickTime(endFadeIn));
-			fade.addProperty("startFadeOut", CommonUtils.normalizeTickTime(startFadeOut));
-			fade.addProperty("endFadeOut", CommonUtils.normalizeTickTime(endFadeOut));
+			fade.addProperty("startFadeIn", startFadeIn);
+			fade.addProperty("endFadeIn", endFadeIn);
+			fade.addProperty("startFadeOut", startFadeOut);
+			fade.addProperty("endFadeOut", endFadeOut);
 		} else {
 			fade.addProperty("alwaysOn", true);
 		}
@@ -163,7 +162,7 @@ public final class SkyboxParser {
 		output.add("fade", fade);
 	}
 
-	private static void parseDaysLoop(String days, String daysLoop, JsonObject output) {
+	private static void parseDaysLoop(final String days, final String daysLoop, final JsonObject output) {
 		final List<Range> rangeEntries = ParserCodecs.getRangeEntriesCodec(false).orElse(List.of()).parse(JavaOps.INSTANCE, days).getOrThrow();
 		if (!rangeEntries.isEmpty()) {
 			final JsonObject loop = new JsonObject();
@@ -177,7 +176,7 @@ public final class SkyboxParser {
 		}
 	}
 
-	private static void parseHeights(String input, JsonObject output) {
+	private static void parseHeights(final String input, final JsonObject output) {
 		final List<Range> rangeEntries = ParserCodecs.getRangeEntriesCodec(true).orElse(List.of()).parse(JavaOps.INSTANCE, input).getOrThrow();
 		if (!rangeEntries.isEmpty()) {
 			final JsonArray heights = new JsonArray();

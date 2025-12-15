@@ -24,6 +24,7 @@
 package btw.lowercase.skyboxify.screen.widget;
 
 import btw.lowercase.skyboxify.screen.widget.components.Box;
+import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.gui.Font;
@@ -74,6 +75,9 @@ public class Text extends Gidget {
 		}
 
 		guiGraphics.drawString(this.font, this.text, finalX, finalY, this.color, this.shadow);
+		if (new Box(finalX, finalY, this.box.width(), this.box.height()).contains(mouseX, mouseY)) {
+			guiGraphics.requestCursor(CursorTypes.IBEAM);
+		}
 	}
 
 	public Builder builder() {

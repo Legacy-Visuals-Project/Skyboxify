@@ -32,6 +32,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.ARGB;
+import net.minecraft.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,9 +56,8 @@ public class SkyboxListScreen extends DebugScreen {
 
 		final List<Gidget> gidgets = new ArrayList<>();
 		for (final Skybox skybox : this.skyboxes) {
-			final Component name = Component.literal(skybox.getWorldKey().location().toString())
-					.withColor(skybox.isActive() ? ARGB.color(155, 0x00FF00) : ARGB.color(155, 0xFF0000));
-			gidgets.add(SimpleButton.builder(name,button -> this.minecraft.setScreen(new SkyLayerListScreen(this, skybox))).build());
+			final Component name = Component.literal(StringUtil.stripColor(skybox.getPackName())).withColor(skybox.isActive() ? ARGB.color(155, 0x00FF00) : ARGB.color(155, 0xFF0000));
+			gidgets.add(SimpleButton.builder(name, button -> this.minecraft.setScreen(new SkyLayerListScreen(this, skybox))).build());
 		}
 
 		final int pad = 20 + this.font.lineHeight;

@@ -37,7 +37,7 @@ public class ScrollableList extends Gidget {
 	public ScrollableList(List<Gidget> gidgets, int x, int y, int width, int height) {
 		super(new Box(x, y, width, height));
 		this.gidgets = gidgets;
-		this.scrollbar = new Scrollbar(width - Scrollbar.DEFAULT_WIDTH - 8, y, height);
+		this.scrollbar = new Scrollbar(width - Scrollbar.DEFAULT_WIDTH - 8, y + 1, height - 1);
 		this.updateGidgetsPosition();
 	}
 

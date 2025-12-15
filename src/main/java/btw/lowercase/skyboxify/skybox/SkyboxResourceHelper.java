@@ -168,6 +168,7 @@ public class SkyboxResourceHelper implements
 			final JsonArray skyLayers = entry.getValue();
 			if (!skyLayers.isEmpty()) {
 				final JsonObject skyboxJson = new JsonObject();
+				skyboxJson.addProperty("pack", packResources.packId());
 				skyboxJson.addProperty("world", switch (entry.getKey()) {
 					case "world0" -> "overworld";
 					case "world-1" -> "nether";

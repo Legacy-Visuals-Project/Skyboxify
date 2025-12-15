@@ -24,6 +24,7 @@
 package btw.lowercase.skyboxify.screen.widget;
 
 import btw.lowercase.skyboxify.screen.widget.components.Box;
+import lombok.RequiredArgsConstructor;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ARGB;
@@ -31,14 +32,9 @@ import net.minecraft.util.ARGB;
 import java.util.HashMap;
 import java.util.Map;
 
+@RequiredArgsConstructor
 public abstract class Gidget {
-	private final Box box;
-	private final Map<ResourceLocation, Object> data;
-
-	public Gidget(Box box) {
-		this.box = box;
-		this.data = new HashMap<>();
-	}
+	protected final Box box;
 
 	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY) {
 		this.renderBackground(guiGraphics, mouseX, mouseY);
@@ -75,18 +71,6 @@ public abstract class Gidget {
 
 	public void resize(int width, int height) {
 		this.box.resize(width, height);
-	}
-
-	public void store(ResourceLocation location, Object data) {
-		this.data.put(location, data);
-	}
-
-	public boolean contains(ResourceLocation location) {
-		return this.data.containsKey(location);
-	}
-
-	public <T> T get(ResourceLocation location) {
-		return (T) this.data.get(location);
 	}
 
 	public Box box() {

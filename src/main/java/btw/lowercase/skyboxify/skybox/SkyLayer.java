@@ -106,10 +106,10 @@ public record SkyLayer(
 	}
 
 	public boolean isActive(long dayTime, int clampedTimeOfDay) {
-		if (!this.fade.alwaysOn() && CommonUtils.isInTimeInterval(clampedTimeOfDay, this.fade.endFadeOut(), this.fade.startFadeIn())) {
+		if (!this.fade.alwaysOn() && CommonUtils.isInTimeInterval(clampedTimeOfDay, this.fade.endOut(), this.fade.startIn())) {
 			return false;
 		} else if (this.loop.ranges() != null) {
-			long adjustedTime = dayTime - (long) this.fade.startFadeIn();
+			long adjustedTime = dayTime - (long) this.fade.startIn();
 			while (adjustedTime < 0L) {
 				adjustedTime += 24000L * this.loop.days();
 			}

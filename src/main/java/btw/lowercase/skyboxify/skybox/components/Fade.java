@@ -27,21 +27,21 @@ import btw.lowercase.skyboxify.utils.CommonUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-public record Fade(int startFadeIn, int endFadeIn, int startFadeOut, int endFadeOut, boolean alwaysOn) {
+public record Fade(int startIn, int endIn, int startOut, int endOut, boolean alwaysOn) {
     public static final Fade DEFAULT = new Fade(0, 0, 0, 0, true);
     public static final Codec<Fade> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codec.INT.optionalFieldOf("startFadeIn", 0).forGetter(Fade::startFadeIn),
-            Codec.INT.optionalFieldOf("endFadeIn", 0).forGetter(Fade::endFadeIn),
-            Codec.INT.optionalFieldOf("startFadeOut", 0).forGetter(Fade::startFadeOut),
-            Codec.INT.optionalFieldOf("endFadeOut", 0).forGetter(Fade::endFadeOut),
+            Codec.INT.optionalFieldOf("startFadeIn", 0).forGetter(Fade::startIn),
+            Codec.INT.optionalFieldOf("endFadeIn", 0).forGetter(Fade::endIn),
+            Codec.INT.optionalFieldOf("startFadeOut", 0).forGetter(Fade::startOut),
+            Codec.INT.optionalFieldOf("endFadeOut", 0).forGetter(Fade::endOut),
             Codec.BOOL.optionalFieldOf("alwaysOn", false).forGetter(Fade::alwaysOn)
     ).apply(instance, Fade::new));
 
-    public Fade(int startFadeIn, int endFadeIn, int startFadeOut, int endFadeOut, boolean alwaysOn) {
-        this.startFadeIn = normalizeIfNot(startFadeIn, alwaysOn);
-        this.endFadeIn = normalizeIfNot(endFadeIn, alwaysOn);
-        this.startFadeOut = normalizeIfNot(startFadeOut, alwaysOn);
-        this.endFadeOut = normalizeIfNot(endFadeOut, alwaysOn);
+    public Fade(int startIn, int endIn, int startOut, int endOut, boolean alwaysOn) {
+        this.startIn = normalizeIfNot(startIn, alwaysOn);
+        this.endIn = normalizeIfNot(endIn, alwaysOn);
+        this.startOut = normalizeIfNot(startOut, alwaysOn);
+        this.endOut = normalizeIfNot(endOut, alwaysOn);
         this.alwaysOn = alwaysOn;
     }
 
@@ -51,7 +51,7 @@ public record Fade(int startFadeIn, int endFadeIn, int startFadeOut, int endFade
 
     public float getAlpha(int timeOfDay) {
         if (!alwaysOn) {
-            return CommonUtils.calculateFadeAlphaValue(1.0F, 0.0F, timeOfDay, startFadeIn, endFadeIn, startFadeOut, endFadeOut);
+            return CommonUtils.calculateFadeAlphaValue(1.0F, 0.0F, timeOfDay, startIn, endIn, startOut, endOut);
         } else {
             return 1.0F;
         }

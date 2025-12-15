@@ -24,6 +24,7 @@
 package btw.lowercase.skyboxify.screen.widget;
 
 import btw.lowercase.skyboxify.screen.widget.components.Box;
+import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
@@ -42,10 +43,10 @@ public class SimpleButton extends Gidget {
 	public SimpleButton(Component text, int x, int y, Consumer<? super SimpleButton> onClick) {
 		super(new Box(x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT));
 		this.text = Text.builder(text)
-				.position(this.box().left() + (this.box().width() / 2), this.box().top() + (this.box().height() / 2))
+				.position(this.box.left() + (this.box.width() / 2), this.box.top() + (this.box.height() / 2))
 				.aligned(Text.Alignment.BOTH)
 				.build(Minecraft.getInstance().font);
-		this.resize(Math.max(this.text.box().width() + DEFAULT_PADDING, DEFAULT_WIDTH), this.box().height());
+		this.resize(Math.max(this.text.box().width() + DEFAULT_PADDING, DEFAULT_WIDTH), this.box.height());
 		this.onClick = onClick;
 	}
 
@@ -56,8 +57,11 @@ public class SimpleButton extends Gidget {
 	@Override
 	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY) {
 		super.render(guiGraphics, mouseX, mouseY);
-		text.setColor(this.box().contains(mouseX, mouseY) ? ARGB.color(255, 0xFFFFA0) : ARGB.color(255, 0xE0E0E0));
-		text.render(guiGraphics, mouseX, mouseY);
+		this.text.setColor(this.box().contains(mouseX, mouseY) ? ARGB.color(255, 0xFFFFA0) : ARGB.color(255, 0xE0E0E0));
+		this.text.render(guiGraphics, mouseX, mouseY);
+		if (this.box().contains(mouseX, mouseY)) {
+			guiGraphics.requestCursor(CursorTypes.POINTING_HAND);
+		}
 	}
 
 	@Override
