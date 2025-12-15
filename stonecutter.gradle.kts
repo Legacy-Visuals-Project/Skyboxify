@@ -23,7 +23,6 @@ tasks.named("publishMods") {
 // Header
 spotless {
     val licenseHeader = rootProject.file("HEADER")
-    lineEndings = com.diffplug.spotless.LineEnding.UNIX
 
     java {
         licenseHeaderFile(licenseHeader)
