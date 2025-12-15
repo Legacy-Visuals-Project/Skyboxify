@@ -37,42 +37,42 @@ import org.visuals.legacy.lightconfig.lib.v1.screen.InternalConfigScreen;
 
 @SuppressWarnings("UnstableApiUsage")
 public class SkyboxifyConfigScreen extends InternalConfigScreen {
-    public SkyboxifyConfigScreen(Component title, SkyboxifyConfig config, Screen parent) {
-        super(title, config, parent);
-    }
+	public SkyboxifyConfigScreen(final Component title, final SkyboxifyConfig config, final Screen parent) {
+		super(title, config, parent);
+	}
 
-    @Override
-    protected void init() {
-        SkyboxifyConfig skyboxifyConfig = (SkyboxifyConfig) this.config;
+	@Override
+	protected void init() {
+		final SkyboxifyConfig skyboxifyConfig = (SkyboxifyConfig) this.config;
 
-        HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this, 61, 33);
-        LinearLayout linearLayout = layout.addToHeader(LinearLayout.vertical().spacing(8));
-        linearLayout.addChild(new StringWidget(this.getTitle(), this.font), LayoutSettings::alignHorizontallyCenter);
+		final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this, 61, 33);
+		LinearLayout linearLayout = layout.addToHeader(LinearLayout.vertical().spacing(8));
+		linearLayout.addChild(new StringWidget(this.getTitle(), this.font), LayoutSettings::alignHorizontallyCenter);
 
-        GridLayout gridLayout = new GridLayout();
-        gridLayout.defaultCellSetting().paddingHorizontal(4).paddingBottom(4).alignHorizontallyCenter().alignVerticallyMiddle();
-        GridLayout.RowHelper rowHelper = gridLayout.createRowHelper(2);
-        // Didn't iterate fields here because I wanted custom order
-        rowHelper.addChild(skyboxifyConfig.enabled.createWidget());
-        rowHelper.addChild(skyboxifyConfig.showOverworldForUnknownDimension.createWidget());
-        rowHelper.addChild(skyboxifyConfig.renderSunMoon.createWidget());
-        rowHelper.addChild(skyboxifyConfig.renderStars.createWidget());
-        rowHelper.addChild(skyboxifyConfig.ignoreBrokenSkies.createWidget());
-        layout.addToContents(gridLayout);
+		GridLayout gridLayout = new GridLayout();
+		gridLayout.defaultCellSetting().paddingHorizontal(4).paddingBottom(4).alignHorizontallyCenter().alignVerticallyMiddle();
+		GridLayout.RowHelper rowHelper = gridLayout.createRowHelper(2);
+		// Didn't iterate fields here because I wanted custom order
+		rowHelper.addChild(skyboxifyConfig.enabled.createWidget());
+		rowHelper.addChild(skyboxifyConfig.showOverworldForUnknownDimension.createWidget());
+		rowHelper.addChild(skyboxifyConfig.renderSunMoon.createWidget());
+		rowHelper.addChild(skyboxifyConfig.renderStars.createWidget());
+		rowHelper.addChild(skyboxifyConfig.ignoreBrokenSkies.createWidget(this.minecraft::reloadResourcePacks));
+		layout.addToContents(gridLayout);
 
-        GridLayout footerGridLayout = new GridLayout();
-        footerGridLayout.defaultCellSetting().paddingHorizontal(4).paddingBottom(4).alignHorizontallyCenter();
-        GridLayout.RowHelper footerRowHelper = footerGridLayout.createRowHelper(2);
-        footerRowHelper.addChild(Button.builder(Translations.RESET, (button) -> this.reset()).width(125).build());
-        footerRowHelper.addChild(Button.builder(CommonComponents.GUI_DONE, (button) -> this.onClose()).width(125).build());
-        layout.addToFooter(footerGridLayout);
+		GridLayout footerGridLayout = new GridLayout();
+		footerGridLayout.defaultCellSetting().paddingHorizontal(4).paddingBottom(4).alignHorizontallyCenter();
+		GridLayout.RowHelper footerRowHelper = footerGridLayout.createRowHelper(2);
+		footerRowHelper.addChild(Button.builder(Translations.RESET, (button) -> this.reset()).width(125).build());
+		footerRowHelper.addChild(Button.builder(CommonComponents.GUI_DONE, (button) -> this.onClose()).width(125).build());
+		layout.addToFooter(footerGridLayout);
 
-        layout.visitWidgets(this::addRenderableWidget);
-        layout.arrangeElements();
-    }
+		layout.visitWidgets(this::addRenderableWidget);
+		layout.arrangeElements();
+	}
 
-    private void reset() {
-        this.config.reset();
-        this.minecraft.reloadResourcePacks();
-    }
+	private void reset() {
+		this.config.reset();
+		this.minecraft.reloadResourcePacks();
+	}
 }

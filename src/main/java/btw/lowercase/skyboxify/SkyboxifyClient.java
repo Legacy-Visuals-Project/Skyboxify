@@ -35,7 +35,7 @@ import net.minecraft.server.packs.PackType;
 public final class SkyboxifyClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
-		Skyboxify.initialize(FabricLoader.getInstance().getConfigDir().resolve("optiboxes.json")); // TODO: change in the future
+		Skyboxify.initialize(); // TODO: change in the future
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
 			dispatcher.register(new SkyboxifyCommand("skyboxify"));
 			dispatcher.register(new SkyboxifyCommand("optiboxes")); // TODO: Remove

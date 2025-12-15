@@ -24,13 +24,10 @@
 package btw.lowercase.skyboxify.config;
 
 import btw.lowercase.skyboxify.Skyboxify;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.visuals.legacy.lightconfig.lib.v1.Config;
 import org.visuals.legacy.lightconfig.lib.v1.field.BooleanConfigField;
-
-import java.nio.file.Path;
 
 public class SkyboxifyConfig extends Config {
 	public final BooleanConfigField enabled = this.booleanFieldOf("enabled", true);
@@ -39,10 +36,8 @@ public class SkyboxifyConfig extends Config {
 	public final BooleanConfigField showOverworldForUnknownDimension = this.booleanFieldOf("showOverworldForUnknownDimension", true);
 	public final BooleanConfigField ignoreBrokenSkies = this.booleanFieldOf("ignoreBrokenSkies", false);
 
-	public SkyboxifyConfig(final Path path) {
-		super(Skyboxify.MOD_ID, path);
-		final Minecraft minecraft = Minecraft.getInstance();
-		this.ignoreBrokenSkies.onValueChanged((oldVal, newVal) -> minecraft.reloadResourcePacks());
+	public SkyboxifyConfig() {
+		super(Skyboxify.MOD_ID);
 	}
 
 	@Override

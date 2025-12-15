@@ -24,7 +24,7 @@
 package btw.lowercase.skyboxify.skybox;
 
 import btw.lowercase.skyboxify.mixins.RenderPipelinesAccessor;
-import btw.lowercase.skyboxify.skybox.components.UVRange;
+import btw.lowercase.skyboxify.skybox.components.UV;
 import btw.lowercase.skyboxify.utils.*;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
@@ -59,12 +59,12 @@ public final class SkyboxSkyRenderer {
             final BufferBuilder builder = new BufferBuilder(byteBufferBuilder, vertexFormatMode, vertexFormat);
             for (final SkyPart skyPart : SkyPart.VALUES) {
                 final Matrix4f matrix4f = skyPart.getRotationMatrix();
-                final UVRange uvRange = skyPart.getUVRange();
+                final UV uv = skyPart.getUVRange();
                 final float quadSize = 30.0F;
-                builder.addVertex(matrix4f, -quadSize, -quadSize, -quadSize).setUv(uvRange.minU(), uvRange.minV());
-                builder.addVertex(matrix4f, -quadSize, -quadSize, quadSize).setUv(uvRange.minU(), uvRange.maxV());
-                builder.addVertex(matrix4f, quadSize, -quadSize, quadSize).setUv(uvRange.maxU(), uvRange.maxV());
-                builder.addVertex(matrix4f, quadSize, -quadSize, -quadSize).setUv(uvRange.maxU(), uvRange.minV());
+                builder.addVertex(matrix4f, -quadSize, -quadSize, -quadSize).setUv(uv.minU(), uv.minV());
+                builder.addVertex(matrix4f, -quadSize, -quadSize, quadSize).setUv(uv.minU(), uv.maxV());
+                builder.addVertex(matrix4f, quadSize, -quadSize, quadSize).setUv(uv.maxU(), uv.maxV());
+                builder.addVertex(matrix4f, quadSize, -quadSize, -quadSize).setUv(uv.maxU(), uv.minV());
             }
 
             //? >=1.21.5

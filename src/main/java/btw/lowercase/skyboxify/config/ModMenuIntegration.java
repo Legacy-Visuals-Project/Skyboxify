@@ -28,6 +28,8 @@ import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;
 import dev.kikugie.fletching_table.annotation.fabric.Entrypoint;
 
+import java.util.Map;
+
 @Entrypoint("modmenu")
 public class ModMenuIntegration implements ModMenuApi {
     @Override

@@ -23,5 +23,5 @@
 
 package btw.lowercase.skyboxify.skybox.components;
 
-public record UVRange(float minU, float minV, float maxU, float maxV) {
+public record UV(float minU, float minV, float maxU, float maxV) {
 }

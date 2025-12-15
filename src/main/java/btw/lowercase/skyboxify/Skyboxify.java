@@ -33,6 +33,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.math.Axis;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
@@ -40,8 +41,6 @@ import org.joml.Matrix4f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.visuals.legacy.lightconfig.lib.v1.events.EventManager;
-
-import java.nio.file.Path;
 
 @UtilityClass
 public class Skyboxify {
@@ -51,14 +50,13 @@ public class Skyboxify {
 	@Getter
 	private final EventManager eventManager = new EventManager();
 	@Getter
-	private SkyboxifyConfig config;
+	private final SkyboxifyConfig config = new SkyboxifyConfig();
 
 	public ResourceLocation locationOrNull(String path) {
 		return ResourceLocation.tryBuild(MOD_ID, path);
 	}
 
-	public void initialize(final Path configPath) {
-		config = new SkyboxifyConfig(configPath);
+	public void initialize() {
 		config.load();
 
 		eventManager.listen(LevelTickEvent.Client.class, event -> SkyboxManager.INSTANCE.tick(event.getLevel()));
