@@ -251,7 +251,7 @@ public abstract class MixinLevelRenderer {
             > original
     ) {
         //noinspection DataFlowIssue
-        if (SkyboxManager.INSTANCE.isEnabled(this.level) && SkyboxManager.INSTANCE.containsEnabled(Level.NETHER) && this.level.dimension().equals(Level.NETHER)) {
+        if (SkyboxManager.isEnabled(this.level) && SkyboxManager.containsEnabled(Level.NETHER) && this.level.dimension().equals(Level.NETHER)) {
             //? >=1.21.11 {
             /*return DimensionType.Skybox.OVERWORLD;
              *///?} else {

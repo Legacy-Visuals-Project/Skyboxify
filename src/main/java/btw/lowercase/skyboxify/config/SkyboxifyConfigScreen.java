@@ -57,7 +57,6 @@ public class SkyboxifyConfigScreen extends InternalConfigScreen {
 		rowHelper.addChild(skyboxifyConfig.showOverworldForUnknownDimension.createWidget());
 		rowHelper.addChild(skyboxifyConfig.renderSunMoon.createWidget());
 		rowHelper.addChild(skyboxifyConfig.renderStars.createWidget());
-		rowHelper.addChild(skyboxifyConfig.ignoreBrokenSkies.createWidget());
 		layout.addToContents(gridLayout);
 
 		GridLayout footerGridLayout = new GridLayout();

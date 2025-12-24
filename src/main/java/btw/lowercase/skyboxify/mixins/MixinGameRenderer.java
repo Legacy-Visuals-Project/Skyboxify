@@ -50,7 +50,7 @@ public abstract class MixinGameRenderer {
 
     @WrapOperation(method = "renderLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/DimensionSpecialEffects;isFoggyAt(II)Z"))
     private boolean skyboxify$allowNetherSky(DimensionSpecialEffects instance, int x, int y, Operation<Boolean> original) {
-        if (SkyboxManager.INSTANCE.isEnabled(this.minecraft.level) && SkyboxManager.INSTANCE.containsEnabled(Level.NETHER) && minecraft.level.effects() instanceof DimensionSpecialEffects.NetherEffects) {
+        if (SkyboxManager.isEnabled(this.minecraft.level) && SkyboxManager.containsEnabled(Level.NETHER) && minecraft.level.effects() instanceof DimensionSpecialEffects.NetherEffects) {
             return false;
         } else {
             return original.call(instance, x, y);

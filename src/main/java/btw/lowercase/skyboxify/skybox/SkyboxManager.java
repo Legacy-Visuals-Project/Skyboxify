@@ -26,6 +26,7 @@ package btw.lowercase.skyboxify.skybox;
 import btw.lowercase.skyboxify.Skyboxify;
 import com.google.common.base.Preconditions;
 import lombok.Getter;
+import lombok.experimental.UtilityClass;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.ResourceKey;
@@ -36,40 +37,35 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+@UtilityClass
 public final class SkyboxManager {
-	public static final SkyboxManager INSTANCE = new SkyboxManager();
 	@Getter
 	private final List<Skybox> loadedSkyboxes = new ArrayList<>();
 	@Getter
 	private final List<Skybox> activeSkyboxes = new LinkedList<>();
 
-	private SkyboxManager() {
-	}
-
 	public void addSkybox(final Skybox skybox) {
 		Preconditions.checkNotNull(skybox, "Skybox was null");
-		this.loadedSkyboxes.add(skybox);
+		loadedSkyboxes.add(skybox);
 	}
 
 	public void clearSkyboxes() {
 		Minecraft.getInstance().execute(SkyboxSkyRenderer.INSTANCE::clearCache);
-		this.loadedSkyboxes.clear();
-		this.activeSkyboxes.clear();
+		loadedSkyboxes.clear();
+		activeSkyboxes.clear();
 	}
 
 	public void tick(final ClientLevel level) {
-		if (!Skyboxify.getConfig().enabled.isEnabled()) {
-			return;
-		}
+		if (Skyboxify.getConfig().enabled.isEnabled()) {
+			for (Skybox skybox : loadedSkyboxes) {
+				skybox.tick(level);
+			}
 
-		for (Skybox skybox : this.loadedSkyboxes) {
-			skybox.tick(level);
-		}
-
-		this.activeSkyboxes.removeIf(optiFineSkybox -> !optiFineSkybox.isActive());
-		for (Skybox skybox : this.loadedSkyboxes) {
-			if (!this.activeSkyboxes.contains(skybox) && skybox.isActive()) {
-				this.activeSkyboxes.add(skybox);
+			activeSkyboxes.removeIf(optiFineSkybox -> !optiFineSkybox.isActive());
+			for (Skybox skybox : loadedSkyboxes) {
+				if (!activeSkyboxes.contains(skybox) && skybox.isActive()) {
+					activeSkyboxes.add(skybox);
+				}
 			}
 		}
 	}

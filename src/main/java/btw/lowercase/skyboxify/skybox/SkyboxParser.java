@@ -50,15 +50,19 @@ public final class SkyboxParser {
 	public static @Nullable JsonObject parseSkyProperties(final Properties properties, final ResourceLocation propertiesResourceLocation) {
 		final JsonObject output = new JsonObject();
 
-		final DataResult<ResourceLocation> sourceResult = ParserCodecs.getSourceTextureCodec(propertiesResourceLocation).parse(JavaOps.INSTANCE, properties.getProperty("source", null));
-		if (sourceResult.isError()) {
-			LOGGER.warn("Failed to load source texture \"{}\"", sourceResult.error().get());
-			if (Skyboxify.getConfig().ignoreBrokenSkies.isEnabled()) {
-				return null;
-			}
+		final String source = properties.getProperty("source", null);
+		if (source == null) {
+			LOGGER.warn("Failed to load source texture \"{}\"", "No source provided or was null");
+			return null;
 		}
 
-		output.addProperty("source", sourceResult.result().orElse(MissingTextureAtlasSprite.getLocation()).toString());
+		final DataResult<ResourceLocation> sourceResult = ParserCodecs.getSourceTextureCodec(propertiesResourceLocation).parse(JavaOps.INSTANCE, source);
+		if (sourceResult.isError()) {
+			LOGGER.warn("{}", sourceResult.error().get());
+			return null;
+		}
+
+		output.addProperty("source", sourceResult.result().get().toString());
 
 		// Convert fade
 		parseFade(properties, output);

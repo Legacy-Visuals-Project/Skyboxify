@@ -35,17 +35,9 @@ public class SkyboxifyConfig extends Config {
 	public final BooleanConfigField renderSunMoon = this.booleanFieldOf("renderSunMoon", true);
 	public final BooleanConfigField renderStars = this.booleanFieldOf("renderStars", true);
 	public final BooleanConfigField showOverworldForUnknownDimension = this.booleanFieldOf("showOverworldForUnknownDimension", true);
-	public final BooleanConfigField ignoreBrokenSkies = this.booleanFieldOf("ignoreBrokenSkies", false);
 
 	public SkyboxifyConfig() {
 		super(Skyboxify.MOD_ID);
-		this.ignoreBrokenSkies.onValueChanged((oldVal, newVal) -> {
-			final Minecraft minecraft = Minecraft.getInstance();
-			// IntelliJ is lying, these can be null (on game start)
-			if (minecraft != null && minecraft.getResourceManager() != null) {
-				minecraft.reloadResourcePacks();
-			}
-		});
 	}
 
 	@Override

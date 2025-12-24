@@ -81,7 +81,7 @@ public class SkyboxResourceHelper implements
 			 *///?}
         return CompletableFuture.runAsync(() -> {
             if (Skyboxify.getConfig().enabled.isEnabled()) {
-				SkyboxManager.INSTANCE.clearSkyboxes();
+				SkyboxManager.clearSkyboxes();
 				LOGGER.info("Looking for OptiFine/MCPatcher Skies...");
 				theResourceManager.listPacks().forEach(pack -> {
 					final List<ResourceLocation> optifineSkies = new ArrayList<>();
@@ -176,12 +176,12 @@ public class SkyboxResourceHelper implements
 				skyboxJson.addProperty("pack", packResources.packId());
 				skyboxJson.addProperty("world", switch (entry.getKey()) {
 					case "world0" -> "overworld";
-					case "world-1" -> "nether";
-					case "world1" -> "end";
+					case "world-1" -> "the_nether";
+					case "world1" -> "the_end";
 					default -> entry.getKey().replaceAll("-", "_");
 				});
 				skyboxJson.add("layers", skyLayers);
-				SkyboxManager.INSTANCE.addSkybox(Skybox.CODEC.decode(JsonOps.INSTANCE, skyboxJson).getOrThrow().getFirst());
+				SkyboxManager.addSkybox(Skybox.CODEC.decode(JsonOps.INSTANCE, skyboxJson).getOrThrow().getFirst());
 				count++;
 			}
 		}

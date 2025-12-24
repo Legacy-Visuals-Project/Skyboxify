@@ -59,7 +59,7 @@ public class Skyboxify {
 	public void initialize() {
 		config.load();
 
-		eventManager.listen(LevelTickEvent.Client.class, event -> SkyboxManager.INSTANCE.tick(event.getLevel()));
+		eventManager.listen(LevelTickEvent.Client.class, event -> SkyboxManager.tick(event.getLevel()));
 
 		eventManager.listen(SkyRenderEvent.Celestial.class, event -> {
 			if (Skyboxify.getConfig().enabled.isEnabled()) {
@@ -86,16 +86,16 @@ public class Skyboxify {
 			final ClientLevel clientLevel = event.getLevel();
 			renderSkyboxes(clientLevel, event.getTickDelta());
 			// Disable Sun, Moon, & Stars in the Nether
-			if (SkyboxManager.INSTANCE.isEnabled(clientLevel) && SkyboxManager.INSTANCE.containsEnabled(Level.NETHER) && clientLevel.dimension().equals(Level.NETHER)) {
+			if (SkyboxManager.isEnabled(clientLevel) && SkyboxManager.containsEnabled(Level.NETHER) && clientLevel.dimension().equals(Level.NETHER)) {
 				event.setCancelled(true);
 			}
 		});
 	}
 
 	private void renderSkyboxes(ClientLevel clientLevel, float tickDelta) {
-		if (SkyboxManager.INSTANCE.isEnabled(clientLevel)) {
+		if (SkyboxManager.isEnabled(clientLevel)) {
 			final Matrix4f modelViewMatrix = new Matrix4f(RenderSystem.getModelViewStack()).rotate(Axis.YP.rotationDegrees(-90.0F));
-			for (Skybox skybox : SkyboxManager.INSTANCE.getActiveSkyboxes()) {
+			for (Skybox skybox : SkyboxManager.getActiveSkyboxes()) {
 				SkyboxSkyRenderer.INSTANCE.renderSkybox(skybox, modelViewMatrix, clientLevel, tickDelta);
 			}
 		}
