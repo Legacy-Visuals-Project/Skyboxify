@@ -74,7 +74,7 @@ public class Skyboxify {
 
 		//? >=1.21.4 <1.21.9 {
 		/*eventManager.listen(SkyRenderEvent.SunriseSunset.After.class, event -> {
-			if (SkyboxManager.INSTANCE.isEnabled(event.getLevel())) {
+			if (SkyboxManager.isEnabled(event.getLevel())) {
 				event.getBufferSource().endBatch();
 			}
 		});
