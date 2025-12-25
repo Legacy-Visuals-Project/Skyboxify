@@ -47,11 +47,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class SkyboxResourceHelper implements
-        //? >=1.21.10 {
-        PreparableReloadListener
-        //?} else {
-        /*net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener
-         *///?}
+		//? >=1.21.10 {
+		PreparableReloadListener
+		//?} else {
+		/*net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener
+		 *///?}
 {
 	private static final String OPTIFINE_SKY_PARENT = "optifine/sky";
 	private static final String SKY_PATTERN_ENDING = "(?<world>[\\w-]+)/(?<name>\\w+).properties$";
@@ -60,29 +60,63 @@ public class SkyboxResourceHelper implements
 	private static final Pattern MCPATCHER_SKY_PATTERN = Pattern.compile(MCPATCHER_SKY_PARENT + "/" + SKY_PATTERN_ENDING);
 	private static final Logger LOGGER = LoggerFactory.getLogger(SkyboxResourceHelper.class);
 
+	private static PackResources.ResourceOutput filterResource(final List<ResourceLocation> list) {
+		return (resourceLocation, streamIoSupplier) -> {
+			if (resourceLocation.getPath().endsWith(".properties")) {
+				list.add(resourceLocation);
+			}
+		};
+	}
+
+	private static Comparator<ResourceLocation> compareLocations(final Pattern pattern) {
+		return Comparator.comparing(ResourceLocation::getPath, (first, second) -> {
+			final Matcher matcherId1 = pattern.matcher(first);
+			final Matcher matcherId2 = pattern.matcher(second);
+			if (matcherId1.find() && matcherId2.find()) {
+				final int a = ParserCodecs.safeParseInteger(matcherId1.group("name").replace("sky", ""), -1);
+				final int b = ParserCodecs.safeParseInteger(matcherId2.group("name").replace("sky", ""), -1);
+				if (a >= 0 && b >= 0) {
+					return a - b;
+				}
+			}
+
+			return 0;
+		});
+	}
+
+	//? <=1.21.8 {
+    /*@Override
+    public ResourceLocation getFabricId() {
+        return Skyboxify.locationOrNull("skybox_reader");
+    }
+    *///?}
+
 	@Override
-    public @NotNull CompletableFuture<Void> reload(
-            //? >=1.21.9
-            SharedState sharedState,
-            //? <1.21.9
-            /*PreparationBarrier preparationBarrier,*/
-            //? <1.21.9
-            /*ResourceManager resourceManager,*/
-            @NotNull Executor backgroundExecutor,
-            //? >=1.21.9
-            PreparationBarrier preparationBarrier,
-            @NotNull Executor gameExecutor
-    ) {
-        final ResourceManager theResourceManager =
-			//? >=1.21.9 {
-			sharedState.resourceManager();
-			//?} else {
-			/*resourceManager;
-			 *///?}
-        return CompletableFuture.runAsync(() -> {
-            if (Skyboxify.getConfig().enabled.isEnabled()) {
+	public @NotNull CompletableFuture<Void> reload(
+			//? >=1.21.9
+			SharedState sharedState,
+			//? <1.21.9
+			/*PreparationBarrier preparationBarrier,*/
+			//? <1.21.9
+			/*ResourceManager resourceManager,*/
+			@NotNull Executor backgroundExecutor,
+			//? >=1.21.9
+			PreparationBarrier preparationBarrier,
+			@NotNull Executor gameExecutor
+	) {
+		final ResourceManager theResourceManager =
+				//? >=1.21.9 {
+				sharedState.resourceManager();
+		//?} else {
+		/*resourceManager;
+		 *///?}
+		return CompletableFuture.runAsync(() -> {
+			if (Skyboxify.getConfig().enabled.isEnabled()) {
 				SkyboxManager.clearSkyboxes();
-				LOGGER.info("Looking for OptiFine/MCPatcher Skies...");
+				if (Skyboxify.getConfig().debug.isEnabled()) {
+					LOGGER.info("Looking for OptiFine/MCPatcher Skies...");
+				}
+
 				theResourceManager.listPacks().forEach(pack -> {
 					final List<ResourceLocation> optifineSkies = new ArrayList<>();
 					pack.listResources(PackType.CLIENT_RESOURCES, ResourceLocation.DEFAULT_NAMESPACE, OPTIFINE_SKY_PARENT, filterResource(optifineSkies));
@@ -94,36 +128,24 @@ public class SkyboxResourceHelper implements
 
 					Pattern skyPattern = OPTIFINE_SKY_PATTERN;
 					if (optifineSkies.isEmpty()) {
-						LOGGER.info("Couldn't find any skies under \"optifine\", searching for skies under \"mcpatcher\" instead...");
+						if (Skyboxify.getConfig().debug.isEnabled()) {
+							LOGGER.info("Couldn't find any skies inside \"{}\" under \"optifine\", searching for skies under \"mcpatcher\" instead...", pack.packId());
+						}
+
 						skyPattern = MCPATCHER_SKY_PATTERN;
 					}
 
 					final List<ResourceLocation> skies = (skyPattern == OPTIFINE_SKY_PATTERN ? optifineSkies : mcpatcherSkies);
 					if (!skies.isEmpty()) {
 						final int count = this.parseSkyboxesInPack(pack, skies, skyPattern);
-						if (count > 0) {
+						if (count > 0 && Skyboxify.getConfig().debug.isEnabled()) {
 							LOGGER.info("Loaded {} {} from \"{}\"!", count, (count == 1 ? "skies" : "sky"), pack.packId());
 						}
 					}
 				});
-            }
-        }).thenCompose(preparationBarrier::wait);
-    }
-
-	private static PackResources.ResourceOutput filterResource(final List<ResourceLocation> list) {
-		return (resourceLocation, streamIoSupplier) -> {
-			if (resourceLocation.getPath().endsWith(".properties")) {
-				list.add(resourceLocation);
 			}
-		};
+		}).thenCompose(preparationBarrier::wait);
 	}
-
-    //? <=1.21.8 {
-    /*@Override
-    public ResourceLocation getFabricId() {
-        return Skyboxify.locationOrNull("skybox_reader");
-    }
-    *///?}
 
 	private int parseSkyboxesInPack(final PackResources packResources, final List<ResourceLocation> skies, final Pattern skyPattern) {
 		final Map<String, JsonArray> layers = new HashMap<>();
@@ -142,7 +164,10 @@ public class SkyboxResourceHelper implements
 
 			if (name.equals("moon_phases") || name.equals("sun")) {
 				// TODO/NOTE: Support moon/sun? (apparently doesn't even work in OptiFine)
-				LOGGER.warn("Skipping {}, moon_phases/sun aren't currently supported!", id);
+				if (Skyboxify.getConfig().debug.isEnabled()) {
+					LOGGER.warn("Skipping {}, moon_phases/sun aren't currently supported!", id);
+				}
+
 				return;
 			}
 
@@ -187,21 +212,5 @@ public class SkyboxResourceHelper implements
 		}
 
 		return count;
-	}
-
-	private static Comparator<ResourceLocation> compareLocations(final Pattern pattern) {
-		return Comparator.comparing(ResourceLocation::getPath, (first, second) -> {
-			final Matcher matcherId1 = pattern.matcher(first);
-			final Matcher matcherId2 = pattern.matcher(second);
-			if (matcherId1.find() && matcherId2.find()) {
-				final int a = ParserCodecs.safeParseInteger(matcherId1.group("name").replace("sky", ""), -1);
-				final int b = ParserCodecs.safeParseInteger(matcherId2.group("name").replace("sky", ""), -1);
-				if (a >= 0 && b >= 0) {
-					return a - b;
-				}
-			}
-
-			return 0;
-		});
 	}
 }

@@ -35,6 +35,7 @@ public class SkyboxifyConfig extends Config {
 	public final BooleanConfigField renderSunMoon = this.booleanFieldOf("renderSunMoon", true);
 	public final BooleanConfigField renderStars = this.booleanFieldOf("renderStars", true);
 	public final BooleanConfigField showOverworldForUnknownDimension = this.booleanFieldOf("showOverworldForUnknownDimension", true);
+	public final BooleanConfigField debug = this.booleanFieldOf("debug", false);
 
 	public SkyboxifyConfig() {
 		super(Skyboxify.MOD_ID);

@@ -1,3 +1,1 @@
-- New Logo
-- Removed "Ignore Broken Skies", it will always be true/on internally
-- Fix Nether/End skies (OOPS LOL sorry)
+- Add debug setting for debugging/logging (Removes log spam #22)
