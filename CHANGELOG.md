@@ -1,2 +1,0 @@
-- Add debug setting for debugging/logging (Removes log spam #22)
-- Update LightConfig

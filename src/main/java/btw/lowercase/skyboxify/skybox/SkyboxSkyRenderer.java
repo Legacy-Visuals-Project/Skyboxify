@@ -131,7 +131,7 @@ public final class SkyboxSkyRenderer {
         final float finalAlpha = Mth.clamp(conditionAlpha * weatherAlpha * fadeAlpha, 0.0F, 1.0F);
         if (!(finalAlpha < 1.0E-4F)) {
             if (skyLayer.rotate()) {
-                CommonUtils.mulPose(modelViewMatrix, this.getAngle(level, skyAngle, skyLayer.speed()), skyLayer.axis());
+				CommonUtils.rotate(modelViewMatrix, this.getAngle(level, skyAngle, skyLayer.speed()), skyLayer.axis());
             }
 
             //? <=1.21.4 {
