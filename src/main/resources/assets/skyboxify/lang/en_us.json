@@ -10,6 +10,8 @@
 	"options.skyboxify.renderStars.tooltip": "Enable/disable rendering of the stars.",
 	"options.skyboxify.debug": "Debug Mode",
 	"options.skyboxify.debug.tooltip": "Enable debug logging & other debugging aspects.",
+	"options.skyboxify.legacyRotationLogic": "[DM] Legacy Rotation Logic",
+	"options.skyboxify.legacyRotationLogic.tooltip": "Enables legacy rotation logic when rotating the sky from PR #24.\nNOTE: Requires \"Debug Mode\" to be on.",
 	"options.template": "%s: %s",
 	"options.on": "ON",
 	"options.off": "OFF",

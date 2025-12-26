@@ -36,9 +36,16 @@ public class SkyboxifyConfig extends Config {
 	public final BooleanConfigField renderStars = this.booleanFieldOf("renderStars", true);
 	public final BooleanConfigField showOverworldForUnknownDimension = this.booleanFieldOf("showOverworldForUnknownDimension", true);
 	public final BooleanConfigField debug = this.booleanFieldOf("debug", false);
+	public final BooleanConfigField legacyRotationLogic = this.booleanFieldOf("legacyRotationLogic", false);
 
 	public SkyboxifyConfig() {
 		super(Skyboxify.MOD_ID);
+		this.enabled.onValueChanged((oldVal, newVal) -> {
+			final Minecraft minecraft = Minecraft.getInstance();
+			if (minecraft != null /* It can be null, on game launch */) {
+				minecraft.reloadResourcePacks();
+			}
+		});
 	}
 
 	@Override

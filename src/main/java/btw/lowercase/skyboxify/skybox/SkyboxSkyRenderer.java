@@ -23,6 +23,7 @@
 
 package btw.lowercase.skyboxify.skybox;
 
+import btw.lowercase.skyboxify.Skyboxify;
 import btw.lowercase.skyboxify.mixins.RenderPipelinesAccessor;
 import btw.lowercase.skyboxify.skybox.components.UV;
 import btw.lowercase.skyboxify.utils.*;
@@ -32,7 +33,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
+import org.joml.AxisAngle4f;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.joml.Vector4f;
 
 public final class SkyboxSkyRenderer {
@@ -131,7 +134,13 @@ public final class SkyboxSkyRenderer {
         final float finalAlpha = Mth.clamp(conditionAlpha * weatherAlpha * fadeAlpha, 0.0F, 1.0F);
         if (!(finalAlpha < 1.0E-4F)) {
             if (skyLayer.rotate()) {
-				CommonUtils.rotate(modelViewMatrix, this.getAngle(level, skyAngle, skyLayer.speed()), skyLayer.axis());
+				final float angle = this.getAngle(level, skyAngle, skyLayer.speed());
+				if (Skyboxify.getConfig().debug.isEnabled() && Skyboxify.getConfig().legacyRotationLogic.isEnabled()) {
+					CommonUtils.rotate(modelViewMatrix, angle, skyLayer.axis());
+				} else {
+					// NOTE: Using `mulPose` directly gives a different result.
+					modelViewMatrix.rotate(new Quaternionf(new AxisAngle4f(angle, skyLayer.axis())));
+				}
             }
 
             //? <=1.21.4 {
