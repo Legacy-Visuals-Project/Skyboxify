@@ -32,9 +32,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
-import org.joml.AxisAngle4f;
 import org.joml.Matrix4f;
-import org.joml.Quaternionf;
 import org.joml.Vector4f;
 
 public final class SkyboxSkyRenderer {
@@ -134,7 +132,7 @@ public final class SkyboxSkyRenderer {
         if (!(finalAlpha < 1.0E-4F)) {
             if (skyLayer.rotate()) {
                 // NOTE: Using `mulPose` directly gives a different result.
-				modelViewMatrix.rotate(new Quaternionf(new AxisAngle4f(this.getAngle(level, skyAngle, skyLayer.speed()), skyLayer.axis())));
+                OldQuaternionMath.mulPose(modelViewMatrix, this.getAngle(level, skyAngle, skyLayer.speed()), skyLayer.axis());
             }
 
             //? <=1.21.4 {
