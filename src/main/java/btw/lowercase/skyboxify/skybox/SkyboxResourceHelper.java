@@ -182,19 +182,19 @@ public class SkyboxResourceHelper implements
 				final InputStream inputStream = resource.get();
 				properties.load(inputStream);
 				inputStream.close();
-			} catch (IOException e) {
+			} catch (final IOException ignored) {
 				LOGGER.error("Error trying to read properties from: {}", id);
 				return;
 			}
 
-			final JsonObject json = SkyboxParser.parseSkyProperties(properties, id);
+			final JsonObject json = SkyboxParser.parseSkyProperties(properties, id, packResources);
 			// NOTE: Don't add broken skies (returns null if broken)
 			if (json != null) {
 				layers.computeIfAbsent(world, key -> new JsonArray()).add(json);
 			}
 		});
 
-		for (Map.Entry<String, JsonArray> entry : layers.entrySet()) {
+		for (final Map.Entry<String, JsonArray> entry : layers.entrySet()) {
 			final JsonArray skyLayers = entry.getValue();
 			if (!skyLayers.isEmpty()) {
 				final JsonObject skyboxJson = new JsonObject();

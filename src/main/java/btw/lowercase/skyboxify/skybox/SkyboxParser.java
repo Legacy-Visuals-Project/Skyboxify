@@ -23,7 +23,6 @@
 
 package btw.lowercase.skyboxify.skybox;
 
-import btw.lowercase.skyboxify.Skyboxify;
 import btw.lowercase.skyboxify.skybox.components.Range;
 import btw.lowercase.skyboxify.utils.ParserCodecs;
 import com.google.gson.JsonArray;
@@ -31,12 +30,15 @@ import com.google.gson.JsonObject;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JavaOps;
 import com.mojang.serialization.JsonOps;
-import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackResources;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.resources.IoSupplier;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.InputStream;
 import java.util.List;
 import java.util.Properties;
 
@@ -47,22 +49,15 @@ public final class SkyboxParser {
 	}
 
 	// TODO: Finish converting to CODEC's
-	public static @Nullable JsonObject parseSkyProperties(final Properties properties, final ResourceLocation propertiesResourceLocation) {
+	public static @Nullable JsonObject parseSkyProperties(final Properties properties, final ResourceLocation propertiesResourceLocation, final PackResources packResources) {
 		final JsonObject output = new JsonObject();
 
-		final String source = properties.getProperty("source", null);
-		if (source == null) {
-			LOGGER.warn("Failed to load source texture \"{}\"", "No source provided or was null");
+		final String sourceTexturePath = parseSourceTexture(properties, propertiesResourceLocation, packResources);
+		if (sourceTexturePath == null) {
 			return null;
 		}
 
-		final DataResult<ResourceLocation> sourceResult = ParserCodecs.getSourceTextureCodec(propertiesResourceLocation).parse(JavaOps.INSTANCE, source);
-		if (sourceResult.isError()) {
-			LOGGER.warn("{}", sourceResult.error().get());
-			return null;
-		}
-
-		output.addProperty("source", sourceResult.result().get().toString());
+		output.addProperty("source", sourceTexturePath);
 
 		// Convert fade
 		parseFade(properties, output);
@@ -118,6 +113,34 @@ public final class SkyboxParser {
 		}
 
 		return output;
+	}
+
+	private static String parseSourceTexture(final Properties properties, final ResourceLocation propertiesResourceLocation, final PackResources packResources) {
+		final String source = properties.getProperty("source", null);
+		if (source == null) {
+			LOGGER.error("Failed to load source texture \"{}\"", "No source provided or was null");
+			return null;
+		}
+
+		final DataResult<ResourceLocation> sourceResult = ParserCodecs.getSourceTextureCodec(propertiesResourceLocation).parse(JavaOps.INSTANCE, source);
+		if (sourceResult.isError()) {
+			LOGGER.error("{}", sourceResult.error().get());
+			return null;
+		}
+
+		final ResourceLocation sourceTextureIdentifier = sourceResult.getOrThrow();
+		final IoSupplier<InputStream> sourceTextureStream = packResources.getResource(PackType.CLIENT_RESOURCES, sourceTextureIdentifier);
+		if (sourceTextureStream == null) {
+			LOGGER.error("Failed to load texture '{}', missing or corrupt image?", sourceTextureIdentifier);
+			return null;
+		}
+
+		try {
+			sourceTextureStream.get().close();
+		} catch (final Exception ignored) {
+		}
+
+		return sourceTextureIdentifier.toString();
 	}
 
 	private static int toTickTime(final String time) {

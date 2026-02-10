@@ -119,15 +119,15 @@ public final class CommonUtils {
 	// See https://github.com/sp614x/optifine/issues/7235#issuecomment-1581930719
 	public static void rotate(final Matrix4f pose, final float angleRads, final Vector3fc axis) {
 		final Quaternionf quat = new Quaternionf(new AxisAngle4f(-angleRads, axis));
-		float qxy = quat.x * quat.y;
-		float qyz = quat.y * quat.z;
-		float qzx = quat.z * quat.x;
-		float qxw = quat.x * quat.w;
-		float qyw = quat.y * quat.w;
-		float qzw = quat.z * quat.w;
-		float j = 2.0F * quat.x * quat.x;
-		float k = 2.0F * quat.y * quat.y;
-		float l = 2.0F * quat.z * quat.z;
+		final float qxy = quat.x * quat.y;
+		final float qyz = quat.y * quat.z;
+		final float qzx = quat.z * quat.x;
+		final float qxw = quat.x * quat.w;
+		final float qyw = quat.y * quat.w;
+		final float qzw = quat.z * quat.w;
+		final float j = 2.0F * quat.x * quat.x;
+		final float k = 2.0F * quat.y * quat.y;
+		final float l = 2.0F * quat.z * quat.z;
 		pose.mul0(new Matrix4f()
 				.m00(1.0F - k - l)
 				.m11(1.0F - l - j)
