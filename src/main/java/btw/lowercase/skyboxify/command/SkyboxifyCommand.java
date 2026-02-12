@@ -25,26 +25,73 @@ package btw.lowercase.skyboxify.command;
 
 import btw.lowercase.skyboxify.Skyboxify;
 import btw.lowercase.skyboxify.screen.SkyboxListScreen;
+import btw.lowercase.skyboxify.skybox.Skybox;
 import btw.lowercase.skyboxify.skybox.SkyboxManager;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.serialization.JsonOps;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class SkyboxifyCommand extends LiteralArgumentBuilder<FabricClientCommandSource> {
-    public SkyboxifyCommand(String name) {
-        super(name);
+	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
-        Minecraft minecraft = Minecraft.getInstance();
-        executes((context) -> {
-            minecraft.schedule(() -> minecraft.setScreen(Skyboxify.getConfig().getConfigScreen(minecraft.screen)));
-            return Command.SINGLE_SUCCESS;
-        });
+	public SkyboxifyCommand(String name) {
+		super(name);
 
-        then(ClientCommandManager.literal("debug").executes((context) -> {
-            minecraft.schedule(() -> minecraft.setScreen(new SkyboxListScreen(minecraft.screen, SkyboxManager.getLoadedSkyboxes())));
-            return Command.SINGLE_SUCCESS;
-        }));
-    }
+		final Minecraft minecraft = Minecraft.getInstance();
+		executes((context) -> {
+			minecraft.schedule(() -> minecraft.setScreen(Skyboxify.getConfig().getConfigScreen(minecraft.screen)));
+			return Command.SINGLE_SUCCESS;
+		});
+
+		then(ClientCommandManager.literal("debug").executes((context) -> {
+			minecraft.schedule(() -> minecraft.setScreen(new SkyboxListScreen(minecraft.screen, SkyboxManager.getLoadedSkyboxes())));
+			return Command.SINGLE_SUCCESS;
+		}));
+
+		then(ClientCommandManager.literal("dump").executes((context) -> {
+			if (!Skyboxify.DEBUG_FOLDER.exists()) {
+				Skyboxify.DEBUG_FOLDER.mkdirs();
+			}
+
+			for (final Skybox skybox : SkyboxManager.getLoadedSkyboxes()) {
+				final JsonElement element = Skybox.CODEC.encode(skybox, JsonOps.INSTANCE, null).getOrThrow((message) -> {
+					context.getSource().sendFeedback(Component.literal(message).withStyle(ChatFormatting.RED));
+					return null;
+				});
+				if (element == null) {
+					return 0;
+				}
+
+				try {
+					final File outputFolder = Skyboxify.DEBUG_FOLDER.toPath().resolve(skybox.getPackName().replaceAll("/", "+").replaceAll(" ", "_")).resolve(skybox.getWorldKey().location().getPath()).toFile();
+					if (!outputFolder.exists()) {
+						outputFolder.mkdirs();
+					}
+
+					Files.writeString(outputFolder.toPath().resolve("output.json"), GSON.toJson(element));
+				} catch (final IOException exception) {
+					context.getSource().sendFeedback(Component.literal("Failed to save Active Skybox's!").withStyle(ChatFormatting.RED));
+					context.getSource().sendFeedback(Component.literal(exception.toString()).withStyle(ChatFormatting.RED));
+					return 0;
+				}
+			}
+
+			context.getSource().sendFeedback(Component.literal("Active Skybox's have been dumped to " + Skyboxify.DEBUG_FOLDER).withStyle(ChatFormatting.GREEN));
+			return Command.SINGLE_SUCCESS;
+		}));
+	}
 }

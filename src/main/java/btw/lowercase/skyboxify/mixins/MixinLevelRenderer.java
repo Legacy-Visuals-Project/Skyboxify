@@ -104,7 +104,7 @@ public abstract class MixinLevelRenderer {
                 //? <=1.21.3
                 /*, poseStack*/
         );
-        Skyboxify.getEventManager().dispatch(new SkyRenderEvent.EndSky.After(
+        Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.EndSky.After(
                 //? >=1.21.11 {
                 /*net.minecraft.client.Minecraft.getInstance().level
                 *///?} else {
@@ -140,7 +140,7 @@ public abstract class MixinLevelRenderer {
             int sunriseOrSunsetColor,
 			Operation<Void> original
     ) {
-        if (!Skyboxify.getEventManager().dispatch(new SkyRenderEvent.SunriseSunset()).isCancelled()) {
+        if (!Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.SunriseSunset()).isCancelled()) {
 			original.call(
 					instance,
 					poseStack,
@@ -151,7 +151,7 @@ public abstract class MixinLevelRenderer {
 					sunAngle,
 					sunriseOrSunsetColor
 			);
-			Skyboxify.getEventManager().dispatch(new SkyRenderEvent.SunriseSunset.After(
+			Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.SunriseSunset.After(
 					//? >=1.21.11 {
 					/*net.minecraft.client.Minecraft.getInstance().level
 					 *///?} else {
@@ -204,7 +204,7 @@ public abstract class MixinLevelRenderer {
             //? <1.21.6
             /*,net.minecraft.client.renderer.FogParameters fog*/
     ) {
-        return !Skyboxify.getEventManager().dispatch(new SkyRenderEvent.SunMoonStars(
+        return !Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.SunMoonStars(
                 //? >=1.21.11 {
                 /*net.minecraft.client.Minecraft.getInstance().level,
                 *///?} else {

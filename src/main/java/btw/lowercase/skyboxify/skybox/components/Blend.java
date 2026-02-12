@@ -55,12 +55,12 @@ public enum Blend implements StringRepresentable {
         this.blendFunction = blendFunction;
     }
 
-    public Vector4f getShaderColor(float value) {
+    public Vector4f getShaderColor(final float value) {
         return this.blendConsumer.apply(value);
     }
 
     //? <=1.21.4 {
-    /*public void apply(float value) {
+    /*public void apply(final float value) {
         final Vector4f shaderColor = getShaderColor(value);
         com.mojang.blaze3d.systems.RenderSystem.setShaderColor(shaderColor.x, shaderColor.y, shaderColor.z, shaderColor.w);
         if (this.blendFunction != null) {

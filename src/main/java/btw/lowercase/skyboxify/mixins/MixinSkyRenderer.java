@@ -66,7 +66,7 @@ public abstract class MixinSkyRenderer {
             *///?}
             PoseStack poseStack
     ) {
-        return !Skyboxify.getEventManager().dispatch(new SkyRenderEvent.Celestial(SkyRenderEvent.Celestial.Type.SUN)).isCancelled();
+        return !Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.Celestial(SkyRenderEvent.Celestial.Type.SUN)).isCancelled();
     }
 
     @WrapWithCondition(
@@ -101,7 +101,7 @@ public abstract class MixinSkyRenderer {
             *///?}
             PoseStack poseStack
     ) {
-        return !Skyboxify.getEventManager().dispatch(new SkyRenderEvent.Celestial(SkyRenderEvent.Celestial.Type.MOON)).isCancelled();
+        return !Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.Celestial(SkyRenderEvent.Celestial.Type.MOON)).isCancelled();
     }
 
     @WrapWithCondition(
@@ -122,7 +122,7 @@ public abstract class MixinSkyRenderer {
             float starBrightness,
             PoseStack poseStack
     ) {
-        return !Skyboxify.getEventManager().dispatch(new SkyRenderEvent.Celestial(SkyRenderEvent.Celestial.Type.STARS)).isCancelled();
+        return !Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.Celestial(SkyRenderEvent.Celestial.Type.STARS)).isCancelled();
     }
     //?}
 }

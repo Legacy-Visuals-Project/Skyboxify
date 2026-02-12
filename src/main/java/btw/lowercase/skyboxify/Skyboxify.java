@@ -33,7 +33,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.math.Axis;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
-import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
@@ -42,13 +42,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.visuals.legacy.lightconfig.lib.v1.events.EventManager;
 
+import java.io.File;
+
 @UtilityClass
 public class Skyboxify {
 	public final String MOD_ID = "@MODID@";
+	public final File DEBUG_FOLDER = Minecraft.getInstance().gameDirectory.toPath().resolve("debug_skyboxify").toFile();
 	@Getter
 	private final Logger logger = LoggerFactory.getLogger(Skyboxify.class);
 	@Getter
-	private final EventManager eventManager = new EventManager();
+	private final EventManager globalEventManager = new EventManager();
 	@Getter
 	private final SkyboxifyConfig config = new SkyboxifyConfig();
 
@@ -59,9 +62,9 @@ public class Skyboxify {
 	public void initialize() {
 		config.load();
 
-		eventManager.listen(LevelTickEvent.Client.class, event -> SkyboxManager.tick(event.getLevel()));
+		globalEventManager.listen(LevelTickEvent.Client.class, event -> SkyboxManager.tick(event.getLevel()));
 
-		eventManager.listen(SkyRenderEvent.Celestial.class, event -> {
+		globalEventManager.listen(SkyRenderEvent.Celestial.class, event -> {
 			if (Skyboxify.getConfig().enabled.isEnabled()) {
 				final SkyRenderEvent.Celestial.Type type = event.getType();
 				if (!config.renderSunMoon.isEnabled() && (type == SkyRenderEvent.Celestial.Type.SUN || type == SkyRenderEvent.Celestial.Type.MOON)) {
@@ -80,9 +83,9 @@ public class Skyboxify {
 		});
 		*///?}
 
-		eventManager.listen(SkyRenderEvent.EndSky.After.class, event -> renderSkyboxes(event.getLevel(), 0.0F));
+		globalEventManager.listen(SkyRenderEvent.EndSky.After.class, event -> renderSkyboxes(event.getLevel(), 0.0F));
 
-		eventManager.listen(SkyRenderEvent.SunMoonStars.class, event -> {
+		globalEventManager.listen(SkyRenderEvent.SunMoonStars.class, event -> {
 			final ClientLevel clientLevel = event.getLevel();
 			renderSkyboxes(clientLevel, event.getTickDelta());
 			// Disable Sun, Moon, & Stars in the Nether

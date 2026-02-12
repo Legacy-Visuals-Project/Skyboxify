@@ -101,7 +101,7 @@ public final class ParserCodecs {
 			}
 
 			return null;
-		}, Range::toString);
+		}, range -> range != null ? range.toString() : "");
 	}
 
     public static Codec<List<Range>> getRangeEntriesCodec(final boolean allowNegative) {

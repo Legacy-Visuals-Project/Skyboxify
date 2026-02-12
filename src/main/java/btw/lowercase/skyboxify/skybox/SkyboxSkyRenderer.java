@@ -103,7 +103,7 @@ public final class SkyboxSkyRenderer {
         builder.withDepthWrite(false);
         builder.withColorWrite(true, false);
         if (blendFunction != null) {
-            builder.withBlend(blendFunction.toNative());
+            builder.withBlend(blendFunction.vanilla());
         }
         builder.withSampler("Sampler0");
         builder.withVertexFormat(DefaultVertexFormat.POSITION_TEX, VertexFormat.Mode.QUADS);
@@ -149,9 +149,7 @@ public final class SkyboxSkyRenderer {
             RenderSystem.depthMask(false);
             RenderSystem.colorMask(true, true, true, false);
             skyLayer.blend().apply(finalAlpha);
-            *///?}
-
-            //? >=1.21.5 {
+            *///?} else {
 			final Vector4f shaderColor = skyLayer.blend().getShaderColor(finalAlpha);
 
             //? >=1.21.6 {
