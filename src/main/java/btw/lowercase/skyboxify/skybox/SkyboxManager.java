@@ -57,16 +57,12 @@ public final class SkyboxManager {
 
 	public void tick(final ClientLevel level) {
 		if (Skyboxify.getConfig().enabled.isEnabled()) {
-			for (Skybox skybox : loadedSkyboxes) {
+			for (final Skybox skybox : loadedSkyboxes) {
 				skybox.tick(level);
 			}
 
 			activeSkyboxes.removeIf(optiFineSkybox -> !optiFineSkybox.isActive());
-			for (Skybox skybox : loadedSkyboxes) {
-				if (!activeSkyboxes.contains(skybox) && skybox.isActive()) {
-					activeSkyboxes.add(skybox);
-				}
-			}
+			loadedSkyboxes.stream().filter(it -> !activeSkyboxes.contains(it) && it.isActive()).forEach(activeSkyboxes::add);
 		}
 	}
 

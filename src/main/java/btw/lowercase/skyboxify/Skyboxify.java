@@ -67,9 +67,8 @@ public class Skyboxify {
 		globalEventManager.listen(SkyRenderEvent.Celestial.class, event -> {
 			if (Skyboxify.getConfig().enabled.isEnabled()) {
 				final SkyRenderEvent.Celestial.Type type = event.getType();
-				if (!config.renderSunMoon.isEnabled() && (type == SkyRenderEvent.Celestial.Type.SUN || type == SkyRenderEvent.Celestial.Type.MOON)) {
-					event.setCancelled(true);
-				} else if (!config.renderStars.isEnabled() && type == SkyRenderEvent.Celestial.Type.STARS) {
+				if ((!config.renderSunMoon.isEnabled() && (type == SkyRenderEvent.Celestial.Type.SUN || type == SkyRenderEvent.Celestial.Type.MOON))
+						|| (!config.renderStars.isEnabled() && type == SkyRenderEvent.Celestial.Type.STARS)) {
 					event.setCancelled(true);
 				}
 			}

@@ -59,7 +59,7 @@ public final class SkyboxParser {
 		}
 
 		output.addProperty("_id", propertiesResourceLocation.toString());
-		output.addProperty("source", sourceTexturePath);
+		output.addProperty("texture", sourceTexturePath);
 
 		// Convert fade
 		parseFade(properties, output);
@@ -120,7 +120,7 @@ public final class SkyboxParser {
 	private static String parseSourceTexture(final Properties properties, final ResourceLocation propertiesResourceLocation, final PackResources packResources) {
 		final String source = properties.getProperty("source", null);
 		if (source == null) {
-			LOGGER.error("Failed to load source texture \"{}\"", "No source provided or was null");
+			LOGGER.error("Failed to load texture texture \"{}\"", "No texture provided or was null");
 			return null;
 		}
 

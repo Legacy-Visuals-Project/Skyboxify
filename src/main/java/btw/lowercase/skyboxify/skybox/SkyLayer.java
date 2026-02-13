@@ -43,7 +43,7 @@ import java.util.List;
 
 public record SkyLayer(
 		ResourceLocation id,
-		ResourceLocation source,
+		ResourceLocation texture,
 		Biomes biomes,
 		List<Range> heights,
 		Blend blend,
@@ -57,7 +57,7 @@ public record SkyLayer(
 ) {
 	public static final Codec<SkyLayer> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			ResourceLocation.CODEC.fieldOf("_id").forGetter(SkyLayer::id),
-			ResourceLocation.CODEC.fieldOf("source").forGetter(SkyLayer::source),
+			ResourceLocation.CODEC.fieldOf("texture").forGetter(SkyLayer::texture),
 			Biomes.CODEC.optionalFieldOf("biomes", Biomes.DEFAULT).forGetter(SkyLayer::biomes),
 			Range.CODEC.listOf().optionalFieldOf("heights", ImmutableList.of()).forGetter(SkyLayer::heights),
 			Blend.CODEC.optionalFieldOf("blend", Blend.ADD).forGetter(SkyLayer::blend),
@@ -70,7 +70,7 @@ public record SkyLayer(
 			ParserCodecs.WEATHER.optionalFieldOf("weather", ImmutableList.of(Weather.CLEAR)).forGetter(SkyLayer::weatherConditions)
 	).apply(instance, SkyLayer::new));
 
-	private boolean getConditionCheck(Level level) {
+	private boolean getConditionCheck(final Level level) {
 		final Entity cameraEntity = Minecraft.getInstance().getCameraEntity();
 		if (cameraEntity == null) {
 			return false;
@@ -79,11 +79,8 @@ public record SkyLayer(
 		final BlockPos entityPos = cameraEntity.getOnPos();
 		if (!this.biomes.locations().isEmpty()) {
 			final Holder<Biome> currentBiome = level.getBiome(entityPos);
-			if (!currentBiome.isBound()) {
-				return false;
-			}
-
-			if (!(this.biomes.inclusion() && this.biomes.locations().contains(level.getBiome(cameraEntity.blockPosition()).unwrapKey().orElseThrow()
+			if (!currentBiome.isBound()
+				|| !(this.biomes.inclusion() && this.biomes.locations().contains(level.getBiome(cameraEntity.blockPosition()).unwrapKey().orElseThrow()
 							//? >=1.21.11 {
 							/*.identifier()
 							 *///?} else {
@@ -118,7 +115,6 @@ public record SkyLayer(
 
 			final int daysPassed = (int) (adjustedTime / 24000L);
 			final int currentDay = daysPassed % this.loop.days();
-			// TODO/NOTE: "Days are numbered from 0 to daysLoop-1"
 			return CommonUtils.checkRanges(currentDay, this.loop.ranges());
 		} else {
 			return true;

@@ -144,7 +144,7 @@ public final class SkyboxSkyRenderer {
             }
 
             //? <=1.21.4 {
-            /*RenderSystem.setShaderTexture(0, skyLayer.source());
+            /*RenderSystem.setShaderTexture(0, skyLayer.texture());
             RenderSystem.setShader(net.minecraft.client.renderer.CoreShaders.POSITION_TEX);
             RenderSystem.depthMask(false);
             RenderSystem.colorMask(true, true, true, false);
@@ -161,7 +161,7 @@ public final class SkyboxSkyRenderer {
 			/*RenderSystem.setShaderColor(shaderColor.x, shaderColor.y, shaderColor.z, shaderColor.w);
 			*///?}
 
-			final com.mojang.blaze3d.pipeline.RenderPipeline renderPipeline = this.renderPipelineCache.computeIfAbsent(skyLayer.source(), (resourceLocation) -> {
+			final com.mojang.blaze3d.pipeline.RenderPipeline renderPipeline = this.renderPipelineCache.computeIfAbsent(skyLayer.texture(), (resourceLocation) -> {
                 com.mojang.blaze3d.pipeline.RenderPipeline pipeline = getSkyboxPipeline(skyLayer.blend().getBlendFunction());
                 IrisUtil.assignPipeline(pipeline, IrisPipeline.SKY_TEXTURED);
                 return pipeline;
@@ -170,7 +170,7 @@ public final class SkyboxSkyRenderer {
             final Minecraft minecraft = Minecraft.getInstance();
 
             final com.mojang.blaze3d.pipeline.RenderTarget renderTarget = minecraft.getMainRenderTarget();
-            final net.minecraft.client.renderer.texture.AbstractTexture skyTexture = minecraft.getTextureManager().getTexture(skyLayer.source());
+            final net.minecraft.client.renderer.texture.AbstractTexture skyTexture = minecraft.getTextureManager().getTexture(skyLayer.texture());
 
             //? >=1.21.6 {
             final com.mojang.blaze3d.textures.GpuTextureView colorTexture = renderTarget.getColorTextureView();

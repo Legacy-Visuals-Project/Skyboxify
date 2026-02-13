@@ -27,66 +27,41 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
-import java.util.Optional;
-
 public final class DynamicTransformsBuilder {
-    private Optional<Matrix4f> modelViewMatrix = Optional.empty();
-    private Optional<Vector4f> colorModulator = Optional.empty();
-    private Optional<Vector3f> modelOffset = Optional.empty();
-    private Optional<Matrix4f> textureMatrix = Optional.empty();
+    private Matrix4f modelViewMatrix = null;
+    private Vector4f colorModulator = null;
 
     public static DynamicTransformsBuilder of() {
         return new DynamicTransformsBuilder();
     }
 
-    public DynamicTransformsBuilder withModelViewMatrix(Matrix4f matrix4f) {
-        this.modelViewMatrix = Optional.of(matrix4f);
+    public DynamicTransformsBuilder withModelViewMatrix(final  Matrix4f matrix4f) {
+        this.modelViewMatrix = matrix4f;
         return this;
     }
 
-    public DynamicTransformsBuilder withShaderColor(Vector4f vector4f) {
-        this.colorModulator = Optional.of(vector4f);
-        return this;
-    }
-
-    public DynamicTransformsBuilder withShaderColor(Vector3f vector3f) {
-        return this.withShaderColor(new Vector4f(vector3f, 1.0F));
-    }
-
-    public DynamicTransformsBuilder withShaderColor(float red, float green, float blue, float alpha) {
-        return this.withShaderColor(new Vector4f(red, green, blue, alpha));
-    }
-
-    public DynamicTransformsBuilder withShaderColor(float red, float green, float blue) {
-        return this.withShaderColor(new Vector3f(red, green, blue));
-    }
-
-    public DynamicTransformsBuilder withModelOffset(Vector3f vector3f) {
-        this.modelOffset = Optional.of(vector3f);
-        return this;
-    }
-
-    public DynamicTransformsBuilder withTextureMatrix(Matrix4f matrix4f) {
-        this.textureMatrix = Optional.of(matrix4f);
+    public DynamicTransformsBuilder withShaderColor(final Vector4f vector4f) {
+        this.colorModulator = vector4f;
         return this;
     }
 
     //? >=1.21.6 {
     public com.mojang.blaze3d.buffers.GpuBufferSlice build() {
         return com.mojang.blaze3d.systems.RenderSystem.getDynamicUniforms().writeTransform(
-                this.modelViewMatrix.orElse(com.mojang.blaze3d.systems.RenderSystem.getModelViewMatrix()),
-                this.colorModulator.orElse(new Vector4f(1.0F, 1.0F, 1.0F, 1.0F)),
-                this.modelOffset.orElse(new Vector3f()),
-                this.textureMatrix.orElse(
-                        //? >=1.21.11 {
-                        /*new org.joml.Matrix4f()
-                        *///?} else {
-                        com.mojang.blaze3d.systems.RenderSystem.getTextureMatrix()
-                         //?}
-                )
-                //? <1.21.11
-                , com.mojang.blaze3d.systems.RenderSystem.getShaderLineWidth()
+                orElse(this.modelViewMatrix, com.mojang.blaze3d.systems.RenderSystem.getModelViewMatrix()),
+                orElse(this.colorModulator, new Vector4f(1.0F)),
+				new Vector3f(),
+				//? >=1.21.11 {
+				/*new org.joml.Matrix4f()
+				*///?} else {
+				com.mojang.blaze3d.systems.RenderSystem.getTextureMatrix(),
+				com.mojang.blaze3d.systems.RenderSystem.getShaderLineWidth()
+				 //?}
         );
     }
     //?}
+
+	private static <T> T orElse(final T value, T defaultValue) {
+		return value == null ? defaultValue : value;
+	}
 }

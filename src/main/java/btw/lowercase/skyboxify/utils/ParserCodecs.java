@@ -43,7 +43,21 @@ public final class ParserCodecs {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ParserCodecs.class);
 
 	public static final Codec<String> TRIMMED_STRING = Codec.STRING.xmap(String::trim, String::trim);
-	public static final Codec<List<String>> SPLIT_SPACE_TRIMMED = TRIMMED_STRING.xmap(input -> Arrays.stream(input.split(" ")).map(String::trim).filter(s -> !s.isEmpty()).toList(), list -> Arrays.toString(list.toArray()));
+
+	public static final Codec<List<String>> SPLIT_SPACE_TRIMMED = TRIMMED_STRING.xmap(input -> {
+		//noinspection CodeBlock2Expr
+		return Arrays.stream(input.split(" "))
+				.map(String::trim)
+				.filter(s -> !s.isEmpty())
+				.toList();
+	}, list -> {
+		final StringBuilder builder = new StringBuilder();
+		for (final String entry : list) {
+			builder.append(entry).append(" ");
+		}
+
+		return builder.toString().trim();
+	});
 
 	public static final Codec<List<Weather>> WEATHER = SPLIT_SPACE_TRIMMED.xmap(input -> {
 		if (!input.isEmpty()) {
@@ -120,7 +134,7 @@ public final class ParserCodecs {
 					if (result != null) {
 						return DataResult.success(result);
 					} else {
-						return DataResult.error(() -> String.format("Failed to read texture source '%s' as resource location", input));
+						return DataResult.error(() -> String.format("Failed to read texture texture '%s' as resource location", input));
 					}
 				}
 			}

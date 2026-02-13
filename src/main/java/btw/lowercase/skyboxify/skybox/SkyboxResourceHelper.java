@@ -198,7 +198,6 @@ public class SkyboxResourceHelper implements
 			final JsonArray skyLayers = entry.getValue();
 			if (!skyLayers.isEmpty()) {
 				final JsonObject skyboxJson = new JsonObject();
-				skyboxJson.addProperty("pack", packResources.packId());
 				skyboxJson.addProperty("world", switch (entry.getKey()) {
 					case "world0" -> "overworld";
 					case "world-1" -> "the_nether";
@@ -207,7 +206,11 @@ public class SkyboxResourceHelper implements
 					default -> entry.getKey().replaceAll("-", "_");
 				});
 				skyboxJson.add("layers", skyLayers);
-				SkyboxManager.addSkybox(Skybox.CODEC.decode(JsonOps.INSTANCE, skyboxJson).getOrThrow().getFirst());
+
+				final Skybox skybox = Skybox.CODEC.decode(JsonOps.INSTANCE, skyboxJson).getOrThrow().getFirst();
+				skybox.setPackName(packResources.packId());
+				SkyboxManager.addSkybox(skybox);
+
 				count++;
 			}
 		}

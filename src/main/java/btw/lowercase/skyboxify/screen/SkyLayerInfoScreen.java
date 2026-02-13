@@ -47,8 +47,8 @@ public class SkyLayerInfoScreen extends DebugScreen {
 				.centered()
 				.build(this.font));
 
-		addLine("Source: " + this.skyLayer.source());
-		addLine("Rotate: " + this.skyLayer.rotate());
+		addLine("Texture: " + this.skyLayer.texture());
+		addLine("Rotates?: " + this.skyLayer.rotate());
 		addLine("Axis: " + this.skyLayer.axis());
 		addLine("Blend: " + this.skyLayer.blend());
 		addLine("Speed: " + this.skyLayer.speed());

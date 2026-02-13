@@ -1,3 +1,2 @@
-# Release 2.4
-- Fix broken skies (Band-Aid)
-- New experimental setting for legacy sky rotations (breaks modern packs, off by default)
+# Release 2.5
+- Fix biomes parsing ("minecraft:plains" is now valid)

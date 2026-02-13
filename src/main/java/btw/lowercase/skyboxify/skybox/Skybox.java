@@ -27,6 +27,7 @@ import btw.lowercase.skyboxify.Skyboxify;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
@@ -38,13 +39,13 @@ import java.util.Map;
 
 public class Skybox {
 	public static final Codec<Skybox> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-			Codec.STRING.fieldOf("pack").forGetter(Skybox::getPackName),
 			Level.RESOURCE_KEY_CODEC.fieldOf("world").forGetter(Skybox::getWorldKey),
 			SkyLayer.CODEC.listOf().fieldOf("layers").forGetter(Skybox::getLayers)
 	).apply(instance, Skybox::new));
 
 	@Getter
-	private final String packName;
+	@Setter
+	private String packName = "_";
 	@Getter
 	private final List<SkyLayer> layers;
 	@Getter
@@ -53,8 +54,7 @@ public class Skybox {
 	@Getter
 	private boolean active = true;
 
-	public Skybox(final String packName, final ResourceKey<@NotNull Level> worldKey, final List<SkyLayer> layers) {
-		this.packName = packName;
+	public Skybox(final ResourceKey<@NotNull Level> worldKey, final List<SkyLayer> layers) {
 		this.worldKey = worldKey;
 		this.layers = layers;
 	}
