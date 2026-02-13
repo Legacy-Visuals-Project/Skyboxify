@@ -78,7 +78,7 @@ public final class ParserCodecs {
 
         LOGGER.warn("Invalid axis provided in skybox, returning default axis (Mth.X_AXIS).");
         return Mth.X_AXIS;
-    }, output -> String.format("%s %s %s", output.x(), output.y(), output.z()));
+    }, output -> String.format("%s %s %s", -output.z(), output.y(), output.x()));
 
 	private static Codec<Range> getRangeEntryCodec(final boolean allowNegative) {
 		final int minValue = allowNegative ? Integer.MIN_VALUE : -1;
