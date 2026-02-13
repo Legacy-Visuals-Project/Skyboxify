@@ -40,45 +40,31 @@ import java.util.Arrays;
 import java.util.List;
 
 public final class ParserCodecs {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ParserCodecs.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ParserCodecs.class);
 
-    public static final Codec<String> TRIMMED_STRING = Codec.STRING.xmap(String::trim, String::valueOf);
-    public static final Codec<List<String>> SPLIT_SPACE_TRIMMED = TRIMMED_STRING.xmap(input -> Arrays.stream(input.split(" ")).map(String::trim).filter(s -> !s.isEmpty()).toList(), list -> Arrays.toString(list.toArray()));
-	public static final Codec<Float> SAFE_FLOAT = TRIMMED_STRING.comapFlatMap(input -> {
-		try {
-			return DataResult.success(Float.parseFloat(input));
-		} catch (NumberFormatException exception) {
-			return DataResult.error(exception::getMessage);
+	public static final Codec<String> TRIMMED_STRING = Codec.STRING.xmap(String::trim, String::trim);
+	public static final Codec<List<String>> SPLIT_SPACE_TRIMMED = TRIMMED_STRING.xmap(input -> Arrays.stream(input.split(" ")).map(String::trim).filter(s -> !s.isEmpty()).toList(), list -> Arrays.toString(list.toArray()));
+
+	public static final Codec<List<Weather>> WEATHER = SPLIT_SPACE_TRIMMED.xmap(input -> {
+		if (!input.isEmpty()) {
+			return Weather.CODEC.listOf().parse(JavaOps.INSTANCE, input).getOrThrow();
+		} else {
+			return List.of(Weather.CLEAR);
 		}
-	}, String::valueOf);
-	public static final Codec<Integer> SAFE_INTEGER = TRIMMED_STRING.comapFlatMap(input -> {
-		try {
-			return DataResult.success(Integer.parseInt(input));
-		} catch (NumberFormatException exception) {
-			return DataResult.error(exception::getMessage);
+	}, list -> list.stream().map(Weather::getSerializedName).toList());
+
+	public static final Codec<Vector3fc> AXIS = TRIMMED_STRING.xmap(input -> {
+		final List<String> parts = SPLIT_SPACE_TRIMMED.parse(JavaOps.INSTANCE, input.replaceAll(" +", " ")).getOrThrow();
+		if (parts.size() == 3) {
+			final Vector3f vector3f = new Vector3f(safeParseFloat(parts.get(0), Float.MIN_VALUE), safeParseFloat(parts.get(1), Float.MIN_VALUE), safeParseFloat(parts.get(2), Float.MIN_VALUE));
+			if (vector3f.lengthSquared() > Mth.EPSILON) {
+				return new Vector3f(vector3f.z, vector3f.y, -vector3f.x);
+			}
 		}
-	}, String::valueOf);
 
-    public static final Codec<List<Weather>> WEATHER = SPLIT_SPACE_TRIMMED.xmap(input -> {
-        if (!input.isEmpty()) {
-            return Weather.CODEC.listOf().parse(JavaOps.INSTANCE, input).getOrThrow();
-        } else {
-            return List.of(Weather.CLEAR);
-        }
-    }, list -> list.stream().map(Weather::getSerializedName).toList());
-
-    public static final Codec<Vector3fc> AXIS = TRIMMED_STRING.xmap(input -> {
-        final List<String> parts = SPLIT_SPACE_TRIMMED.parse(JavaOps.INSTANCE, input.replaceAll(" +", " ")).getOrThrow();
-        if (parts.size() == 3) {
-            final Vector3f vector3f = new Vector3f(safeParseFloat(parts.get(0), Float.MIN_VALUE), safeParseFloat(parts.get(1), Float.MIN_VALUE), safeParseFloat(parts.get(2), Float.MIN_VALUE));
-            if (vector3f.lengthSquared() > Mth.EPSILON) {
-                return new Vector3f(vector3f.z, vector3f.y, -vector3f.x);
-            }
-        }
-
-        LOGGER.warn("Invalid axis provided in skybox, returning default axis (Mth.X_AXIS).");
-        return Mth.X_AXIS;
-    }, output -> String.format("%s %s %s", -output.z(), output.y(), output.x()));
+		LOGGER.warn("Invalid axis provided in skybox, returning default axis (Mth.X_AXIS).");
+		return Mth.X_AXIS;
+	}, output -> String.format("%s %s %s", -output.z(), output.y(), output.x()));
 
 	private static Codec<Range> getRangeEntryCodec(final boolean allowNegative) {
 		final int minValue = allowNegative ? Integer.MIN_VALUE : -1;
@@ -104,19 +90,19 @@ public final class ParserCodecs {
 		}, range -> range != null ? range.toString() : "");
 	}
 
-    public static Codec<List<Range>> getRangeEntriesCodec(final boolean allowNegative) {
-        return TRIMMED_STRING.xmap(input -> {
-            final List<Range> entries = new ArrayList<>();
-            for (String part : input.split("\\s*,\\s*|\\s+")) {
-                final Range range = getRangeEntryCodec(allowNegative).parse(JavaOps.INSTANCE, part).getOrThrow();
+	public static Codec<List<Range>> getRangeEntriesCodec(final boolean allowNegative) {
+		return TRIMMED_STRING.xmap(input -> {
+			final List<Range> entries = new ArrayList<>();
+			for (final String part : input.split("\\s*,\\s*|\\s+")) {
+				final Range range = getRangeEntryCodec(allowNegative).parse(JavaOps.INSTANCE, part).getOrThrow();
 				if (range != null) {
 					entries.add(range);
 				}
-            }
+			}
 
-            return entries;
-        }, output -> Arrays.toString(output.stream().map(Range::toString).toArray()));
-    }
+			return entries;
+		}, output -> Arrays.toString(output.stream().map(Range::toString).toArray()));
+	}
 
 	public static Codec<ResourceLocation> getSourceTextureCodec(final ResourceLocation propertiesLocation) {
 		return Codec.STRING.comapFlatMap(input -> {
@@ -141,13 +127,29 @@ public final class ParserCodecs {
 		}, ResourceLocation::toString);
 	}
 
-    public static float safeParseFloat(String value, float defaultValue) {
-        return SAFE_FLOAT.orElse(defaultValue).parse(JavaOps.INSTANCE, value).getOrThrow();
-    }
+	public static final Codec<Float> SAFE_FLOAT = TRIMMED_STRING.comapFlatMap(input -> {
+		try {
+			return DataResult.success(Float.parseFloat(input));
+		} catch (final NumberFormatException exception) {
+			return DataResult.error(exception::toString);
+		}
+	}, String::valueOf);
 
-    public static int safeParseInteger(String value, int defaultValue) {
-        return SAFE_INTEGER.orElse(defaultValue).parse(JavaOps.INSTANCE, value).getOrThrow();
-    }
+	public static float safeParseFloat(String value, float defaultValue) {
+		return SAFE_FLOAT.orElse(defaultValue).parse(JavaOps.INSTANCE, value).getOrThrow();
+	}
+
+	public static final Codec<Integer> SAFE_INTEGER = TRIMMED_STRING.comapFlatMap(input -> {
+		try {
+			return DataResult.success(Integer.parseInt(input));
+		} catch (final NumberFormatException exception) {
+			return DataResult.error(exception::toString);
+		}
+	}, String::valueOf);
+
+	public static int safeParseInteger(String value, int defaultValue) {
+		return SAFE_INTEGER.orElse(defaultValue).parse(JavaOps.INSTANCE, value).getOrThrow();
+	}
 
 	public static <T> String emptyCodecString(T output) {
 		return "";

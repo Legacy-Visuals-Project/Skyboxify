@@ -30,6 +30,7 @@ import com.mojang.serialization.JavaOps;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.List;
+import java.util.Objects;
 
 public record Biomes(ImmutableList<ResourceLocation> locations, boolean inclusion) {
 	public static Biomes DEFAULT = new Biomes(ImmutableList.of(), true);
@@ -43,10 +44,25 @@ public record Biomes(ImmutableList<ResourceLocation> locations, boolean inclusio
 		final List<String> entries = ParserCodecs.SPLIT_SPACE_TRIMMED.parse(JavaOps.INSTANCE, input).getOrThrow();
 		if (!entries.isEmpty()) {
 			final ImmutableList.Builder<ResourceLocation> builder = new ImmutableList.Builder<>();
-			builder.addAll(entries.stream().filter(ResourceLocation::isValidPath).map(ResourceLocation::parse).toList());
+			builder.addAll(entries.stream().map(ResourceLocation::tryParse).filter(Objects::nonNull).toList());
 			return new Biomes(builder.build(), inclusion);
 		} else {
 			return Biomes.DEFAULT;
 		}
-	}, ParserCodecs::emptyCodecString);
+	}, biomes -> {
+		if (biomes.locations.isEmpty()) {
+			return "";
+		} else {
+			final StringBuilder builder = new StringBuilder();
+			if (!biomes.inclusion) {
+				builder.append("!");
+			}
+
+			for (final ResourceLocation location : biomes.locations) {
+				builder.append(location).append(" ");
+			}
+
+			return builder.toString().trim();
+		}
+	});
 }
