@@ -203,6 +203,7 @@ public class SkyboxResourceHelper implements
 					case "world0" -> "overworld";
 					case "world-1" -> "the_nether";
 					case "world1" -> "the_end";
+					/*case "world4" -> "aether";*/
 					default -> entry.getKey().replaceAll("-", "_");
 				});
 				skyboxJson.add("layers", skyLayers);
