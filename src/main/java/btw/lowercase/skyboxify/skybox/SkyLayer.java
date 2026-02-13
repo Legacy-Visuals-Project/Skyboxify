@@ -42,6 +42,7 @@ import org.joml.Vector3fc;
 import java.util.List;
 
 public record SkyLayer(
+		ResourceLocation id,
 		ResourceLocation source,
 		Biomes biomes,
 		List<Range> heights,
@@ -55,6 +56,7 @@ public record SkyLayer(
 		List<Weather> weatherConditions
 ) {
 	public static final Codec<SkyLayer> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+			ResourceLocation.CODEC.fieldOf("_id").forGetter(SkyLayer::id),
 			ResourceLocation.CODEC.fieldOf("source").forGetter(SkyLayer::source),
 			Biomes.CODEC.optionalFieldOf("biomes", Biomes.DEFAULT).forGetter(SkyLayer::biomes),
 			Range.CODEC.listOf().optionalFieldOf("heights", ImmutableList.of()).forGetter(SkyLayer::heights),

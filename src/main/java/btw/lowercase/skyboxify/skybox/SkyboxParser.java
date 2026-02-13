@@ -58,6 +58,7 @@ public final class SkyboxParser {
 			return null;
 		}
 
+		output.addProperty("_id", propertiesResourceLocation.toString());
 		output.addProperty("source", sourceTexturePath);
 
 		// Convert fade

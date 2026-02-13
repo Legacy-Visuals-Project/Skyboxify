@@ -33,8 +33,8 @@ import net.minecraft.network.chat.Component;
 public class SkyLayerInfoScreen extends DebugScreen {
 	private final SkyLayer skyLayer;
 
-	public SkyLayerInfoScreen(final Screen parent, final SkyLayer skyLayer, final int index) {
-		super(Component.literal(index + " - " + skyLayer.source().toString()), parent);
+	public SkyLayerInfoScreen(final Screen parent, final SkyLayer skyLayer, final Component title) {
+		super(title, parent);
 		this.skyLayer = skyLayer;
 	}
 
@@ -47,6 +47,7 @@ public class SkyLayerInfoScreen extends DebugScreen {
 				.centered()
 				.build(this.font));
 
+		addLine("Source: " + this.skyLayer.source());
 		addLine("Rotate: " + this.skyLayer.rotate());
 		addLine("Axis: " + this.skyLayer.axis());
 		addLine("Blend: " + this.skyLayer.blend());

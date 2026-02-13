@@ -60,11 +60,9 @@ public class SkyLayerListScreen extends DebugScreen {
 				.build(this.font));
 
 		final List<Gidget> gidgets = new ArrayList<>();
-		int index = 0;
 		for (final SkyLayer skyLayer : this.skybox.getLayers()) {
-			int skyIndex = index;
-			gidgets.add(SimpleButton.builder(Component.literal((index + 1) + " - " + skyLayer.source()), button -> this.minecraft.setScreen(new SkyLayerInfoScreen(this, skyLayer, skyIndex))).build());
-			index++;
+			final Component title = Component.literal(skyLayer.id().toString());
+			gidgets.add(SimpleButton.builder(title, button -> this.minecraft.setScreen(new SkyLayerInfoScreen(this, skyLayer, title))).build());
 		}
 
 		final int pad = 20 + font.lineHeight;
