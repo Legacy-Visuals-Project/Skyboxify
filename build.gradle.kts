@@ -62,6 +62,11 @@ stonecutter {
         direction = eval(current.version, ">=1.21.11")
         replace(".location().toString()", ".identifier().toString()")
     }
+
+    replacements.string {
+        direction = eval(current.version, ">=1.21.11")
+        replace(".location().getPath()", ".identifier().getPath()")
+    }
 }
 
 blossom {
