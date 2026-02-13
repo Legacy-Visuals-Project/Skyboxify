@@ -133,14 +133,18 @@ public final class SkyboxParser {
 		try {
 			if (!Skyboxify.getConfig().debug.isEnabled()) {
 				final IoSupplier<InputStream> sourceTextureStream = packResources.getResource(PackType.CLIENT_RESOURCES, sourceTextureIdentifier);
-				if (sourceTextureStream == null && !Skyboxify.getConfig().debug.isEnabled()) {
+				if (sourceTextureStream == null) {
 					LOGGER.error("Failed to load texture '{}', missing or corrupt image?", sourceTextureIdentifier);
 					return null;
 				}
 
 				sourceTextureStream.get().close();
 			}
-		} catch (final Exception ignored) {
+		} catch (final Exception exception) {
+			LOGGER.error("Failed to load texture '{}'", sourceTextureIdentifier);
+			if (Skyboxify.getConfig().debug.isEnabled()) {
+				exception.printStackTrace();
+			}
 		}
 
 		return sourceTextureIdentifier.toString();
