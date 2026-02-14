@@ -55,13 +55,13 @@ public final class SkyboxSkyRenderer {
 
     private void buildSky() {
         final VertexFormat vertexFormat = DefaultVertexFormat.POSITION_TEX;
-        try (ByteBufferBuilder byteBufferBuilder = new ByteBufferBuilder(vertexFormat.getVertexSize() * SkyPart.COUNT * 4)) {
+        try (final ByteBufferBuilder byteBufferBuilder = new ByteBufferBuilder(vertexFormat.getVertexSize() * SkyPart.COUNT * 4)) {
             final VertexFormat.Mode vertexFormatMode = VertexFormat.Mode.QUADS;
             final BufferBuilder builder = new BufferBuilder(byteBufferBuilder, vertexFormatMode, vertexFormat);
             for (final SkyPart skyPart : SkyPart.VALUES) {
                 final Matrix4f matrix4f = skyPart.getRotationMatrix();
-                final UV uv = skyPart.getUVRange();
-                final float quadSize = 30.0F;
+                final UV uv = skyPart.getUv();
+                final float quadSize = 40.0F;
                 builder.addVertex(matrix4f, -quadSize, -quadSize, -quadSize).setUv(uv.minU(), uv.minV());
                 builder.addVertex(matrix4f, -quadSize, -quadSize, quadSize).setUv(uv.minU(), uv.maxV());
                 builder.addVertex(matrix4f, quadSize, -quadSize, quadSize).setUv(uv.maxU(), uv.maxV());
@@ -74,7 +74,7 @@ public final class SkyboxSkyRenderer {
                 //? >=1.21.5 {
                 skyBufferIndexCount = meshData.drawState().indexCount();
                 skyBuffer = RenderSystem.getDevice().createBuffer(
-                        () -> "OptiFine Skybox",
+                        () -> "Skybox",
                         //? >=1.21.6 {
                         com.mojang.blaze3d.buffers.GpuBuffer.USAGE_COPY_DST,
                         //?} else {
@@ -95,7 +95,7 @@ public final class SkyboxSkyRenderer {
     //? >=1.21.5 {
     private final java.util.Map<net.minecraft.resources.ResourceLocation, com.mojang.blaze3d.pipeline.RenderPipeline> renderPipelineCache = new java.util.HashMap<>();
 
-    public static com.mojang.blaze3d.pipeline.RenderPipeline getSkyboxPipeline(@org.jetbrains.annotations.Nullable BlendFunction blendFunction) {
+    public static com.mojang.blaze3d.pipeline.RenderPipeline getSkyboxPipeline(final @org.jetbrains.annotations.Nullable BlendFunction blendFunction) {
         final com.mojang.blaze3d.pipeline.RenderPipeline.Builder builder = com.mojang.blaze3d.pipeline.RenderPipeline.builder(RenderPipelinesAccessor.skyboxify$getMatricesProjectionSnippet());
         builder.withLocation(btw.lowercase.skyboxify.Skyboxify.locationOrNull("pipeline/custom_skybox"));
         builder.withVertexShader(btw.lowercase.skyboxify.Skyboxify.locationOrNull("core/custom_skybox"));
@@ -145,7 +145,7 @@ public final class SkyboxSkyRenderer {
 
             //? <=1.21.4 {
             /*RenderSystem.setShaderTexture(0, skyLayer.texture());
-            RenderSystem.setShader(net.minecraft.client.renderer.CoreShaders.POSITION_TEX);
+            RenderSystem.setShader(net.minecraft.client.renderer.CoreShaders.POSITION_TEX); // TODO: Use custom_skybox shader
             RenderSystem.depthMask(false);
             RenderSystem.colorMask(true, true, true, false);
             skyLayer.blend().apply(finalAlpha);

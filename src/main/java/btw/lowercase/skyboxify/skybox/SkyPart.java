@@ -24,6 +24,7 @@
 package btw.lowercase.skyboxify.skybox;
 
 import btw.lowercase.skyboxify.skybox.components.UV;
+import lombok.Getter;
 import org.joml.Matrix4f;
 
 public enum SkyPart {
@@ -55,19 +56,13 @@ public enum SkyPart {
     public static final SkyPart[] VALUES = values();
     public static final int COUNT = VALUES.length;
 
-    private final Matrix4f rotationMatrix;
+    @Getter
+	private final Matrix4f rotationMatrix;
+	@Getter
     private final UV uv;
 
-    SkyPart(Matrix4f rotationMatrix, UV uv) {
+    SkyPart(final Matrix4f rotationMatrix, final UV uv) {
         this.rotationMatrix = rotationMatrix;
         this.uv = uv;
-    }
-
-    public Matrix4f getRotationMatrix() {
-        return this.rotationMatrix;
-    }
-
-    public UV getUVRange() {
-        return uv;
     }
 }

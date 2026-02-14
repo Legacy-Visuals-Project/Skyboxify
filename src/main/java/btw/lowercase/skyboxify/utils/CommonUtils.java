@@ -36,7 +36,7 @@ import java.util.List;
 
 @UtilityClass
 public final class CommonUtils {
-	public static int normalizeTickTime(int tickTime) {
+	public static int normalizeTickTime(final int tickTime) {
 		int result = tickTime % 24000;
 		if (result < 0) {
 			result += 24000;
@@ -45,12 +45,12 @@ public final class CommonUtils {
 		return result;
 	}
 
-	public static boolean checkRanges(double value, List<Range> rangeEntries) {
+	public static boolean checkRanges(final double value, final List<Range> rangeEntries) {
 		return rangeEntries.isEmpty() || rangeEntries.stream()
 				.anyMatch(range -> com.google.common.collect.Range.closed(range.min(), range.max()).contains((float) value));
 	}
 
-	public static boolean isInTimeInterval(int currentTime, int startTime, int endTime) {
+	public static boolean isInTimeInterval(final int currentTime, final int startTime, final int endTime) {
 		if (currentTime < 0 || currentTime >= 24000) {
 			return false; // Invalid time
 		} else if (startTime <= endTime) {
@@ -60,27 +60,7 @@ public final class CommonUtils {
 		}
 	}
 
-	public static float calculateFadeAlphaValue(float maxAlpha, float minAlpha, int currentTime, int startFadeIn, int endFadeIn, int startFadeOut, int endFadeOut) {
-		if (isInTimeInterval(currentTime, endFadeIn, startFadeOut)) {
-			return maxAlpha;
-		} else if (isInTimeInterval(currentTime, startFadeIn, endFadeIn)) {
-			final int fadeInDuration = calculateCyclicTimeDistance(startFadeIn, endFadeIn);
-			final int timePassedSinceFadeInStart = calculateCyclicTimeDistance(startFadeIn, currentTime);
-			return minAlpha + ((float) timePassedSinceFadeInStart / fadeInDuration) * (maxAlpha - minAlpha);
-		} else if (isInTimeInterval(currentTime, startFadeOut, endFadeOut)) {
-			final int fadeOutDuration = calculateCyclicTimeDistance(startFadeOut, endFadeOut);
-			final int timePassedSinceFadeOutStart = calculateCyclicTimeDistance(startFadeOut, currentTime);
-			return maxAlpha + ((float) timePassedSinceFadeOutStart / fadeOutDuration) * (minAlpha - maxAlpha);
-		} else {
-			return minAlpha;
-		}
-	}
-
-	public static int calculateCyclicTimeDistance(int startTime, int endTime) {
-		return (endTime - startTime + 24000) % 24000;
-	}
-
-	public static float calculateConditionAlphaValue(float maxAlpha, float minAlpha, float lastAlpha, int duration, boolean in) {
+	public static float calculateConditionAlphaValue(final float maxAlpha, final float minAlpha, final float lastAlpha, final int duration, final boolean in) {
 		if (duration == 0) {
 			return lastAlpha;
 		} else if (in && maxAlpha == lastAlpha) {
@@ -94,7 +74,7 @@ public final class CommonUtils {
 		}
 	}
 
-	public static float getWeatherAlpha(List<Weather> weatherConditions, float rainStrength, float thunderStrength) {
+	public static float getWeatherAlpha(final List<Weather> weatherConditions, final float rainStrength, final float thunderStrength) {
 		final float alpha = 1.0F - rainStrength;
 		final float calculatedRainStrength = rainStrength - thunderStrength;
 

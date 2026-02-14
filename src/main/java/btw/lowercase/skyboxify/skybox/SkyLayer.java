@@ -79,14 +79,7 @@ public record SkyLayer(
 		final BlockPos entityPos = cameraEntity.getOnPos();
 		if (!this.biomes.locations().isEmpty()) {
 			final Holder<Biome> currentBiome = level.getBiome(entityPos);
-			if (!currentBiome.isBound()
-				|| !(this.biomes.inclusion() && this.biomes.locations().contains(level.getBiome(cameraEntity.blockPosition()).unwrapKey().orElseThrow()
-							//? >=1.21.11 {
-							/*.identifier()
-							 *///?} else {
-							.location()
-					//?}
-			))) {
+			if (!currentBiome.isBound() || !(this.biomes.inclusion() && this.biomes.locations().contains(level.getBiome(cameraEntity.blockPosition()).unwrapKey().orElseThrow().location()))) {
 				return false;
 			}
 		}
@@ -94,7 +87,7 @@ public record SkyLayer(
 		return this.heights == null || CommonUtils.checkRanges(entityPos.getY(), this.heights);
 	}
 
-	public float getPositionBrightness(Level level, float conditionAlpha) {
+	public float getPositionBrightness(final Level level, final float conditionAlpha) {
 		if (this.biomes.locations().isEmpty() && this.heights.isEmpty()) {
 			return 1.0F;
 		} else if (conditionAlpha == -1.0F) {
@@ -104,7 +97,7 @@ public record SkyLayer(
 		}
 	}
 
-	public boolean isActive(long dayTime, int clampedTimeOfDay) {
+	public boolean isActive(final long dayTime, final int clampedTimeOfDay) {
 		if (!this.fade.alwaysOn() && CommonUtils.isInTimeInterval(clampedTimeOfDay, this.fade.endOut(), this.fade.startIn())) {
 			return false;
 		} else if (this.loop.ranges() != null) {

@@ -41,6 +41,6 @@ public record Range(float min, float max) {
 
     @Override
     public @NotNull String toString() {
-        return String.format("%s..%s", min, max);
+        return String.format("%s..%s", this.min, this.max);
     }
 }

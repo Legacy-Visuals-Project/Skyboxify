@@ -40,13 +40,7 @@ public class SkyLayerListScreen extends DebugScreen {
 	private final Skybox skybox;
 
 	public SkyLayerListScreen(final Screen parent, final Skybox skybox) {
-		super(Component.literal(
-				//? >=1.21.11 {
-				/*skybox.getDimension().location().toString()
-				 *///?} else {
-				skybox.getDimension().location().toString()
-				//?}
-		), parent);
+		super(Component.literal(skybox.getDimension().location().toString()), parent);
 		this.skybox = skybox;
 	}
 

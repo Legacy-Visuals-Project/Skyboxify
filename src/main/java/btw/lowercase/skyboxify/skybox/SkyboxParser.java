@@ -49,7 +49,6 @@ public final class SkyboxParser {
 	private SkyboxParser() {
 	}
 
-	// TODO: Finish converting to CODEC's
 	public static @Nullable JsonObject parseSkyProperties(final Properties properties, final ResourceLocation propertiesResourceLocation, final PackResources packResources) {
 		final JsonObject output = new JsonObject();
 
@@ -76,12 +75,21 @@ public final class SkyboxParser {
 
 		// Heights
 		if (properties.containsKey("heights")) {
-			parseHeights(properties.getProperty("heights"), output);
+			final List<Range> rangeEntries = ParserCodecs.getRangeEntriesCodec(true).orElse(List.of()).parse(JavaOps.INSTANCE, properties.getProperty("heights")).getOrThrow();
+			if (!rangeEntries.isEmpty()) {
+				final JsonArray heights = new JsonArray();
+				rangeEntries.stream().map(range -> Range.CODEC.encode(range, JsonOps.INSTANCE, new JsonObject()).getOrThrow()).forEach(heights::add);
+				output.add("heights", heights);
+			}
 		}
 
 		// Days Loop -> Loop
 		if (properties.containsKey("days")) {
-			parseDaysLoop(properties.getProperty("days"), properties.getProperty("daysLoop", null), output);
+			parseLoop(
+					properties.getProperty("days"),
+					properties.getProperty("daysLoop", null),
+					output
+			);
 		}
 
 		// Blend
@@ -197,26 +205,19 @@ public final class SkyboxParser {
 		output.add("fade", fade);
 	}
 
-	private static void parseDaysLoop(final String days, final String daysLoop, final JsonObject output) {
+	private static void parseLoop(final String days, final String daysLoop, final JsonObject output) {
+		final JsonObject loop = new JsonObject();
+		if (daysLoop != null) {
+			loop.addProperty("days", ParserCodecs.safeParseInteger(daysLoop, 8));
+		}
+
 		final List<Range> rangeEntries = ParserCodecs.getRangeEntriesCodec(false).orElse(List.of()).parse(JavaOps.INSTANCE, days).getOrThrow();
 		if (!rangeEntries.isEmpty()) {
-			final JsonObject loop = new JsonObject();
-			loop.addProperty("days", daysLoop == null ? 8 : ParserCodecs.safeParseInteger(daysLoop, 8));
-
 			final JsonArray ranges = new JsonArray();
-			rangeEntries.stream().map(range -> Range.CODEC.encode(range, JsonOps.INSTANCE, new JsonObject()).getOrThrow()).forEach(ranges::add);
+			rangeEntries.stream().map(range -> Range.CODEC.encode(range, JsonOps.INSTANCE, null).getOrThrow()).forEach(ranges::add);
 			loop.add("ranges", ranges);
-
-			output.add("loop", loop);
 		}
-	}
 
-	private static void parseHeights(final String input, final JsonObject output) {
-		final List<Range> rangeEntries = ParserCodecs.getRangeEntriesCodec(true).orElse(List.of()).parse(JavaOps.INSTANCE, input).getOrThrow();
-		if (!rangeEntries.isEmpty()) {
-			final JsonArray heights = new JsonArray();
-			rangeEntries.stream().map(range -> Range.CODEC.encode(range, JsonOps.INSTANCE, new JsonObject()).getOrThrow()).forEach(heights::add);
-			output.add("heights", heights);
-		}
+		output.add("loop", loop);
 	}
 }
