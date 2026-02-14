@@ -32,6 +32,7 @@ import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3fc;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 @UtilityClass
@@ -119,5 +120,14 @@ public final class CommonUtils {
 				.m02(2.0F * (qzx + qyw))
 				.m21(2.0F * (qyz + qxw))
 				.m12(2.0F * (qyz - qxw)));
+	}
+
+	private static final DecimalFormat VECTOR_FORMAT = new DecimalFormat("# .##");
+
+	public static String vectorToString(final Vector3fc vector3fc) {
+		final String x = VECTOR_FORMAT.format(vector3fc.x()).trim();
+		final String y = VECTOR_FORMAT.format(vector3fc.y()).trim();
+		final String z = VECTOR_FORMAT.format(vector3fc.z()).trim();
+		return String.format("[x=%s, y=%s, z=%s]", x, y, z);
 	}
 }

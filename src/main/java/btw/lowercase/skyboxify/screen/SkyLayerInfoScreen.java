@@ -26,6 +26,7 @@ package btw.lowercase.skyboxify.screen;
 import btw.lowercase.skyboxify.screen.widget.SimpleButton;
 import btw.lowercase.skyboxify.screen.widget.Text;
 import btw.lowercase.skyboxify.skybox.SkyLayer;
+import btw.lowercase.skyboxify.utils.CommonUtils;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -49,7 +50,7 @@ public class SkyLayerInfoScreen extends DebugScreen {
 
 		addLine("Texture: " + this.skyLayer.texture());
 		addLine("Rotates?: " + this.skyLayer.rotate());
-		addLine("Axis: " + this.skyLayer.axis());
+		addLine("Axis: " + CommonUtils.vectorToString(this.skyLayer.axis()));
 		addLine("Blend: " + this.skyLayer.blend());
 		addLine("Speed: " + this.skyLayer.speed());
 		addLine("Transition: " + this.skyLayer.transition());
