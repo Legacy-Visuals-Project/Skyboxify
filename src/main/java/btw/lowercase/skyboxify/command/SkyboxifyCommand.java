@@ -40,7 +40,7 @@ import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.io.File;
 import java.io.IOException;
@@ -86,7 +86,7 @@ public class SkyboxifyCommand extends LiteralArgumentBuilder<FabricClientCommand
 					packFolder.mkdir();
 				}
 
-				final ResourceLocation dimension = skybox.getDimension().location();
+				final Identifier dimension = skybox.getDimension().identifier();
 				final File dimensionFolder = packFolder.toPath().resolve(dimension.getNamespace()).resolve(dimension.getPath()).toFile();
 				if (!dimensionFolder.exists()) {
 					dimensionFolder.mkdirs();

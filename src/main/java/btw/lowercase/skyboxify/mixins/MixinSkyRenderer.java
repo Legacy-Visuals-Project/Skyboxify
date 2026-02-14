@@ -27,20 +27,13 @@ import btw.lowercase.skyboxify.Skyboxify;
 import btw.lowercase.skyboxify.events.SkyRenderEvent;
 import org.spongepowered.asm.mixin.Mixin;
 
-//? >=1.21.2 {
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.SkyRenderer;
 import org.spongepowered.asm.mixin.injection.At;
-//?}
 
-//? >=1.21.2 {
 @Mixin(SkyRenderer.class)
-//?} else {
-/*@Mixin(net.minecraft.client.Minecraft.class)
- *///?}
 public abstract class MixinSkyRenderer {
-    //? >=1.21.2 {
     @WrapWithCondition(
             method = "renderSunMoonAndStars",
             at = @At(
@@ -74,10 +67,10 @@ public abstract class MixinSkyRenderer {
             at = @At(
                     value = "INVOKE",
                     //? >=1.21.11 {
-                    /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderMoon(Lnet/minecraft/world/level/MoonPhase;FLcom/mojang/blaze3d/vertex/PoseStack;)V"
-                    *///?} else >=1.21.9 {
-                    target = "Lnet/minecraft/client/renderer/SkyRenderer;renderMoon(IFLcom/mojang/blaze3d/vertex/PoseStack;)V"
-                    //?} else >=1.21.4 {
+                    target = "Lnet/minecraft/client/renderer/SkyRenderer;renderMoon(Lnet/minecraft/world/level/MoonPhase;FLcom/mojang/blaze3d/vertex/PoseStack;)V"
+                    //?} else >=1.21.9 {
+                    /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderMoon(IFLcom/mojang/blaze3d/vertex/PoseStack;)V"
+                    *///?} else >=1.21.4 {
                     /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderMoon(IFLnet/minecraft/client/renderer/MultiBufferSource;Lcom/mojang/blaze3d/vertex/PoseStack;)V"
                     *///?} else {
                     /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderMoon(IFLcom/mojang/blaze3d/vertex/Tesselator;Lcom/mojang/blaze3d/vertex/PoseStack;)V"
@@ -87,10 +80,10 @@ public abstract class MixinSkyRenderer {
     private boolean skyboxify$toggleMoon(
             SkyRenderer instance,
             //? >=1.21.11 {
-            /*net.minecraft.world.level.MoonPhase moonPhases,
-             *///?} else {
-            int moonPhases,
-            //?}
+            net.minecraft.world.level.MoonPhase moonPhases,
+             //?} else {
+            /*int moonPhases,
+            *///?}
             float rainLevel,
             //? <1.21.9 {
             /*//? >=1.21.4 {
@@ -124,5 +117,4 @@ public abstract class MixinSkyRenderer {
     ) {
         return !Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.Celestial(SkyRenderEvent.Celestial.Type.STARS)).isCancelled();
     }
-    //?}
 }

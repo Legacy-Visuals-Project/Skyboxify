@@ -52,11 +52,11 @@ public final class DynamicTransformsBuilder {
                 orElse(this.colorModulator, new Vector4f(1.0F)),
 				new Vector3f(),
 				//? >=1.21.11 {
-				/*new org.joml.Matrix4f()
-				*///?} else {
-				com.mojang.blaze3d.systems.RenderSystem.getTextureMatrix(),
+				new org.joml.Matrix4f()
+				//?} else {
+				/*com.mojang.blaze3d.systems.RenderSystem.getTextureMatrix(),
 				com.mojang.blaze3d.systems.RenderSystem.getShaderLineWidth()
-				 //?}
+				 *///?}
         );
     }
     //?}

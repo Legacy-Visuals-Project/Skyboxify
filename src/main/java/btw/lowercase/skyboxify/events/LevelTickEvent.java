@@ -30,7 +30,7 @@ import org.visuals.legacy.lightconfig.lib.v1.events.Event;
 
 public class LevelTickEvent extends Event {
 	@RequiredArgsConstructor
-	public static class Client extends LevelTickEvent {
+	public final static class Client extends LevelTickEvent {
 		@Getter
 		private final ClientLevel level;
 	}

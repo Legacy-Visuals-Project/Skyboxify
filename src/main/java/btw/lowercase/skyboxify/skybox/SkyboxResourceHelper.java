@@ -28,7 +28,7 @@ import btw.lowercase.skyboxify.utils.ParserCodecs;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.JsonOps;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.IoSupplier;
@@ -60,7 +60,7 @@ public class SkyboxResourceHelper implements
 	private static final Pattern MCPATCHER_SKY_PATTERN = Pattern.compile(MCPATCHER_SKY_PARENT + "/" + SKY_PATTERN_ENDING);
 	private static final Logger LOGGER = LoggerFactory.getLogger(SkyboxResourceHelper.class);
 
-	private static PackResources.ResourceOutput filterResource(final List<ResourceLocation> list) {
+	private static PackResources.ResourceOutput filterResource(final List<Identifier> list) {
 		return (resourceLocation, streamIoSupplier) -> {
 			if (resourceLocation.getPath().endsWith(".properties")) {
 				list.add(resourceLocation);
@@ -68,8 +68,8 @@ public class SkyboxResourceHelper implements
 		};
 	}
 
-	private static Comparator<ResourceLocation> compareLocations(final Pattern pattern) {
-		return Comparator.comparing(ResourceLocation::getPath, (first, second) -> {
+	private static Comparator<Identifier> compareLocations(final Pattern pattern) {
+		return Comparator.comparing(Identifier::getPath, (first, second) -> {
 			final Matcher matcherId1 = pattern.matcher(first);
 			final Matcher matcherId2 = pattern.matcher(second);
 			if (matcherId1.find() && matcherId2.find()) {
@@ -86,7 +86,7 @@ public class SkyboxResourceHelper implements
 
 	//? <=1.21.8 {
     /*@Override
-    public ResourceLocation getFabricId() {
+    public Identifier getFabricId() {
         return Skyboxify.locationOrNull("skybox_reader");
     }
     *///?}
@@ -118,12 +118,12 @@ public class SkyboxResourceHelper implements
 				}
 
 				theResourceManager.listPacks().forEach(pack -> {
-					final List<ResourceLocation> optifineSkies = new ArrayList<>();
-					pack.listResources(PackType.CLIENT_RESOURCES, ResourceLocation.DEFAULT_NAMESPACE, OPTIFINE_SKY_PARENT, filterResource(optifineSkies));
+					final List<Identifier> optifineSkies = new ArrayList<>();
+					pack.listResources(PackType.CLIENT_RESOURCES, Identifier.DEFAULT_NAMESPACE, OPTIFINE_SKY_PARENT, filterResource(optifineSkies));
 					optifineSkies.sort(compareLocations(OPTIFINE_SKY_PATTERN));
 
-					final List<ResourceLocation> mcpatcherSkies = new ArrayList<>();
-					pack.listResources(PackType.CLIENT_RESOURCES, ResourceLocation.DEFAULT_NAMESPACE, MCPATCHER_SKY_PARENT, filterResource(mcpatcherSkies));
+					final List<Identifier> mcpatcherSkies = new ArrayList<>();
+					pack.listResources(PackType.CLIENT_RESOURCES, Identifier.DEFAULT_NAMESPACE, MCPATCHER_SKY_PARENT, filterResource(mcpatcherSkies));
 					mcpatcherSkies.sort(compareLocations(MCPATCHER_SKY_PATTERN));
 
 					Pattern skyPattern = OPTIFINE_SKY_PATTERN;
@@ -135,7 +135,7 @@ public class SkyboxResourceHelper implements
 						skyPattern = MCPATCHER_SKY_PATTERN;
 					}
 
-					final List<ResourceLocation> skies = (skyPattern == OPTIFINE_SKY_PATTERN ? optifineSkies : mcpatcherSkies);
+					final List<Identifier> skies = (skyPattern == OPTIFINE_SKY_PATTERN ? optifineSkies : mcpatcherSkies);
 					if (!skies.isEmpty()) {
 						final int count = this.parseSkyboxesInPack(pack, skies, skyPattern);
 						if (count > 0 && Skyboxify.getConfig().debug.isEnabled()) {
@@ -147,7 +147,7 @@ public class SkyboxResourceHelper implements
 		}).thenCompose(preparationBarrier::wait);
 	}
 
-	private int parseSkyboxesInPack(final PackResources packResources, final List<ResourceLocation> skies, final Pattern skyPattern) {
+	private int parseSkyboxesInPack(final PackResources packResources, final List<Identifier> skies, final Pattern skyPattern) {
 		final Map<String, JsonArray> layers = new HashMap<>();
 		int count = 0;
 		skies.forEach(id -> {

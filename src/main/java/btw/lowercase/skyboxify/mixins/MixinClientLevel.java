@@ -33,8 +33,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ClientLevel.class)
 public abstract class MixinClientLevel {
-    @Inject(method = "tick", at = @At("TAIL"))
-    private void skyboxify$tick(CallbackInfo ci) {
-        Skyboxify.getGlobalEventManager().dispatch(new LevelTickEvent.Client((ClientLevel) (Object) this));
-    }
+	@Inject(method = "tick", at = @At("TAIL"))
+	private void skyboxify$tick(final CallbackInfo ci) {
+		Skyboxify.getGlobalEventManager().dispatch(new LevelTickEvent.Client((ClientLevel) (Object) this));
+	}
 }

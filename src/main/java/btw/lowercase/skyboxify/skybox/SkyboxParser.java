@@ -31,7 +31,7 @@ import com.google.gson.JsonObject;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JavaOps;
 import com.mojang.serialization.JsonOps;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.IoSupplier;
@@ -49,15 +49,15 @@ public final class SkyboxParser {
 	private SkyboxParser() {
 	}
 
-	public static @Nullable JsonObject parseSkyProperties(final Properties properties, final ResourceLocation propertiesResourceLocation, final PackResources packResources) {
+	public static @Nullable JsonObject parseSkyProperties(final Properties properties, final Identifier propertiesIdentifier, final PackResources packResources) {
 		final JsonObject output = new JsonObject();
 
-		final String sourceTexturePath = parseSourceTexture(properties, propertiesResourceLocation, packResources);
+		final String sourceTexturePath = parseSourceTexture(properties, propertiesIdentifier, packResources);
 		if (sourceTexturePath == null) {
 			return null;
 		}
 
-		output.addProperty("_id", propertiesResourceLocation.toString());
+		output.addProperty("_id", propertiesIdentifier.toString());
 		output.addProperty("texture", sourceTexturePath);
 
 		// Convert fade
@@ -125,20 +125,20 @@ public final class SkyboxParser {
 		return output;
 	}
 
-	private static String parseSourceTexture(final Properties properties, final ResourceLocation propertiesResourceLocation, final PackResources packResources) {
+	private static String parseSourceTexture(final Properties properties, final Identifier propertiesIdentifier, final PackResources packResources) {
 		final String source = properties.getProperty("source", null);
 		if (source == null) {
 			LOGGER.error("Failed to load texture texture \"{}\"", "No texture provided or was null");
 			return null;
 		}
 
-		final DataResult<ResourceLocation> sourceResult = ParserCodecs.getSourceTextureCodec(propertiesResourceLocation).parse(JavaOps.INSTANCE, source);
+		final DataResult<Identifier> sourceResult = ParserCodecs.getSourceTextureCodec(propertiesIdentifier).parse(JavaOps.INSTANCE, source);
 		if (sourceResult.isError()) {
 			LOGGER.error("{}", sourceResult.error().get());
 			return null;
 		}
 
-		final ResourceLocation sourceTextureIdentifier = sourceResult.getOrThrow();
+		final Identifier sourceTextureIdentifier = sourceResult.getOrThrow();
 		try {
 			if (!Skyboxify.getConfig().debug.isEnabled()) {
 				final IoSupplier<InputStream> sourceTextureStream = packResources.getResource(PackType.CLIENT_RESOURCES, sourceTextureIdentifier);

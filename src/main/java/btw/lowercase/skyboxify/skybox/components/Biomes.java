@@ -27,12 +27,12 @@ import btw.lowercase.skyboxify.utils.ParserCodecs;
 import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JavaOps;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.List;
 import java.util.Objects;
 
-public record Biomes(ImmutableList<ResourceLocation> locations, boolean inclusion) {
+public record Biomes(ImmutableList<Identifier> locations, boolean inclusion) {
 	public static Biomes DEFAULT = new Biomes(ImmutableList.of(), true);
 
 	public static Codec<Biomes> CODEC = ParserCodecs.TRIMMED_STRING.xmap(input -> {
@@ -43,8 +43,8 @@ public record Biomes(ImmutableList<ResourceLocation> locations, boolean inclusio
 
 		final List<String> entries = ParserCodecs.SPLIT_SPACE_TRIMMED.parse(JavaOps.INSTANCE, input).getOrThrow();
 		if (!entries.isEmpty()) {
-			final ImmutableList.Builder<ResourceLocation> builder = new ImmutableList.Builder<>();
-			builder.addAll(entries.stream().map(ResourceLocation::tryParse).filter(Objects::nonNull).toList());
+			final ImmutableList.Builder<Identifier> builder = new ImmutableList.Builder<>();
+			builder.addAll(entries.stream().map(Identifier::tryParse).filter(Objects::nonNull).toList());
 			return new Biomes(builder.build(), inclusion);
 		} else {
 			return Biomes.DEFAULT;
@@ -58,7 +58,7 @@ public record Biomes(ImmutableList<ResourceLocation> locations, boolean inclusio
 				builder.append("!");
 			}
 
-			for (final ResourceLocation location : biomes.locations) {
+			for (final Identifier location : biomes.locations) {
 				builder.append(location).append(" ");
 			}
 

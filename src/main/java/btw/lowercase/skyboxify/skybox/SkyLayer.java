@@ -32,7 +32,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
@@ -42,8 +42,8 @@ import org.joml.Vector3fc;
 import java.util.List;
 
 public record SkyLayer(
-		ResourceLocation id,
-		ResourceLocation texture,
+		Identifier id,
+		Identifier texture,
 		Biomes biomes,
 		List<Range> heights,
 		Blend blend,
@@ -56,8 +56,8 @@ public record SkyLayer(
 		List<Weather> weatherConditions
 ) {
 	public static final Codec<SkyLayer> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-			ResourceLocation.CODEC.fieldOf("_id").forGetter(SkyLayer::id),
-			ResourceLocation.CODEC.fieldOf("texture").forGetter(SkyLayer::texture),
+			Identifier.CODEC.fieldOf("_id").forGetter(SkyLayer::id),
+			Identifier.CODEC.fieldOf("texture").forGetter(SkyLayer::texture),
 			Biomes.CODEC.optionalFieldOf("biomes", Biomes.DEFAULT).forGetter(SkyLayer::biomes),
 			Range.CODEC.listOf().optionalFieldOf("heights", ImmutableList.of()).forGetter(SkyLayer::heights),
 			Blend.CODEC.optionalFieldOf("blend", Blend.ADD).forGetter(SkyLayer::blend),
@@ -79,7 +79,7 @@ public record SkyLayer(
 		final BlockPos entityPos = cameraEntity.getOnPos();
 		if (!this.biomes.locations().isEmpty()) {
 			final Holder<Biome> currentBiome = level.getBiome(entityPos);
-			if (!currentBiome.isBound() || !(this.biomes.inclusion() && this.biomes.locations().contains(level.getBiome(cameraEntity.blockPosition()).unwrapKey().orElseThrow().location()))) {
+			if (!currentBiome.isBound() || !(this.biomes.inclusion() && this.biomes.locations().contains(level.getBiome(cameraEntity.blockPosition()).unwrapKey().orElseThrow().identifier()))) {
 				return false;
 			}
 		}

@@ -35,7 +35,7 @@ import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 import org.joml.Matrix4f;
 import org.slf4j.Logger;
@@ -55,8 +55,8 @@ public class Skyboxify {
 	@Getter
 	private final SkyboxifyConfig config = new SkyboxifyConfig();
 
-	public ResourceLocation locationOrNull(String path) {
-		return ResourceLocation.tryBuild(MOD_ID, path);
+	public Identifier locationOrNull(String path) {
+		return Identifier.tryBuild(MOD_ID, path);
 	}
 
 	public void initialize() {
@@ -76,7 +76,7 @@ public class Skyboxify {
 
 		//? >=1.21.4 <1.21.9 {
 		/*globalEventManager.listen(SkyRenderEvent.SunriseSunset.After.class, event -> {
-			if (SkyboxManager.isEnabled(event.getLevel())) {
+			if (SkyboxManager.isEnabled()) {
 				event.getBufferSource().endBatch();
 			}
 		});
@@ -88,14 +88,14 @@ public class Skyboxify {
 			final ClientLevel clientLevel = event.getLevel();
 			renderSkyboxes(clientLevel, event.getTickDelta());
 			// Disable Sun, Moon, & Stars in the Nether
-			if (SkyboxManager.isEnabled(clientLevel) && SkyboxManager.containsEnabled(Level.NETHER) && clientLevel.dimension().equals(Level.NETHER)) {
+			if (SkyboxManager.isEnabled() && SkyboxManager.containsEnabled(Level.NETHER) && clientLevel.dimension().equals(Level.NETHER)) {
 				event.setCancelled(true);
 			}
 		});
 	}
 
-	private void renderSkyboxes(ClientLevel clientLevel, float tickDelta) {
-		if (SkyboxManager.isEnabled(clientLevel)) {
+	private void renderSkyboxes(final ClientLevel clientLevel, final float tickDelta) {
+		if (SkyboxManager.isEnabled()) {
 			final Matrix4f modelViewMatrix = new Matrix4f(RenderSystem.getModelViewStack()).rotate(Axis.YP.rotationDegrees(-90.0F));
 			for (final Skybox skybox : SkyboxManager.getActiveSkyboxes()) {
 				SkyboxSkyRenderer.INSTANCE.renderSkybox(skybox, modelViewMatrix, clientLevel, tickDelta);

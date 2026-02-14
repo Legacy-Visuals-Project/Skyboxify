@@ -24,9 +24,8 @@
 package btw.lowercase.skyboxify.skybox;
 
 import btw.lowercase.skyboxify.Skyboxify;
-import btw.lowercase.skyboxify.mixins.RenderPipelinesAccessor;
 import btw.lowercase.skyboxify.skybox.components.UV;
-import btw.lowercase.skyboxify.utils.*;
+import btw.lowercase.skyboxify.utils.CommonUtils;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.Minecraft;
@@ -37,6 +36,11 @@ import org.joml.AxisAngle4f;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector4f;
+
+//? >=1.21.5 {
+import btw.lowercase.skyboxify.mixins.RenderPipelinesAccessor;
+import btw.lowercase.skyboxify.utils.*;
+//?}
 
 public final class SkyboxSkyRenderer {
     public static final SkyboxSkyRenderer INSTANCE = new SkyboxSkyRenderer();
@@ -49,8 +53,21 @@ public final class SkyboxSkyRenderer {
     /*private com.mojang.blaze3d.vertex.VertexBuffer skyBuffer;
      *///?}
 
+	//? <=1.21.4
+	/*private final net.minecraft.client.renderer.ShaderProgram customSkyboxShader;*/
+
     private SkyboxSkyRenderer() {
         Minecraft.getInstance().schedule(this::buildSky);
+
+		//? <=1.21.4 {
+		/*this.customSkyboxShader = new net.minecraft.client.renderer.ShaderProgram(
+				Skyboxify.locationOrNull("core/custom_skybox"),
+				DefaultVertexFormat.POSITION_TEX,
+				net.minecraft.client.renderer.ShaderDefines.EMPTY
+		);
+
+		net.minecraft.client.renderer.CoreShaders.getProgramsToPreload().add(this.customSkyboxShader);
+		*///?}
     }
 
     private void buildSky() {
@@ -93,7 +110,7 @@ public final class SkyboxSkyRenderer {
     }
 
     //? >=1.21.5 {
-    private final java.util.Map<net.minecraft.resources.ResourceLocation, com.mojang.blaze3d.pipeline.RenderPipeline> renderPipelineCache = new java.util.HashMap<>();
+    private final java.util.Map<net.minecraft.resources.Identifier, com.mojang.blaze3d.pipeline.RenderPipeline> renderPipelineCache = new java.util.HashMap<>();
 
     public static com.mojang.blaze3d.pipeline.RenderPipeline getSkyboxPipeline(final @org.jetbrains.annotations.Nullable BlendFunction blendFunction) {
         final com.mojang.blaze3d.pipeline.RenderPipeline.Builder builder = com.mojang.blaze3d.pipeline.RenderPipeline.builder(RenderPipelinesAccessor.skyboxify$getMatricesProjectionSnippet());
@@ -117,13 +134,14 @@ public final class SkyboxSkyRenderer {
 			final int clampedTimeOfDay = (int) (dayTime % 24000L);
 			final float skyAngle = getTimeOfDay(level);
 			final float rainLevel = level.getRainLevel(tickDelta);
+
 			float thunderLevel = level.getThunderLevel(tickDelta);
 			if (rainLevel > 0.0F) {
 				thunderLevel /= rainLevel;
 			}
 
 			for (final SkyLayer skyLayer : skybox.getLayers().stream().filter(layer -> layer.isActive(dayTime, clampedTimeOfDay)).toList()) {
-				renderSkyLayer(skyLayer, new Matrix4f(modelViewMatrix), level, clampedTimeOfDay, skyAngle, rainLevel, thunderLevel, skybox.getConditionAlphaFor(skyLayer));
+				this.renderSkyLayer(skyLayer, new Matrix4f(modelViewMatrix), level, clampedTimeOfDay, skyAngle, rainLevel, thunderLevel, skybox.getConditionAlphaFor(skyLayer));
 			}
 		}
     }
@@ -144,12 +162,13 @@ public final class SkyboxSkyRenderer {
             }
 
             //? <=1.21.4 {
-            /*RenderSystem.setShaderTexture(0, skyLayer.texture());
-            RenderSystem.setShader(net.minecraft.client.renderer.CoreShaders.POSITION_TEX); // TODO: Use custom_skybox shader
+            /*RenderSystem.setShader(this.customSkyboxShader);
+			RenderSystem.setShaderTexture(0, skyLayer.texture());
             RenderSystem.depthMask(false);
             RenderSystem.colorMask(true, true, true, false);
             skyLayer.blend().apply(finalAlpha);
-            *///?} else {
+            *///?}
+
 			final Vector4f shaderColor = skyLayer.blend().getShaderColor(finalAlpha);
 
             //? >=1.21.6 {
@@ -161,6 +180,7 @@ public final class SkyboxSkyRenderer {
 			/*RenderSystem.setShaderColor(shaderColor.x, shaderColor.y, shaderColor.z, shaderColor.w);
 			*///?}
 
+			//? >=1.21.5 {
 			final com.mojang.blaze3d.pipeline.RenderPipeline renderPipeline = this.renderPipelineCache.computeIfAbsent(skyLayer.texture(), (resourceLocation) -> {
                 com.mojang.blaze3d.pipeline.RenderPipeline pipeline = getSkyboxPipeline(skyLayer.blend().getBlendFunction());
                 IrisUtil.assignPipeline(pipeline, IrisPipeline.SKY_TEXTURED);
@@ -201,10 +221,10 @@ public final class SkyboxSkyRenderer {
                 //?}
 
                 //? >=1.21.11 {
-                /*renderPass.bindTexture("Sampler0", skyTexture.getTextureView(), skyTexture.getSampler());
-                 *///?} else >= 1.21.6 {
-                renderPass.bindSampler("Sampler0", skyTexture.getTextureView());
-                //?} else {
+                renderPass.bindTexture("Sampler0", skyTexture.getTextureView(), skyTexture.getSampler());
+                 //?} else >= 1.21.6 {
+                /*renderPass.bindSampler("Sampler0", skyTexture.getTextureView());
+                *///?} else {
                 /*renderPass.bindSampler("Sampler0", skyTexture.getTexture());
                  *///?}
 
@@ -250,7 +270,7 @@ public final class SkyboxSkyRenderer {
 
     private float getTimeOfDay(final Level level) {
         //? >=1.21.11 {
-        /*long fixedTime = level.getDayTime();
+        long fixedTime = level.getDayTime();
         if (level.dimensionType().hasFixedTime()) {
             if (level.dimension().equals(Level.NETHER)) {
                 fixedTime = 18000L;
@@ -262,8 +282,8 @@ public final class SkyboxSkyRenderer {
         final double frac = Mth.frac(fixedTime / 24000.0 - 0.25);
         final double mul = 0.5 - Math.cos(frac * Math.PI) / 2.0;
         return (float)(frac * 2.0 + mul) / 3.0F;
-        *///?} else {
-        return level.getTimeOfDay(1.0F);
-        //?}
+        //?} else {
+        /*return level.getTimeOfDay(1.0F);
+        *///?}
     }
 }

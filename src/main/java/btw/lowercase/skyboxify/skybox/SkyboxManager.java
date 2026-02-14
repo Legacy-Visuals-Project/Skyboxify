@@ -66,8 +66,8 @@ public final class SkyboxManager {
 		}
 	}
 
-	public boolean isEnabled(final Level level) {
-		return Skyboxify.getConfig().enabled.isEnabled() && !activeSkyboxes.isEmpty() && level != null;
+	public boolean isEnabled() {
+		return Skyboxify.getConfig().enabled.isEnabled() && !activeSkyboxes.isEmpty();
 	}
 
 	public List<Skybox> getSkiesFor(final ResourceKey<@NotNull Level> resourceKey) {

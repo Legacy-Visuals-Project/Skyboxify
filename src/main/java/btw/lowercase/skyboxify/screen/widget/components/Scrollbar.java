@@ -27,11 +27,11 @@ import btw.lowercase.skyboxify.Skyboxify;
 import btw.lowercase.skyboxify.screen.widget.Gidget;
 import lombok.Getter;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 
 public class Scrollbar extends Gidget {
-	public static final ResourceLocation BAR_TEXTURE = Skyboxify.locationOrNull("widget/scrollbar/bar");
+	public static final Identifier BAR_TEXTURE = Skyboxify.locationOrNull("widget/scrollbar/bar");
 
 	public static final int DEFAULT_WIDTH = 10;
 	private final Knob knob;
@@ -86,7 +86,7 @@ public class Scrollbar extends Gidget {
 	}
 
 	private class Knob extends Gidget {
-		public static final ResourceLocation KNOB_TEXTURE = Skyboxify.locationOrNull("widget/scrollbar/knob");
+		public static final Identifier KNOB_TEXTURE = Skyboxify.locationOrNull("widget/scrollbar/knob");
 		public static final int DEFAULT_HEIGHT = 30;
 
 		public Knob(int x, int y, int height) {

@@ -31,7 +31,7 @@ import org.visuals.legacy.lightconfig.lib.v1.events.CancellableEvent;
 import org.visuals.legacy.lightconfig.lib.v1.events.Event;
 
 public class SkyRenderEvent {
-	public static class EndSky {
+	public static final class EndSky {
 		@RequiredArgsConstructor
 		public static class After extends Event {
 			@Getter
@@ -40,11 +40,9 @@ public class SkyRenderEvent {
 	}
 
 	@RequiredArgsConstructor
-	public static class SunriseSunset extends CancellableEvent {
+	public static final class SunriseSunset extends CancellableEvent {
 		@RequiredArgsConstructor
 		public static class After extends Event {
-			@Getter
-			private final Level level;
 			//? >=1.21.4 <1.21.9 {
 			/*@Getter
 			private final net.minecraft.client.renderer.MultiBufferSource.BufferSource bufferSource;
@@ -53,7 +51,7 @@ public class SkyRenderEvent {
 	}
 
 	@RequiredArgsConstructor
-	public static class SunMoonStars extends CancellableEvent {
+	public static final class SunMoonStars extends CancellableEvent {
 		@Getter
 		private final ClientLevel level;
 		@Getter
@@ -61,7 +59,7 @@ public class SkyRenderEvent {
 	}
 
 	@RequiredArgsConstructor
-	public static class Celestial extends CancellableEvent {
+	public static final class Celestial extends CancellableEvent {
 		@Getter
 		private final Type type;
 
