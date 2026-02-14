@@ -39,7 +39,7 @@ import java.util.Map;
 
 public class Skybox {
 	public static final Codec<Skybox> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-			Level.RESOURCE_KEY_CODEC.fieldOf("world").forGetter(Skybox::getWorldKey),
+			Level.RESOURCE_KEY_CODEC.fieldOf("dimension").forGetter(Skybox::getDimension),
 			SkyLayer.CODEC.listOf().fieldOf("layers").forGetter(Skybox::getLayers)
 	).apply(instance, Skybox::new));
 
@@ -49,20 +49,20 @@ public class Skybox {
 	@Getter
 	private final List<SkyLayer> layers;
 	@Getter
-	private final ResourceKey<@NotNull Level> worldKey;
+	private final ResourceKey<@NotNull Level> dimension;
 	private final Map<SkyLayer, Float> alphaMap = new HashMap<>();
 	@Getter
 	private boolean active = true;
 
-	public Skybox(final ResourceKey<@NotNull Level> worldKey, final List<SkyLayer> layers) {
-		this.worldKey = worldKey;
+	public Skybox(final ResourceKey<@NotNull Level> dimension, final List<SkyLayer> layers) {
+		this.dimension = dimension;
 		this.layers = layers;
 	}
 
 	public void tick(final ClientLevel level) {
 		this.active = true;
-		final boolean allowOtherDimensions = Skyboxify.getConfig().showOverworldForUnknownDimension.isEnabled() && this.worldKey.equals(Level.OVERWORLD) && !level.dimension().equals(Level.NETHER) && !level.dimension().equals(Level.END);
-		if (this.worldKey.equals(level.dimension()) || allowOtherDimensions) {
+		final boolean allowOtherDimensions = Skyboxify.getConfig().showOverworldForUnknownDimension.isEnabled() && this.dimension.equals(Level.OVERWORLD) && !level.dimension().equals(Level.NETHER) && !level.dimension().equals(Level.END);
+		if (this.dimension.equals(level.dimension()) || allowOtherDimensions) {
 			this.layers.forEach(layer -> alphaMap.put(layer, layer.getPositionBrightness(level, this.getConditionAlphaFor(layer))));
 		} else {
 			this.layers.forEach(layer -> alphaMap.put(layer, -1.0F));

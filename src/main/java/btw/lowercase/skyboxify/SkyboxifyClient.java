@@ -35,7 +35,7 @@ public final class SkyboxifyClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		Skyboxify.initialize(); // TODO: change in the future
-		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(new SkyboxifyCommand("skyboxify")));
+		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(new SkyboxifyCommand()));
 		//? >=1.21.10 {
 		net.fabricmc.fabric.api.resource.v1.ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloader(Skyboxify.locationOrNull("skybox_reader"), new SkyboxResourceHelper());
 		//?} else {

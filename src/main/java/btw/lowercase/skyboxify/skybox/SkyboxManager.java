@@ -71,7 +71,7 @@ public final class SkyboxManager {
 	}
 
 	public List<Skybox> getSkiesFor(final ResourceKey<@NotNull Level> resourceKey) {
-		return getActiveSkyboxes().stream().filter(skybox -> resourceKey.equals(skybox.getWorldKey())).toList();
+		return getActiveSkyboxes().stream().filter(skybox -> resourceKey.equals(skybox.getDimension())).toList();
 	}
 
 	public boolean containsEnabled(final ResourceKey<@NotNull Level> resourceKey) {
