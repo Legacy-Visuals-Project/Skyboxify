@@ -54,7 +54,7 @@ public class SkyboxResourceHelper implements
 		 *///?}
 {
 	private static final String OPTIFINE_SKY_PARENT = "optifine/sky";
-	private static final String SKY_PATTERN_ENDING = "(?<world>[\\w-]+)/(?<name>\\w+).properties$";
+	private static final String SKY_PATTERN_ENDING = "(?<dimension>[\\w-]+)/(?<name>\\w+).properties$";
 	private static final Pattern OPTIFINE_SKY_PATTERN = Pattern.compile(OPTIFINE_SKY_PARENT + "/" + SKY_PATTERN_ENDING);
 	private static final String MCPATCHER_SKY_PARENT = "mcpatcher/sky";
 	private static final Pattern MCPATCHER_SKY_PATTERN = Pattern.compile(MCPATCHER_SKY_PARENT + "/" + SKY_PATTERN_ENDING);
@@ -105,11 +105,11 @@ public class SkyboxResourceHelper implements
 			@NotNull Executor gameExecutor
 	) {
 		final ResourceManager theResourceManager =
-				//? >=1.21.9 {
-				sharedState.resourceManager();
-		//?} else {
-		/*resourceManager;
-		 *///?}
+			//? >=1.21.9 {
+			sharedState.resourceManager();
+			//?} else {
+			/*resourceManager;
+			 *///?}
 		return CompletableFuture.runAsync(() -> {
 			if (Skyboxify.getConfig().enabled.isEnabled()) {
 				SkyboxManager.clearSkyboxes();
@@ -156,9 +156,9 @@ public class SkyboxResourceHelper implements
 				return;
 			}
 
-			final String world = matcher.group("world");
+			final String dimension = matcher.group("dimension");
 			final String name = matcher.group("name");
-			if (world == null || name == null) {
+			if (dimension == null || name == null) {
 				return;
 			}
 
@@ -190,7 +190,7 @@ public class SkyboxResourceHelper implements
 			final JsonObject json = SkyboxParser.parseSkyProperties(properties, id, packResources);
 			// NOTE: Don't add broken skies (returns null if broken)
 			if (json != null) {
-				layers.computeIfAbsent(world, key -> new JsonArray()).add(json);
+				layers.computeIfAbsent(dimension, key -> new JsonArray()).add(json);
 			}
 		});
 
@@ -199,10 +199,10 @@ public class SkyboxResourceHelper implements
 			if (!skyLayers.isEmpty()) {
 				final JsonObject skyboxJson = new JsonObject();
 				skyboxJson.addProperty("dimension", switch (entry.getKey()) {
-					case "world0" -> "overworld";
-					case "world-1" -> "the_nether";
-					case "world1" -> "the_end";
-					/*case "world4" -> "the_aether";*/
+					case "world0" -> "minecraft:overworld";
+					case "world-1" -> "minecraft:the_nether";
+					case "world1" -> "minecraft:the_end";
+					case "world4" -> "aether:the_aether";
 					default -> entry.getKey().replaceAll("-", "_");
 				});
 				skyboxJson.add("layers", skyLayers);

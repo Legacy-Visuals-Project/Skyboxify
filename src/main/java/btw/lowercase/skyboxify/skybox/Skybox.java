@@ -45,7 +45,7 @@ public class Skybox {
 
 	@Getter
 	@Setter
-	private String packName = "_";
+	private String packName = null;
 	@Getter
 	private final List<SkyLayer> layers;
 	@Getter
@@ -70,7 +70,7 @@ public class Skybox {
 		}
 	}
 
-	public float getConditionAlphaFor(final SkyLayer skyLayer) {
-		return this.alphaMap.getOrDefault(skyLayer, -1.0F);
+	public float getConditionAlphaFor(final SkyLayer layer) {
+		return this.alphaMap.getOrDefault(layer, -1.0F);
 	}
 }
