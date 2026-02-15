@@ -40,7 +40,7 @@ public interface RenderPipelinesAccessor {
             *///?}
     )
     static com.mojang.blaze3d.pipeline.RenderPipeline.Snippet skyboxify$getMatricesProjectionSnippet() {
-        return null;
+        throw new UnsupportedOperationException();
     }
     //?}
 }

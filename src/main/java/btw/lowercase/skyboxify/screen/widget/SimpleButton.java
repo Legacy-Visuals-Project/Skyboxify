@@ -39,7 +39,12 @@ public class SimpleButton extends Gidget {
 	private final Text text;
 	private final Consumer<? super SimpleButton> onClick;
 
-	public SimpleButton(Component text, int x, int y, Consumer<? super SimpleButton> onClick) {
+	public SimpleButton(
+			final Component text,
+			final int x,
+			final int y,
+			final Consumer<? super SimpleButton> onClick
+	) {
 		super(new Box(x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT));
 		this.text = Text.builder(text)
 				.position(this.box.left() + (this.box.width() / 2), this.box.top() + (this.box.height() / 2))
@@ -54,7 +59,7 @@ public class SimpleButton extends Gidget {
 	}
 
 	@Override
-	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+	public void render(final GuiGraphics guiGraphics, final int mouseX, final int mouseY) {
 		super.render(guiGraphics, mouseX, mouseY);
 		this.text.setColor(this.box().contains(mouseX, mouseY) ? ARGB.color(255, 0xFFFFA0) : ARGB.color(255, 0xE0E0E0));
 		this.text.render(guiGraphics, mouseX, mouseY);
@@ -66,13 +71,13 @@ public class SimpleButton extends Gidget {
 	}
 
 	@Override
-	public boolean onMouseClicked(double mouseX, double mouseY) {
+	public boolean onMouseClicked(final double mouseX, final double mouseY) {
 		this.onClick.accept(this);
 		return true;
 	}
 
 	@Override
-	public void move(int x, int y) {
+	public void move(final int x, final int y) {
 		super.move(x, y);
 		this.text.move(this.box().left() + (this.box().width() / 2), this.box().top() + (this.box().height() / 2));
 	}
@@ -92,7 +97,7 @@ public class SimpleButton extends Gidget {
 			this.onClick = onClick;
 		}
 
-		public Builder position(int x, int y) {
+		public Builder position(final int x, final int y) {
 			this.x = x;
 			this.y = y;
 			return this;

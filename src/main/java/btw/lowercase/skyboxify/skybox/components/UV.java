@@ -23,5 +23,14 @@
 
 package btw.lowercase.skyboxify.skybox.components;
 
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import org.joml.Matrix4f;
+
 public record UV(float minU, float minV, float maxU, float maxV) {
+	public void face(final VertexConsumer vertexConsumer, final Matrix4f matrix4f, final float size) {
+		vertexConsumer.addVertex(matrix4f, -size, -size, -size).setUv(this.minU, this.minV);
+		vertexConsumer.addVertex(matrix4f, -size, -size, size).setUv(this.minU, this.maxV);
+		vertexConsumer.addVertex(matrix4f, size, -size, size).setUv(this.maxU, this.maxV);
+		vertexConsumer.addVertex(matrix4f, size, -size, -size).setUv(this.maxU, this.minV);
+	}
 }

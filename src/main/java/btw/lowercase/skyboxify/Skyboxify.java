@@ -28,7 +28,7 @@ import btw.lowercase.skyboxify.events.LevelTickEvent;
 import btw.lowercase.skyboxify.events.SkyRenderEvent;
 import btw.lowercase.skyboxify.skybox.Skybox;
 import btw.lowercase.skyboxify.skybox.SkyboxManager;
-import btw.lowercase.skyboxify.skybox.SkyboxSkyRenderer;
+import btw.lowercase.skyboxify.skybox.SkyboxRenderer;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.math.Axis;
 import lombok.Getter;
@@ -47,7 +47,7 @@ import java.nio.file.Path;
 @UtilityClass
 public class Skyboxify {
 	public final String MOD_ID = "@MODID@";
-	public final Path DEBUG_FOLDER = Minecraft.getInstance().gameDirectory.toPath().resolve("debug_skyboxify");
+	public final Path DEBUG_FOLDER = Minecraft.getInstance().gameDirectory.toPath().resolve("debug_" + MOD_ID);
 	@Getter
 	private final Logger logger = LoggerFactory.getLogger(Skyboxify.class);
 	@Getter
@@ -82,24 +82,28 @@ public class Skyboxify {
 		});
 		*///?}
 
-		globalEventManager.listen(SkyRenderEvent.EndSky.After.class, event -> renderSkyboxes(event.getLevel(), 0.0F));
+		globalEventManager.listen(SkyRenderEvent.EndSky.After.class, event -> {
+			if (SkyboxManager.isEnabled()) {
+				renderSkyboxes(event.getLevel(), 0.0F);
+			}
+		});
 
 		globalEventManager.listen(SkyRenderEvent.SunMoonStars.class, event -> {
 			final ClientLevel level = event.getLevel();
-			renderSkyboxes(level, event.getTickDelta());
-			// Disable Sun, Moon, & Stars in the Nether
-			if (SkyboxManager.isEnabled() && SkyboxManager.containsEnabled(Level.NETHER) && level.dimension().equals(Level.NETHER)) {
-				event.setCancelled(true);
+			if (SkyboxManager.isEnabled()) {
+				renderSkyboxes(level, event.getTickDelta());
+				// Disable Sun, Moon, & Stars in the Nether
+				if (SkyboxManager.containsEnabled(Level.NETHER) && level.dimension().equals(Level.NETHER)){
+					event.setCancelled(true);
+				}
 			}
 		});
 	}
 
 	private void renderSkyboxes(final ClientLevel level, final float tickDelta) {
-		if (SkyboxManager.isEnabled()) {
-			final Matrix4f modelViewMatrix = new Matrix4f(RenderSystem.getModelViewStack()).rotate(Axis.YP.rotationDegrees(-90.0F));
-			for (final Skybox skybox : SkyboxManager.getActive()) {
-				SkyboxSkyRenderer.INSTANCE.renderSkybox(skybox, modelViewMatrix, level, tickDelta);
-			}
+		final Matrix4f modelViewMatrix = new Matrix4f(RenderSystem.getModelViewStack()).rotate(Axis.YP.rotationDegrees(-90.0F));
+		for (final Skybox skybox : SkyboxManager.getActive()) {
+			SkyboxRenderer.INSTANCE.render(skybox, modelViewMatrix, level, tickDelta);
 		}
 	}
 }

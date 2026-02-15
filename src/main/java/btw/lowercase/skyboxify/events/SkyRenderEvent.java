@@ -53,6 +53,7 @@ public class SkyRenderEvent {
 	public static final class SunMoonStars extends CancellableEvent {
 		@Getter
 		private final ClientLevel level;
+
 		@Getter
 		private final float tickDelta;
 	}

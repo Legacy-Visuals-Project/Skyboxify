@@ -44,7 +44,15 @@ public class Text extends Gidget {
 	@Setter
 	private int color;
 
-	public Text(Font font, Component text, int x, int y, Alignment alignment, boolean shadow, int color) {
+	public Text(
+			final Font font,
+			final Component text,
+			final int x,
+			final int y,
+			final Alignment alignment,
+			final boolean shadow,
+			final int color
+	) {
 		super(new Box(x, y, font.width(text.getString()), font.lineHeight));
 		this.font = font;
 		this.text = text;
@@ -62,7 +70,7 @@ public class Text extends Gidget {
 	}
 
 	@Override
-	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+	public void render(final GuiGraphics guiGraphics, final int mouseX, final int mouseY) {
 		int finalX = this.box().left();
 		if (this.alignment == Alignment.BOTH || this.alignment == Alignment.CENTER_HORIZONTAL) {
 			finalX -= this.box().width() / 2;
@@ -122,23 +130,23 @@ public class Text extends Gidget {
 			this(Component.literal(text));
 		}
 
-		public Builder position(int x, int y) {
+		public Builder position(final int x, final int y) {
 			this.x = x;
 			this.y = y;
 			return this;
 		}
 
-		public Builder withColor(int color) {
+		public Builder withColor(final int color) {
 			this.color = color;
 			return this;
 		}
 
-		public Builder withShadow(boolean shadow) {
+		public Builder withShadow(final boolean shadow) {
 			this.shadow = shadow;
 			return this;
 		}
 
-		public Builder aligned(Alignment alignment) {
+		public Builder aligned(final Alignment alignment) {
 			this.alignment = alignment;
 			return this;
 		}
@@ -148,7 +156,7 @@ public class Text extends Gidget {
 			return this;
 		}
 
-		public Text build(Font font) {
+		public Text build(final Font font) {
 			return new Text(font, this.text, this.x, this.y, this.alignment, this.shadow, this.color);
 		}
 	}

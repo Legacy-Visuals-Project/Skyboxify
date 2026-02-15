@@ -26,50 +26,46 @@ package btw.lowercase.skyboxify.screen.widget;
 import btw.lowercase.skyboxify.screen.widget.components.Box;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @RequiredArgsConstructor
 public abstract class Gidget {
 	protected final Box box;
 
-	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+	public void render(final GuiGraphics guiGraphics, final int mouseX, final int mouseY) {
 		this.renderBackground(guiGraphics, mouseX, mouseY);
 	}
 
-	public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+	public void renderBackground(final GuiGraphics guiGraphics, final int mouseX, final int mouseY) {
 		final int backgroundColor = this.box.contains(mouseX, mouseY) ? ARGB.white(0.7F) : ARGB.white(0.58F);
 		guiGraphics.fill(this.box.left(), this.box.top(), this.box.right(), this.box.bottom(), backgroundColor);
 	}
 
-	public boolean onMouseMove(double mouseX, double mouseY) {
+	public boolean onMouseMove(final double mouseX, final double mouseY) {
 		return false;
 	}
 
-	public boolean onMouseClicked(double mouseX, double mouseY) {
+	public boolean onMouseClicked(final double mouseX, final double mouseY) {
 		return false;
 	}
 
-	public boolean onMouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+	public boolean onMouseScrolled(final double mouseX, final double mouseY, final double scrollX, final double scrollY) {
 		return false;
 	}
 
-	public boolean onKeyDown(int scancode, int key, int modifiers) {
+	public boolean onKeyDown(final int scancode, final int key, final int modifiers) {
 		return false;
 	}
 
-	public boolean onKeyUp(int scancode, int key, int modifiers) {
+	public boolean onKeyUp(final int scancode, final int key, final int modifiers) {
 		return false;
 	}
 
-	public void move(int x, int y) {
+	public void move(final int x, final int y) {
 		this.box.move(x, y);
 	}
 
-	public void resize(int width, int height) {
+	public void resize(final int width, final int height) {
 		this.box.resize(width, height);
 	}
 

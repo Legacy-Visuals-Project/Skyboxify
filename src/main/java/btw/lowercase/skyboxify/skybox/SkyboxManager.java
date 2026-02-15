@@ -27,7 +27,6 @@ import btw.lowercase.skyboxify.Skyboxify;
 import com.google.common.base.Preconditions;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
@@ -51,7 +50,7 @@ public final class SkyboxManager {
 	}
 
 	public void clearSkyboxes() {
-		Minecraft.getInstance().execute(SkyboxSkyRenderer.INSTANCE::clearCache);
+		SkyboxRenderer.INSTANCE.clearCache();
 		loaded.clear();
 		active.clear();
 	}

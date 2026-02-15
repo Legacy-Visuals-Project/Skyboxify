@@ -49,14 +49,14 @@ public class DebugScreen extends Screen {
 	}
 
 	@Override
-	public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+	public void render(final @NotNull GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float delta) {
 		super.render(guiGraphics, mouseX, mouseY, delta);
 		for (final Gidget gidget : this.gidgets) {
 			gidget.render(guiGraphics, mouseX, mouseY);
 		}
 	}
 
-	private boolean mouseClickedInternal(double mouseX, double mouseY) {
+	private boolean mouseClickedInternal(final double mouseX, final double mouseY) {
 		for (final Gidget gidget : this.gidgets) {
 			if (gidget.box().contains((int) mouseX, (int) mouseY) && gidget.onMouseClicked(mouseX, mouseY)) {
 				return true;
@@ -68,18 +68,18 @@ public class DebugScreen extends Screen {
 
 	//? >=1.21.9 {
 	@Override
-	public boolean mouseClicked(net.minecraft.client.input.MouseButtonEvent event, boolean isDoubleClick) {
+	public boolean mouseClicked(final net.minecraft.client.input.MouseButtonEvent event, final boolean isDoubleClick) {
 		return this.mouseClickedInternal(event.x(), event.y());
 	}
 	//?} else {
     /*@Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(final double mouseX, final double mouseY, final int button) {
         return this.mouseClickedInternal(mouseX, mouseY);
     }
     *///?}
 
 	@Override
-	public void mouseMoved(double mouseX, double mouseY) {
+	public void mouseMoved(final double mouseX, final double mouseY) {
 		for (final Gidget gidget : this.gidgets) {
 			gidget.onMouseMove(mouseX, mouseY);
 		}
@@ -88,7 +88,7 @@ public class DebugScreen extends Screen {
 	}
 
 	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+	public boolean mouseScrolled(final double mouseX, final double mouseY, final double scrollX, final double scrollY) {
 		for (final Gidget gidget : this.gidgets) {
 			if (gidget.box().contains((int) mouseX, (int) mouseY) && gidget.onMouseScrolled(mouseX, mouseY, scrollX, scrollY)) {
 				return true;
@@ -98,7 +98,7 @@ public class DebugScreen extends Screen {
 		return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
 	}
 
-	private boolean keyPressedInternal(int keyCode, int scanCode, int modifiers) {
+	private boolean keyPressedInternal(final int keyCode, final int scanCode, final int modifiers) {
 		if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
 			this.minecraft.setScreen(null);
 			return true;
@@ -115,17 +115,17 @@ public class DebugScreen extends Screen {
 
 	//? >=1.21.9 {
 	@Override
-	public boolean keyPressed(net.minecraft.client.input.KeyEvent event) {
+	public boolean keyPressed(final net.minecraft.client.input.KeyEvent event) {
 		return this.keyPressedInternal(event.key(), event.scancode(), event.modifiers());
 	}
 	//?} else {
     /*@Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+    public boolean keyPressed(final int keyCode, final int scanCode, final int modifiers) {
         return this.keyPressedInternal(keyCode, scanCode, modifiers);
     }
     *///?}
 
-	private boolean keyReleasedInternal(int keyCode, int scanCode, int modifiers) {
+	private boolean keyReleasedInternal(final int keyCode, final int scanCode, final int modifiers) {
 		for (final Gidget gidget : this.gidgets) {
 			if (gidget.onKeyUp(scanCode, keyCode, modifiers)) {
 				return true;
@@ -137,20 +137,18 @@ public class DebugScreen extends Screen {
 
 	//? >=1.21.9 {
 	@Override
-	public boolean keyReleased(net.minecraft.client.input.KeyEvent event) {
-		return this.keyPressedInternal(event.key(), event.scancode(), event.modifiers());
+	public boolean keyReleased(final net.minecraft.client.input.KeyEvent event) {
+		return this.keyReleasedInternal(event.key(), event.scancode(), event.modifiers());
 	}
 	//?} else {
     /*@Override
-    public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
-        return this.keyPressedInternal(keyCode, scanCode, modifiers);
+    public boolean keyReleased(final int keyCode, final int scanCode, final int modifiers) {
+        return this.keyReleasedInternal(keyCode, scanCode, modifiers);
     }
     *///?}
 
 	@Override
 	public void onClose() {
-		if (this.minecraft != null) {
-			this.minecraft.setScreen(this.parent);
-		}
+		this.minecraft.setScreen(this.parent);
 	}
 }
