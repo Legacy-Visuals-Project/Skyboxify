@@ -23,7 +23,7 @@
 
 package btw.lowercase.skyboxify.skybox;
 
-import btw.lowercase.skyboxify.Skyboxify;
+import btw.lowercase.skyboxify.api.SkyboxifyImpl;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.Getter;
@@ -61,7 +61,7 @@ public class Skybox {
 
 	public void tick(final ClientLevel level) {
 		this.active = true;
-		final boolean allowOtherDimensions = Skyboxify.getConfig().showOverworldForUnknownDimension.isEnabled() && this.dimension.equals(Level.OVERWORLD) && !level.dimension().equals(Level.NETHER) && !level.dimension().equals(Level.END);
+		final boolean allowOtherDimensions = SkyboxifyImpl.config().showOverworldForUnknownDimension.isEnabled() && this.dimension.equals(Level.OVERWORLD) && !level.dimension().equals(Level.NETHER) && !level.dimension().equals(Level.END);
 		if (this.dimension.equals(level.dimension()) || allowOtherDimensions) {
 			this.layers.forEach(layer -> alphaMap.put(layer, layer.getPositionBrightness(level, this.getConditionAlphaFor(layer))));
 		} else {

@@ -23,10 +23,10 @@
 
 package btw.lowercase.skyboxify.utils;
 
-import btw.lowercase.skyboxify.Skyboxify;
 import lombok.experimental.UtilityClass;
 
 //? >=1.21.5 {
+import btw.lowercase.skyboxify.api.SkyboxifyImpl;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 
 import java.lang.reflect.Method;
@@ -53,7 +53,7 @@ public final class IrisUtil {
             // Methods
             IRIS_ASSIGN_PIPELINE_METHOD = IRIS_INSTANCE.getClass().getMethod("assignPipeline", RenderPipeline.class, irisProgramEnum);
         } catch (final Exception exception) {
-			if (Skyboxify.getConfig().debug.isEnabled()) {
+			if (SkyboxifyImpl.config().debug.isEnabled()) {
 				exception.printStackTrace();
 			}
         }

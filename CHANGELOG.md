@@ -11,6 +11,10 @@
 
 - New API
     - Get instance via SkyboxifyImpl#getInstance returns SkyboxifyApi
+- SkyboxifyApi#getConfig
+    - Returns the Skyboxify config instance
+- SkyboxifyApi#getSkyboxManager
+    - Returns the Skybox manager class that handles inactive/active skyboxes & handling
 - SkyboxifyApi#registerDimensionMapping(int legacyId, Identifier modernId)
     - for other mods to use to map their older dimension ids to their modern counterpart
     - will throw exception if legacy id is already taken or if modern id is already assigned a value

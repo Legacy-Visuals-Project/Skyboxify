@@ -23,10 +23,9 @@
 
 package btw.lowercase.skyboxify.skybox;
 
-import btw.lowercase.skyboxify.Skyboxify;
+import btw.lowercase.skyboxify.api.SkyboxifyApi;
 import com.google.common.base.Preconditions;
 import lombok.Getter;
-import lombok.experimental.UtilityClass;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
@@ -36,38 +35,42 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-@UtilityClass
 public final class SkyboxManager {
 	@Getter
 	private final List<Skybox> loaded = new ArrayList<>();
 	@Getter
 	private final List<Skybox> active = new LinkedList<>();
+	private final SkyboxifyApi api;
+
+	public SkyboxManager(final SkyboxifyApi api) {
+		this.api = api;
+	}
 
 	public void addSkybox(final Skybox skybox) {
-		if (Skyboxify.getConfig().enabled.isEnabled()) {
-			loaded.add(Preconditions.checkNotNull(skybox, "Skybox was null"));
+		if (this.api.getConfig().enabled.isEnabled()) {
+			this.loaded.add(Preconditions.checkNotNull(skybox, "Skybox was null"));
 		}
 	}
 
 	public void clearSkyboxes() {
 		SkyboxRenderer.INSTANCE.clearCache();
-		loaded.clear();
-		active.clear();
+		this.loaded.clear();
+		this.active.clear();
 	}
 
 	public void tick(final ClientLevel level) {
-		if (Skyboxify.getConfig().enabled.isEnabled()) {
-			for (final Skybox skybox : loaded) {
+		if (this.api.getConfig().enabled.isEnabled()) {
+			for (final Skybox skybox : this.loaded) {
 				skybox.tick(level);
 			}
 
-			active.removeIf(optiFineSkybox -> !optiFineSkybox.isActive());
-			loaded.stream().filter(it -> !active.contains(it) && it.isActive()).forEach(active::add);
+			this.active.removeIf(optiFineSkybox -> !optiFineSkybox.isActive());
+			this.loaded.stream().filter(it -> !this.active.contains(it) && it.isActive()).forEach(this.active::add);
 		}
 	}
 
 	public boolean isEnabled() {
-		return Skyboxify.getConfig().enabled.isEnabled() && !active.isEmpty();
+		return this.api.getConfig().enabled.isEnabled() && !this.active.isEmpty();
 	}
 
 	public List<Skybox> getSkiesFor(final ResourceKey<@NotNull Level> resourceKey) {

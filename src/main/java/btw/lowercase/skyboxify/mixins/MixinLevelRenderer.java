@@ -24,8 +24,8 @@
 package btw.lowercase.skyboxify.mixins;
 
 import btw.lowercase.skyboxify.Skyboxify;
+import btw.lowercase.skyboxify.api.SkyboxifyImpl;
 import btw.lowercase.skyboxify.events.SkyRenderEvent;
-import btw.lowercase.skyboxify.skybox.SkyboxManager;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -246,7 +246,7 @@ public abstract class MixinLevelRenderer {
             > original
     ) {
         //noinspection DataFlowIssue
-        if (SkyboxManager.isEnabled() && SkyboxManager.containsEnabled(Level.NETHER) && this.level.dimension().equals(Level.NETHER)) {
+        if (SkyboxifyImpl.skyboxManager().isEnabled() && SkyboxifyImpl.skyboxManager().containsEnabled(Level.NETHER) && this.level.dimension().equals(Level.NETHER)) {
             //? >=1.21.11 {
             return DimensionType.Skybox.OVERWORLD;
              //?} else {

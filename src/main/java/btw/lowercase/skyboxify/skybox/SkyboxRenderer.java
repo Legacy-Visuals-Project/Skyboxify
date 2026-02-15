@@ -24,6 +24,7 @@
 package btw.lowercase.skyboxify.skybox;
 
 import btw.lowercase.skyboxify.Skyboxify;
+import btw.lowercase.skyboxify.api.SkyboxifyImpl;
 import btw.lowercase.skyboxify.utils.CommonUtils;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
@@ -154,7 +155,7 @@ public final class SkyboxRenderer {
         if (!(finalAlpha < 1.0E-4F)) {
             if (skyLayer.rotate()) {
 				final float angle = this.getAngle(level, skyAngle, skyLayer.speed());
-				if (Skyboxify.getConfig().debug.isEnabled() && Skyboxify.getConfig().legacyRotationLogic.isEnabled()) {
+				if (SkyboxifyImpl.config().debug.isEnabled() && SkyboxifyImpl.config().legacyRotationLogic.isEnabled()) {
 					CommonUtils.rotate(modelViewMatrix, angle, skyLayer.axis());
 				} else {
 					// NOTE: Using `mulPose` directly gives a different result.

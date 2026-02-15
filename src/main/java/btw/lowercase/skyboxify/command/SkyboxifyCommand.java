@@ -24,10 +24,10 @@
 package btw.lowercase.skyboxify.command;
 
 import btw.lowercase.skyboxify.Skyboxify;
+import btw.lowercase.skyboxify.api.SkyboxifyImpl;
 import btw.lowercase.skyboxify.screen.SkyboxListScreen;
 import btw.lowercase.skyboxify.skybox.SkyLayer;
 import btw.lowercase.skyboxify.skybox.Skybox;
-import btw.lowercase.skyboxify.skybox.SkyboxManager;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -60,7 +60,7 @@ public class SkyboxifyCommand extends LiteralArgumentBuilder<FabricClientCommand
 	@Override
 	public int run(final CommandContext<FabricClientCommandSource> context) {
 		final Minecraft minecraft = Minecraft.getInstance();
-		minecraft.schedule(() -> minecraft.setScreen(Skyboxify.getConfig().getConfigScreen(minecraft.screen)));
+		minecraft.schedule(() -> minecraft.setScreen(SkyboxifyImpl.config().getConfigScreen(minecraft.screen)));
 		return Command.SINGLE_SUCCESS;
 	}
 
@@ -68,7 +68,7 @@ public class SkyboxifyCommand extends LiteralArgumentBuilder<FabricClientCommand
 		@Override
 		public int run(final CommandContext<FabricClientCommandSource> context) {
 			final Minecraft minecraft = Minecraft.getInstance();
-			minecraft.schedule(() -> minecraft.setScreen(new SkyboxListScreen(minecraft.screen, SkyboxManager.getLoaded())));
+			minecraft.schedule(() -> minecraft.setScreen(new SkyboxListScreen(minecraft.screen, SkyboxifyImpl.skyboxManager().getLoaded())));
 			return Command.SINGLE_SUCCESS;
 		}
 	}
@@ -85,7 +85,7 @@ public class SkyboxifyCommand extends LiteralArgumentBuilder<FabricClientCommand
 				Files.createDirectories(Skyboxify.DEBUG_FOLDER);
 			}
 
-			for (final Skybox skybox : SkyboxManager.getLoaded()) {
+			for (final Skybox skybox : SkyboxifyImpl.skyboxManager().getLoaded()) {
 				final Path packFolder = Skyboxify.DEBUG_FOLDER.resolve(skybox.getPackName().replaceAll("/", "+").replaceAll(" ", "_"));
 				if (!Files.exists(packFolder)) {
 					Files.createDirectory(packFolder);

@@ -23,7 +23,7 @@
 
 package btw.lowercase.skyboxify.skybox;
 
-import btw.lowercase.skyboxify.Skyboxify;
+import btw.lowercase.skyboxify.api.SkyboxifyImpl;
 import btw.lowercase.skyboxify.skybox.components.Range;
 import btw.lowercase.skyboxify.utils.ParserCodecs;
 import com.google.gson.JsonArray;
@@ -140,7 +140,7 @@ public final class SkyboxParser {
 
 		final Identifier sourceTextureIdentifier = sourceResult.getOrThrow();
 		try {
-			if (!Skyboxify.getConfig().debug.isEnabled()) {
+			if (!SkyboxifyImpl.config().debug.isEnabled()) {
 				final IoSupplier<InputStream> sourceTextureStream = packResources.getResource(PackType.CLIENT_RESOURCES, sourceTextureIdentifier);
 				if (sourceTextureStream == null) {
 					LOGGER.error("Failed to load texture '{}', missing or corrupt image?", sourceTextureIdentifier);
@@ -151,7 +151,7 @@ public final class SkyboxParser {
 			}
 		} catch (final Exception exception) {
 			LOGGER.error("Failed to load texture '{}'", sourceTextureIdentifier);
-			if (Skyboxify.getConfig().debug.isEnabled()) {
+			if (SkyboxifyImpl.config().debug.isEnabled()) {
 				exception.printStackTrace();
 			}
 		}

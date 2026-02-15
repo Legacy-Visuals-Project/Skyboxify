@@ -23,7 +23,6 @@
 
 package btw.lowercase.skyboxify.skybox;
 
-import btw.lowercase.skyboxify.Skyboxify;
 import btw.lowercase.skyboxify.api.SkyboxifyImpl;
 import btw.lowercase.skyboxify.utils.ParserCodecs;
 import com.google.gson.JsonArray;
@@ -88,7 +87,7 @@ public class SkyboxResourceHelper implements
 	//? <=1.21.8 {
     /*@Override
     public Identifier getFabricId() {
-        return Skyboxify.locationOrNull("skybox_reader");
+        return btw.lowercase.skyboxify.Skyboxify.locationOrNull("skybox_reader");
     }
     *///?}
 
@@ -112,8 +111,8 @@ public class SkyboxResourceHelper implements
 			/*resourceManager;
 			 *///?}
 		return CompletableFuture.runAsync(() -> {
-			if (Skyboxify.getConfig().enabled.isEnabled()) {
-				SkyboxManager.clearSkyboxes();
+			if (SkyboxifyImpl.config().enabled.isEnabled()) {
+				SkyboxifyImpl.skyboxManager().clearSkyboxes();
 				theResourceManager.listPacks().forEach(pack -> {
 					final List<Identifier> optifineSkies = new ArrayList<>();
 					pack.listResources(PackType.CLIENT_RESOURCES, Identifier.DEFAULT_NAMESPACE, OPTIFINE_SKY_PARENT, filterResource(optifineSkies));
@@ -125,7 +124,7 @@ public class SkyboxResourceHelper implements
 
 					Pattern skyPattern = OPTIFINE_SKY_PATTERN;
 					if (optifineSkies.isEmpty()) {
-						if (Skyboxify.getConfig().debug.isEnabled()) {
+						if (SkyboxifyImpl.config().debug.isEnabled()) {
 							LOGGER.info("Couldn't find any skies inside \"{}\" under \"optifine\", searching for skies under \"mcpatcher\" instead...", pack.packId());
 						}
 
@@ -135,7 +134,7 @@ public class SkyboxResourceHelper implements
 					final List<Identifier> skies = (skyPattern == OPTIFINE_SKY_PATTERN ? optifineSkies : mcpatcherSkies);
 					if (!skies.isEmpty()) {
 						final int count = this.parseSkyboxesInPack(pack, skies, skyPattern);
-						if (count > 0 && Skyboxify.getConfig().debug.isEnabled()) {
+						if (count > 0 && SkyboxifyImpl.config().debug.isEnabled()) {
 							LOGGER.info("Loaded {} {} from \"{}\"!", count, (count == 1 ? "skies" : "sky"), pack.packId());
 						}
 					}
@@ -161,7 +160,7 @@ public class SkyboxResourceHelper implements
 
 			if (name.equals("moon_phases") || name.equals("sun")) {
 				// TODO/NOTE: Support moon/sun? (apparently doesn't even work in OptiFine)
-				if (Skyboxify.getConfig().debug.isEnabled()) {
+				if (SkyboxifyImpl.config().debug.isEnabled()) {
 					LOGGER.warn("Skipping {}, moon_phases/sun aren't currently supported!", id);
 				}
 
@@ -197,7 +196,7 @@ public class SkyboxResourceHelper implements
 				final int dimensionId = Integer.parseInt(entry.getKey().replace("world", ""));
 				final Identifier dimension = SkyboxifyImpl.getInstance().getModernDimension(dimensionId);
 				if (dimension == null) {
-					if (Skyboxify.getConfig().debug.isEnabled()) {
+					if (SkyboxifyImpl.config().debug.isEnabled()) {
 						LOGGER.warn("Tried to load Skybox with legacy dimension id {} but no modern dimension identifier mapping was found, skipping!", dimensionId);
 					}
 
@@ -211,7 +210,7 @@ public class SkyboxResourceHelper implements
 
 				final Skybox skybox = Skybox.CODEC.decode(JsonOps.INSTANCE, skyboxJson).getOrThrow().getFirst();
 				skybox.setPackName(packResources.packId());
-				SkyboxManager.addSkybox(skybox);
+				SkyboxifyImpl.skyboxManager().addSkybox(skybox);
 
 				count++;
 			}

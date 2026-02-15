@@ -26,7 +26,7 @@ package btw.lowercase.skyboxify.mixins;
 import org.spongepowered.asm.mixin.Mixin;
 
 //? <=1.21.10 {
-/*import btw.lowercase.skyboxify.skybox.SkyboxManager;
+/*import btw.lowercase.skyboxify.api.SkyboxifyImpl;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.Minecraft;
@@ -49,8 +49,8 @@ public abstract class MixinGameRenderer {
     private Minecraft minecraft;
 
     @WrapOperation(method = "renderLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/DimensionSpecialEffects;isFoggyAt(II)Z"))
-    private boolean skyboxify$allowNetherSky(DimensionSpecialEffects instance, int x, int y, Operation<Boolean> original) {
-        if (SkyboxManager.isEnabled() && SkyboxManager.containsEnabled(Level.NETHER) && minecraft.level.effects() instanceof DimensionSpecialEffects.NetherEffects) {
+    private boolean skyboxify$allowNetherSky(final DimensionSpecialEffects instance, final int x, final int y, final Operation<Boolean> original) {
+        if (SkyboxifyImpl.skyboxManager().isEnabled() && SkyboxifyImpl.skyboxManager().containsEnabled(Level.NETHER) && minecraft.level.effects() instanceof DimensionSpecialEffects.NetherEffects) {
             return false;
         } else {
             return original.call(instance, x, y);

@@ -34,7 +34,7 @@ import net.minecraft.server.packs.PackType;
 public final class SkyboxifyClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
-		Skyboxify.initialize(); // TODO: change in the future
+		Skyboxify.initialize();
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(new SkyboxifyCommand()));
 		//? >=1.21.10 {
 		net.fabricmc.fabric.api.resource.v1.ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloader(Skyboxify.locationOrNull("skybox_reader"), new SkyboxResourceHelper());

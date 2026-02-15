@@ -23,17 +23,15 @@
 
 package btw.lowercase.skyboxify.config;
 
-import btw.lowercase.skyboxify.Skyboxify;
+import btw.lowercase.skyboxify.api.SkyboxifyImpl;
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;
 import dev.kikugie.fletching_table.annotation.fabric.Entrypoint;
 
-import java.util.Map;
-
 @Entrypoint("modmenu")
 public class ModMenuIntegration implements ModMenuApi {
-    @Override
-    public ConfigScreenFactory<?> getModConfigScreenFactory() {
-        return Skyboxify.getConfig()::getConfigScreen;
-    }
+	@Override
+	public ConfigScreenFactory<?> getModConfigScreenFactory() {
+		return SkyboxifyImpl.config()::getConfigScreen;
+	}
 }

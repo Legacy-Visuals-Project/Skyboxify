@@ -23,6 +23,8 @@
 
 package btw.lowercase.skyboxify;
 
+import btw.lowercase.skyboxify.api.SkyboxifyApi;
+import btw.lowercase.skyboxify.api.SkyboxifyImpl;
 import btw.lowercase.skyboxify.config.SkyboxifyConfig;
 import btw.lowercase.skyboxify.events.LevelTickEvent;
 import btw.lowercase.skyboxify.events.SkyRenderEvent;
@@ -52,20 +54,19 @@ public class Skyboxify {
 	private final Logger logger = LoggerFactory.getLogger(Skyboxify.class);
 	@Getter
 	private final EventManager globalEventManager = new EventManager();
-	@Getter
-	private final SkyboxifyConfig config = new SkyboxifyConfig();
 
 	public Identifier locationOrNull(final String path) {
 		return Identifier.fromNamespaceAndPath(MOD_ID, path);
 	}
 
 	public void initialize() {
+		final SkyboxifyConfig config = SkyboxifyImpl.config();
 		config.load();
 
-		globalEventManager.listen(LevelTickEvent.Client.class, event -> SkyboxManager.tick(event.getLevel()));
+		globalEventManager.listen(LevelTickEvent.Client.class, event -> SkyboxifyImpl.skyboxManager().tick(event.getLevel()));
 
 		globalEventManager.listen(SkyRenderEvent.Celestial.class, event -> {
-			if (Skyboxify.getConfig().enabled.isEnabled()) {
+			if (config.enabled.isEnabled()) {
 				final SkyRenderEvent.Celestial.Type type = event.getType();
 				if ((!config.renderSunMoon.isEnabled() && (type == SkyRenderEvent.Celestial.Type.SUN || type == SkyRenderEvent.Celestial.Type.MOON))
 						|| (!config.renderStars.isEnabled() && type == SkyRenderEvent.Celestial.Type.STARS)) {
@@ -76,24 +77,24 @@ public class Skyboxify {
 
 		//? >=1.21.4 <1.21.9 {
 		/*globalEventManager.listen(SkyRenderEvent.SunriseSunset.After.class, event -> {
-			if (SkyboxManager.isEnabled()) {
+			if (SkyboxifyImpl.skyboxManager().isEnabled()) {
 				event.getBufferSource().endBatch();
 			}
 		});
 		*///?}
 
 		globalEventManager.listen(SkyRenderEvent.EndSky.After.class, event -> {
-			if (SkyboxManager.isEnabled()) {
+			if (SkyboxifyImpl.skyboxManager().isEnabled()) {
 				renderSkyboxes(event.getLevel(), 0.0F);
 			}
 		});
 
 		globalEventManager.listen(SkyRenderEvent.SunMoonStars.class, event -> {
 			final ClientLevel level = event.getLevel();
-			if (SkyboxManager.isEnabled()) {
+			if (SkyboxifyImpl.skyboxManager().isEnabled()) {
 				renderSkyboxes(level, event.getTickDelta());
 				// Disable Sun, Moon, & Stars in the Nether
-				if (SkyboxManager.containsEnabled(Level.NETHER) && level.dimension().equals(Level.NETHER)){
+				if (SkyboxifyImpl.skyboxManager().containsEnabled(Level.NETHER) && level.dimension().equals(Level.NETHER)){
 					event.setCancelled(true);
 				}
 			}
@@ -102,7 +103,7 @@ public class Skyboxify {
 
 	private void renderSkyboxes(final ClientLevel level, final float tickDelta) {
 		final Matrix4f modelViewMatrix = new Matrix4f(RenderSystem.getModelViewStack()).rotate(Axis.YP.rotationDegrees(-90.0F));
-		for (final Skybox skybox : SkyboxManager.getActive()) {
+		for (final Skybox skybox : SkyboxifyImpl.skyboxManager().getActive()) {
 			SkyboxRenderer.INSTANCE.render(skybox, modelViewMatrix, level, tickDelta);
 		}
 	}
