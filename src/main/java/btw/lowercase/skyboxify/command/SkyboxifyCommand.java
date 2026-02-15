@@ -43,7 +43,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -87,15 +86,15 @@ public class SkyboxifyCommand extends LiteralArgumentBuilder<FabricClientCommand
 			}
 
 			for (final Skybox skybox : SkyboxManager.getLoaded()) {
-				final File packFolder = Skyboxify.DEBUG_FOLDER.resolve(skybox.getPackName().replaceAll("/", "+").replaceAll(" ", "_")).toFile();
-				if (!packFolder.exists()) {
-					packFolder.mkdir();
+				final Path packFolder = Skyboxify.DEBUG_FOLDER.resolve(skybox.getPackName().replaceAll("/", "+").replaceAll(" ", "_"));
+				if (!Files.exists(packFolder)) {
+					Files.createDirectory(packFolder);
 				}
 
 				final Identifier dimension = skybox.getDimension().identifier();
-				final File dimensionFolder = packFolder.toPath().resolve(dimension.getNamespace()).resolve(dimension.getPath()).toFile();
-				if (!dimensionFolder.exists()) {
-					dimensionFolder.mkdirs();
+				final Path dimensionFolder = packFolder.resolve(dimension.getNamespace()).resolve(dimension.getPath());
+				if (!Files.exists(dimensionFolder)) {
+					Files.createDirectories(dimensionFolder);
 				}
 
 				for (final SkyLayer layer : skybox.getLayers()) {
@@ -114,7 +113,7 @@ public class SkyboxifyCommand extends LiteralArgumentBuilder<FabricClientCommand
 							continue;
 						}
 
-						Files.writeString(dimensionFolder.toPath().resolve(id + ".json"), GSON.toJson(element));
+						Files.writeString(dimensionFolder.resolve(id + ".json"), GSON.toJson(element));
 					} catch (final IOException exception) {
 						error(context, "Failed to encode layer " + layer.id());
 						error(context, exception.toString());
