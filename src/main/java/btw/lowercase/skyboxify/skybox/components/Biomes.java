@@ -2,8 +2,8 @@
  * Skyboxify
  * A skybox mod that allows you to use OptiFine skies in Fabric 1.21+
  * <p>
- * Copyright (C) 2025 lowercasebtw
- * Copyright (C) 2025 Contributors to the project retain their copyright
+ * Copyright (C) 2025-2026 lowercasebtw
+ * Copyright (C) 2025-2026 Contributors to the project retain their copyright
  * <p>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,37 +32,33 @@ import net.minecraft.resources.Identifier;
 import java.util.List;
 import java.util.Objects;
 
-public record Biomes(ImmutableList<Identifier> locations, boolean inclusion) {
-	public static Biomes DEFAULT = new Biomes(ImmutableList.of(), true);
+public record Biomes(ImmutableList<Identifier> locations, boolean exclusion) {
+	public static Biomes DEFAULT = new Biomes(ImmutableList.of(), false);
 
 	public static Codec<Biomes> CODEC = ParserCodecs.TRIMMED_STRING.xmap(input -> {
-		final boolean inclusion = !input.startsWith("!");
-		if (!inclusion) {
+		final boolean exclusion = input.startsWith("!");
+		if (exclusion) {
 			input = input.substring(1);
 		}
 
 		final List<String> entries = ParserCodecs.SPLIT_SPACE_TRIMMED.parse(JavaOps.INSTANCE, input).getOrThrow();
 		if (!entries.isEmpty()) {
 			final ImmutableList.Builder<Identifier> builder = new ImmutableList.Builder<>();
-			builder.addAll(entries.stream().map(Identifier::tryParse).filter(Objects::nonNull).toList());
-			return new Biomes(builder.build(), inclusion);
+			entries.stream().map(Identifier::tryParse).filter(Objects::nonNull).forEach(builder::add);
+			return new Biomes(builder.build(), exclusion);
 		} else {
 			return Biomes.DEFAULT;
 		}
 	}, biomes -> {
-		if (biomes.locations.isEmpty()) {
-			return "";
-		} else {
-			final StringBuilder builder = new StringBuilder();
-			if (!biomes.inclusion) {
-				builder.append("!");
-			}
-
-			for (final Identifier location : biomes.locations) {
-				builder.append(location).append(" ");
-			}
-
-			return builder.toString().trim();
+		final StringBuilder builder = new StringBuilder();
+		if (biomes.exclusion) {
+			builder.append("!");
 		}
+
+		for (final Identifier location : biomes.locations) {
+			builder.append(location).append(" ");
+		}
+
+		return builder.toString().trim();
 	});
 }

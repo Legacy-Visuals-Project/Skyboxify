@@ -2,8 +2,8 @@
  * Skyboxify
  * A skybox mod that allows you to use OptiFine skies in Fabric 1.21+
  * <p>
- * Copyright (C) 2025 lowercasebtw
- * Copyright (C) 2025 Contributors to the project retain their copyright
+ * Copyright (C) 2025-2026 lowercasebtw
+ * Copyright (C) 2025-2026 Contributors to the project retain their copyright
  * <p>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,12 +30,12 @@ import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import org.joml.Vector3fc;
 
@@ -70,7 +70,7 @@ public record SkyLayer(
 			ParserCodecs.WEATHER.optionalFieldOf("weather", ImmutableList.of(Weather.CLEAR)).forGetter(SkyLayer::weatherConditions)
 	).apply(instance, SkyLayer::new));
 
-	private boolean getConditionCheck(final Level level) {
+	private boolean getConditionCheck(final ClientLevel level) {
 		final Entity cameraEntity = Minecraft.getInstance().getCameraEntity();
 		if (cameraEntity == null) {
 			return false;
@@ -79,7 +79,7 @@ public record SkyLayer(
 		final BlockPos entityPos = cameraEntity.getOnPos();
 		if (!this.biomes.locations().isEmpty()) {
 			final Holder<Biome> currentBiome = level.getBiome(entityPos);
-			if (!currentBiome.isBound() || !(this.biomes.inclusion() && this.biomes.locations().contains(level.getBiome(cameraEntity.blockPosition()).unwrapKey().orElseThrow().identifier()))) {
+			if (!currentBiome.isBound() || !(!this.biomes.exclusion() && this.biomes.locations().contains(level.getBiome(cameraEntity.blockPosition()).unwrapKey().orElseThrow().identifier()))) {
 				return false;
 			}
 		}
@@ -87,7 +87,7 @@ public record SkyLayer(
 		return this.heights == null || CommonUtils.checkRanges(entityPos.getY(), this.heights);
 	}
 
-	public float getPositionBrightness(final Level level, final float conditionAlpha) {
+	public float getPositionBrightness(final ClientLevel level, final float conditionAlpha) {
 		if (this.biomes.locations().isEmpty() && this.heights.isEmpty()) {
 			return 1.0F;
 		} else if (conditionAlpha == -1.0F) {

@@ -2,8 +2,8 @@
  * Skyboxify
  * A skybox mod that allows you to use OptiFine skies in Fabric 1.21+
  * <p>
- * Copyright (C) 2025 lowercasebtw
- * Copyright (C) 2025 Contributors to the project retain their copyright
+ * Copyright (C) 2025-2026 lowercasebtw
+ * Copyright (C) 2025-2026 Contributors to the project retain their copyright
  * <p>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
