@@ -61,7 +61,7 @@ public class SkyboxResourceHelper implements
 	private static final Logger LOGGER = LoggerFactory.getLogger(SkyboxResourceHelper.class);
 
 	private static PackResources.ResourceOutput filterResource(final List<Identifier> list) {
-		return (resourceLocation, streamIoSupplier) -> {
+		return (resourceLocation, ioSupplier) -> {
 			if (resourceLocation.getPath().endsWith(".properties")) {
 				list.add(resourceLocation);
 			}
@@ -113,10 +113,6 @@ public class SkyboxResourceHelper implements
 		return CompletableFuture.runAsync(() -> {
 			if (Skyboxify.getConfig().enabled.isEnabled()) {
 				SkyboxManager.clearSkyboxes();
-				if (Skyboxify.getConfig().debug.isEnabled()) {
-					LOGGER.info("Looking for OptiFine/MCPatcher Skies...");
-				}
-
 				theResourceManager.listPacks().forEach(pack -> {
 					final List<Identifier> optifineSkies = new ArrayList<>();
 					pack.listResources(PackType.CLIENT_RESOURCES, Identifier.DEFAULT_NAMESPACE, OPTIFINE_SKY_PARENT, filterResource(optifineSkies));

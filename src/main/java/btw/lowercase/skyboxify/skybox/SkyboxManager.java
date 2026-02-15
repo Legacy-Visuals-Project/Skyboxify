@@ -40,38 +40,39 @@ import java.util.List;
 @UtilityClass
 public final class SkyboxManager {
 	@Getter
-	private final List<Skybox> loadedSkyboxes = new ArrayList<>();
+	private final List<Skybox> loaded = new ArrayList<>();
 	@Getter
-	private final List<Skybox> activeSkyboxes = new LinkedList<>();
+	private final List<Skybox> active = new LinkedList<>();
 
 	public void addSkybox(final Skybox skybox) {
-		Preconditions.checkNotNull(skybox, "Skybox was null");
-		loadedSkyboxes.add(skybox);
+		if (Skyboxify.getConfig().enabled.isEnabled()) {
+			loaded.add(Preconditions.checkNotNull(skybox, "Skybox was null"));
+		}
 	}
 
 	public void clearSkyboxes() {
 		Minecraft.getInstance().execute(SkyboxSkyRenderer.INSTANCE::clearCache);
-		loadedSkyboxes.clear();
-		activeSkyboxes.clear();
+		loaded.clear();
+		active.clear();
 	}
 
 	public void tick(final ClientLevel level) {
 		if (Skyboxify.getConfig().enabled.isEnabled()) {
-			for (final Skybox skybox : loadedSkyboxes) {
+			for (final Skybox skybox : loaded) {
 				skybox.tick(level);
 			}
 
-			activeSkyboxes.removeIf(optiFineSkybox -> !optiFineSkybox.isActive());
-			loadedSkyboxes.stream().filter(it -> !activeSkyboxes.contains(it) && it.isActive()).forEach(activeSkyboxes::add);
+			active.removeIf(optiFineSkybox -> !optiFineSkybox.isActive());
+			loaded.stream().filter(it -> !active.contains(it) && it.isActive()).forEach(active::add);
 		}
 	}
 
 	public boolean isEnabled() {
-		return Skyboxify.getConfig().enabled.isEnabled() && !activeSkyboxes.isEmpty();
+		return Skyboxify.getConfig().enabled.isEnabled() && !active.isEmpty();
 	}
 
 	public List<Skybox> getSkiesFor(final ResourceKey<@NotNull Level> resourceKey) {
-		return getActiveSkyboxes().stream().filter(skybox -> resourceKey.equals(skybox.getDimension())).toList();
+		return getActive().stream().filter(skybox -> resourceKey.equals(skybox.getDimension())).toList();
 	}
 
 	public boolean containsEnabled(final ResourceKey<@NotNull Level> resourceKey) {

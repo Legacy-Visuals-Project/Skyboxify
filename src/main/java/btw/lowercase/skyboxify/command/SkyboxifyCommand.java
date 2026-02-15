@@ -35,6 +35,7 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.serialization.JsonOps;
+import lombok.SneakyThrows;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.ChatFormatting;
@@ -68,20 +69,25 @@ public class SkyboxifyCommand extends LiteralArgumentBuilder<FabricClientCommand
 		@Override
 		public int run(final CommandContext<FabricClientCommandSource> context) {
 			final Minecraft minecraft = Minecraft.getInstance();
-			minecraft.schedule(() -> minecraft.setScreen(new SkyboxListScreen(minecraft.screen, SkyboxManager.getLoadedSkyboxes())));
+			minecraft.schedule(() -> minecraft.setScreen(new SkyboxListScreen(minecraft.screen, SkyboxManager.getLoaded())));
 			return Command.SINGLE_SUCCESS;
 		}
 	}
 
 	private static class Dump implements Command<FabricClientCommandSource> {
+		@SneakyThrows
 		@Override
 		public int run(final CommandContext<FabricClientCommandSource> context) {
-			if (!Skyboxify.DEBUG_FOLDER.exists()) {
-				Skyboxify.DEBUG_FOLDER.mkdirs();
+			if (!Files.isDirectory(Skyboxify.DEBUG_FOLDER)) {
+				Files.delete(Skyboxify.DEBUG_FOLDER);
 			}
 
-			for (final Skybox skybox : SkyboxManager.getLoadedSkyboxes()) {
-				final File packFolder = Skyboxify.DEBUG_FOLDER.toPath().resolve(skybox.getPackName().replaceAll("/", "+").replaceAll(" ", "_")).toFile();
+			if (!Files.exists(Skyboxify.DEBUG_FOLDER)) {
+				Files.createDirectories(Skyboxify.DEBUG_FOLDER);
+			}
+
+			for (final Skybox skybox : SkyboxManager.getLoaded()) {
+				final File packFolder = Skyboxify.DEBUG_FOLDER.resolve(skybox.getPackName().replaceAll("/", "+").replaceAll(" ", "_")).toFile();
 				if (!packFolder.exists()) {
 					packFolder.mkdir();
 				}

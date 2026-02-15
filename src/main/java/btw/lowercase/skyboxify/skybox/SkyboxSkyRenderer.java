@@ -78,11 +78,11 @@ public final class SkyboxSkyRenderer {
             for (final SkyPart skyPart : SkyPart.VALUES) {
                 final Matrix4f matrix4f = skyPart.getRotationMatrix();
                 final UV uv = skyPart.getUv();
-                final float quadSize = 40.0F;
-                builder.addVertex(matrix4f, -quadSize, -quadSize, -quadSize).setUv(uv.minU(), uv.minV());
-                builder.addVertex(matrix4f, -quadSize, -quadSize, quadSize).setUv(uv.minU(), uv.maxV());
-                builder.addVertex(matrix4f, quadSize, -quadSize, quadSize).setUv(uv.maxU(), uv.maxV());
-                builder.addVertex(matrix4f, quadSize, -quadSize, -quadSize).setUv(uv.maxU(), uv.minV());
+                final float boxSize = 100.0F; // Bigger the value, the less view-bobbing affects it
+                builder.addVertex(matrix4f, -boxSize, -boxSize, -boxSize).setUv(uv.minU(), uv.minV());
+                builder.addVertex(matrix4f, -boxSize, -boxSize, boxSize).setUv(uv.minU(), uv.maxV());
+                builder.addVertex(matrix4f, boxSize, -boxSize, boxSize).setUv(uv.maxU(), uv.maxV());
+                builder.addVertex(matrix4f, boxSize, -boxSize, -boxSize).setUv(uv.maxU(), uv.minV());
             }
 
             //? >=1.21.5
@@ -181,7 +181,7 @@ public final class SkyboxSkyRenderer {
 			*///?}
 
 			//? >=1.21.5 {
-			final com.mojang.blaze3d.pipeline.RenderPipeline renderPipeline = this.renderPipelineCache.computeIfAbsent(skyLayer.texture(), (resourceLocation) -> {
+			final com.mojang.blaze3d.pipeline.RenderPipeline renderPipeline = this.renderPipelineCache.computeIfAbsent(skyLayer.texture(), identifier -> {
                 com.mojang.blaze3d.pipeline.RenderPipeline pipeline = getSkyboxPipeline(skyLayer.blend().getBlendFunction());
                 IrisUtil.assignPipeline(pipeline, IrisPipeline.SKY_TEXTURED);
                 return pipeline;

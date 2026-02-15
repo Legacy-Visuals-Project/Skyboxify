@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public final class ParserCodecs {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ParserCodecs.class);
@@ -107,13 +108,7 @@ public final class ParserCodecs {
 	public static Codec<List<Range>> getRangeEntriesCodec(final boolean allowNegative) {
 		return TRIMMED_STRING.xmap(input -> {
 			final List<Range> entries = new ArrayList<>();
-			for (final String part : input.split("\\s*,\\s*|\\s+")) {
-				final Range range = getRangeEntryCodec(allowNegative).parse(JavaOps.INSTANCE, part).getOrThrow();
-				if (range != null) {
-					entries.add(range);
-				}
-			}
-
+			Arrays.stream(input.split("\\s*,\\s*|\\s+")).map(it -> getRangeEntryCodec(allowNegative).parse(JavaOps.INSTANCE, it).getOrThrow()).filter(Objects::nonNull).forEach(entries::add);
 			return entries;
 		}, output -> Arrays.toString(output.stream().map(Range::toString).toArray()));
 	}
@@ -149,7 +144,7 @@ public final class ParserCodecs {
 		}
 	}, String::valueOf);
 
-	public static float safeParseFloat(String value, float defaultValue) {
+	public static float safeParseFloat(final String value, final float defaultValue) {
 		return SAFE_FLOAT.orElse(defaultValue).parse(JavaOps.INSTANCE, value).getOrThrow();
 	}
 
@@ -161,11 +156,7 @@ public final class ParserCodecs {
 		}
 	}, String::valueOf);
 
-	public static int safeParseInteger(String value, int defaultValue) {
+	public static int safeParseInteger(final String value, final int defaultValue) {
 		return SAFE_INTEGER.orElse(defaultValue).parse(JavaOps.INSTANCE, value).getOrThrow();
-	}
-
-	public static <T> String emptyCodecString(T output) {
-		return "";
 	}
 }

@@ -23,6 +23,7 @@
 
 package btw.lowercase.skyboxify.utils;
 
+import btw.lowercase.skyboxify.Skyboxify;
 import lombok.experimental.UtilityClass;
 
 //? >=1.21.5 {
@@ -41,30 +42,27 @@ public final class IrisUtil {
     static {
         try {
             // API
-            Class<?> irisApiClass = Class.forName("net.irisshaders.iris.api.v0.IrisApi");
+			final Class<?> irisApiClass = Class.forName("net.irisshaders.iris.api.v0.IrisApi");
             IRIS_INSTANCE = irisApiClass.getMethod("getInstance").invoke(null);
 
             // Enums
             @SuppressWarnings("rawtypes")
-            Class<? extends Enum> irisProgramEnum = Class.forName("net.irisshaders.iris.api.v0.IrisProgram").asSubclass(Enum.class);
+			final Class<? extends Enum> irisProgramEnum = Class.forName("net.irisshaders.iris.api.v0.IrisProgram").asSubclass(Enum.class);
             Arrays.stream(IrisPipeline.VALUES).forEach((program) -> program.initialize(irisProgramEnum));
 
             // Methods
             IRIS_ASSIGN_PIPELINE_METHOD = IRIS_INSTANCE.getClass().getMethod("assignPipeline", RenderPipeline.class, irisProgramEnum);
-        } catch (Exception ignored) {
+        } catch (final Exception exception) {
+			if (Skyboxify.getConfig().debug.isEnabled()) {
+				exception.printStackTrace();
+			}
         }
     }
 
-    public static void assignPipeline(RenderPipeline pipeline, IrisPipeline program) {
+    public static void assignPipeline(final RenderPipeline pipeline, final IrisPipeline program) {
         try {
             IRIS_ASSIGN_PIPELINE_METHOD.invoke(IRIS_INSTANCE, pipeline, program.internal());
         } catch (Exception ignored) {
-        }
-    }
-
-    public static void assignPipeline(IrisPipeline program, RenderPipeline... pipelines) {
-        for (RenderPipeline pipeline : pipelines) {
-            assignPipeline(pipeline, program);
         }
     }
     //?}

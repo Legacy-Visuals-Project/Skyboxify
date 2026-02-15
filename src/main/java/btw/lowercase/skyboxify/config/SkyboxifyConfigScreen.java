@@ -49,9 +49,9 @@ public class SkyboxifyConfigScreen extends InternalConfigScreen {
 		LinearLayout linearLayout = layout.addToHeader(LinearLayout.vertical().spacing(8));
 		linearLayout.addChild(new StringWidget(this.getTitle(), this.font), LayoutSettings::alignHorizontallyCenter);
 
-		GridLayout gridLayout = new GridLayout();
+		final GridLayout gridLayout = new GridLayout();
 		gridLayout.defaultCellSetting().paddingHorizontal(4).paddingBottom(4).alignHorizontallyCenter().alignVerticallyMiddle();
-		GridLayout.RowHelper rowHelper = gridLayout.createRowHelper(2);
+		final GridLayout.RowHelper rowHelper = gridLayout.createRowHelper(2);
 		// Didn't iterate fields here because I wanted custom order
 		rowHelper.addChild(skyboxifyConfig.enabled.createWidget());
 		rowHelper.addChild(skyboxifyConfig.showOverworldForUnknownDimension.createWidget());
@@ -61,9 +61,9 @@ public class SkyboxifyConfigScreen extends InternalConfigScreen {
 		rowHelper.addChild(skyboxifyConfig.legacyRotationLogic.createWidget());
 		layout.addToContents(gridLayout);
 
-		GridLayout footerGridLayout = new GridLayout();
+		final GridLayout footerGridLayout = new GridLayout();
 		footerGridLayout.defaultCellSetting().paddingHorizontal(4).paddingBottom(4).alignHorizontallyCenter();
-		GridLayout.RowHelper footerRowHelper = footerGridLayout.createRowHelper(2);
+		final GridLayout.RowHelper footerRowHelper = footerGridLayout.createRowHelper(2);
 		footerRowHelper.addChild(Button.builder(Translations.RESET, (button) -> this.reset()).width(125).build());
 		footerRowHelper.addChild(Button.builder(CommonComponents.GUI_DONE, (button) -> this.onClose()).width(125).build());
 		layout.addToFooter(footerGridLayout);

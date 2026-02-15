@@ -42,12 +42,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.visuals.legacy.lightconfig.lib.v1.events.EventManager;
 
-import java.io.File;
+import java.nio.file.Path;
 
 @UtilityClass
 public class Skyboxify {
 	public final String MOD_ID = "@MODID@";
-	public final File DEBUG_FOLDER = Minecraft.getInstance().gameDirectory.toPath().resolve("debug_skyboxify").toFile();
+	public final Path DEBUG_FOLDER = Minecraft.getInstance().gameDirectory.toPath().resolve("debug_skyboxify");
 	@Getter
 	private final Logger logger = LoggerFactory.getLogger(Skyboxify.class);
 	@Getter
@@ -55,8 +55,8 @@ public class Skyboxify {
 	@Getter
 	private final SkyboxifyConfig config = new SkyboxifyConfig();
 
-	public Identifier locationOrNull(String path) {
-		return Identifier.tryBuild(MOD_ID, path);
+	public Identifier locationOrNull(final String path) {
+		return Identifier.fromNamespaceAndPath(MOD_ID, path);
 	}
 
 	public void initialize() {
@@ -85,20 +85,20 @@ public class Skyboxify {
 		globalEventManager.listen(SkyRenderEvent.EndSky.After.class, event -> renderSkyboxes(event.getLevel(), 0.0F));
 
 		globalEventManager.listen(SkyRenderEvent.SunMoonStars.class, event -> {
-			final ClientLevel clientLevel = event.getLevel();
-			renderSkyboxes(clientLevel, event.getTickDelta());
+			final ClientLevel level = event.getLevel();
+			renderSkyboxes(level, event.getTickDelta());
 			// Disable Sun, Moon, & Stars in the Nether
-			if (SkyboxManager.isEnabled() && SkyboxManager.containsEnabled(Level.NETHER) && clientLevel.dimension().equals(Level.NETHER)) {
+			if (SkyboxManager.isEnabled() && SkyboxManager.containsEnabled(Level.NETHER) && level.dimension().equals(Level.NETHER)) {
 				event.setCancelled(true);
 			}
 		});
 	}
 
-	private void renderSkyboxes(final ClientLevel clientLevel, final float tickDelta) {
+	private void renderSkyboxes(final ClientLevel level, final float tickDelta) {
 		if (SkyboxManager.isEnabled()) {
 			final Matrix4f modelViewMatrix = new Matrix4f(RenderSystem.getModelViewStack()).rotate(Axis.YP.rotationDegrees(-90.0F));
-			for (final Skybox skybox : SkyboxManager.getActiveSkyboxes()) {
-				SkyboxSkyRenderer.INSTANCE.renderSkybox(skybox, modelViewMatrix, clientLevel, tickDelta);
+			for (final Skybox skybox : SkyboxManager.getActive()) {
+				SkyboxSkyRenderer.INSTANCE.renderSkybox(skybox, modelViewMatrix, level, tickDelta);
 			}
 		}
 	}

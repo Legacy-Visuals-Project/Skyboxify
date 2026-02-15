@@ -26,7 +26,6 @@ package btw.lowercase.skyboxify.events;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.world.level.Level;
 import org.visuals.legacy.lightconfig.lib.v1.events.CancellableEvent;
 import org.visuals.legacy.lightconfig.lib.v1.events.Event;
 
