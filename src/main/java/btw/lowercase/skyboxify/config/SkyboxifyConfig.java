@@ -23,7 +23,7 @@
 
 package btw.lowercase.skyboxify.config;
 
-import btw.lowercase.skyboxify.Skyboxify;
+import btw.lowercase.skyboxify.SkyboxifyInfo;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -39,7 +39,7 @@ public class SkyboxifyConfig extends Config {
 	public final BooleanConfigField legacyRotationLogic = this.booleanFieldOf("legacyRotationLogic", false);
 
 	public SkyboxifyConfig() {
-		super(Skyboxify.MOD_ID);
+		super(SkyboxifyInfo.MOD_ID);
 		this.enabled.onValueChanged((oldVal, newVal) -> {
 			final Minecraft minecraft = Minecraft.getInstance();
 			if (minecraft != null /* It can be null, on game launch */) {
@@ -50,6 +50,6 @@ public class SkyboxifyConfig extends Config {
 
 	@Override
 	public Screen getConfigScreen(Screen parent) {
-		return new SkyboxifyConfigScreen(Component.translatable("options." + Skyboxify.MOD_ID + ".title"), this, parent);
+		return new SkyboxifyConfigScreen(Component.translatable("options." + SkyboxifyInfo.MOD_ID + ".title"), this, parent);
 	}
 }

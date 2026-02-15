@@ -6,6 +6,7 @@
     - View-bobbing seems to affect it less when bigger
     - Fixes random far/near clipping
 - 1.21.2/3 & 1.21.4 now use the "custom_skybox" custom core shader for sky rendering
+- Config screen now shows current version & commit in top right
 
 ### Experimental
 

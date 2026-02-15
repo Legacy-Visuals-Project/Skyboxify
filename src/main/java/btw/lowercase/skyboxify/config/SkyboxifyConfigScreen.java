@@ -23,6 +23,9 @@
 
 package btw.lowercase.skyboxify.config;
 
+import btw.lowercase.skyboxify.SkyboxifyInfo;
+import btw.lowercase.skyboxify.screen.widget.Text;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.layouts.GridLayout;
@@ -32,11 +35,14 @@ import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.ARGB;
 import org.visuals.legacy.lightconfig.lib.v1.Translations;
 import org.visuals.legacy.lightconfig.lib.v1.screen.InternalConfigScreen;
 
 @SuppressWarnings("UnstableApiUsage")
 public class SkyboxifyConfigScreen extends InternalConfigScreen {
+	private Text versionText;
+
 	public SkyboxifyConfigScreen(final Component title, final SkyboxifyConfig config, final Screen parent) {
 		super(title, config, parent);
 	}
@@ -70,6 +76,19 @@ public class SkyboxifyConfigScreen extends InternalConfigScreen {
 
 		layout.visitWidgets(this::addRenderableWidget);
 		layout.arrangeElements();
+
+		final int padding = 8;
+		final String text = "Skyboxify " + SkyboxifyInfo.VERSION + " (" + SkyboxifyInfo.COMMIT + ")";
+		this.versionText = Text.builder(text)
+				.position(this.width - this.font.width(text) - padding, padding)
+				.withColor(ARGB.color(100, 0x898989))
+				.build(this.font);
+	}
+
+	@Override
+	public void render(final GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float tickDelta) {
+		super.render(guiGraphics, mouseX, mouseY, tickDelta);
+		this.versionText.render(guiGraphics, mouseX, mouseY);
 	}
 
 	private void reset() {

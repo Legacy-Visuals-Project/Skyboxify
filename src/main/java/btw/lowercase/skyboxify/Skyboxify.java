@@ -23,13 +23,11 @@
 
 package btw.lowercase.skyboxify;
 
-import btw.lowercase.skyboxify.api.SkyboxifyApi;
 import btw.lowercase.skyboxify.api.SkyboxifyImpl;
 import btw.lowercase.skyboxify.config.SkyboxifyConfig;
 import btw.lowercase.skyboxify.events.LevelTickEvent;
 import btw.lowercase.skyboxify.events.SkyRenderEvent;
 import btw.lowercase.skyboxify.skybox.Skybox;
-import btw.lowercase.skyboxify.skybox.SkyboxManager;
 import btw.lowercase.skyboxify.skybox.SkyboxRenderer;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.math.Axis;
@@ -48,15 +46,14 @@ import java.nio.file.Path;
 
 @UtilityClass
 public class Skyboxify {
-	public final String MOD_ID = "@MODID@";
-	public final Path DEBUG_FOLDER = Minecraft.getInstance().gameDirectory.toPath().resolve("debug_" + MOD_ID);
+	public final Path DEBUG_FOLDER = Minecraft.getInstance().gameDirectory.toPath().resolve("debug_" + SkyboxifyInfo.MOD_ID);
 	@Getter
 	private final Logger logger = LoggerFactory.getLogger(Skyboxify.class);
 	@Getter
 	private final EventManager globalEventManager = new EventManager();
 
 	public Identifier locationOrNull(final String path) {
-		return Identifier.fromNamespaceAndPath(MOD_ID, path);
+		return Identifier.fromNamespaceAndPath(SkyboxifyInfo.MOD_ID, path);
 	}
 
 	public void initialize() {

@@ -22,7 +22,7 @@ class ModData {
     val modrinth = property("mod.modrinth") as String
     val curseforge = property("mod.curseforge") as String
     val discord = property("mod.discord") as String
-    val obfuscated = parseBoolean(property("mod.obfuscated")  as String)
+    val obfuscated = parseBoolean(property("mod.obfuscated") as String)
     val minecraftVersion = property("mod.minecraft_version") as String
     val minecraftVersionRange = property("mod.minecraft_version_range") as String
 }
@@ -64,9 +64,16 @@ stonecutter {
     }
 }
 
+val currentCommitHash: String by lazy {
+    Runtime.getRuntime()
+        .exec("git rev-parse --verify --short HEAD", null, rootDir)
+        .inputStream.bufferedReader().readText().trim()
+}
+
 blossom {
     replaceToken("@MODID@", mod.id)
     replaceToken("@VERSION@", mod.version)
+    replaceToken("@COMMIT@", currentCommitHash)
 }
 
 loom {
@@ -225,10 +232,11 @@ tasks {
             put("discord", mod.discord)
             if (loader.isFabric) {
                 put("fabric_loader_version", deps.fabricLoaderVersion)
-                put("fabric_resource_loader_dep", if (stonecutter.eval(stonecutter.current.version, ">=1.21.10"))
-                    "fabric-resource-loader-v1"
-                else
-                    "fabric-resource-loader-v0"
+                put(
+                    "fabric_resource_loader_dep", if (stonecutter.eval(stonecutter.current.version, ">=1.21.10"))
+                        "fabric-resource-loader-v1"
+                    else
+                        "fabric-resource-loader-v0"
                 )
             }
 
