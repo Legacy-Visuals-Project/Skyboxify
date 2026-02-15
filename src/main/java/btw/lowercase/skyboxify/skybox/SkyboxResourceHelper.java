@@ -60,6 +60,36 @@ public class SkyboxResourceHelper implements
 	private static final Pattern MCPATCHER_SKY_PATTERN = Pattern.compile(MCPATCHER_SKY_PARENT + "/" + SKY_PATTERN_ENDING);
 	private static final Logger LOGGER = LoggerFactory.getLogger(SkyboxResourceHelper.class);
 
+	// TODO: Load mapping from json (should we allow packs to override mapping?)
+	private static final Map<Integer, String> DIMENSION_MAPPING = new HashMap<>(Map.of(
+			-1, "minecraft:the_nether",
+			0, "minecraft:overworld",
+			1, "minecraft:the_end",
+			4, "aether:the_aether",
+			7, "twilightforest:twilight_forest"
+	));
+
+	// For mods to register their own dimension mappings
+	public static void registerDimensionMapping(final int legacyId, final Identifier modernId) {
+		if (DIMENSION_MAPPING.containsKey(legacyId)) {
+			throw new IllegalArgumentException("Cannot register dimension mapping, world with legacy id " + legacyId + " is already taken by \"" + DIMENSION_MAPPING.get(legacyId) + "\"!");
+		}
+
+		final String modern = modernId.toString();
+		if (DIMENSION_MAPPING.containsValue(modern)) {
+			int currentId = 0;
+			for (final int key : DIMENSION_MAPPING.keySet()) {
+				if (Objects.equals(DIMENSION_MAPPING.get(key), modern)) {
+					currentId = key;
+				}
+			}
+
+			throw new IllegalArgumentException("Cannot register dimension mapping, world \"" + modern + "\" is already mapped to legacy id " + currentId);
+		}
+
+		DIMENSION_MAPPING.put(legacyId, modern);
+	}
+
 	private static PackResources.ResourceOutput filterResource(final List<Identifier> list) {
 		return (resourceLocation, ioSupplier) -> {
 			if (resourceLocation.getPath().endsWith(".properties")) {
@@ -193,14 +223,19 @@ public class SkyboxResourceHelper implements
 		for (final Map.Entry<String, JsonArray> entry : layers.entrySet()) {
 			final JsonArray skyLayers = entry.getValue();
 			if (!skyLayers.isEmpty()) {
+				final int dimensionId = Integer.parseInt(entry.getKey().replace("world", ""));
+				final String dimension = DIMENSION_MAPPING.getOrDefault(dimensionId, null);
+				if (dimension == null) {
+					if (Skyboxify.getConfig().debug.isEnabled()) {
+						LOGGER.warn("Tried to load Skybox with legacy dimension id {} but no modern dimension identifier mapping was found, skipping!", dimensionId);
+					}
+
+					// Skip as unknown dimension
+					continue;
+				}
+
 				final JsonObject skyboxJson = new JsonObject();
-				skyboxJson.addProperty("dimension", switch (entry.getKey()) {
-					case "world0" -> "minecraft:overworld";
-					case "world-1" -> "minecraft:the_nether";
-					case "world1" -> "minecraft:the_end";
-					case "world4" -> "aether:the_aether";
-					default -> entry.getKey().replaceAll("-", "_");
-				});
+				skyboxJson.addProperty("dimension", dimension);
 				skyboxJson.add("layers", skyLayers);
 
 				final Skybox skybox = Skybox.CODEC.decode(JsonOps.INSTANCE, skyboxJson).getOrThrow().getFirst();
