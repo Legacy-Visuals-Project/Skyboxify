@@ -24,18 +24,41 @@
 package btw.lowercase.skyboxify.skybox.components;
 
 import com.mojang.serialization.Codec;
+import net.minecraft.util.Mth;
 import net.minecraft.util.StringRepresentable;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 public enum Weather implements StringRepresentable {
-    CLEAR,
-    RAIN,
-    THUNDER;
+	CLEAR,
+	RAIN,
+	THUNDER;
 
-    public static final Codec<Weather> CODEC = StringRepresentable.fromEnum(Weather::values);
+	public static final Codec<Weather> CODEC = StringRepresentable.fromEnum(Weather::values);
 
-    @Override
-    public @NotNull String getSerializedName() {
-        return this.name().toLowerCase();
-    }
+	public static float getAlpha(final List<Weather> weatherConditions, final float rainStrength, final float thunderStrength) {
+		final float alpha = 1.0F - rainStrength;
+		final float calculatedRainStrength = rainStrength - thunderStrength;
+
+		float weatherAlpha = 0.0F;
+		if (weatherConditions.contains(Weather.CLEAR)) {
+			weatherAlpha += alpha;
+		}
+
+		if (weatherConditions.contains(Weather.RAIN)) {
+			weatherAlpha += calculatedRainStrength;
+		}
+
+		if (weatherConditions.contains(Weather.THUNDER)) {
+			weatherAlpha += thunderStrength;
+		}
+
+		return Mth.clamp(weatherAlpha, 0.0F, 1.0F);
+	}
+
+	@Override
+	public @NotNull String getSerializedName() {
+		return this.name().toLowerCase();
+	}
 }

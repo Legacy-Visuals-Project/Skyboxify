@@ -25,6 +25,7 @@ package btw.lowercase.skyboxify.skybox;
 
 import btw.lowercase.skyboxify.Skyboxify;
 import btw.lowercase.skyboxify.api.SkyboxifyImpl;
+import btw.lowercase.skyboxify.skybox.components.Weather;
 import btw.lowercase.skyboxify.utils.CommonUtils;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
@@ -149,7 +150,7 @@ public final class SkyboxRenderer {
     }
 
     private void renderLayer(final SkyLayer skyLayer, final Matrix4f modelViewMatrix, final Level level, final int timeOfDay, final float skyAngle, float rainLevel, float thunderLevel, float conditionAlpha) {
-        final float weatherAlpha = CommonUtils.getWeatherAlpha(skyLayer.weatherConditions(), rainLevel, thunderLevel);
+        final float weatherAlpha = Weather.getAlpha(skyLayer.weatherConditions(), rainLevel, thunderLevel);
         final float fadeAlpha = skyLayer.fade().getAlpha(timeOfDay);
         final float finalAlpha = Mth.clamp(conditionAlpha * weatherAlpha * fadeAlpha, 0.0F, 1.0F);
         if (!(finalAlpha < 1.0E-4F)) {

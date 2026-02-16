@@ -114,16 +114,16 @@ public class SkyboxResourceHelper implements
 			if (SkyboxifyImpl.config().enabled.isEnabled()) {
 				SkyboxifyImpl.skyboxManager().clearSkyboxes();
 				theResourceManager.listPacks().forEach(pack -> {
-					final List<Identifier> optifineSkies = new ArrayList<>();
-					pack.listResources(PackType.CLIENT_RESOURCES, Identifier.DEFAULT_NAMESPACE, OPTIFINE_SKY_PARENT, filterResource(optifineSkies));
-					optifineSkies.sort(compareLocations(OPTIFINE_SKY_PATTERN));
+					final List<Identifier> optiFineSkies = new ArrayList<>();
+					pack.listResources(PackType.CLIENT_RESOURCES, Identifier.DEFAULT_NAMESPACE, OPTIFINE_SKY_PARENT, filterResource(optiFineSkies));
+					optiFineSkies.sort(compareLocations(OPTIFINE_SKY_PATTERN));
 
-					final List<Identifier> mcpatcherSkies = new ArrayList<>();
-					pack.listResources(PackType.CLIENT_RESOURCES, Identifier.DEFAULT_NAMESPACE, MCPATCHER_SKY_PARENT, filterResource(mcpatcherSkies));
-					mcpatcherSkies.sort(compareLocations(MCPATCHER_SKY_PATTERN));
+					final List<Identifier> mcPatcherSkies = new ArrayList<>();
+					pack.listResources(PackType.CLIENT_RESOURCES, Identifier.DEFAULT_NAMESPACE, MCPATCHER_SKY_PARENT, filterResource(mcPatcherSkies));
+					mcPatcherSkies.sort(compareLocations(MCPATCHER_SKY_PATTERN));
 
 					Pattern skyPattern = OPTIFINE_SKY_PATTERN;
-					if (optifineSkies.isEmpty()) {
+					if (optiFineSkies.isEmpty()) {
 						if (SkyboxifyImpl.config().debug.isEnabled()) {
 							LOGGER.info("Couldn't find any skies inside \"{}\" under \"optifine\", searching for skies under \"mcpatcher\" instead...", pack.packId());
 						}
@@ -131,7 +131,7 @@ public class SkyboxResourceHelper implements
 						skyPattern = MCPATCHER_SKY_PATTERN;
 					}
 
-					final List<Identifier> skies = (skyPattern == OPTIFINE_SKY_PATTERN ? optifineSkies : mcpatcherSkies);
+					final List<Identifier> skies = (skyPattern == OPTIFINE_SKY_PATTERN ? optiFineSkies : mcPatcherSkies);
 					if (!skies.isEmpty()) {
 						final int count = this.parseSkyboxesInPack(pack, skies, skyPattern);
 						if (count > 0 && SkyboxifyImpl.config().debug.isEnabled()) {

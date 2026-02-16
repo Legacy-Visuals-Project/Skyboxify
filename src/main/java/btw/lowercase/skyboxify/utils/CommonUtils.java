@@ -23,7 +23,6 @@
 
 package btw.lowercase.skyboxify.utils;
 
-import btw.lowercase.skyboxify.skybox.components.Weather;
 import lombok.experimental.UtilityClass;
 import net.minecraft.util.Mth;
 import org.joml.AxisAngle4f;
@@ -32,7 +31,6 @@ import org.joml.Quaternionf;
 import org.joml.Vector3fc;
 
 import java.text.DecimalFormat;
-import java.util.List;
 
 @UtilityClass
 public final class CommonUtils {
@@ -67,26 +65,6 @@ public final class CommonUtils {
 			final float result = in ? lastAlpha + alphaChange : lastAlpha - alphaChange;
 			return Mth.clamp(result, minAlpha, maxAlpha);
 		}
-	}
-
-	public static float getWeatherAlpha(final List<Weather> weatherConditions, final float rainStrength, final float thunderStrength) {
-		final float alpha = 1.0F - rainStrength;
-		final float calculatedRainStrength = rainStrength - thunderStrength;
-
-		float weatherAlpha = 0.0F;
-		if (weatherConditions.contains(Weather.CLEAR)) {
-			weatherAlpha += alpha;
-		}
-
-		if (weatherConditions.contains(Weather.RAIN)) {
-			weatherAlpha += calculatedRainStrength;
-		}
-
-		if (weatherConditions.contains(Weather.THUNDER)) {
-			weatherAlpha += thunderStrength;
-		}
-
-		return Mth.clamp(weatherAlpha, 0.0F, 1.0F);
 	}
 
 	// This method replicates the old Mojang-made Quaternion mulPose method, which was
