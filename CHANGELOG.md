@@ -1,5 +1,7 @@
 # Release 2.5
 
+### General
+
 - Fix biomes parsing ("minecraft:plains" is now valid)
 - Removed "optiboxes" command alias ("/skyboxify" is the only command now)
 - Increased Skybox size
@@ -10,7 +12,7 @@
 
 ### Experimental
 
-- New API
+- New API v0
     - Get instance via SkyboxifyImpl#getInstance returns SkyboxifyApi
 - SkyboxifyApi#getConfig
     - Returns the Skyboxify config instance
@@ -26,6 +28,8 @@
     - world7 is classified by default as "twilightforest:twilight_forest" dimension
 - SkyboxifyApi#getModernDimension(int legacyId)
     - Returns mapped modern identifier or null if none
+- SkyboxifyApi#getApiVersion
+  - Returns current api version (currently 0)
 
 ### Debug
 

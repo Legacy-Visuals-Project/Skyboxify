@@ -37,6 +37,6 @@ public interface SkyboxifyApi {
 	void registerDimensionMapping(final int legacyId, final Identifier modernId);
 
 	default int getApiVersion() {
-		return 1;
+		return 0;
 	}
 }
