@@ -33,22 +33,14 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.math.Axis;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 import org.joml.Matrix4f;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.visuals.legacy.lightconfig.lib.v1.events.EventManager;
-
-import java.nio.file.Path;
 
 @UtilityClass
 public class Skyboxify {
-	public final Path DEBUG_FOLDER = Minecraft.getInstance().gameDirectory.toPath().resolve("debug_" + SkyboxifyInfo.MOD_ID);
-	@Getter
-	private final Logger logger = LoggerFactory.getLogger(Skyboxify.class);
 	@Getter
 	private final EventManager globalEventManager = new EventManager();
 
@@ -65,8 +57,15 @@ public class Skyboxify {
 		globalEventManager.listen(SkyRenderEvent.Celestial.class, event -> {
 			if (config.enabled.isEnabled()) {
 				final SkyRenderEvent.Celestial.Type type = event.getType();
-				if ((!config.renderSunMoon.isEnabled() && (type == SkyRenderEvent.Celestial.Type.SUN || type == SkyRenderEvent.Celestial.Type.MOON))
-						|| (!config.renderStars.isEnabled() && type == SkyRenderEvent.Celestial.Type.STARS)) {
+				if (!config.renderSunMoon.isEnabled() && (type == SkyRenderEvent.Celestial.Type.SUN || type == SkyRenderEvent.Celestial.Type.MOON)) {
+					event.setCancelled(true);
+				}
+
+				if (SkyboxifyImpl.skyboxManager().isEnabled() && type == SkyRenderEvent.Celestial.Type.STARS) {
+					if (config.renderStars.isEnabled()) {
+						return;
+					}
+
 					event.setCancelled(true);
 				}
 			}
@@ -100,7 +99,7 @@ public class Skyboxify {
 
 	private void renderSkyboxes(final ClientLevel level, final float tickDelta) {
 		final Matrix4f modelViewMatrix = new Matrix4f(RenderSystem.getModelViewStack()).rotate(Axis.YP.rotationDegrees(-90.0F));
-		for (final Skybox skybox : SkyboxifyImpl.skyboxManager().getActive()) {
+		for (final Skybox skybox : SkyboxifyImpl.skyboxManager().getActiveSkies()) {
 			SkyboxRenderer.INSTANCE.render(skybox, modelViewMatrix, level, tickDelta);
 		}
 	}

@@ -71,7 +71,11 @@ public final class ParserCodecs {
 	public static final Codec<Vector3fc> AXIS = TRIMMED_STRING.xmap(input -> {
 		final List<String> parts = SPLIT_SPACE_TRIMMED.parse(JavaOps.INSTANCE, input.replaceAll(" +", " ")).getOrThrow();
 		if (parts.size() == 3) {
-			final Vector3f vector3f = new Vector3f(safeParseFloat(parts.get(0), Float.MIN_VALUE), safeParseFloat(parts.get(1), Float.MIN_VALUE), safeParseFloat(parts.get(2), Float.MIN_VALUE));
+			final Vector3f vector3f = new Vector3f(
+					safeParseFloat(parts.get(0), Float.MIN_VALUE),
+					safeParseFloat(parts.get(1), Float.MIN_VALUE),
+					safeParseFloat(parts.get(2), Float.MIN_VALUE)
+			);
 			if (vector3f.lengthSquared() > Mth.EPSILON) {
 				return new Vector3f(vector3f.z, vector3f.y, -vector3f.x);
 			}
@@ -108,7 +112,10 @@ public final class ParserCodecs {
 	public static Codec<List<Range>> getRangeEntriesCodec(final boolean allowNegative) {
 		return TRIMMED_STRING.xmap(input -> {
 			final List<Range> entries = new ArrayList<>();
-			Arrays.stream(input.split("\\s*,\\s*|\\s+")).map(it -> getRangeEntryCodec(allowNegative).parse(JavaOps.INSTANCE, it).getOrThrow()).filter(Objects::nonNull).forEach(entries::add);
+			Arrays.stream(input.split("\\s*,\\s*|\\s+"))
+					.map(it -> getRangeEntryCodec(allowNegative).parse(JavaOps.INSTANCE, it).getOrThrow())
+					.filter(Objects::nonNull)
+					.forEach(entries::add);
 			return entries;
 		}, output -> Arrays.toString(output.stream().map(Range::toString).toArray()));
 	}

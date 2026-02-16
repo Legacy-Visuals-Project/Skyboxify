@@ -7,7 +7,7 @@
 	"options.skyboxify.renderSunMoon": "Render Sun & Moon",
 	"options.skyboxify.renderSunMoon.tooltip": "Enable/disable rendering of the sun and moon.",
 	"options.skyboxify.renderStars": "Render Stars",
-	"options.skyboxify.renderStars.tooltip": "Enable/disable rendering of the stars.",
+	"options.skyboxify.renderStars.tooltip": "Force enable rendering of stars when a Skybox resource pack is enabled & active.",
 	"options.skyboxify.debug": "Debug Mode",
 	"options.skyboxify.debug.tooltip": "Enable debug logging & other debugging aspects.",
 	"options.skyboxify.legacyRotationLogic": "[DM] Legacy Rotation Logic",

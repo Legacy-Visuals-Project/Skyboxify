@@ -33,7 +33,7 @@ import org.visuals.legacy.lightconfig.lib.v1.field.BooleanConfigField;
 public class SkyboxifyConfig extends Config {
 	public final BooleanConfigField enabled = this.booleanFieldOf("enabled", true);
 	public final BooleanConfigField renderSunMoon = this.booleanFieldOf("renderSunMoon", true);
-	public final BooleanConfigField renderStars = this.booleanFieldOf("renderStars", true);
+	public final BooleanConfigField renderStars = this.booleanFieldOf("renderStars", false);
 	public final BooleanConfigField showOverworldForUnknownDimension = this.booleanFieldOf("showOverworldForUnknownDimension", true);
 	public final BooleanConfigField debug = this.booleanFieldOf("debug", false);
 	public final BooleanConfigField legacyRotationLogic = this.booleanFieldOf("legacyRotationLogic", false);

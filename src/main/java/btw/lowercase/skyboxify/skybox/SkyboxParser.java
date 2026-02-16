@@ -57,7 +57,7 @@ public final class SkyboxParser {
 			return null;
 		}
 
-		output.addProperty("_id", propertiesIdentifier.toString());
+		output.addProperty("properties", propertiesIdentifier.toString());
 		output.addProperty("texture", sourceTexturePath);
 
 		// Convert fade
@@ -78,7 +78,9 @@ public final class SkyboxParser {
 			final List<Range> rangeEntries = ParserCodecs.getRangeEntriesCodec(true).orElse(List.of()).parse(JavaOps.INSTANCE, properties.getProperty("heights")).getOrThrow();
 			if (!rangeEntries.isEmpty()) {
 				final JsonArray heights = new JsonArray();
-				rangeEntries.stream().map(range -> Range.CODEC.encode(range, JsonOps.INSTANCE, new JsonObject()).getOrThrow()).forEach(heights::add);
+				rangeEntries.stream()
+						.map(range -> Range.CODEC.encode(range, JsonOps.INSTANCE, null).getOrThrow())
+						.forEach(heights::add);
 				output.add("heights", heights);
 			}
 		}

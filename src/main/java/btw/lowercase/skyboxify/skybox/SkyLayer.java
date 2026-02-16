@@ -42,7 +42,7 @@ import org.joml.Vector3fc;
 import java.util.List;
 
 public record SkyLayer(
-		Identifier id,
+		Identifier properties,
 		Identifier texture,
 		Biomes biomes,
 		List<Range> heights,
@@ -56,7 +56,7 @@ public record SkyLayer(
 		List<Weather> weatherConditions
 ) {
 	public static final Codec<SkyLayer> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-			Identifier.CODEC.fieldOf("_id").forGetter(SkyLayer::id),
+			Identifier.CODEC.fieldOf("properties").forGetter(SkyLayer::properties),
 			Identifier.CODEC.fieldOf("texture").forGetter(SkyLayer::texture),
 			Biomes.CODEC.optionalFieldOf("biomes", Biomes.DEFAULT).forGetter(SkyLayer::biomes),
 			Range.CODEC.listOf().optionalFieldOf("heights", ImmutableList.of()).forGetter(SkyLayer::heights),
@@ -84,7 +84,7 @@ public record SkyLayer(
 			}
 		}
 
-		return this.heights == null || CommonUtils.checkRanges(entityPos.getY(), this.heights);
+		return this.heights == null || this.heights.isEmpty() || Range.contains(this.heights, entityPos.getY());
 	}
 
 	public float getPositionBrightness(final ClientLevel level, final float conditionAlpha) {
@@ -108,7 +108,7 @@ public record SkyLayer(
 
 			final int daysPassed = (int) (adjustedTime / 24000L);
 			final int currentDay = daysPassed % this.loop.days();
-			return CommonUtils.checkRanges(currentDay, this.loop.ranges());
+			return this.loop.ranges().isEmpty() || Range.contains(this.loop.ranges(), currentDay);
 		} else {
 			return true;
 		}

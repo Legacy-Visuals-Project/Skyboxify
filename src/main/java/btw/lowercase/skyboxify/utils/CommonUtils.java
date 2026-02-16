@@ -23,7 +23,6 @@
 
 package btw.lowercase.skyboxify.utils;
 
-import btw.lowercase.skyboxify.skybox.components.Range;
 import btw.lowercase.skyboxify.skybox.components.Weather;
 import lombok.experimental.UtilityClass;
 import net.minecraft.util.Mth;
@@ -44,11 +43,6 @@ public final class CommonUtils {
 		}
 
 		return result;
-	}
-
-	public static boolean checkRanges(final double value, final List<Range> rangeEntries) {
-		return rangeEntries.isEmpty() || rangeEntries.stream()
-				.anyMatch(range -> com.google.common.collect.Range.closed(range.min(), range.max()).contains((float) value));
 	}
 
 	public static boolean isInTimeInterval(final int currentTime, final int startTime, final int endTime) {

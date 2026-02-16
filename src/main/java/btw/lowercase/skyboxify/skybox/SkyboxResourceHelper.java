@@ -197,7 +197,7 @@ public class SkyboxResourceHelper implements
 				final Identifier dimension = SkyboxifyImpl.getInstance().getModernDimension(dimensionId);
 				if (dimension == null) {
 					if (SkyboxifyImpl.config().debug.isEnabled()) {
-						LOGGER.warn("Tried to load Skybox with legacy dimension id {} but no modern dimension identifier mapping was found, skipping!", dimensionId);
+						LOGGER.warn("Tried to load Skybox with legacy dimension properties {} but no modern dimension identifier mapping was found, skipping!", dimensionId);
 					}
 
 					// Skip as unknown dimension

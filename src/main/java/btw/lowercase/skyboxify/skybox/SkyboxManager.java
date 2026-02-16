@@ -37,9 +37,9 @@ import java.util.List;
 
 public final class SkyboxManager {
 	@Getter
-	private final List<Skybox> loaded = new ArrayList<>();
+	private final List<Skybox> loadedSkies = new ArrayList<>();
 	@Getter
-	private final List<Skybox> active = new LinkedList<>();
+	private final List<Skybox> activeSkies = new LinkedList<>();
 	private final SkyboxifyApi api;
 
 	public SkyboxManager(final SkyboxifyApi api) {
@@ -48,33 +48,33 @@ public final class SkyboxManager {
 
 	public void addSkybox(final Skybox skybox) {
 		if (this.api.getConfig().enabled.isEnabled()) {
-			this.loaded.add(Preconditions.checkNotNull(skybox, "Skybox was null"));
+			this.loadedSkies.add(Preconditions.checkNotNull(skybox, "Skybox was null"));
 		}
 	}
 
 	public void clearSkyboxes() {
 		SkyboxRenderer.INSTANCE.clearCache();
-		this.loaded.clear();
-		this.active.clear();
+		this.loadedSkies.clear();
+		this.activeSkies.clear();
 	}
 
 	public void tick(final ClientLevel level) {
 		if (this.api.getConfig().enabled.isEnabled()) {
-			for (final Skybox skybox : this.loaded) {
+			for (final Skybox skybox : this.loadedSkies) {
 				skybox.tick(level);
 			}
 
-			this.active.removeIf(optiFineSkybox -> !optiFineSkybox.isActive());
-			this.loaded.stream().filter(it -> !this.active.contains(it) && it.isActive()).forEach(this.active::add);
+			this.activeSkies.removeIf(optiFineSkybox -> !optiFineSkybox.isActive());
+			this.loadedSkies.stream().filter(it -> !this.activeSkies.contains(it) && it.isActive()).forEach(this.activeSkies::add);
 		}
 	}
 
 	public boolean isEnabled() {
-		return this.api.getConfig().enabled.isEnabled() && !this.active.isEmpty();
+		return this.api.getConfig().enabled.isEnabled() && !this.activeSkies.isEmpty();
 	}
 
 	public List<Skybox> getSkiesFor(final ResourceKey<@NotNull Level> resourceKey) {
-		return getActive().stream().filter(skybox -> resourceKey.equals(skybox.getDimension())).toList();
+		return getActiveSkies().stream().filter(skybox -> resourceKey.equals(skybox.getDimension())).toList();
 	}
 
 	public boolean containsEnabled(final ResourceKey<@NotNull Level> resourceKey) {

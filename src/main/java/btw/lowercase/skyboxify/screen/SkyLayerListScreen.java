@@ -55,7 +55,7 @@ public class SkyLayerListScreen extends DebugScreen {
 
 		final List<Gidget> gidgets = new ArrayList<>();
 		for (final SkyLayer skyLayer : this.skybox.getLayers()) {
-			final Component title = Component.literal(skyLayer.id().toString());
+			final Component title = Component.literal(skyLayer.properties().toString());
 			gidgets.add(SimpleButton.builder(title, button -> this.minecraft.setScreen(new SkyLayerInfoScreen(this, skyLayer, title))).build());
 		}
 

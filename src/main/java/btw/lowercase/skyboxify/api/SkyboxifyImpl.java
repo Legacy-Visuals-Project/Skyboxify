@@ -76,7 +76,7 @@ public final class SkyboxifyImpl implements SkyboxifyApi {
 	@Override
 	public void registerDimensionMapping(final int legacyId, final Identifier modernId) {
 		if (this.dimensionMapping.containsKey(legacyId)) {
-			throw new IllegalArgumentException("Cannot register dimension mapping, world with legacy id " + legacyId + " is already taken by \"" + dimensionMapping.get(legacyId) + "\"!");
+			throw new IllegalArgumentException("Cannot register dimension mapping, world with legacy properties " + legacyId + " is already taken by \"" + dimensionMapping.get(legacyId) + "\"!");
 		}
 
 		if (this.dimensionMapping.containsValue(modernId)) {
@@ -87,7 +87,7 @@ public final class SkyboxifyImpl implements SkyboxifyApi {
 				}
 			}
 
-			throw new IllegalArgumentException("Cannot register dimension mapping, world \"" + modernId + "\" is already mapped to legacy id " + currentId);
+			throw new IllegalArgumentException("Cannot register dimension mapping, world \"" + modernId + "\" is already mapped to legacy properties " + currentId);
 		}
 
 		this.dimensionMapping.put(legacyId, modernId);

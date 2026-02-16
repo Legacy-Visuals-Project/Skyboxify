@@ -23,7 +23,7 @@
 
 package btw.lowercase.skyboxify.command;
 
-import btw.lowercase.skyboxify.Skyboxify;
+import btw.lowercase.skyboxify.SkyboxifyInfo;
 import btw.lowercase.skyboxify.api.SkyboxifyImpl;
 import btw.lowercase.skyboxify.screen.SkyboxListScreen;
 import btw.lowercase.skyboxify.skybox.SkyLayer;
@@ -68,7 +68,7 @@ public class SkyboxifyCommand extends LiteralArgumentBuilder<FabricClientCommand
 		@Override
 		public int run(final CommandContext<FabricClientCommandSource> context) {
 			final Minecraft minecraft = Minecraft.getInstance();
-			minecraft.schedule(() -> minecraft.setScreen(new SkyboxListScreen(minecraft.screen, SkyboxifyImpl.skyboxManager().getLoaded())));
+			minecraft.schedule(() -> minecraft.setScreen(new SkyboxListScreen(minecraft.screen, SkyboxifyImpl.skyboxManager().getLoadedSkies())));
 			return Command.SINGLE_SUCCESS;
 		}
 	}
@@ -77,16 +77,16 @@ public class SkyboxifyCommand extends LiteralArgumentBuilder<FabricClientCommand
 		@SneakyThrows
 		@Override
 		public int run(final CommandContext<FabricClientCommandSource> context) {
-			if (!Files.isDirectory(Skyboxify.DEBUG_FOLDER)) {
-				Files.delete(Skyboxify.DEBUG_FOLDER);
+			if (!Files.isDirectory(SkyboxifyInfo.DEBUG_FOLDER)) {
+				Files.delete(SkyboxifyInfo.DEBUG_FOLDER);
 			}
 
-			if (!Files.exists(Skyboxify.DEBUG_FOLDER)) {
-				Files.createDirectories(Skyboxify.DEBUG_FOLDER);
+			if (!Files.exists(SkyboxifyInfo.DEBUG_FOLDER)) {
+				Files.createDirectories(SkyboxifyInfo.DEBUG_FOLDER);
 			}
 
-			for (final Skybox skybox : SkyboxifyImpl.skyboxManager().getLoaded()) {
-				final Path packFolder = Skyboxify.DEBUG_FOLDER.resolve(skybox.getPackName().replaceAll("/", "+").replaceAll(" ", "_"));
+			for (final Skybox skybox : SkyboxifyImpl.skyboxManager().getLoadedSkies()) {
+				final Path packFolder = SkyboxifyInfo.DEBUG_FOLDER.resolve(skybox.getPackName().replaceAll("/", "+").replaceAll(" ", "_"));
 				if (!Files.exists(packFolder)) {
 					Files.createDirectory(packFolder);
 				}
@@ -99,7 +99,7 @@ public class SkyboxifyCommand extends LiteralArgumentBuilder<FabricClientCommand
 
 				for (final SkyLayer layer : skybox.getLayers()) {
 					try {
-						String id = Path.of(layer.id().getPath()).getFileName().toString();
+						String id = Path.of(layer.properties().getPath()).getFileName().toString();
 						if (id.endsWith(".properties")) {
 							id = id.substring(0, id.length() - 11);
 						}
@@ -115,13 +115,13 @@ public class SkyboxifyCommand extends LiteralArgumentBuilder<FabricClientCommand
 
 						Files.writeString(dimensionFolder.resolve(id + ".json"), GSON.toJson(element));
 					} catch (final IOException exception) {
-						error(context, "Failed to encode layer " + layer.id());
+						error(context, "Failed to encode layer " + layer.properties());
 						error(context, exception.toString());
 					}
 				}
 			}
 
-			success(context, "Active Skybox's have been dumped to " + Skyboxify.DEBUG_FOLDER);
+			success(context, "Active Skybox's have been dumped to " + SkyboxifyInfo.DEBUG_FOLDER);
 			return Command.SINGLE_SUCCESS;
 		}
 	}
