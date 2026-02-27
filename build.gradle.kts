@@ -176,9 +176,14 @@ dependencies {
 val modrinthId = findProperty("publish.modrinth")?.toString()?.takeIf { it.isNotBlank() }
 val curseforgeId = findProperty("publish.curseforge")?.toString()?.takeIf { it.isNotBlank() }
 
+// accessTokens should be placed in the user Gradle gradle.properties file
+// for example, on Windows this would be "C:\Users\{user}\.gradle\gradle.properties"
+// then add:
+// modrinth.token=
+// curseforge.token=
 publishMods {
     file =
-        (if (mod.obfuscated) tasks.jar else tasks.named<net.fabricmc.loom.task.RemapJarTask>("remapJar")).flatMap { it.archiveFile }
+        (if (mod.obfuscated) tasks.named<net.fabricmc.loom.task.RemapJarTask>("remapJar") else tasks.jar).flatMap { it.archiveFile }
 
     val niceVersionRangeTitle = if (mod.minecraftVersionRange.contains(' ')) {
         val parts = mod.minecraftVersionRange.trim().split(' ')
@@ -188,7 +193,7 @@ publishMods {
     }
 
     displayName = "Release ${mod.version} for $niceVersionRangeTitle"
-    this.version = mod.version
+    version = mod.version
     changelog = project.rootProject.file("CHANGELOG.md").takeIf { it.exists() }?.readText() ?: "No changelog provided."
     type = STABLE
 
