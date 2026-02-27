@@ -6,14 +6,18 @@ plugins {
 
 stonecutter active "1.21.11-fabric" /* [SC] DO NOT EDIT */
 
-stonecutter tasks {
-    order("publishMods", versionComparator)
-}
+stonecutter {
+    tasks {
+        order("publishMods", versionComparator.thenComparingInt {
+            if (it.metadata.project.endsWith("fabric")) 1 else 0
+        })
+    }
 
-stonecutter parameters {
-    val loader = node.project.property("loom.platform")
-    constants["fabric"] = loader == "fabric"
-    constants["neoforge"] = loader == "neoforge"
+    parameters {
+        val loader = node.project.property("loader.platform")
+        constants["fabric"] = loader == "fabric"
+        constants["neoforge"] = loader == "neoforge"
+    }
 }
 
 tasks.named("publishMods") {

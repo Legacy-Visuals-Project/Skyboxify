@@ -98,7 +98,8 @@ public class Skyboxify {
 	}
 
 	private void renderSkyboxes(final ClientLevel level, final float tickDelta) {
-		final Matrix4f modelViewMatrix = new Matrix4f(RenderSystem.getModelViewStack()).rotate(Axis.YP.rotationDegrees(-90.0F));
+		final Matrix4f modelViewMatrix = new Matrix4f(RenderSystem.getModelViewStack());
+		modelViewMatrix.rotate(Axis.YP.rotationDegrees(-90.0F));
 		for (final Skybox skybox : SkyboxifyImpl.skyboxManager().getActiveSkies()) {
 			SkyboxRenderer.INSTANCE.render(skybox, modelViewMatrix, level, tickDelta);
 		}

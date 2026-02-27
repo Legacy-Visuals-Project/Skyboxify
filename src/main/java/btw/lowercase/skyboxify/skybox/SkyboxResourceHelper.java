@@ -32,7 +32,6 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.IoSupplier;
-import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -48,7 +47,7 @@ import java.util.regex.Pattern;
 
 public class SkyboxResourceHelper implements
 		//? >=1.21.10 {
-		PreparableReloadListener
+		net.minecraft.server.packs.resources.PreparableReloadListener
 		//?} else {
 		/*net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener
 		 *///?}
@@ -96,9 +95,9 @@ public class SkyboxResourceHelper implements
 			//? >=1.21.9
 			SharedState sharedState,
 			//? <1.21.9
-			/*PreparationBarrier preparationBarrier,*/
+			//PreparationBarrier preparationBarrier,
 			//? <1.21.9
-			/*ResourceManager resourceManager,*/
+			//ResourceManager resourceManager,
 			@NotNull Executor backgroundExecutor,
 			//? >=1.21.9
 			PreparationBarrier preparationBarrier,

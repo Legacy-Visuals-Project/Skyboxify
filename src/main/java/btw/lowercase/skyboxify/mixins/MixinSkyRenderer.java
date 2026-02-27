@@ -111,7 +111,7 @@ public abstract class MixinSkyRenderer {
     private boolean skyboxify$toggleStars(
             SkyRenderer instance,
             //? <1.21.6
-            /*net.minecraft.client.renderer.FogParameters fog,*/
+            //net.minecraft.client.renderer.FogParameters fog,
             float starBrightness,
             PoseStack poseStack
     ) {

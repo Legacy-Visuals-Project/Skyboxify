@@ -71,7 +71,7 @@ public enum Blend implements StringRepresentable {
     *///?}
 
     @Override
-    public @NotNull String getSerializedName() {
+    public String getSerializedName() {
         return this.name().toLowerCase();
     }
 }

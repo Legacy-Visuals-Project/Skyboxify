@@ -36,7 +36,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.ARGB;
-import org.jspecify.annotations.NonNull;
+import org.jetbrains.annotations.NotNull;
 import org.visuals.legacy.lightconfig.lib.v1.Translations;
 import org.visuals.legacy.lightconfig.lib.v1.screen.InternalConfigScreen;
 
@@ -87,7 +87,7 @@ public class SkyboxifyConfigScreen extends InternalConfigScreen {
 	}
 
 	@Override
-	public void render(@NonNull final GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float tickDelta) {
+	public void render(@NotNull final GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float tickDelta) {
 		super.render(guiGraphics, mouseX, mouseY, tickDelta);
 		this.versionText.render(guiGraphics, mouseX, mouseY);
 	}

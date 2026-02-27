@@ -12,7 +12,7 @@ pluginManagement {
 }
 
 plugins {
-	id("dev.kikugie.stonecutter") version "0.7.8"
+	id("dev.kikugie.stonecutter") version "0.8.3"
 }
 
 stonecutter {
@@ -20,11 +20,11 @@ stonecutter {
 	centralScript = "build.gradle.kts"
 
 	create(rootProject) {
-		fun mc(mcVersion: String, loaders: Iterable<String>) {
-			for (loader in loaders) {
-				vers("$mcVersion-$loader", mcVersion)
-			}
-		}
+        fun mc(mcVersion: String, loaders: Iterable<String>) {
+            for (loader in loaders) {
+                version("$mcVersion-$loader", mcVersion)
+            }
+        }
 
 		mc("1.21.3", listOf("fabric"))
 		mc("1.21.4", listOf("fabric"))

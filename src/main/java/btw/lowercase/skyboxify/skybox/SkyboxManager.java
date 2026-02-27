@@ -73,11 +73,11 @@ public final class SkyboxManager {
 		return this.api.getConfig().enabled.isEnabled() && !this.activeSkies.isEmpty();
 	}
 
-	public List<Skybox> getSkiesFor(final ResourceKey<@NotNull Level> resourceKey) {
+	public List<Skybox> getSkiesFor(final ResourceKey<Level> resourceKey) {
 		return getActiveSkies().stream().filter(skybox -> resourceKey.equals(skybox.getDimension())).toList();
 	}
 
-	public boolean containsEnabled(final ResourceKey<@NotNull Level> resourceKey) {
+	public boolean containsEnabled(final ResourceKey<Level> resourceKey) {
 		return !getSkiesFor(resourceKey).isEmpty();
 	}
 }

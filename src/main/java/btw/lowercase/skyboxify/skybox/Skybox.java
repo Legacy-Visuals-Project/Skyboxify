@@ -49,12 +49,12 @@ public class Skybox {
 	@Getter
 	private final List<SkyLayer> layers;
 	@Getter
-	private final ResourceKey<@NotNull Level> dimension;
+	private final ResourceKey<Level> dimension;
 	private final Map<SkyLayer, Float> alphaMap = new HashMap<>();
 	@Getter
 	private boolean active = true;
 
-	public Skybox(final ResourceKey<@NotNull Level> dimension, final List<SkyLayer> layers) {
+	public Skybox(final ResourceKey<Level> dimension, final List<SkyLayer> layers) {
 		this.dimension = dimension;
 		this.layers = layers;
 	}

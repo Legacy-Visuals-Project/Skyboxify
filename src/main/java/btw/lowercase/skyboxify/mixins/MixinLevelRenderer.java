@@ -64,7 +64,7 @@ public abstract class MixinLevelRenderer {
             FrameGraphBuilder frameGraphBuilder,
             Camera camera,
             //? <=1.21.8
-            /*float tickDelta,*/
+            //float tickDelta,
             //? >=1.21.6 {
             com.mojang.blaze3d.buffers.GpuBufferSlice gpuBufferSlice,
             //?} else {
@@ -96,13 +96,13 @@ public abstract class MixinLevelRenderer {
     void skyboxify$renderEndSkybox(
             net.minecraft.client.renderer.SkyRenderer instance,
             //? <=1.21.3
-            /*PoseStack poseStack,*/
+            //PoseStack poseStack,
             Operation<Void> original
     ) {
         original.call(
                 instance
                 //? <=1.21.3
-                /*, poseStack*/
+                //, poseStack
         );
         Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.EndSky.After(
                 //? >=1.21.11 {
@@ -133,9 +133,9 @@ public abstract class MixinLevelRenderer {
             net.minecraft.client.renderer.SkyRenderer instance,
             PoseStack poseStack,
             //? >=1.21.4 <1.21.9
-            /*net.minecraft.client.renderer.MultiBufferSource.BufferSource bufferSource,*/
+            //net.minecraft.client.renderer.MultiBufferSource.BufferSource bufferSource,
             //? <=1.21.3
-            /*com.mojang.blaze3d.vertex.Tesselator tesselator,*/
+            //com.mojang.blaze3d.vertex.Tesselator tesselator,
             float sunAngle,
             int sunriseOrSunsetColor,
 			Operation<Void> original
@@ -145,15 +145,15 @@ public abstract class MixinLevelRenderer {
 					instance,
 					poseStack,
 					//? >=1.21.4 <1.21.9
-					/*bufferSource,*/
+					//bufferSource,
 					//? <=1.21.3
-					/*tesselator,*/
+					//tesselator,
 					sunAngle,
 					sunriseOrSunsetColor
 			);
 			Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.SunriseSunset.After(
 					//? >=1.21.4 <1.21.9
-					/*bufferSource*/
+					//bufferSource
 			));
 		}
     }
@@ -182,9 +182,9 @@ public abstract class MixinLevelRenderer {
             net.minecraft.client.renderer.SkyRenderer instance,
             PoseStack poseStack,
             //? >=1.21.4 <1.21.9
-            /*net.minecraft.client.renderer.MultiBufferSource.BufferSource bufferSource,*/
+            //net.minecraft.client.renderer.MultiBufferSource.BufferSource bufferSource,
             //? <=1.21.3
-            /*com.mojang.blaze3d.vertex.Tesselator tesselator,*/
+            //com.mojang.blaze3d.vertex.Tesselator tesselator,
             float timeOfDay,
             //? <=1.21.10 {
             /*int moonPhase,
@@ -197,7 +197,7 @@ public abstract class MixinLevelRenderer {
             float starBrightness
             //?}
             //? <1.21.6
-            /*,net.minecraft.client.renderer.FogParameters fog*/
+            //,net.minecraft.client.renderer.FogParameters fog
     ) {
         return !Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.SunMoonStars(
                 //? >=1.21.11 {

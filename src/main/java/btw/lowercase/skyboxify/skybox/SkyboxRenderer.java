@@ -52,7 +52,21 @@ import net.minecraft.client.renderer.texture.AbstractTexture;
 public final class SkyboxRenderer {
     public static final SkyboxRenderer INSTANCE = new SkyboxRenderer();
 
-	public static final Identifier CUSTOM_SKYBOX_LOCATION = Skyboxify.locationOrNull("core/custom_skybox");
+	private static final Identifier CUSTOM_SKYBOX_LOCATION = Skyboxify.locationOrNull("core/custom_skybox");
+
+	//? <=1.21.4 {
+	/*private static final net.minecraft.client.renderer.ShaderProgram CUSTOM_SKYBOX_SHADER;
+
+	static {
+		CUSTOM_SKYBOX_SHADER = new net.minecraft.client.renderer.ShaderProgram(
+				CUSTOM_SKYBOX_LOCATION,
+				DefaultVertexFormat.POSITION_TEX,
+				net.minecraft.client.renderer.ShaderDefines.EMPTY
+		);
+
+		net.minecraft.client.renderer.CoreShaders.getProgramsToPreload().add(CUSTOM_SKYBOX_SHADER);
+	}
+	*///? }
 
     //? >=1.21.5 {
     private GpuBuffer skyBuffer;
@@ -62,21 +76,8 @@ public final class SkyboxRenderer {
     /*private com.mojang.blaze3d.vertex.VertexBuffer skyBuffer;
      *///?}
 
-	//? <=1.21.4
-	/*private final net.minecraft.client.renderer.ShaderProgram customSkyboxShader;*/
-
     private SkyboxRenderer() {
         Minecraft.getInstance().schedule(this::buildSky);
-
-		//? <=1.21.4 {
-		/*this.customSkyboxShader = new net.minecraft.client.renderer.ShaderProgram(
-				CUSTOM_SKYBOX_LOCATION,
-				DefaultVertexFormat.POSITION_TEX,
-				net.minecraft.client.renderer.ShaderDefines.EMPTY
-		);
-
-		net.minecraft.client.renderer.CoreShaders.getProgramsToPreload().add(this.customSkyboxShader);
-		*///?}
     }
 
     private void buildSky() {
@@ -85,7 +86,8 @@ public final class SkyboxRenderer {
             final VertexFormat.Mode vertexFormatMode = VertexFormat.Mode.QUADS;
             final BufferBuilder builder = new BufferBuilder(byteBufferBuilder, vertexFormatMode, vertexFormat);
             for (final SkyPart part : SkyPart.VALUES) {
-				part.getUv().face(builder, part.getRotationMatrix(), 800.0F); // Bigger the value, the less view-bobbing affects it
+				// 400
+				part.getUv().face(builder, part.getRotationMatrix(), 100.0F); // Bigger the value, the less view-bobbing affects it, but it starts clipping which is bad
             }
 
             //? >=1.21.5
@@ -143,10 +145,10 @@ public final class SkyboxRenderer {
 				thunderLevel /= rainLevel;
 			}
 
-			for (final SkyLayer skyLayer : skybox.getLayers().stream().filter(layer -> layer.isActive(dayTime, clampedTimeOfDay)).toList()) {
-				this.renderLayer(skyLayer, new Matrix4f(modelViewMatrix), level, clampedTimeOfDay, skyAngle, rainLevel, thunderLevel, skybox.getConditionAlphaFor(skyLayer));
-			}
-		}
+	        for (final SkyLayer skyLayer : skybox.getLayers().stream().filter(layer -> layer.isActive(dayTime, clampedTimeOfDay)).toList()) {
+		        this.renderLayer(skyLayer, new Matrix4f(modelViewMatrix), level, clampedTimeOfDay, skyAngle, rainLevel, thunderLevel, skybox.getConditionAlphaFor(skyLayer));
+	        }
+        }
     }
 
     private void renderLayer(final SkyLayer skyLayer, final Matrix4f modelViewMatrix, final Level level, final int timeOfDay, final float skyAngle, float rainLevel, float thunderLevel, float conditionAlpha) {
@@ -230,7 +232,7 @@ public final class SkyboxRenderer {
                  *///?}
             }
             //?} else {
-            /*RenderSystem.setShader(this.customSkyboxShader);
+            /*RenderSystem.setShader(CUSTOM_SKYBOX_SHADER);
 			RenderSystem.setShaderTexture(0, skyLayer.texture());
             RenderSystem.depthMask(false);
             RenderSystem.colorMask(true, true, true, false);
