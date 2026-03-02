@@ -202,7 +202,7 @@ publishMods {
     dryRun = modrinthId == null && curseforgeId == null
     if (modrinthId != null) {
         modrinth {
-            projectId = property("publish.modrinth").toString()
+            projectId = modrinthId
             accessToken = findProperty("modrinth.token").toString()
             minecraftVersions.addAll(mod.minecraftVersionRange.split(' '))
             if (loader.isFabric) {
@@ -214,7 +214,7 @@ publishMods {
 
     if (curseforgeId != null) {
         curseforge {
-            projectId = property("publish.curseforge").toString()
+            projectId = curseforgeId
             accessToken = findProperty("curseforge.token").toString()
             minecraftVersions.addAll(mod.minecraftVersionRange.split(' '))
             if (loader.isFabric) {

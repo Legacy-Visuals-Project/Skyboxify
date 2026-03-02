@@ -159,7 +159,7 @@ public final class SkyboxRenderer {
             if (skyLayer.rotate()) {
 				final float angle = this.getAngle(level, skyAngle, skyLayer.speed());
 				if (SkyboxifyImpl.config().debug.isEnabled() && SkyboxifyImpl.config().legacyRotationLogic.isEnabled()) {
-					CommonUtils.rotate(modelViewMatrix, angle, skyLayer.axis());
+					CommonUtils.mulPose(modelViewMatrix, angle, skyLayer.axis());
 				} else {
 					// NOTE: Using `mulPose` directly gives a different result.
 					modelViewMatrix.rotate(new Quaternionf(new AxisAngle4f(angle, skyLayer.axis())));
