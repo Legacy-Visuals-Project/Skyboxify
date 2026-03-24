@@ -57,7 +57,7 @@ if (mod.obfuscated) {
 class LoaderData {
     val name = property("loader.platform") as String?
     val isFabric = "fabric".equals(name, ignoreCase = true)
-    val isNeoforge = "neoforge".equals(name, ignoreCase = true)
+    val isNeoForge = "neoforge".equals(name, ignoreCase = true)
 }
 
 val loader = LoaderData()
@@ -168,7 +168,7 @@ dependencies {
                 exclude(group, "net.fabricmc.fabric-api")
             }
         }
-    } else if (loader.isNeoforge) {
+    } else if (loader.isNeoForge) {
         // TODO: "neoForge"("net.neoforged:neoforge:${deps.neoForgeVersion}")
     }
 }
@@ -236,6 +236,9 @@ java {
 
     sourceCompatibility = requiredJava
     targetCompatibility = requiredJava
+    if (!mod.obfuscated) {
+        withSourcesJar()
+    }
 }
 
 tasks {
@@ -261,7 +264,7 @@ tasks {
                 )
             }
 
-            if (loader.isNeoforge) {
+            if (loader.isNeoForge) {
                 put("neoforge_version", deps.neoForgeVersion)
             }
 
@@ -286,7 +289,7 @@ tasks {
             exclude(listOf("META-INF/neoforge.mods.toml"))
         }
 
-        if (loader.isNeoforge) {
+        if (loader.isNeoForge) {
             filesMatching("META-INF/neoforge.mods.toml") { expand(props) }
             exclude("fabric.mod.json")
         }
@@ -294,13 +297,17 @@ tasks {
 
     register<Copy>("buildAndCollect") {
         group = "build"
+
         if (mod.obfuscated) {
             val remapJar by existing(net.fabricmc.loom.task.RemapJarTask::class)
             val remapSourcesJar by existing(net.fabricmc.loom.task.RemapSourcesJarTask::class)
             from(remapJar, remapSourcesJar)
+        } else {
+            val sourcesJar by existing
+            from(jar, sourcesJar)
         }
 
-        into(rootProject.layout.buildDirectory.file("libs/${project.property("mod.version")}"))
+        into(rootProject.layout.buildDirectory.file("libs/${mod.version}"))
         dependsOn("build")
     }
 }

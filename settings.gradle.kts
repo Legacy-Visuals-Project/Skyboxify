@@ -7,8 +7,8 @@ pluginManagement {
 		maven("https://maven.architectury.dev")
 		maven("https://maven.kikugie.dev/snapshots")
 		maven("https://maven.kikugie.dev/releases")
-		maven("https://repo.polyfrost.cc/releases")
-	}
+        maven("https://repo.polyfrost.cc/releases")
+    }
 }
 
 plugins {
@@ -18,7 +18,6 @@ plugins {
 stonecutter {
 	kotlinController = true
 	centralScript = "build.gradle.kts"
-
 	create(rootProject) {
         fun mc(mcVersion: String, loaders: Iterable<String>) {
             for (loader in loaders) {
@@ -32,6 +31,7 @@ stonecutter {
 		mc("1.21.8", listOf("fabric"))
 		mc("1.21.10", listOf("fabric"))
 		mc("1.21.11", listOf("fabric"))
+		mc("26.1", listOf("fabric"))
 
 		vcsVersion = "1.21.8-fabric"
 	}
