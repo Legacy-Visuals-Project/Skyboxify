@@ -27,7 +27,9 @@ import btw.lowercase.skyboxify.utils.ParserCodecs;
 import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JavaOps;
+import net.minecraft.core.Holder;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.biome.Biome;
 
 import java.util.List;
 import java.util.Objects;
@@ -61,4 +63,13 @@ public record Biomes(ImmutableList<Identifier> locations, boolean exclusion) {
 
 		return builder.toString().trim();
 	});
+
+    public boolean contains(final Holder<Biome> currentBiome) {
+        if (!currentBiome.isBound()) {
+            return false;
+        } else {
+            final boolean hasBiome = this.locations().contains(currentBiome.unwrapKey().orElseThrow().identifier());
+            return (!this.exclusion() || !hasBiome) && (this.exclusion() || hasBiome);
+        }
+    }
 }

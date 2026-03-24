@@ -24,7 +24,6 @@
 package btw.lowercase.skyboxify.config;
 
 import btw.lowercase.skyboxify.SkyboxifyInfo;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.visuals.legacy.lightconfig.lib.v1.Config;
@@ -40,12 +39,6 @@ public class SkyboxifyConfig extends Config {
 
 	public SkyboxifyConfig() {
 		super(SkyboxifyInfo.MOD_ID);
-		this.enabled.onValueChanged((oldVal, newVal) -> {
-			final Minecraft minecraft = Minecraft.getInstance();
-			if (minecraft != null /* It can be null, on game launch */) {
-				minecraft.reloadResourcePacks();
-			}
-		});
 	}
 
 	@Override

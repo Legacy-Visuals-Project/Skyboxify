@@ -32,11 +32,9 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.biome.Biome;
 import org.joml.Vector3fc;
 
 import java.util.List;
@@ -74,17 +72,11 @@ public record SkyLayer(
 		final Entity cameraEntity = Minecraft.getInstance().getCameraEntity();
 		if (cameraEntity == null) {
 			return false;
-		}
-
-		final BlockPos entityPos = cameraEntity.getOnPos();
-		if (!this.biomes.locations().isEmpty()) {
-			final Holder<Biome> currentBiome = level.getBiome(entityPos);
-            if (!currentBiome.isBound() || (this.biomes.exclusion() && this.biomes.locations().contains(level.getBiome(cameraEntity.blockPosition()).unwrapKey().orElseThrow().identifier()))) {
-				return false;
-			}
-		}
-
-		return this.heights == null || this.heights.isEmpty() || Range.contains(this.heights, entityPos.getY());
+		} else if (!this.biomes.locations().isEmpty() && !this.biomes.contains(level.getBiome(cameraEntity.blockPosition()))) {
+            return false;
+        } else {
+            return this.heights == null || this.heights.isEmpty() || Range.contains(this.heights, cameraEntity.getOnPos().getY());
+        }
 	}
 
 	public float getPositionBrightness(final ClientLevel level, final float conditionAlpha) {

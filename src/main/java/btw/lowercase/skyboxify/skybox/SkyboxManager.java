@@ -47,9 +47,7 @@ public final class SkyboxManager {
 	}
 
 	public void addSkybox(final Skybox skybox) {
-		if (this.api.getConfig().enabled.isEnabled()) {
-			this.loadedSkies.add(Preconditions.checkNotNull(skybox, "Skybox was null"));
-		}
+        this.loadedSkies.add(Preconditions.checkNotNull(skybox, "Skybox was null"));
 	}
 
 	public void clearSkyboxes() {
@@ -59,14 +57,12 @@ public final class SkyboxManager {
 	}
 
 	public void tick(final ClientLevel level) {
-		if (this.api.getConfig().enabled.isEnabled()) {
-			for (final Skybox skybox : this.loadedSkies) {
-				skybox.tick(level);
-			}
+        for (final Skybox skybox : this.loadedSkies) {
+            skybox.tick(level);
+        }
 
-			this.activeSkies.removeIf(optiFineSkybox -> !optiFineSkybox.isActive());
-			this.loadedSkies.stream().filter(it -> !this.activeSkies.contains(it) && it.isActive()).forEach(this.activeSkies::add);
-		}
+        this.activeSkies.removeIf(optiFineSkybox -> !optiFineSkybox.isActive());
+        this.loadedSkies.stream().filter(it -> !this.activeSkies.contains(it) && it.isActive()).forEach(this.activeSkies::add);
 	}
 
 	public boolean isEnabled() {
