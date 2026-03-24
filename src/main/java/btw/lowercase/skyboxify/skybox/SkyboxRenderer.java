@@ -122,11 +122,18 @@ public final class SkyboxRenderer {
         builder.withLocation(Skyboxify.locationOrNull("pipeline/custom_skybox"));
         builder.withVertexShader(CUSTOM_SKYBOX_LOCATION);
         builder.withFragmentShader(CUSTOM_SKYBOX_LOCATION);
-        builder.withDepthWrite(false);
+
+        //? >=26.1 {
+        final com.mojang.blaze3d.pipeline.BlendFunction vanillaBlendFunction = blendFunction == null ? null : blendFunction.vanilla();
+        builder.withColorTargetState(new com.mojang.blaze3d.pipeline.ColorTargetState(java.util.Optional.ofNullable(vanillaBlendFunction), 7));
+        //? } else {
+        /*builder.withDepthWrite(false);
         builder.withColorWrite(true, false);
         if (blendFunction != null) {
             builder.withBlend(blendFunction.vanilla());
         }
+        *///? }
+
         builder.withSampler("Sampler0");
         builder.withVertexFormat(DefaultVertexFormat.POSITION_TEX, VertexFormat.Mode.QUADS);
         return builder.build();
@@ -135,7 +142,7 @@ public final class SkyboxRenderer {
 
     public void render(final Skybox skybox, final Matrix4f modelViewMatrix, final ClientLevel level, final float tickDelta) {
      	if (this.skyBuffer != null) {
-			final long dayTime = level.getDayTime();
+			final long dayTime = level.getOverworldClockTime();
 			final int clampedTimeOfDay = (int) (dayTime % 24000L);
 			final float skyAngle = getTimeOfDay(level);
 			final float rainLevel = level.getRainLevel(tickDelta);
@@ -255,7 +262,7 @@ public final class SkyboxRenderer {
     private float getAngle(final Level level, final float skyAngle, final float speed) {
         float angleDayStart = 0.0F;
         if (speed != (float) Math.round(speed)) {
-            final long currentWorldDay = (level.getDayTime() + 18000L) / 24000L;
+            final long currentWorldDay = (level.getOverworldClockTime() + 18000L) / 24000L;
             final double anglePerDay = speed % 1.0F;
             final double currentAngle = (double) currentWorldDay * anglePerDay;
             angleDayStart = (float) (currentAngle % 1.0D);
@@ -272,7 +279,7 @@ public final class SkyboxRenderer {
 
     private float getTimeOfDay(final Level level) {
         //? >=1.21.11 {
-        long fixedTime = level.getDayTime();
+        long fixedTime = level.getOverworldClockTime();
         if (level.dimensionType().hasFixedTime()) {
             if (level.dimension().equals(Level.NETHER)) {
                 fixedTime = 18000L;

@@ -79,7 +79,7 @@ public record SkyLayer(
 		final BlockPos entityPos = cameraEntity.getOnPos();
 		if (!this.biomes.locations().isEmpty()) {
 			final Holder<Biome> currentBiome = level.getBiome(entityPos);
-			if (!currentBiome.isBound() || !(!this.biomes.exclusion() && this.biomes.locations().contains(level.getBiome(cameraEntity.blockPosition()).unwrapKey().orElseThrow().identifier()))) {
+            if (!currentBiome.isBound() || (this.biomes.exclusion() && this.biomes.locations().contains(level.getBiome(cameraEntity.blockPosition()).unwrapKey().orElseThrow().identifier()))) {
 				return false;
 			}
 		}

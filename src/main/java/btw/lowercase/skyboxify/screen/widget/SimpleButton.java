@@ -25,7 +25,7 @@ package btw.lowercase.skyboxify.screen.widget;
 
 import btw.lowercase.skyboxify.screen.widget.components.Box;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.ARGB;
 
@@ -59,10 +59,10 @@ public class SimpleButton extends Gidget {
 	}
 
 	@Override
-	public void render(final GuiGraphics guiGraphics, final int mouseX, final int mouseY) {
-		super.render(guiGraphics, mouseX, mouseY);
+	public void extractRenderState(final GuiGraphicsExtractor guiGraphics, final int mouseX, final int mouseY) {
+		super.extractRenderState(guiGraphics, mouseX, mouseY);
 		this.text.setColor(this.box().contains(mouseX, mouseY) ? ARGB.color(255, 0xFFFFA0) : ARGB.color(255, 0xE0E0E0));
-		this.text.render(guiGraphics, mouseX, mouseY);
+		this.text.extractRenderState(guiGraphics, mouseX, mouseY);
 		//? >=1.21.9 {
 		if (this.box().contains(mouseX, mouseY)) {
 			guiGraphics.requestCursor(com.mojang.blaze3d.platform.cursor.CursorTypes.POINTING_HAND);

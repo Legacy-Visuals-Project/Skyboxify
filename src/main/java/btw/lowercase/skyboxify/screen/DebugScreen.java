@@ -24,7 +24,7 @@
 package btw.lowercase.skyboxify.screen;
 
 import btw.lowercase.skyboxify.screen.widget.Gidget;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
@@ -49,10 +49,10 @@ public class DebugScreen extends Screen {
 	}
 
 	@Override
-	public void render(final @NotNull GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float delta) {
-		super.render(guiGraphics, mouseX, mouseY, delta);
+	public void extractRenderState(final GuiGraphicsExtractor guiGraphics, final int mouseX, final int mouseY, final float delta) {
+		super.extractRenderState(guiGraphics, mouseX, mouseY, delta);
 		for (final Gidget gidget : this.gidgets) {
-			gidget.render(guiGraphics, mouseX, mouseY);
+			gidget.extractRenderState(guiGraphics, mouseX, mouseY);
 		}
 	}
 

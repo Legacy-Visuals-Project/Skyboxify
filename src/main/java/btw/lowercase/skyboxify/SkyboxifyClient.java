@@ -37,7 +37,13 @@ public final class SkyboxifyClient implements ClientModInitializer {
 		Skyboxify.initialize();
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(new SkyboxifyCommand()));
 		//? >=1.21.10 {
-		net.fabricmc.fabric.api.resource.v1.ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloader(Skyboxify.locationOrNull("skybox_reader"), new SkyboxResourceHelper());
+		net.fabricmc.fabric.api.resource.v1.ResourceLoader.get(PackType.CLIENT_RESOURCES)
+                //? >=26.1 {
+                .registerReloadListener
+                //? } else {
+                /*.registerReloader
+                *///? }
+                (Skyboxify.locationOrNull("skybox_reader"), new SkyboxResourceHelper());
 		//?} else {
 		/*net.fabricmc.fabric.api.resource.ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new SkyboxResourceHelper());
 		 *///?}

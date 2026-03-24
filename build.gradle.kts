@@ -70,6 +70,61 @@ base {
 
 stonecutter {
     replacements.string {
+        direction = eval(current.version, ">=26.1")
+        replace("level.getDayTime", "level.getOverworldClockTime")
+    }
+
+    replacements.string {
+        direction = eval(current.version, ">=26.1")
+        replace("method_62215", $$"lambda$addSkyPass$0")
+    }
+
+    replacements.string {
+        direction = eval(current.version, ">=26.1")
+        replace("Lnet/minecraft/client/renderer/state/SkyRenderState", "Lnet/minecraft/client/renderer/state/level/SkyRenderState")
+    }
+
+    replacements.string {
+        direction = eval(current.version, ">=26.1")
+        replace("net.minecraft.client.renderer.state.SkyRenderState", "net.minecraft.client.renderer.state.level.SkyRenderState")
+    }
+
+    replacements.string {
+        direction = eval(current.version, ">=26.1")
+        replace("ClientCommandManager", "ClientCommands")
+    }
+
+    replacements.string {
+        direction = eval(current.version, ">=26.1")
+        replace(".render(guiGraphics", ".extractRenderState(guiGraphics")
+    }
+
+    replacements.string {
+        direction = eval(current.version, ">=26.1")
+        replace("public void render(final GuiGraphics guiGraphics", "public void extractRenderState(final GuiGraphicsExtractor guiGraphics")
+    }
+
+    replacements.string {
+        direction = eval(current.version, ">=26.1")
+        replace("GuiGraphics guiGraphics", "GuiGraphicsExtractor guiGraphics")
+    }
+
+    replacements.string {
+        direction = eval(current.version, ">=26.1")
+        replace("guiGraphics.drawString", "guiGraphics.text")
+    }
+
+    replacements.string {
+        direction = eval(current.version, ">=26.1")
+        replace("guiGraphics.hLine", "guiGraphics.horizontalLine")
+    }
+
+    replacements.string {
+        direction = eval(current.version, ">=26.1")
+        replace("net.minecraft.client.gui.GuiGraphics", "net.minecraft.client.gui.GuiGraphicsExtractor")
+    }
+
+    replacements.string {
         direction = eval(current.version, ">=1.21.11")
         replace("ResourceLocation", "Identifier")
     }
@@ -165,7 +220,7 @@ dependencies {
 
         optionalProp("deps.modmenu_version") { prop ->
             modImplementation("com.terraformersmc:modmenu:${prop}") {
-                exclude(group, "net.fabricmc.fabric-api")
+                exclude(group="net.fabricmc.fabric-api")
             }
         }
     } else if (loader.isNeoForge) {

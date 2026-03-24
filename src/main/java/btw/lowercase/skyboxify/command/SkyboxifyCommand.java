@@ -36,7 +36,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.serialization.JsonOps;
 import lombok.SneakyThrows;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommands;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -53,8 +53,8 @@ public class SkyboxifyCommand extends LiteralArgumentBuilder<FabricClientCommand
 	public SkyboxifyCommand() {
 		super("skyboxify");
 		executes(this)
-				.then(ClientCommandManager.literal("debug").executes(new Debug()))
-				.then(ClientCommandManager.literal("dump").executes(new Dump()));
+				.then(ClientCommands.literal("debug").executes(new Debug()))
+				.then(ClientCommands.literal("dump").executes(new Dump()));
 	}
 
 	@Override

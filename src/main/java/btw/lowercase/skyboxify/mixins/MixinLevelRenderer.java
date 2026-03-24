@@ -31,7 +31,6 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.framegraph.FrameGraphBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.world.level.Level;
@@ -43,6 +42,12 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+//? >=26.1 {
+import net.minecraft.client.renderer.state.level.CameraRenderState;
+//? } else {
+/*import net.minecraft.client.Camera;
+*///? }
 
 //? >=1.21.11 {
 import net.minecraft.world.level.dimension.DimensionType;
@@ -62,7 +67,11 @@ public abstract class MixinLevelRenderer {
     @Inject(method = "addSkyPass", at = @At("HEAD"))
     private void skyboxify$getLocals(
             FrameGraphBuilder frameGraphBuilder,
-            Camera camera,
+            //? >=26.1 {
+            CameraRenderState camera,
+            //? } else {
+            /*Camera camera,
+            *///? }
             //? <=1.21.8
             //float tickDelta,
             //? >=1.21.6 {
@@ -80,7 +89,7 @@ public abstract class MixinLevelRenderer {
     }
 
     @WrapOperation(
-            method = "method_62215",
+            method = "lambda$addSkyPass$0",
             at = @At(
                     value = "INVOKE",
                     //? >=1.21.4 {
@@ -114,7 +123,7 @@ public abstract class MixinLevelRenderer {
     }
 
     @WrapOperation(
-            method = "method_62215",
+            method = "lambda$addSkyPass$0",
             at = @At(
                     value = "INVOKE",
                     //? >=1.21.9 {
@@ -159,7 +168,7 @@ public abstract class MixinLevelRenderer {
     }
 
     @WrapWithCondition(
-            method = "method_62215",
+            method = "lambda$addSkyPass$0",
             at = @At(
                     value = "INVOKE",
                     //? >=1.21.11 {
@@ -214,7 +223,7 @@ public abstract class MixinLevelRenderer {
             at = @At(
                     //? >=1.21.11 {
                     value = "FIELD",
-                    target = "Lnet/minecraft/client/renderer/state/SkyRenderState;skybox:Lnet/minecraft/world/level/dimension/DimensionType$Skybox;",
+                    target = "Lnet/minecraft/client/renderer/state/level/SkyRenderState;skybox:Lnet/minecraft/world/level/dimension/DimensionType$Skybox;",
                     //?} else >=1.21.10 {
                     /*value = "FIELD",
                     target = "Lnet/minecraft/client/renderer/state/SkyRenderState;skyType:Lnet/minecraft/client/renderer/DimensionSpecialEffects$SkyType;",
@@ -233,7 +242,7 @@ public abstract class MixinLevelRenderer {
     *///?}
     skyboxify$allowNetherSky(
             //? >= 1.21.9 {
-            net.minecraft.client.renderer.state.SkyRenderState instance,
+            net.minecraft.client.renderer.state.level.SkyRenderState instance,
              //?} else {
             /*DimensionSpecialEffects instance,
             *///?}

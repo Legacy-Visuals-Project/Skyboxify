@@ -25,7 +25,7 @@ package btw.lowercase.skyboxify.config;
 
 import btw.lowercase.skyboxify.SkyboxifyInfo;
 import btw.lowercase.skyboxify.screen.widget.Text;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.layouts.GridLayout;
@@ -87,9 +87,9 @@ public class SkyboxifyConfigScreen extends InternalConfigScreen {
 	}
 
 	@Override
-	public void render(@NotNull final GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float tickDelta) {
-		super.render(guiGraphics, mouseX, mouseY, tickDelta);
-		this.versionText.render(guiGraphics, mouseX, mouseY);
+	public void extractRenderState(final GuiGraphicsExtractor guiGraphics, final int mouseX, final int mouseY, final float tickDelta) {
+		super.extractRenderState(guiGraphics, mouseX, mouseY, tickDelta);
+		this.versionText.extractRenderState(guiGraphics, mouseX, mouseY);
 	}
 
 	private void reset() {

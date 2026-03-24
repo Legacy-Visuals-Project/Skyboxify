@@ -27,7 +27,7 @@ import btw.lowercase.skyboxify.screen.widget.components.Box;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.ARGB;
 
@@ -70,7 +70,7 @@ public class Text extends Gidget {
 	}
 
 	@Override
-	public void render(final GuiGraphics guiGraphics, final int mouseX, final int mouseY) {
+	public void extractRenderState(final GuiGraphicsExtractor guiGraphics, final int mouseX, final int mouseY) {
 		int finalX = this.box().left();
 		if (this.alignment == Alignment.BOTH || this.alignment == Alignment.CENTER_HORIZONTAL) {
 			finalX -= this.box().width() / 2;
@@ -81,7 +81,7 @@ public class Text extends Gidget {
 			finalY -= this.box().height() / 2;
 		}
 
-		guiGraphics.drawString(this.font, this.text, finalX, finalY, this.color, this.shadow);
+		guiGraphics.text(this.font, this.text, finalX, finalY, this.color, this.shadow);
 		//? >=1.21.9 {
 		if (new Box(finalX, finalY, this.box.width(), this.box.height()).contains(mouseX, mouseY)) {
 			guiGraphics.requestCursor(com.mojang.blaze3d.platform.cursor.CursorTypes.IBEAM);

@@ -26,7 +26,7 @@ package btw.lowercase.skyboxify.screen.widget.components;
 import btw.lowercase.skyboxify.Skyboxify;
 import btw.lowercase.skyboxify.screen.widget.Gidget;
 import lombok.Getter;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 
@@ -45,9 +45,9 @@ public class Scrollbar extends Gidget {
 	}
 
 	@Override
-	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-		super.render(guiGraphics, mouseX, mouseY);
-		this.knob.render(guiGraphics, mouseX, mouseY);
+	public void extractRenderState(final GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY) {
+		super.extractRenderState(guiGraphics, mouseX, mouseY);
+		this.knob.extractRenderState(guiGraphics, mouseX, mouseY);
 		//? >=1.21.9 {
 		if (this.box().contains(mouseX, mouseY) && !this.knob.box().contains(mouseX, mouseY)) {
 			guiGraphics.requestCursor(com.mojang.blaze3d.platform.cursor.CursorTypes.RESIZE_NS);
@@ -56,7 +56,7 @@ public class Scrollbar extends Gidget {
 	}
 
 	@Override
-	public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+	public void renderBackground(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY) {
 		guiGraphics.blitSprite(
 				//? >=1.21.6 {
 				net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED,
@@ -98,8 +98,8 @@ public class Scrollbar extends Gidget {
 		}
 
 		@Override
-		public void render(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-			super.render(guiGraphics, mouseX, mouseY);
+		public void extractRenderState(final GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY) {
+			super.extractRenderState(guiGraphics, mouseX, mouseY);
 			//? >=1.21.9 {
 			if (this.box().contains(mouseX, mouseY)) {
 				guiGraphics.requestCursor(com.mojang.blaze3d.platform.cursor.CursorTypes.RESIZE_ALL);
@@ -108,7 +108,7 @@ public class Scrollbar extends Gidget {
 		}
 
 		@Override
-		public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+		public void renderBackground(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY) {
 			guiGraphics.blitSprite(
 					//? >=1.21.6 {
 					net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED,

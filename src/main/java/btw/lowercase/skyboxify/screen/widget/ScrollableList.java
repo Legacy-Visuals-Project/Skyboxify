@@ -25,7 +25,7 @@ package btw.lowercase.skyboxify.screen.widget;
 
 import btw.lowercase.skyboxify.screen.widget.components.Box;
 import btw.lowercase.skyboxify.screen.widget.components.Scrollbar;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.util.ARGB;
 
 import java.util.List;
@@ -57,22 +57,22 @@ public class ScrollableList extends Gidget {
 	}
 
 	@Override
-	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-		super.render(guiGraphics, mouseX, mouseY);
-		this.scrollbar.render(guiGraphics, mouseX, mouseY);
+	public void extractRenderState(final GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY) {
+		super.extractRenderState(guiGraphics, mouseX, mouseY);
+		this.scrollbar.extractRenderState(guiGraphics, mouseX, mouseY);
 		guiGraphics.enableScissor(this.box().left(), this.box().top(), this.box().right(), this.box().bottom());
 		for (Gidget gidget : this.gidgets) {
-			gidget.render(guiGraphics, mouseX, mouseY);
+			gidget.extractRenderState(guiGraphics, mouseX, mouseY);
 		}
 		guiGraphics.disableScissor();
 	}
 
 	@Override
-	public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+	public void renderBackground(final GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY) {
 		guiGraphics.fill(this.box().left(), this.box().top(), this.box().right(), this.box().bottom(), ARGB.color(76, 0));
 		final int lineColor = ARGB.color(170, 0xA0A0A0);
-		guiGraphics.hLine(this.box().left(), this.box().right(), this.box().top(), lineColor);
-		guiGraphics.hLine(this.box().left(), this.box().right(), this.box().top() + this.box().height(), lineColor);
+		guiGraphics.horizontalLine(this.box().left(), this.box().right(), this.box().top(), lineColor);
+		guiGraphics.horizontalLine(this.box().left(), this.box().right(), this.box().top() + this.box().height(), lineColor);
 	}
 
 	@Override
