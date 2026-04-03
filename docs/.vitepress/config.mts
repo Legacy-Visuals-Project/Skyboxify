@@ -5,7 +5,7 @@ export default defineConfig({
   title: "Skyboxify Documentation",
   description: "Documentation/Specification on the skyboxify skybox pack format & more!",
 
-  base: "/website",
+  base: "/Skyboxify",
 
   themeConfig: {
     nav: [{ text: 'Home', link: '/' }],
