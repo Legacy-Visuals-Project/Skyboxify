@@ -1,8 +1,8 @@
-# Skyboxify
+# Skyboxify Documentation
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/C0C31INYGG)
 
-A skybox mod that allows you to use OptiFine skies in Fabric 1.21+
+Documentation/Specification on the skyboxify skybox pack format & more!
 Join our discord: https://discord.gg/C8KKgbA8jy
 
 ## License
@@ -11,11 +11,4 @@ This project is licensed under the GPL-3.0 license w/ Minecraft Linking Exceptio
 
 ## Notes
 
-Special thanks to UsernameGeri & Zenith for helping with the logo!
-
-## Support
-
-Have any issues or need support? Feel free to use
-the [issue tracker](https://github.com/lowercasebtw/Skyboxify/issues) to address that. If you are reporting a
-crash, make sure you include information about the mods you are using and attach any relevant log files you have. If you
-want to suggest features, join the [discord](https://discord.gg/C8KKgbA8jy)!
+Special thanks to UsernameGeri for helping make this wiki!
