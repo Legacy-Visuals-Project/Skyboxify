@@ -24,7 +24,7 @@ Defines the source texture used for rendering the sky. This object is required.
 
 Example for a sky texture:
 
-
+<img src="skybox.png" alt="skybox.png" width="400"/>
 
 ## 2. Blend
 Defines how the texture should blend with the previous sky layer, the first layer always being the vanilla sky. This object is optional.
@@ -72,7 +72,7 @@ To generate different axis values, a Blender tool has been developed courtesy of
 
 Instructions for the tool are documented within the blend file. Only the most basic Blender skills are required to utilize this tool, such as navigating the interface and selecting- and rotating objects.
 
-[skybox rotation.blend](https://1078790420-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2Fkrje7NVonSJALxtU3KtJ%2Fuploads%2Fh7KKRyuHKoBirJfhwwjc%2Fskybox%20rotation.blend?alt=media&token=3575fe2f-e528-4916-8ba9-20f68220395b)
+[skybox rotation.blend](https://github.com/UsernameGeri/Skyboxify/raw/refs/heads/docs/docs/skybox%20rotation.blend) 
 
 Blender is a free, open source software. Download at https://www.blender.org/
 
