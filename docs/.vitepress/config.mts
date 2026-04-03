@@ -4,25 +4,16 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: "Skyboxify Documentation",
   description: "Documentation/Specification on the skyboxify skybox pack format & more!",
-  themeConfig: {
-    // https://vitepress.dev/reference/default-theme-config
-    nav: [
-      { text: 'Home', link: '/' },
-      { text: 'Examples', link: '/markdown-examples' }
-    ],
 
-    sidebar: [
-      {
-        text: 'Examples',
-        items: [
-          { text: 'Markdown Examples', link: '/markdown-examples' },
-          { text: 'Runtime API Examples', link: '/api-examples' }
-        ]
-      }
-    ],
+  base: "/website",
+
+  themeConfig: {
+    nav: [{ text: 'Home', link: '/' }],
+
+    sidebar: [],
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/vuejs/vitepress' }
+      { icon: 'github', link: 'https://github.com/Legacy-Visuals-Project/Skyboxify/' }
     ]
   }
 })
