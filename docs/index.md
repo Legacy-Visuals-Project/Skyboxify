@@ -24,7 +24,7 @@ Defines the source texture used for rendering the sky. This object is required.
 
 Example for a sky texture:
 
-![skybox.png](./skybox.png | width=400)
+<img src="skybox.png" alt="skybox.png" width="400">
 
 ## 2. Blend
 Defines how the texture should blend with the previous sky layer, the first layer always being the vanilla sky. This object is optional.
