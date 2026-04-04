@@ -172,3 +172,4 @@ transition=10
 
 </details>
 
+[skyboxify_template_pack.zip](https://github.com/UsernameGeri/Skyboxify/raw/refs/heads/docs/docs/skyboxify_template_pack.zip)
