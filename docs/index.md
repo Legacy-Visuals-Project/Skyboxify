@@ -2,7 +2,7 @@
 
 On this page, you will find a comprehensive guide for creating a custom sky for your resource pack.
 
-Throughout the document you will find examples, and the bottom of the page, you will find examples for complete configuration files, and a template resource pack.
+Throughout the document you will find examples, and the bottom of the page, you will find an example for a complete configuration file, and a template resource pack.
 
 In the configuration files, there are 12 types of parameters you can use to adjust the behavior of your sky.
 
@@ -133,7 +133,7 @@ Ranges can be specified as lowest-to-highest, or highest-to-lowest, such as:\
 or\
 `heights=115-100`
 
-_The following configurations currently do not work, these are currently discrepancies with Optifine's format._
+_The following configurations currently do not work, these are currently discrepancies with OptiFine's format._
 ***
 When using negative hight values in a range, the second value must be in brackets: `heights=-20-(-10)`
 
@@ -151,7 +151,7 @@ This object only effects `biomes` and `heights`.
 
 `transition=10`
 
-## Examples and template pack
+## Example and template pack
 
 <details>
 <summary>Full confoguration example</summary>
