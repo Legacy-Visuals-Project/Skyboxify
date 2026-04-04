@@ -64,7 +64,10 @@ These values must be separated by a space.
 
 `axis=0.0 -1.0 0.0`
 
-This vector must have a length of 1 unit, otherwise you will get strange results. The example below is not a valid configuration, as this vector only has a length of 0.2 units.
+This vector for example points to north-west:\
+`axis=-0.70711 0.0 -0.70711`
+
+This vector must have a length of 1 unit, otherwise you will get strange results. Notice in the example above how the values are `1/√2` to get a vector that points 45° inbetween north and west. Below is an example of an invalid configuration, as this vector only has a length of 0.2 units.
 
 `axis=0.0 -0.2 0.0`
 
