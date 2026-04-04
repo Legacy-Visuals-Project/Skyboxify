@@ -72,7 +72,7 @@ To generate different axis values, a Blender tool has been developed courtesy of
 
 Instructions for the tool are documented within the blend file. Only the most basic Blender skills are required to utilize this tool, such as navigating the interface and selecting- and rotating objects.
 
-[skybox rotation.blend](https://github.com/UsernameGeri/Skyboxify/raw/refs/heads/docs/docs/skybox%20rotation.blend) 
+[skybox_rotation.blend](./skybox_rotation.blend) 
 
 Blender is a free, open source software. Download at https://www.blender.org/
 
