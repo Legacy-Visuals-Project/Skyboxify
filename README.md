@@ -16,6 +16,6 @@ Special thanks to UsernameGeri & Zenith for helping with the logo!
 ## Support
 
 Have any issues or need support? Feel free to use
-the [issue tracker](https://github.com/lowercasebtw/Skyboxify/issues) to address that. If you are reporting a
+the [issue tracker](https://github.com/Legacy-Visuals-Project/Skyboxify/issues) to address that. If you are reporting a
 crash, make sure you include information about the mods you are using and attach any relevant log files you have. If you
 want to suggest features, join the [discord](https://discord.gg/C8KKgbA8jy)!
