@@ -48,7 +48,7 @@ public final class DynamicTransformsBuilder {
     //? >=1.21.6 {
     public com.mojang.blaze3d.buffers.GpuBufferSlice build() {
         return com.mojang.blaze3d.systems.RenderSystem.getDynamicUniforms().writeTransform(
-                orElse(this.modelViewMatrix, com.mojang.blaze3d.systems.RenderSystem.getModelViewMatrix()),
+                orElse(this.modelViewMatrix, com.mojang.blaze3d.systems.RenderSystem.getModelViewStack()),
                 orElse(this.colorModulator, new Vector4f(1.0F)),
 				new Vector3f(),
 				//? >=1.21.11 {

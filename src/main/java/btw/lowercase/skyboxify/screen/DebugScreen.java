@@ -100,7 +100,7 @@ public class DebugScreen extends Screen {
 
 	private boolean keyPressedInternal(final int keyCode, final int scanCode, final int modifiers) {
 		if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
-			this.minecraft.setScreen(null);
+			this.minecraft.gui.setScreen(null);
 			return true;
 		}
 
@@ -149,6 +149,6 @@ public class DebugScreen extends Screen {
 
 	@Override
 	public void onClose() {
-		this.minecraft.setScreen(this.parent);
+		this.minecraft.gui.setScreen(this.parent);
 	}
 }

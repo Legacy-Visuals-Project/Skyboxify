@@ -226,7 +226,7 @@ public abstract class MixinLevelRenderer {
                     target = "Lnet/minecraft/client/renderer/state/level/SkyRenderState;skybox:Lnet/minecraft/world/level/dimension/DimensionType$Skybox;",
                     //?} else >=1.21.10 {
                     /*value = "FIELD",
-                    target = "Lnet/minecraft/client/renderer/state/SkyRenderState;skyType:Lnet/minecraft/client/renderer/DimensionSpecialEffects$SkyType;",
+                    target = "Lnet/minecraft/client/renderer/state/level/SkyRenderState;skyType:Lnet/minecraft/client/renderer/DimensionSpecialEffects$SkyType;",
                     *///?} else {
                     /*value = "INVOKE",
                     target = "Lnet/minecraft/client/renderer/DimensionSpecialEffects;skyType()Lnet/minecraft/client/renderer/DimensionSpecialEffects$SkyType;",
