@@ -118,7 +118,10 @@ public final class SkyboxRenderer {
     private final java.util.Map<Identifier, RenderPipeline> renderPipelineCache = new java.util.HashMap<>();
 
     public static RenderPipeline getSkyboxPipeline(final @org.jetbrains.annotations.Nullable BlendFunction blendFunction) {
-        final RenderPipeline.Builder builder = RenderPipeline.builder(RenderPipelinesAccessor.skyboxify$getMatricesProjectionSnippet());
+        final RenderPipeline.Builder builder = RenderPipeline.builder(
+                //? <=26.1
+                //RenderPipelinesAccessor.skyboxify$getMatricesProjectionSnippet()
+        );
         builder.withLocation(Skyboxify.locationOrNull("pipeline/custom_skybox"));
         builder.withVertexShader(CUSTOM_SKYBOX_LOCATION);
         builder.withFragmentShader(CUSTOM_SKYBOX_LOCATION);
@@ -135,6 +138,7 @@ public final class SkyboxRenderer {
         *///? }
 
         //? >=26.2 {
+        builder.withBindGroupLayout(net.minecraft.client.renderer.BindGroupLayouts.MATRICES_PROJECTION);
         builder.withBindGroupLayout(com.mojang.blaze3d.pipeline.BindGroupLayout.builder().withSampler("Sampler0").build());
         //? } else {
         /*builder.withSampler("Sampler0");
@@ -202,7 +206,7 @@ public final class SkyboxRenderer {
             //? >=26.2 {
                 minecraft.gameRenderer.mainRenderTarget();
             //? } else {
-            /*  minecraft.getMainRenderTarget();
+              /*minecraft.getMainRenderTarget();
             *///? }
 
             final AbstractTexture skyTexture = minecraft.getTextureManager().getTexture(skyLayer.texture());
