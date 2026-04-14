@@ -134,7 +134,12 @@ public final class SkyboxRenderer {
         }
         *///? }
 
-        builder.withSampler("Sampler0");
+        //? >=26.2 {
+        builder.withBindGroupLayout(com.mojang.blaze3d.pipeline.BindGroupLayout.builder().withSampler("Sampler0").build());
+        //? } else {
+        /*builder.withSampler("Sampler0");
+        *///? }
+
         builder.withVertexFormat(DefaultVertexFormat.POSITION_TEX, VertexFormat.Mode.QUADS);
         return builder.build();
     }
@@ -193,7 +198,13 @@ public final class SkyboxRenderer {
 
             final Minecraft minecraft = Minecraft.getInstance();
 
-            final RenderTarget renderTarget = minecraft.getMainRenderTarget();
+            final RenderTarget renderTarget =
+            //? >=26.2 {
+                minecraft.gameRenderer.mainRenderTarget();
+            //? } else {
+            /*  minecraft.getMainRenderTarget();
+            *///? }
+
             final AbstractTexture skyTexture = minecraft.getTextureManager().getTexture(skyLayer.texture());
 
             //? >=1.21.6 {
