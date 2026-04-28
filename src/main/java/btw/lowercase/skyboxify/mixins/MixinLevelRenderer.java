@@ -107,13 +107,7 @@ public abstract class MixinLevelRenderer {
                 //? <=1.21.3
                 //, poseStack
         );
-        Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.EndSky.After(
-                //? >=1.21.11 {
-                net.minecraft.client.Minecraft.getInstance().level
-                //?} else {
-                /*this.level
-                 *///?}
-        ));
+        Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.EndSky.After(Minecraft.getInstance().level));
     }
 
     @WrapOperation(
@@ -202,14 +196,7 @@ public abstract class MixinLevelRenderer {
             //? <1.21.6
             //,net.minecraft.client.renderer.FogParameters fog
     ) {
-        return !Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.SunMoonStars(
-                //? >=1.21.11 {
-                net.minecraft.client.Minecraft.getInstance().level,
-                //?} else {
-                /*this.level,
-                 *///?}
-                skyboxify$tickDelta
-        )).isCancelled();
+        return !Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.SunMoonStars(Minecraft.getInstance().level, skyboxify$tickDelta)).isCancelled();
     }
 
     @WrapOperation(

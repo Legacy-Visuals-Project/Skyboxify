@@ -14,8 +14,5 @@
 	"options.skyboxify.showOverworldForUnknownDimension.tooltip": "Tetapan ini akan menunjukkan kotak langit permukaan di dalam dimensi yang tidak diketahui, namun tidak akan ditunjukkan di dalam nether/end melainkan ada kotak langit yang menetapkannya.",
 	"options.skyboxify.ignoreBrokenSkies": "Abaikan Langit yang Rosak",
 	"options.skyboxify.ignoreBrokenSkies.tooltip": "Jika sesuatu di dalam lapisan langit gagal dimuatkan, ia akan mengabaikannya dan tidak memuatkannya.",
-	"options.template": "%s: %s",
-	"options.on": "BUKA",
-	"options.off": "TUTUP",
 	"options.reset": "Tetap Semula"
 }

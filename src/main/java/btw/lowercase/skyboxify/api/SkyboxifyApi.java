@@ -25,18 +25,20 @@ package btw.lowercase.skyboxify.api;
 
 import btw.lowercase.skyboxify.config.SkyboxifyConfig;
 import btw.lowercase.skyboxify.skybox.SkyboxManager;
+import dev.isxander.yacl3.config.v2.api.ConfigClassHandler;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.Identifier;
 
 public interface SkyboxifyApi {
-	SkyboxifyConfig getConfig();
+    SkyboxifyConfig getConfig();
 
-	SkyboxManager getSkyboxManager();
+    ConfigClassHandler<SkyboxifyConfig> getConfigHandler();
 
-	Identifier getModernDimension(final int legacyId);
+    Screen getConfigScreen(final Screen parent);
 
-	void registerDimensionMapping(final int legacyId, final Identifier modernId);
+    SkyboxManager getSkyboxManager();
 
-	default int getApiVersion() {
-		return 0;
-	}
+    Identifier getModernDimension(final int legacyId);
+
+    void registerDimensionMapping(final int legacyId, final Identifier modernId);
 }

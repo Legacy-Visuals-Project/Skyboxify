@@ -60,7 +60,7 @@ public class SkyboxifyCommand extends LiteralArgumentBuilder<FabricClientCommand
 	@Override
 	public int run(final CommandContext<FabricClientCommandSource> context) {
 		final Minecraft minecraft = Minecraft.getInstance();
-		minecraft.schedule(() -> minecraft.gui.setScreen(SkyboxifyImpl.config().getConfigScreen(minecraft.gui.screen())));
+		minecraft.schedule(() -> minecraft.gui.setScreen(SkyboxifyImpl.getInstance().getConfigScreen(minecraft.gui.screen())));
 		return Command.SINGLE_SUCCESS;
 	}
 

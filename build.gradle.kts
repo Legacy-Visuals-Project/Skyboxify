@@ -41,7 +41,6 @@ class Dependencies {
     val mixinconstraintsVersion = property("deps.mixinconstraints_version") as String?
     val mixinsquaredVersion = property("deps.mixinsquared_version") as String?
     val lombokVersion = property("deps.lombok_version") as String?
-    val lightConfigVersion = property("deps.lightconfig_version") as String?
 }
 
 val mod = ModData()
@@ -186,6 +185,7 @@ repositories {
     maven("https://maven.bawnorton.com/releases") // MixinSquared
     maven("https://maven.terraformersmc.com") // Mod Menu
     maven("https://api.modrinth.com/maven") // Modrinth
+    maven("https://maven.isxander.dev/releases") // YACL
 }
 
 val loom: LoomGradleExtensionAPI by extensions
@@ -217,9 +217,6 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok:${deps.lombokVersion}")
     modRuntimeOnly("me.djtheredstoner:DevAuth-${loader.name}:${deps.devAuthVersion}")
 
-    // LightConfig
-    include(modImplementation("org.visuals.legacy:lightconfig:${deps.lightConfigVersion}-${mod.minecraftVersion}_${loader.name}")!!)
-
     include(implementation("com.moulberry:mixinconstraints:${deps.mixinconstraintsVersion}")!!)!!
     include(implementation(annotationProcessor("com.github.bawnorton.mixinsquared:mixinsquared-${loader.name}:${deps.mixinsquaredVersion}")!!)!!)
     if (loader.isFabric) {
@@ -230,6 +227,12 @@ dependencies {
 
         optionalProp("deps.modmenu_version") { prop ->
             modImplementation("com.terraformersmc:modmenu:${prop}") {
+                exclude(group="net.fabricmc.fabric-api")
+            }
+        }
+
+        optionalProp("deps.yacl_version") { prop ->
+            modImplementation("dev.isxander:yet-another-config-lib:$prop") {
                 exclude(group="net.fabricmc.fabric-api")
             }
         }

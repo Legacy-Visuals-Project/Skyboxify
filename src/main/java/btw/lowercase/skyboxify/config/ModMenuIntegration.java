@@ -30,8 +30,8 @@ import dev.kikugie.fletching_table.annotation.fabric.Entrypoint;
 
 @Entrypoint("modmenu")
 public class ModMenuIntegration implements ModMenuApi {
-	@Override
-	public ConfigScreenFactory<?> getModConfigScreenFactory() {
-		return SkyboxifyImpl.config()::getConfigScreen;
-	}
+    @Override
+    public ConfigScreenFactory<?> getModConfigScreenFactory() {
+        return SkyboxifyImpl.getInstance()::getConfigScreen;
+    }
 }

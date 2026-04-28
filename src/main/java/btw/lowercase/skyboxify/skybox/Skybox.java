@@ -61,7 +61,7 @@ public class Skybox {
 
 	public void tick(final ClientLevel level) {
 		this.active = true;
-		final boolean allowOtherDimensions = SkyboxifyImpl.config().showOverworldForUnknownDimension.isEnabled() && this.dimension.equals(Level.OVERWORLD) && !level.dimension().equals(Level.NETHER) && !level.dimension().equals(Level.END);
+		final boolean allowOtherDimensions = SkyboxifyImpl.config().showOverworldForUnknownDimension && this.dimension.equals(Level.OVERWORLD) && !level.dimension().equals(Level.NETHER) && !level.dimension().equals(Level.END);
 		if (this.dimension.equals(level.dimension()) || allowOtherDimensions) {
 			this.layers.forEach(layer -> alphaMap.put(layer, layer.getPositionBrightness(level, this.getConditionAlphaFor(layer))));
 		} else {
