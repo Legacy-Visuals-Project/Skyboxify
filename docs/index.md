@@ -75,7 +75,7 @@ To generate different axis values, a Blender tool has been developed courtesy of
 
 Instructions for the tool are documented within the blend file. Only the most basic Blender skills are required to utilize this tool, such as navigating the interface and selecting- and rotating objects.
 
-[skybox rotation.blend](https://github.com/UsernameGeri/Skyboxify/raw/refs/heads/docs/docs/skybox_rotation.blend)
+[skybox rotation.blend](https://github.com/Legacy-Visuals-Project/Skyboxify/raw/refs/heads/docs/docs/skybox_rotation.blend)
 
 Blender is a free, open source software. Download at https://www.blender.org/
 
@@ -155,7 +155,7 @@ This object only effects `biomes` and `heights`.
 
 <details>
 <summary>Full confoguration example</summary>
-  
+
 ```
 source=minecraft:optifine/sky/world0/sky1.png
 blend=alpha
@@ -175,4 +175,4 @@ transition=10
 
 </details>
 
-[skyboxify_template_pack.zip](https://github.com/UsernameGeri/Skyboxify/raw/refs/heads/docs/docs/skyboxify_template_pack.zip)
+[skyboxify_template_pack.zip](https://github.com/Legacy-Visuals-Project/Skyboxify/raw/refs/heads/docs/docs/skyboxify_template_pack.zip)

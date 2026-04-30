@@ -2,7 +2,7 @@
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/C0C31INYGG)
 
-Documentation/Specification on the skyboxify skybox pack format & more!
+Documentation/Specification on the Skyboxify skybox pack format & more!
 Join our discord: https://discord.gg/C8KKgbA8jy
 
 ## License
