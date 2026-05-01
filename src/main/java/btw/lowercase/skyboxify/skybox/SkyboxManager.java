@@ -66,7 +66,7 @@ public final class SkyboxManager {
 	}
 
 	public boolean isEnabled() {
-		return this.api.getConfig().enabled.isEnabled() && !this.activeSkies.isEmpty();
+		return this.api.getConfig().enabled && !this.activeSkies.isEmpty();
 	}
 
 	public List<Skybox> getSkiesFor(final ResourceKey<Level> resourceKey) {

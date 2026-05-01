@@ -23,26 +23,19 @@
 
 package btw.lowercase.skyboxify.config;
 
-import btw.lowercase.skyboxify.SkyboxifyInfo;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.Component;
-import org.visuals.legacy.lightconfig.lib.v1.Config;
-import org.visuals.legacy.lightconfig.lib.v1.field.BooleanConfigField;
+import dev.isxander.yacl3.config.v2.api.SerialEntry;
 
-public class SkyboxifyConfig extends Config {
-	public final BooleanConfigField enabled = this.booleanFieldOf("enabled", true);
-	public final BooleanConfigField renderSunMoon = this.booleanFieldOf("renderSunMoon", true);
-	public final BooleanConfigField renderStars = this.booleanFieldOf("renderStars", false);
-	public final BooleanConfigField showOverworldForUnknownDimension = this.booleanFieldOf("showOverworldForUnknownDimension", true);
-	public final BooleanConfigField debug = this.booleanFieldOf("debug", false);
-	public final BooleanConfigField legacyRotationLogic = this.booleanFieldOf("legacyRotationLogic", false);
-
-	public SkyboxifyConfig() {
-		super(SkyboxifyInfo.MOD_ID);
-	}
-
-	@Override
-	public Screen getConfigScreen(Screen parent) {
-		return new SkyboxifyConfigScreen(Component.translatable("options." + SkyboxifyInfo.MOD_ID + ".title"), this, parent);
-	}
+public class SkyboxifyConfig {
+    @SerialEntry
+    public boolean enabled = true;
+    @SerialEntry
+    public boolean renderSunMoon = true;
+    @SerialEntry
+    public boolean renderStars = false;
+    @SerialEntry
+    public boolean showOverworldForUnknownDimension = true;
+    @SerialEntry
+    public boolean debug = false;
+    @SerialEntry
+    public boolean legacyRotationLogic = false;
 }

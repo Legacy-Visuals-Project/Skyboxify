@@ -14,8 +14,5 @@
 	"options.skyboxify.showOverworldForUnknownDimension.tooltip": "A felvilág égboltját fogja mutatni ismeretlen dimenzióban. A nether/end-ben nem fogja mutatni, ha csak egy égbolt nem definiálja.",
 	"options.skyboxify.ignoreBrokenSkies": "Hibás egek figyelmen kívül hagyása",
 	"options.skyboxify.ignoreBrokenSkies.tooltip": "Ha valamit egy égbolt rétegben nem sikerül betölteni, figyelmen kívül lesz hagyva és nem lesz betöltve.",
-	"options.template": "%s: %s",
-	"options.on": "BE",
-	"options.off": "KI",
 	"options.reset": "Visszaállít"
 }

@@ -118,7 +118,10 @@ public final class SkyboxRenderer {
     private final java.util.Map<Identifier, RenderPipeline> renderPipelineCache = new java.util.HashMap<>();
 
     public static RenderPipeline getSkyboxPipeline(final @org.jetbrains.annotations.Nullable BlendFunction blendFunction) {
-        final RenderPipeline.Builder builder = RenderPipeline.builder(RenderPipelinesAccessor.skyboxify$getMatricesProjectionSnippet());
+        final RenderPipeline.Builder builder = RenderPipeline.builder(
+                //? <=26.1
+                //RenderPipelinesAccessor.skyboxify$getMatricesProjectionSnippet()
+        );
         builder.withLocation(Skyboxify.locationOrNull("pipeline/custom_skybox"));
         builder.withVertexShader(CUSTOM_SKYBOX_LOCATION);
         builder.withFragmentShader(CUSTOM_SKYBOX_LOCATION);
@@ -134,7 +137,13 @@ public final class SkyboxRenderer {
         }
         *///? }
 
-        builder.withSampler("Sampler0");
+        //? >=26.2 {
+        builder.withBindGroupLayout(net.minecraft.client.renderer.BindGroupLayouts.MATRICES_PROJECTION);
+        builder.withBindGroupLayout(com.mojang.blaze3d.pipeline.BindGroupLayout.builder().withSampler("Sampler0").build());
+        //? } else {
+        /*builder.withSampler("Sampler0");
+        *///? }
+
         builder.withVertexFormat(DefaultVertexFormat.POSITION_TEX, VertexFormat.Mode.QUADS);
         return builder.build();
     }
@@ -165,7 +174,7 @@ public final class SkyboxRenderer {
         if (!(finalAlpha < 1.0E-4F)) {
             if (skyLayer.rotate()) {
 				final float angle = this.getAngle(level, skyAngle, skyLayer.speed());
-				if (SkyboxifyImpl.config().debug.isEnabled() && SkyboxifyImpl.config().legacyRotationLogic.isEnabled()) {
+				if (SkyboxifyImpl.config().debug && SkyboxifyImpl.config().legacyRotationLogic) {
 					CommonUtils.mulPose(modelViewMatrix, angle, skyLayer.axis());
 				} else {
 					// NOTE: Using `mulPose` directly gives a different result.
@@ -193,7 +202,13 @@ public final class SkyboxRenderer {
 
             final Minecraft minecraft = Minecraft.getInstance();
 
-            final RenderTarget renderTarget = minecraft.getMainRenderTarget();
+            final RenderTarget renderTarget =
+            //? >=26.2 {
+                minecraft.gameRenderer.mainRenderTarget();
+            //? } else {
+              /*minecraft.getMainRenderTarget();
+            *///? }
+
             final AbstractTexture skyTexture = minecraft.getTextureManager().getTexture(skyLayer.texture());
 
             //? >=1.21.6 {

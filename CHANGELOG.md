@@ -1,10 +1,14 @@
-# Release 2.7
+# Release 2.8
 
 ### General
 
-- Updated to 26.1
-- Fix 'biomes' exclusion/inclusion
-- Made "enabled" config option only affect visuals (hide skybox/no longer reloads resources)
+- Moved from LightConfig to YetAnotherConfigLib as LightConfig is discontinued.
+  - You will need to download yacl, as it is not included.
+  - Your settings should persist.
 
 ### Other/API
-If you were using any of the skyboxify debug ui related rendering stuff, the "render" methods have been renamed to "extractRenderState" in 26.1+ only.
+
+- Removed getVersion as I don't know how to handle these changes
+- New getConfigHandler and getConfigScreen methods
+- SkyboxifyConfig#load is gone -> ``SkyboxifyImpl.getInstance().getConfigHandler().load()``
+- SkyboxifyConfig#getConfigScreen is gone -> ``SkyboxifyImpl.getInstance().getConfigScreen(parent)``

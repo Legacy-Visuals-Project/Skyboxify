@@ -53,7 +53,7 @@ public final class IrisUtil {
             // Methods
             IRIS_ASSIGN_PIPELINE_METHOD = IRIS_INSTANCE.getClass().getMethod("assignPipeline", RenderPipeline.class, irisProgramEnum);
         } catch (final Exception exception) {
-			if (SkyboxifyImpl.config().debug.isEnabled()) {
+			if (SkyboxifyImpl.config().debug) {
 				exception.printStackTrace();
 			}
         }

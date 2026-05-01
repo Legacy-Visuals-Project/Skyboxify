@@ -26,47 +26,42 @@ package btw.lowercase.skyboxify.events;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.client.multiplayer.ClientLevel;
-import org.visuals.legacy.lightconfig.lib.v1.events.CancellableEvent;
-import org.visuals.legacy.lightconfig.lib.v1.events.Event;
 
 public class SkyRenderEvent {
-	public static final class EndSky {
-		@RequiredArgsConstructor
-		public static class After extends Event {
-			@Getter
-			private final ClientLevel level;
-		}
-	}
+    public static final class EndSky {
+        public record After(ClientLevel level) implements Event {
+        }
+    }
 
-	@RequiredArgsConstructor
-	public static final class SunriseSunset extends CancellableEvent {
-		@RequiredArgsConstructor
-		public static class After extends Event {
-			//? >=1.21.4 <1.21.9 {
+    @RequiredArgsConstructor
+    public static final class SunriseSunset extends CancellableEvent {
+        @RequiredArgsConstructor
+        public static class After implements Event {
+            //? >=1.21.4 <1.21.9 {
 			/*@Getter
 			private final net.minecraft.client.renderer.MultiBufferSource.BufferSource bufferSource;
 			*///?}
-		}
-	}
+        }
+    }
 
-	@RequiredArgsConstructor
-	public static final class SunMoonStars extends CancellableEvent {
-		@Getter
-		private final ClientLevel level;
+    @RequiredArgsConstructor
+    public static final class SunMoonStars extends CancellableEvent {
+        @Getter
+        private final ClientLevel level;
 
-		@Getter
-		private final float tickDelta;
-	}
+        @Getter
+        private final float tickDelta;
+    }
 
-	@RequiredArgsConstructor
-	public static final class Celestial extends CancellableEvent {
-		@Getter
-		private final Type type;
+    @RequiredArgsConstructor
+    public static final class Celestial extends CancellableEvent {
+        @Getter
+        private final Type type;
 
-		public enum Type {
-			SUN,
-			MOON,
-			STARS
-		}
-	}
+        public enum Type {
+            SUN,
+            MOON,
+            STARS
+        }
+    }
 }

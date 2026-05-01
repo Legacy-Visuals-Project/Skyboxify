@@ -4,13 +4,11 @@ plugins {
     alias(libs.plugins.spotless)
 }
 
-stonecutter active "26.1-fabric" /* [SC] DO NOT EDIT */
+stonecutter active "26.2-fabric" /* [SC] DO NOT EDIT */
 
 stonecutter {
     tasks {
-        order("publishMods", versionComparator.thenComparingInt {
-            if (it.metadata.project.endsWith("fabric")) 1 else 0
-        })
+        order("publishMods", versionComparator)
     }
 
     parameters {

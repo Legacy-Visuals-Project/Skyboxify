@@ -27,7 +27,6 @@ import btw.lowercase.skyboxify.utils.BlendFunction;
 import com.mojang.serialization.Codec;
 import lombok.Getter;
 import net.minecraft.util.StringRepresentable;
-import org.jetbrains.annotations.NotNull;
 import org.joml.Vector4f;
 import org.lwjgl.opengl.GL11;
 
