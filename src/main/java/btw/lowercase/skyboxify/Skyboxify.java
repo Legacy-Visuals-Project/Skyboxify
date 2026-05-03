@@ -29,8 +29,8 @@ import btw.lowercase.skyboxify.config.SkyboxifyConfig;
 import btw.lowercase.skyboxify.events.EventManager;
 import btw.lowercase.skyboxify.events.LevelTickEvent;
 import btw.lowercase.skyboxify.events.SkyRenderEvent;
-import btw.lowercase.skyboxify.skybox.Skybox;
-import btw.lowercase.skyboxify.skybox.SkyboxRenderer;
+import btw.lowercase.skyboxify.skybox.SkyFeatureRenderer;
+import btw.lowercase.skyboxify.skybox.impl.Skybox;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.math.Axis;
 import lombok.Getter;
@@ -101,10 +101,13 @@ public class Skyboxify {
     }
 
     private void renderSkyboxes(final ClientLevel level, final float tickDelta) {
+        final SkyFeatureRenderer skyFeatureRenderer = SkyboxifyImpl.skyboxManager().getSkyFeatureRenderer();
         final Matrix4f modelViewMatrix = new Matrix4f(RenderSystem.getModelViewStack());
         modelViewMatrix.rotate(Axis.YP.rotationDegrees(-90.0F));
         for (final Skybox skybox : SkyboxifyImpl.skyboxManager().getActiveSkies()) {
-            SkyboxRenderer.INSTANCE.render(skybox, modelViewMatrix, level, tickDelta);
+            skybox.extract(skyFeatureRenderer, level, modelViewMatrix, tickDelta);
         }
+
+        skyFeatureRenderer.endFrame();
     }
 }

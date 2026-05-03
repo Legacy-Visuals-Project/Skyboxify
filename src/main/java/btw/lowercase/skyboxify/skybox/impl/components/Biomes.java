@@ -21,7 +21,7 @@
  * "MINECRAFT" LINKING EXCEPTION TO THE GPL
  */
 
-package btw.lowercase.skyboxify.skybox.components;
+package btw.lowercase.skyboxify.skybox.impl.components;
 
 import btw.lowercase.skyboxify.utils.ParserCodecs;
 import com.google.common.collect.ImmutableList;

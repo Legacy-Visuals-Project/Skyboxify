@@ -27,7 +27,7 @@ import btw.lowercase.skyboxify.screen.widget.Gidget;
 import btw.lowercase.skyboxify.screen.widget.ScrollableList;
 import btw.lowercase.skyboxify.screen.widget.SimpleButton;
 import btw.lowercase.skyboxify.screen.widget.Text;
-import btw.lowercase.skyboxify.skybox.Skybox;
+import btw.lowercase.skyboxify.skybox.impl.Skybox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;

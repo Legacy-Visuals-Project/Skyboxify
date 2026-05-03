@@ -24,56 +24,64 @@
 package btw.lowercase.skyboxify.skybox;
 
 import btw.lowercase.skyboxify.api.SkyboxifyApi;
+import btw.lowercase.skyboxify.skybox.impl.Skybox;
 import com.google.common.base.Preconditions;
 import lombok.Getter;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 public final class SkyboxManager {
-	@Getter
-	private final List<Skybox> loadedSkies = new ArrayList<>();
-	@Getter
-	private final List<Skybox> activeSkies = new LinkedList<>();
-	private final SkyboxifyApi api;
+    private SkyFeatureRenderer skyFeatureRenderer;
+    @Getter
+    private final List<Skybox> loadedSkies = new ArrayList<>();
+    @Getter
+    private final List<Skybox> activeSkies = new LinkedList<>();
+    private final SkyboxifyApi api;
 
-	public SkyboxManager(final SkyboxifyApi api) {
-		this.api = api;
-	}
+    public SkyboxManager(final SkyboxifyApi api) {
+        this.api = api;
+    }
 
-	public void addSkybox(final Skybox skybox) {
+    public void addSkybox(final Skybox skybox) {
         this.loadedSkies.add(Preconditions.checkNotNull(skybox, "Skybox was null"));
-	}
+    }
 
-	public void clearSkyboxes() {
-		SkyboxRenderer.INSTANCE.clearCache();
-		this.loadedSkies.clear();
-		this.activeSkies.clear();
-	}
+    public void clearSkyboxes() {
+        this.loadedSkies.clear();
+        this.activeSkies.clear();
+    }
 
-	public void tick(final ClientLevel level) {
+    public void tick(final ClientLevel level) {
         for (final Skybox skybox : this.loadedSkies) {
             skybox.tick(level);
         }
 
         this.activeSkies.removeIf(optiFineSkybox -> !optiFineSkybox.isActive());
         this.loadedSkies.stream().filter(it -> !this.activeSkies.contains(it) && it.isActive()).forEach(this.activeSkies::add);
-	}
+    }
 
-	public boolean isEnabled() {
-		return this.api.getConfig().enabled && !this.activeSkies.isEmpty();
-	}
+    public boolean isEnabled() {
+        return this.api.getConfig().enabled && !this.activeSkies.isEmpty();
+    }
 
-	public List<Skybox> getSkiesFor(final ResourceKey<Level> resourceKey) {
-		return getActiveSkies().stream().filter(skybox -> resourceKey.equals(skybox.getDimension())).toList();
-	}
+    public List<Skybox> getSkiesFor(final ResourceKey<Level> resourceKey) {
+        return getActiveSkies().stream().filter(skybox -> resourceKey.equals(skybox.getDimension())).toList();
+    }
 
-	public boolean containsEnabled(final ResourceKey<Level> resourceKey) {
-		return !getSkiesFor(resourceKey).isEmpty();
-	}
+    public boolean containsEnabled(final ResourceKey<Level> resourceKey) {
+        return !getSkiesFor(resourceKey).isEmpty();
+    }
+
+    public SkyFeatureRenderer getSkyFeatureRenderer() {
+        if (this.skyFeatureRenderer == null) {
+            this.skyFeatureRenderer = new SkyFeatureRenderer();
+        }
+
+        return this.skyFeatureRenderer;
+    }
 }

@@ -8,7 +8,8 @@ stonecutter active "26.2-fabric" /* [SC] DO NOT EDIT */
 
 stonecutter {
     tasks {
-        order("publishMods", versionComparator)
+        order("publishCurseforge", versionComparator)
+        order("publishModrinth", versionComparator)
     }
 
     parameters {
@@ -19,7 +20,7 @@ stonecutter {
 }
 
 tasks.named("publishMods") {
-    group = "build"
+    group = "publishing"
 }
 
 // Header

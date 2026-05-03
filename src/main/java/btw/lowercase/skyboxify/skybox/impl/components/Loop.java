@@ -21,26 +21,20 @@
  * "MINECRAFT" LINKING EXCEPTION TO THE GPL
  */
 
-package btw.lowercase.skyboxify.mixins;
+package btw.lowercase.skyboxify.skybox.impl.components;
 
-import org.spongepowered.asm.mixin.Mixin;
+import com.google.common.collect.ImmutableList;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.util.ExtraCodecs;
 
-//? >= 1.21.5 && <=26.1 {
-/*@Mixin(net.minecraft.client.renderer.RenderPipelines.class)
- *///?} else {
-@Mixin(net.minecraft.client.Minecraft.class)
-//?}
-public interface RenderPipelinesAccessor {
-    //? >= 1.21.5 && <=26.1 {
-    /*@org.spongepowered.asm.mixin.gen.Accessor(
-            //? >=1.21.6 {
-            /^"MATRICES_PROJECTION_SNIPPET"
-            ^///?} else {
-            "MATRICES_COLOR_FOG_SNIPPET"
-            //?}
-    )
-    static com.mojang.blaze3d.pipeline.RenderPipeline.Snippet skyboxify$getMatricesProjectionSnippet() {
-        throw new UnsupportedOperationException();
-    }
-    *///?}
+import java.util.List;
+
+public record Loop(int days, List<Range> ranges) {
+    public static final Loop DEFAULT = new Loop(8, ImmutableList.of());
+
+    public static final Codec<Loop> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            ExtraCodecs.intRange(1, Integer.MAX_VALUE).optionalFieldOf("days", 8).forGetter(Loop::days),
+            Range.CODEC.listOf().optionalFieldOf("ranges", ImmutableList.of()).forGetter(Loop::ranges)
+    ).apply(instance, Loop::new));
 }

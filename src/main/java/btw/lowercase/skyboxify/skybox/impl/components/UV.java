@@ -21,7 +21,7 @@
  * "MINECRAFT" LINKING EXCEPTION TO THE GPL
  */
 
-package btw.lowercase.skyboxify.skybox.components;
+package btw.lowercase.skyboxify.skybox.impl.components;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import org.joml.Matrix4f;

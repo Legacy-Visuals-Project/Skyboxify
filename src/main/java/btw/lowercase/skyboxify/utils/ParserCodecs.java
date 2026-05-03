@@ -23,8 +23,8 @@
 
 package btw.lowercase.skyboxify.utils;
 
-import btw.lowercase.skyboxify.skybox.components.Range;
-import btw.lowercase.skyboxify.skybox.components.Weather;
+import btw.lowercase.skyboxify.skybox.impl.components.Range;
+import btw.lowercase.skyboxify.skybox.impl.components.Weather;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JavaOps;

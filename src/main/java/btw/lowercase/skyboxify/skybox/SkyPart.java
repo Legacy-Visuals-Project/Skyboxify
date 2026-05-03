@@ -23,7 +23,7 @@
 
 package btw.lowercase.skyboxify.skybox;
 
-import btw.lowercase.skyboxify.skybox.components.UV;
+import btw.lowercase.skyboxify.skybox.impl.components.UV;
 import lombok.Getter;
 import org.joml.Matrix4f;
 

@@ -21,20 +21,13 @@
  * "MINECRAFT" LINKING EXCEPTION TO THE GPL
  */
 
-package btw.lowercase.skyboxify.skybox.components;
+package btw.lowercase.skyboxify.skybox;
 
-import com.google.common.collect.ImmutableList;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.util.ExtraCodecs;
+import net.minecraft.client.multiplayer.ClientLevel;
+import org.joml.Matrix4f;
 
-import java.util.List;
+public abstract class AbstractSkybox {
+    public abstract void extract(final SkyFeatureRenderer skyFeatureRenderer, final ClientLevel level, final Matrix4f modelViewMatrix, final float tickDelta);
 
-public record Loop(int days, List<Range> ranges) {
-    public static final Loop DEFAULT = new Loop(8, ImmutableList.of());
-
-    public static final Codec<Loop> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            ExtraCodecs.intRange(1, Integer.MAX_VALUE).optionalFieldOf("days", 8).forGetter(Loop::days),
-            Range.CODEC.listOf().optionalFieldOf("ranges", ImmutableList.of()).forGetter(Loop::ranges)
-    ).apply(instance, Loop::new));
+    public abstract void tick(final ClientLevel level);
 }

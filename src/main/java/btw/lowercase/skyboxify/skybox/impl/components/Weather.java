@@ -21,36 +21,44 @@
  * "MINECRAFT" LINKING EXCEPTION TO THE GPL
  */
 
-package btw.lowercase.skyboxify.skybox.components;
+package btw.lowercase.skyboxify.skybox.impl.components;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.util.Mth;
+import net.minecraft.util.StringRepresentable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public record Range(float min, float max) {
-	public static final Codec<Range> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-			Codec.FLOAT.fieldOf("min").forGetter(Range::min),
-			Codec.FLOAT.fieldOf("max").forGetter(Range::max)
-	).apply(instance, Range::new));
+public enum Weather implements StringRepresentable {
+	CLEAR,
+	RAIN,
+	THUNDER;
 
-	public Range {
-		if (min > max) {
-			throw new IllegalStateException("Maximum value is lower than the minimum value: " + this);
+	public static final Codec<Weather> CODEC = StringRepresentable.fromEnum(Weather::values);
+
+	public static float getAlpha(final List<Weather> weatherConditions, final float rainStrength, final float thunderStrength) {
+		final float alpha = 1.0F - rainStrength;
+		final float calculatedRainStrength = rainStrength - thunderStrength;
+
+		float weatherAlpha = 0.0F;
+		if (weatherConditions.contains(Weather.CLEAR)) {
+			weatherAlpha += alpha;
 		}
-	}
 
-	public boolean contains(final float value) {
-		return value >= this.min && value <= this.max;
-	}
+		if (weatherConditions.contains(Weather.RAIN)) {
+			weatherAlpha += calculatedRainStrength;
+		}
 
-	public static boolean contains(final List<Range> entries, final float value) {
-		return entries.stream().anyMatch(range -> range.contains(value));
+		if (weatherConditions.contains(Weather.THUNDER)) {
+			weatherAlpha += thunderStrength;
+		}
+
+		return Mth.clamp(weatherAlpha, 0.0F, 1.0F);
 	}
 
 	@Override
-	public @NotNull String toString() {
-		return String.format("%s..%s", this.min, this.max);
+	public @NotNull String getSerializedName() {
+		return this.name().toLowerCase();
 	}
 }

@@ -221,20 +221,13 @@ dependencies {
     include(implementation(annotationProcessor("com.github.bawnorton.mixinsquared:mixinsquared-${loader.name}:${deps.mixinsquaredVersion}")!!)!!)
     if (loader.isFabric) {
         modImplementation("net.fabricmc:fabric-loader:${deps.fabricLoaderVersion}")
-
-        modImplementation(fabricApi.module("fabric-resource-loader-v0", deps.fabricApiVersion!!))
-        modImplementation(fabricApi.module("fabric-command-api-v2", deps.fabricApiVersion))
-
+        modImplementation("net.fabricmc.fabric-api:fabric-api:${deps.fabricApiVersion}")
         optionalProp("deps.modmenu_version") { prop ->
-            modImplementation("com.terraformersmc:modmenu:${prop}") {
-                exclude(group="net.fabricmc.fabric-api")
-            }
+            modImplementation("com.terraformersmc:modmenu:${prop}")
         }
 
         optionalProp("deps.yacl_version") { prop ->
-            modImplementation("dev.isxander:yet-another-config-lib:$prop") {
-                exclude(group="net.fabricmc.fabric-api")
-            }
+            modImplementation("dev.isxander:yet-another-config-lib:$prop")
         }
     } else if (loader.isNeoForge) {
         // TODO: "neoForge"("net.neoforged:neoforge:${deps.neoForgeVersion}")

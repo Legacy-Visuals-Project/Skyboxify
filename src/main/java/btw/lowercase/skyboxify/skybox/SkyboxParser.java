@@ -24,7 +24,7 @@
 package btw.lowercase.skyboxify.skybox;
 
 import btw.lowercase.skyboxify.api.SkyboxifyImpl;
-import btw.lowercase.skyboxify.skybox.components.Range;
+import btw.lowercase.skyboxify.skybox.impl.components.Range;
 import btw.lowercase.skyboxify.utils.ParserCodecs;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
