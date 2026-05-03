@@ -79,7 +79,7 @@ public final class SkyStorage {
 
             //? >=26.2 {
             builder.withBindGroupLayout(net.minecraft.client.renderer.BindGroupLayouts.MATRICES_PROJECTION);
-            builder.withBindGroupLayout(com.mojang.blaze3d.pipeline.BindGroupLayout.builder().withSampler("Sampler0").build());
+            builder.withBindGroupLayout(net.minecraft.client.renderer.BindGroupLayouts.SAMPLER0);
             //? } else {
             /*builder.withSampler("Sampler0");
             *///? }
