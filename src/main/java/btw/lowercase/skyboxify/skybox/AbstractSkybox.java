@@ -23,6 +23,7 @@
 
 package btw.lowercase.skyboxify.skybox;
 
+import btw.lowercase.skyboxify.skybox.renderer.SkyFeatureRenderer;
 import net.minecraft.client.multiplayer.ClientLevel;
 import org.joml.Matrix4f;
 

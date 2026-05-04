@@ -25,7 +25,7 @@ package btw.lowercase.skyboxify.skybox.impl;
 
 import btw.lowercase.skyboxify.api.SkyboxifyImpl;
 import btw.lowercase.skyboxify.skybox.AbstractSkybox;
-import btw.lowercase.skyboxify.skybox.SkyFeatureRenderer;
+import btw.lowercase.skyboxify.skybox.renderer.SkyFeatureRenderer;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.Getter;

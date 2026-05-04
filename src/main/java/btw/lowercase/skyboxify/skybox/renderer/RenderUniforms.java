@@ -21,7 +21,9 @@
  * "MINECRAFT" LINKING EXCEPTION TO THE GPL
  */
 
-package btw.lowercase.skyboxify.skybox.impl.components;
+package btw.lowercase.skyboxify.skybox.renderer;
 
-public record UV(float minU, float minV, float maxU, float maxV) {
+import org.joml.Matrix4f;
+
+public record RenderUniforms(Matrix4f modelViewMatrix, int shaderColor) {
 }

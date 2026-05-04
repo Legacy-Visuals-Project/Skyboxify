@@ -21,7 +21,25 @@
  * "MINECRAFT" LINKING EXCEPTION TO THE GPL
  */
 
-package btw.lowercase.skyboxify.skybox.impl.components;
+package btw.lowercase.skyboxify.mixins;
 
-public record UV(float minU, float minV, float maxU, float maxV) {
+import org.spongepowered.asm.mixin.Mixin;
+
+//? >=1.21.5 {
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.mojang.blaze3d.buffers.GpuBuffer;
+import com.mojang.blaze3d.systems.RenderSystem;
+import org.spongepowered.asm.mixin.injection.At;
+
+@Mixin(RenderSystem.AutoStorageIndexBuffer.class)
+//? } else {
+/*@Mixin(net.minecraft.client.Minecraft.class)
+*///? }
+public abstract class MixinAutoStorageIndexBuffer {
+    //? >=1.21.5 {
+    @ModifyExpressionValue(method = "ensureStorage", at = @At(value = "CONSTANT", args = "intValue=64"))
+    private int skyboxify$modifyIndexFlags(final int original) {
+        return original | GpuBuffer.USAGE_COPY_SRC;
+    }
+    //? }
 }

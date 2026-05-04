@@ -4,9 +4,11 @@
 	"package": "btw.lowercase.skyboxify.mixins",
 	"compatibilityLevel": "JAVA_21",
 	"client": [
+		"MixinAutoStorageIndexBuffer",
 		"MixinClientLevel",
 		"MixinGameRenderer",
 		"MixinLevelRenderer",
+		"MixinMinecraft",
 		"MixinSkyRenderer",
 		"RenderPipelinesAccessor"
 	],

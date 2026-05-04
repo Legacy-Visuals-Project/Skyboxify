@@ -32,6 +32,8 @@ import net.minecraft.resources.Identifier;
 //import btw.lowercase.skyboxify.mixins.RenderPipelinesAccessor;
 import btw.lowercase.skyboxify.utils.*;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
+import java.util.Map;
+import java.util.HashMap;
 //?}
 
 public final class SkyStorage {
@@ -52,7 +54,7 @@ public final class SkyStorage {
 	*///? }
 
     //? >=1.21.5 {
-    private static final java.util.Map<BlendFunction, RenderPipeline> blendRenderPipelineCache = new java.util.HashMap<>();
+    private static final Map<BlendFunction, RenderPipeline> blendRenderPipelineCache = new HashMap<>();
 
     public static RenderPipeline createSkyboxPipeline(final @org.jetbrains.annotations.Nullable BlendFunction blendFunction) {
         if (blendRenderPipelineCache.containsKey(blendFunction)) {

@@ -29,12 +29,13 @@ import btw.lowercase.skyboxify.config.SkyboxifyConfig;
 import btw.lowercase.skyboxify.events.EventManager;
 import btw.lowercase.skyboxify.events.LevelTickEvent;
 import btw.lowercase.skyboxify.events.SkyRenderEvent;
-import btw.lowercase.skyboxify.skybox.SkyFeatureRenderer;
 import btw.lowercase.skyboxify.skybox.impl.Skybox;
+import btw.lowercase.skyboxify.skybox.renderer.SkyFeatureRenderer;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.math.Axis;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import net.minecraft.SharedConstants;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
@@ -50,6 +51,8 @@ public class Skyboxify {
     }
 
     public void initialize() {
+        SharedConstants.IS_RUNNING_IN_IDE = true;
+
         final SkyboxifyApi impl = SkyboxifyImpl.getInstance();
         impl.getConfigHandler().load();
 
