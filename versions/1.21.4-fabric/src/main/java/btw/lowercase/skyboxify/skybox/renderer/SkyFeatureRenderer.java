@@ -65,7 +65,7 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
                 RenderSystem.disableBlend();
             }
 
-            final VertexBuffer vertexBuffer = ((ReusableGeometry) geometry).vertexBuffer();
+            final VertexBuffer vertexBuffer = ((StaticGeometry) geometry).vertexBuffer();
             vertexBuffer.bind();
             for (final Submit submit : entry.getValue()) {
                 final Vector4f shaderColor = CommonUtils.unpackARGB(submit.uniforms.shaderColor());

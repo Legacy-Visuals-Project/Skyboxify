@@ -134,6 +134,11 @@ stonecutter {
     }
 
     replacements.string {
+        direction = eval(current.version, ">=26.1")
+        replace("ClientTickEvents.END_WORLD_TICK", "ClientTickEvents.END_LEVEL_TICK")
+    }
+
+    replacements.string {
         direction = eval(current.version, ">=1.21.11")
         replace("ResourceLocation", "Identifier")
     }

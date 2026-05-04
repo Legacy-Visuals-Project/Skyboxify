@@ -27,7 +27,6 @@ import btw.lowercase.skyboxify.api.SkyboxifyApi;
 import btw.lowercase.skyboxify.api.SkyboxifyImpl;
 import btw.lowercase.skyboxify.config.SkyboxifyConfig;
 import btw.lowercase.skyboxify.events.EventManager;
-import btw.lowercase.skyboxify.events.LevelTickEvent;
 import btw.lowercase.skyboxify.events.SkyRenderEvent;
 import btw.lowercase.skyboxify.skybox.impl.Skybox;
 import btw.lowercase.skyboxify.skybox.renderer.SkyFeatureRenderer;
@@ -35,6 +34,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.math.Axis;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.Identifier;
@@ -57,8 +57,7 @@ public class Skyboxify {
         impl.getConfigHandler().load();
 
         final SkyboxifyConfig config = impl.getConfig();
-
-        globalEventManager.listen(LevelTickEvent.Client.class, event -> SkyboxifyImpl.skyboxManager().tick(event.getLevel()));
+        ClientTickEvents.END_LEVEL_TICK.register(SkyboxifyImpl.skyboxManager()::tick);
 
         globalEventManager.listen(SkyRenderEvent.Celestial.class, event -> {
             if (config.enabled) {

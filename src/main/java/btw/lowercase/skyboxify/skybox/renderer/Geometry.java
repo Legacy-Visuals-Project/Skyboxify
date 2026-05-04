@@ -29,7 +29,7 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
 
 public interface Geometry extends AutoCloseable {
-    ReusableGeometry DEFAULT = ReusableGeometry.create(DefaultVertexFormat.POSITION_TEX, VertexFormat.Mode.QUADS, SkyPart.COUNT * 4, vertexConsumer -> {
+    StaticGeometry DEFAULT = StaticGeometry.create(DefaultVertexFormat.POSITION_TEX, VertexFormat.Mode.QUADS, SkyPart.COUNT * 4, vertexConsumer -> {
         for (final SkyPart part : SkyPart.VALUES) {
             final UV uv = part.getUv();
             final float size = 100.0F; // Bigger the value, the less view-bobbing affects it, but it starts clipping which is bad

@@ -54,7 +54,7 @@ import net.minecraft.world.level.dimension.DimensionType;
 *///?}
 
 @Mixin(value = LevelRenderer.class, priority = 900)
-public abstract class MixinLevelRenderer {
+public abstract class MixinLevelRenderer_SkyEvents {
     @Unique
     private static float skyboxify$tickDelta = 0.0F;
 

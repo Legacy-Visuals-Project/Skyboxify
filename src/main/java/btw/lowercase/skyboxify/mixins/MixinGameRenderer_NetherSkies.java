@@ -42,7 +42,7 @@ import org.spongepowered.asm.mixin.injection.At;
 //?} else {
 /*@Mixin(net.minecraft.client.renderer.LevelRenderer.class)
  *///?}
-public abstract class MixinGameRenderer {
+public abstract class MixinGameRenderer_NetherSkies {
     //? <=1.21.10 {
     /*@Shadow
     @Final

@@ -33,7 +33,7 @@ import net.minecraft.client.renderer.SkyRenderer;
 import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(SkyRenderer.class)
-public abstract class MixinSkyRenderer {
+public abstract class MixinSkyRenderer_CelestialEvents {
     @WrapWithCondition(
             method = "renderSunMoonAndStars",
             at = @At(

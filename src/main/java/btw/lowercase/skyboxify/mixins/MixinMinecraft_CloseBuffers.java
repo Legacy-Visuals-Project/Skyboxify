@@ -23,23 +23,17 @@
 
 package btw.lowercase.skyboxify.mixins;
 
+import btw.lowercase.skyboxify.skybox.renderer.Geometry;
+import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.Mixin;
-
-//? >=1.21.5 {
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import com.mojang.blaze3d.buffers.GpuBuffer;
-import com.mojang.blaze3d.systems.RenderSystem;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(RenderSystem.AutoStorageIndexBuffer.class)
-//? } else {
-/*@Mixin(net.minecraft.client.Minecraft.class)
-*///? }
-public abstract class MixinAutoStorageIndexBuffer {
-    //? >=1.21.5 {
-    @ModifyExpressionValue(method = "ensureStorage", at = @At(value = "CONSTANT", args = "intValue=64"))
-    private int skyboxify$modifyIndexFlags(final int original) {
-        return original | GpuBuffer.USAGE_COPY_SRC;
+@Mixin(Minecraft.class)
+public abstract class MixinMinecraft_CloseBuffers {
+    @Inject(method = "close", at = @At("HEAD"))
+    private void skyboxify$closeBuffers(final CallbackInfo ci) {
+        Geometry.DEFAULT.close();
     }
-    //? }
 }

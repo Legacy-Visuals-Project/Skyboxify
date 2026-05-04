@@ -23,18 +23,23 @@
 
 package btw.lowercase.skyboxify.mixins;
 
-import btw.lowercase.skyboxify.Skyboxify;
-import btw.lowercase.skyboxify.events.LevelTickEvent;
-import net.minecraft.client.multiplayer.ClientLevel;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(ClientLevel.class)
-public abstract class MixinClientLevel {
-	@Inject(method = "tick", at = @At("TAIL"))
-	private void skyboxify$tick(final CallbackInfo ci) {
-		Skyboxify.getGlobalEventManager().dispatch(new LevelTickEvent.Client((ClientLevel) (Object) this));
-	}
+//? >=1.21.6 {
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.mojang.blaze3d.buffers.GpuBuffer;
+import com.mojang.blaze3d.systems.RenderSystem;
+import org.spongepowered.asm.mixin.injection.At;
+
+@Mixin(RenderSystem.AutoStorageIndexBuffer.class)
+//? } else {
+/*@Mixin(net.minecraft.client.Minecraft.class)
+*///? }
+public abstract class MixinAutoStorageIndexBuffer_AllowCopySrc {
+    //? >=1.21.6 {
+    @ModifyExpressionValue(method = "ensureStorage", at = @At(value = "CONSTANT", args = "intValue=64"))
+    private int skyboxify$modifyIndexFlags(final int original) {
+        return original | GpuBuffer.USAGE_COPY_SRC;
+    }
+    //? }
 }

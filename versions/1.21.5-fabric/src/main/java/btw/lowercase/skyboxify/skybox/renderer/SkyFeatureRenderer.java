@@ -60,9 +60,9 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
                 }
 
                 pass.setPipeline(key.pipeline().pipeline());
-                if (geometry instanceof ReusableGeometry reusableGeometry) {
-                    pass.setVertexBuffer(0, reusableGeometry.vertexBuffer());
-                    pass.setIndexBuffer(reusableGeometry.indexBuffer(), reusableGeometry.indexType());
+                if (geometry instanceof StaticGeometry staticGeometry) {
+                    pass.setVertexBuffer(0, staticGeometry.vertexBuffer());
+                    pass.setIndexBuffer(staticGeometry.indexBuffer(), staticGeometry.indexType());
                 }
 
                 for (final Submit submit : entry.getValue()) {
@@ -72,8 +72,8 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
                     RenderSystem.setShaderColor(shaderColor.x, shaderColor.y, shaderColor.z, shaderColor.w);
                     RenderSystem.getModelViewStack().set(submit.uniforms.modelViewMatrix());
                     pass.bindSampler("Sampler0", submit.texture);
-                    if (geometry instanceof ReusableGeometry reusableGeometry) {
-                        pass.drawIndexed(0, reusableGeometry.indexCount());
+                    if (geometry instanceof StaticGeometry staticGeometry) {
+                        pass.drawIndexed(0, staticGeometry.indexCount());
                     }
 
                     RenderSystem.getModelViewStack().set(modelViewBackup);
