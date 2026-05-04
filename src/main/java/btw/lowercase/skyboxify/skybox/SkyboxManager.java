@@ -28,6 +28,7 @@ import btw.lowercase.skyboxify.skybox.impl.Skybox;
 import btw.lowercase.skyboxify.skybox.renderer.SkyFeatureRenderer;
 import com.google.common.base.Preconditions;
 import lombok.Getter;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
@@ -55,6 +56,13 @@ public final class SkyboxManager {
     public void clearSkyboxes() {
         this.loadedSkies.clear();
         this.activeSkies.clear();
+    }
+
+    public void tick() {
+        final ClientLevel level = Minecraft.getInstance().level;
+        if (level != null) {
+            tick(level);
+        }
     }
 
     public void tick(final ClientLevel level) {

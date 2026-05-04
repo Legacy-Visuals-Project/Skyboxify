@@ -111,7 +111,8 @@ public class SkyboxResourceHelper implements
 			/*resourceManager;
 			 *///?}
 		return CompletableFuture.runAsync(() -> {
-            SkyboxifyImpl.skyboxManager().clearSkyboxes();
+            final SkyboxManager skyboxManager = SkyboxifyImpl.skyboxManager();
+            skyboxManager.clearSkyboxes();
             theResourceManager.listPacks().forEach(pack -> {
                 final List<Identifier> optiFineSkies = new ArrayList<>();
                 pack.listResources(PackType.CLIENT_RESOURCES, Identifier.DEFAULT_NAMESPACE, OPTIFINE_SKY_PARENT, filterResource(optiFineSkies));
@@ -132,7 +133,7 @@ public class SkyboxResourceHelper implements
 
                 final List<Identifier> skies = (skyPattern == OPTIFINE_SKY_PATTERN ? optiFineSkies : mcPatcherSkies);
                 if (!skies.isEmpty()) {
-                    final int count = this.parseSkyboxesInPack(pack, skies, skyPattern);
+                    final int count = this.parseSkyboxesInPack(skyboxManager, pack, skies, skyPattern);
                     if (count > 0 && SkyboxifyImpl.config().debug) {
                         LOGGER.info("Loaded {} {} from \"{}\"!", count, (count == 1 ? "skies" : "sky"), pack.packId());
                     }
@@ -141,7 +142,7 @@ public class SkyboxResourceHelper implements
 		}).thenCompose(preparationBarrier::wait);
 	}
 
-	private int parseSkyboxesInPack(final PackResources packResources, final List<Identifier> skies, final Pattern skyPattern) {
+	private int parseSkyboxesInPack(final SkyboxManager skyboxManager, final PackResources packResources, final List<Identifier> skies, final Pattern skyPattern) {
 		final Map<String, JsonArray> layers = new HashMap<>();
 		int count = 0;
 		skies.forEach(id -> {
@@ -208,8 +209,9 @@ public class SkyboxResourceHelper implements
 
 				final Skybox skybox = Skybox.CODEC.decode(JsonOps.INSTANCE, skyboxJson).getOrThrow().getFirst();
 				skybox.setPackName(packResources.packId());
-				SkyboxifyImpl.skyboxManager().addSkybox(skybox);
-
+                skyboxManager.addSkybox(skybox);
+                // Tick at-least once as a trick for the sky to show up immediately while in the menu
+                skyboxManager.tick();
 				count++;
 			}
 		}
