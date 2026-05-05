@@ -23,6 +23,8 @@
 
 package btw.lowercase.skyboxify.skybox.renderer;
 
+import com.mojang.blaze3d.IndexType;
+import com.mojang.blaze3d.PrimitiveTopology;
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.systems.GpuDevice;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -34,20 +36,20 @@ import java.util.function.Consumer;
 public class StaticGeometry implements Geometry {
     private final GpuBuffer vertexBuffer;
     private final GpuBuffer indexBuffer;
-    private final VertexFormat.IndexType indexType;
+    private final IndexType indexType;
     private final int indexCount;
     private boolean closed;
 
-    StaticGeometry(final GpuBuffer vertexBuffer, final GpuBuffer indexBuffer, final VertexFormat.IndexType indexType, final int indexCount) {
+    StaticGeometry(final GpuBuffer vertexBuffer, final GpuBuffer indexBuffer, final IndexType indexType, final int indexCount) {
         this.vertexBuffer = vertexBuffer;
         this.indexBuffer = indexBuffer;
         this.indexType = indexType;
         this.indexCount = indexCount;
     }
 
-    public static StaticGeometry create(final VertexFormat vertexFormat, final VertexFormat.Mode vertexMode, final int vertexCount, final Consumer<VertexConsumer> vertexConsumer) {
+    public static StaticGeometry create(final VertexFormat vertexFormat, final PrimitiveTopology topology, final int vertexCount, final Consumer<VertexConsumer> vertexConsumer) {
         try (final ByteBufferBuilder byteBufferBuilder = new ByteBufferBuilder(vertexFormat.getVertexSize() * vertexCount)) {
-            final BufferBuilder builder = new BufferBuilder(byteBufferBuilder, vertexMode, vertexFormat);
+            final BufferBuilder builder = new BufferBuilder(byteBufferBuilder, topology, vertexFormat);
             vertexConsumer.accept(builder);
             try (final MeshData meshData = builder.buildOrThrow()) {
                 final GpuDevice device = RenderSystem.getDevice();
@@ -56,11 +58,11 @@ public class StaticGeometry implements Geometry {
                 final int indexCount = meshData.drawState().indexCount();
 
                 GpuBuffer indexBuffer;
-                VertexFormat.IndexType indexType;
+                IndexType indexType;
 
                 final ByteBuffer indexByteBuffer = meshData.indexBuffer();
                 if (indexByteBuffer == null) {
-                    final RenderSystem.AutoStorageIndexBuffer autoStorageIndexBuffer = RenderSystem.getSequentialBuffer(meshData.drawState().mode());
+                    final RenderSystem.AutoStorageIndexBuffer autoStorageIndexBuffer = RenderSystem.getSequentialBuffer(topology);
                     final GpuBuffer autoIndexBuffer = autoStorageIndexBuffer.getBuffer(indexCount);
                     indexBuffer = device.createBuffer(() -> "Static geometry auto index buffer", GpuBuffer.USAGE_INDEX | GpuBuffer.USAGE_COPY_DST, autoIndexBuffer.size());
                     device.createCommandEncoder().copyToBuffer(autoIndexBuffer.slice(), indexBuffer.slice());
@@ -83,7 +85,7 @@ public class StaticGeometry implements Geometry {
         return this.indexBuffer;
     }
 
-    public VertexFormat.IndexType indexType() {
+    public IndexType indexType() {
         return this.indexType;
     }
 

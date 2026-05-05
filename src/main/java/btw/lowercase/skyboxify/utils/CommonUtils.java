@@ -103,12 +103,7 @@ public final class CommonUtils {
     }
 
     public static Vector4f unpackARGB(final int color) {
-        return new Vector4f(
-                ARGB.red(color) / 255.0F,
-                ARGB.green(color) / 255.0F,
-                ARGB.blue(color) / 255.0F,
-                ARGB.alpha(color) / 255.0F
-        );
+        return new Vector4f(ARGB.redFloat(color), ARGB.greenFloat(color), ARGB.blueFloat(color), ARGB.alphaFloat(color));
     }
 
     public static int packARGB(final float red, final float green, final float blue, final float alpha) {

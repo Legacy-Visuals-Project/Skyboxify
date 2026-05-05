@@ -46,17 +46,17 @@ public enum Blend implements StringRepresentable {
 
     public static final Codec<Blend> CODEC = StringRepresentable.fromEnum(Blend::values).orElse(Blend.ADD);
 
-    private final Function<Float, Integer> blendConsumer;
+    private final Function<Float, Integer> colorConsumer;
     @Getter
     private final BlendFunction blendFunction;
 
-    Blend(final Function<Float, Integer> blendConsumer, final BlendFunction blendFunction) {
-        this.blendConsumer = blendConsumer;
+    Blend(final Function<Float, Integer> colorConsumer, final BlendFunction blendFunction) {
+        this.colorConsumer = colorConsumer;
         this.blendFunction = blendFunction;
     }
 
-    public int getShaderColor(final float value) {
-        return this.blendConsumer.apply(value);
+    public int getShaderColor(final float alpha) {
+        return this.colorConsumer.apply(alpha);
     }
 
     @NotNull

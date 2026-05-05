@@ -54,11 +54,11 @@ public final class SkyStorage {
 	*///? }
 
     //? >=1.21.6 {
-    private static final Map<BlendFunction, RenderPipeline> blendRenderPipelineCache = new HashMap<>();
+    private static final Map<BlendFunction, RenderPipeline> renderPipelineCache = new HashMap<>();
 
     public static RenderPipeline createSkyboxPipeline(final @org.jetbrains.annotations.Nullable BlendFunction blendFunction) {
-        if (blendRenderPipelineCache.containsKey(blendFunction)) {
-            return blendRenderPipelineCache.get(blendFunction);
+        if (renderPipelineCache.containsKey(blendFunction)) {
+            return renderPipelineCache.get(blendFunction);
         } else {
             final RenderPipeline.Builder builder = RenderPipeline.builder(
                     //? <=26.1
@@ -69,8 +69,16 @@ public final class SkyStorage {
             builder.withFragmentShader(CUSTOM_SKYBOX_LOCATION);
 
             //? >=26.1 {
+            final int writeColor = com.mojang.blaze3d.pipeline.ColorTargetState.WRITE_COLOR;
             final com.mojang.blaze3d.pipeline.BlendFunction vanillaBlendFunction = blendFunction == null ? null : blendFunction.vanilla();
-            builder.withColorTargetState(new com.mojang.blaze3d.pipeline.ColorTargetState(java.util.Optional.ofNullable(vanillaBlendFunction), 7));
+            builder.withColorTargetState(new com.mojang.blaze3d.pipeline.ColorTargetState(
+                    java.util.Optional.ofNullable(vanillaBlendFunction),
+                    //? >=26.2 {
+                    com.mojang.blaze3d.GpuFormat.RGBA8_UNORM, writeColor
+                    //? } else {
+                    /*writeColor
+                    *///? }
+            ));
             //? } else {
             /*builder.withDepthWrite(false);
             builder.withColorWrite(true, false);
@@ -86,9 +94,15 @@ public final class SkyStorage {
             /*builder.withSampler("Sampler0");
             *///? }
 
-            builder.withVertexFormat(DefaultVertexFormat.POSITION_TEX, VertexFormat.Mode.QUADS);
+            //? >=26.2 {
+            builder.withVertexBinding(0, DefaultVertexFormat.POSITION_TEX);
+            builder.withPrimitiveTopology(com.mojang.blaze3d.PrimitiveTopology.QUADS);
+            //? } else {
+            /*builder.withVertexFormat(DefaultVertexFormat.POSITION_TEX, VertexFormat.Mode.QUADS);
+            *///? }
+
             final RenderPipeline pipeline = builder.build();
-            blendRenderPipelineCache.put(blendFunction, pipeline);
+            renderPipelineCache.put(blendFunction, pipeline);
             IrisUtil.assignPipeline(pipeline, IrisPipeline.SKY_TEXTURED);
             return pipeline;
         }

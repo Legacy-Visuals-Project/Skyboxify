@@ -26,19 +26,32 @@ package btw.lowercase.skyboxify.skybox.renderer;
 import btw.lowercase.skyboxify.skybox.SkyPart;
 import btw.lowercase.skyboxify.skybox.impl.components.UV;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.VertexFormat;
+
+//? >=26.2 {
+import com.mojang.blaze3d.PrimitiveTopology;
+//? } else {
+/*import com.mojang.blaze3d.vertex.VertexFormat;
+*///? }
 
 public interface Geometry extends AutoCloseable {
-    StaticGeometry DEFAULT = StaticGeometry.create(DefaultVertexFormat.POSITION_TEX, VertexFormat.Mode.QUADS, SkyPart.COUNT * 4, vertexConsumer -> {
-        for (final SkyPart part : SkyPart.VALUES) {
-            final UV uv = part.getUv();
-            final float size = 100.0F; // Bigger the value, the less view-bobbing affects it, but it starts clipping which is bad
-            vertexConsumer.addVertex(part.getRotationMatrix(), -size, -size, -size).setUv(uv.minU(), uv.minV());
-            vertexConsumer.addVertex(part.getRotationMatrix(), -size, -size, size).setUv(uv.minU(), uv.maxV());
-            vertexConsumer.addVertex(part.getRotationMatrix(), size, -size, size).setUv(uv.maxU(), uv.maxV());
-            vertexConsumer.addVertex(part.getRotationMatrix(), size, -size, -size).setUv(uv.maxU(), uv.minV());
-        }
-    });
+    StaticGeometry DEFAULT = StaticGeometry.create(
+            DefaultVertexFormat.POSITION_TEX,
+            //? >=26.2 {
+            PrimitiveTopology.QUADS,
+            //? } else {
+            /*VertexFormat.Mode.QUADS,
+            *///? }
+            SkyPart.COUNT * 4,
+            vertexConsumer -> {
+                for (final SkyPart part : SkyPart.VALUES) {
+                    final UV uv = part.getUv();
+                    final float size = 100.0F; // Bigger the value, the less view-bobbing affects it, but it starts clipping which is bad
+                    vertexConsumer.addVertex(part.getRotationMatrix(), -size, -size, -size).setUv(uv.minU(), uv.minV());
+                    vertexConsumer.addVertex(part.getRotationMatrix(), -size, -size, size).setUv(uv.minU(), uv.maxV());
+                    vertexConsumer.addVertex(part.getRotationMatrix(), size, -size, size).setUv(uv.maxU(), uv.maxV());
+                    vertexConsumer.addVertex(part.getRotationMatrix(), size, -size, -size).setUv(uv.maxU(), uv.minV());
+                }
+            });
 
     boolean isClosed();
 

@@ -35,8 +35,8 @@ import net.minecraft.resources.Identifier;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.OptionalDouble;
-import java.util.OptionalInt;
 
 public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submit> {
     private final RenderTarget renderTarget = Minecraft.getInstance().gameRenderer.mainRenderTarget();
@@ -53,7 +53,7 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
         final GpuTextureView colorTextureView = this.renderTarget.getColorTextureView();
         final GpuTextureView depthTextureView = this.renderTarget.useDepth ? this.renderTarget.getDepthTextureView() : null;
         assert colorTextureView != null;
-        try (final RenderPass pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(() -> "Sky Feature End Frame", colorTextureView, OptionalInt.empty(), depthTextureView, OptionalDouble.empty())) {
+        try (final RenderPass pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(() -> "Sky Feature End Frame", colorTextureView, Optional.empty(), depthTextureView, OptionalDouble.empty())) {
             RenderSystem.bindDefaultUniforms(pass);
             for (final Map.Entry<Key, List<Submit>> entry : this.submits.entrySet()) {
                 final Key key = entry.getKey();
@@ -64,7 +64,7 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
 
                 pass.setPipeline(key.pipeline().pipeline());
                 if (geometry instanceof StaticGeometry staticGeometry) {
-                    pass.setVertexBuffer(0, staticGeometry.vertexBuffer());
+                    pass.setVertexBuffer(0, staticGeometry.vertexBuffer().slice());
                     pass.setIndexBuffer(staticGeometry.indexBuffer(), staticGeometry.indexType());
                 }
 
