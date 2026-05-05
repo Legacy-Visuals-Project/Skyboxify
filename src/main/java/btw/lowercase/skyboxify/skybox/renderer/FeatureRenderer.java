@@ -45,11 +45,12 @@ public abstract class FeatureRenderer<T extends FeatureRenderer.Submit> {
         this.renderTarget = renderTarget;
     }
 
-    protected abstract T createSubmit(final RenderUniforms uniforms, final Identifier location);
+    protected abstract T createSubmit(final Key key, final RenderUniforms uniforms, final Identifier location);
 
     public void submit(final Pipeline pipeline, final Geometry geometry, final RenderUniforms uniforms, final Identifier location) {
         if (geometry != null && !geometry.isClosed()) {
-            this.submits.computeIfAbsent(new Key(pipeline, geometry), key -> new ArrayList<>()).add(createSubmit(uniforms, location));
+            final Key key = new Key(pipeline, geometry);
+            this.submits.computeIfAbsent(key, it -> new ArrayList<>()).add(createSubmit(key, uniforms, location));
         } else {
             throw new IllegalStateException("Cannot call submit with " + (geometry == null ? "null" : "closed") + " geometry!");
         }

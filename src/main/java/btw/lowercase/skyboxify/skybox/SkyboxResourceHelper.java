@@ -23,6 +23,7 @@
 
 package btw.lowercase.skyboxify.skybox;
 
+import btw.lowercase.skyboxify.Skyboxify;
 import btw.lowercase.skyboxify.api.SkyboxifyImpl;
 import btw.lowercase.skyboxify.skybox.impl.Skybox;
 import btw.lowercase.skyboxify.utils.ParserCodecs;
@@ -53,7 +54,9 @@ public class SkyboxResourceHelper implements
 		/*net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener
 		 *///?}
 {
-	private static final String OPTIFINE_SKY_PARENT = "optifine/sky";
+    public static final Identifier CUSTOM_SKYBOX_LOCATION = Skyboxify.locationOrNull("core/custom_skybox");
+
+    private static final String OPTIFINE_SKY_PARENT = "optifine/sky";
 	private static final String SKY_PATTERN_ENDING = "(?<dimension>[\\w-]+)/(?<name>\\w+).properties$";
 	private static final Pattern OPTIFINE_SKY_PATTERN = Pattern.compile(OPTIFINE_SKY_PARENT + "/" + SKY_PATTERN_ENDING);
 	private static final String MCPATCHER_SKY_PARENT = "mcpatcher/sky";

@@ -45,7 +45,7 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
     }
 
     @Override
-    protected Submit createSubmit(final RenderUniforms uniforms, final ResourceLocation location) {
+    protected Submit createSubmit(final Key key, final RenderUniforms uniforms, final ResourceLocation location) {
         final GpuTextureView textureView = Minecraft.getInstance().getTextureManager().getTexture(location).getTextureView();
         final GpuBufferSlice dynamicTransforms = RenderSystem.getDynamicUniforms().writeTransform(uniforms.modelViewMatrix(), (Vector4f) uniforms.shaderColor(), new Vector3f(), new Matrix4f(), 1.0F);
         return new Submit(uniforms, textureView, dynamicTransforms);

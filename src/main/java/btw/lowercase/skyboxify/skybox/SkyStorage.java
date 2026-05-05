@@ -25,7 +25,6 @@ package btw.lowercase.skyboxify.skybox;
 
 import btw.lowercase.skyboxify.Skyboxify;
 import com.mojang.blaze3d.vertex.*;
-import net.minecraft.resources.Identifier;
 
 //? >=1.21.6 {
 //? <=26.1
@@ -37,22 +36,6 @@ import java.util.HashMap;
 //?}
 
 public final class SkyStorage {
-	public static final Identifier CUSTOM_SKYBOX_LOCATION = Skyboxify.locationOrNull("core/custom_skybox");
-
-	//? <=1.21.4 {
-	/*public static final net.minecraft.client.renderer.ShaderProgram CUSTOM_SKYBOX_SHADER;
-
-	static {
-		CUSTOM_SKYBOX_SHADER = new net.minecraft.client.renderer.ShaderProgram(
-				CUSTOM_SKYBOX_LOCATION,
-				DefaultVertexFormat.POSITION_TEX,
-				net.minecraft.client.renderer.ShaderDefines.EMPTY
-		);
-
-		net.minecraft.client.renderer.CoreShaders.getProgramsToPreload().add(CUSTOM_SKYBOX_SHADER);
-	}
-	*///? }
-
     //? >=1.21.6 {
     private static final Map<BlendFunction, RenderPipeline> renderPipelineCache = new HashMap<>();
 
@@ -65,8 +48,8 @@ public final class SkyStorage {
                     //RenderPipelinesAccessor.skyboxify$getMatricesProjectionSnippet()
             );
             builder.withLocation(Skyboxify.locationOrNull("pipeline/custom_skybox"));
-            builder.withVertexShader(CUSTOM_SKYBOX_LOCATION);
-            builder.withFragmentShader(CUSTOM_SKYBOX_LOCATION);
+            builder.withVertexShader(SkyboxResourceHelper.CUSTOM_SKYBOX_LOCATION);
+            builder.withFragmentShader(SkyboxResourceHelper.CUSTOM_SKYBOX_LOCATION);
 
             //? >=26.1 {
             final int writeColor = com.mojang.blaze3d.pipeline.ColorTargetState.WRITE_COLOR;
