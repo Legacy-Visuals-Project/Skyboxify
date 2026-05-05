@@ -51,8 +51,6 @@ public class Skyboxify {
     }
 
     public void initialize() {
-        SharedConstants.IS_RUNNING_IN_IDE = true;
-
         final SkyboxifyApi impl = SkyboxifyImpl.getInstance();
         impl.getConfigHandler().load();
 
