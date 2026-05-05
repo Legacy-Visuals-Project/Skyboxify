@@ -33,12 +33,15 @@ import com.mojang.blaze3d.textures.GpuTextureView;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.Identifier;
 import org.joml.Vector4f;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 import java.util.Map;
 
 public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submit> {
-    private final RenderTarget renderTarget = Minecraft.getInstance().gameRenderer.mainRenderTarget();
+    public SkyFeatureRenderer(final RenderTarget renderTarget) {
+        super(renderTarget);
+    }
 
     @Override
     protected Submit createSubmit(final RenderUniforms uniforms, final Identifier location) {
@@ -49,11 +52,7 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
 
     @Override
     public void endFrame() {
-        assert this.renderTarget.getColorTextureView() != null;
-        @SuppressWarnings("DataFlowIssue") final RenderPassDescriptor descriptor = RenderPassDescriptor.create((() -> "Sky Feature End Frame"))
-                .withColorAttachment(this.renderTarget.getColorTextureView())
-                .withDepthAttachment(this.renderTarget.useDepth ? this.renderTarget.getDepthTextureView() : null);
-        try (final RenderPass pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(descriptor)) {
+        try (final RenderPass pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(this.createPassDescriptor())) {
             RenderSystem.bindDefaultUniforms(pass);
             for (final Map.Entry<Key, List<Submit>> entry : this.submits.entrySet()) {
                 final Key key = entry.getKey();
@@ -79,6 +78,23 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
         }
 
         this.clear();
+    }
+
+    private @NonNull RenderPassDescriptor createPassDescriptor() {
+        final RenderPassDescriptor descriptor = RenderPassDescriptor.create((() -> "Sky Feature End Frame"));
+
+        final GpuTextureView colorTextureView = this.renderTarget.getColorTextureView();
+        if (colorTextureView != null) {
+            descriptor.withColorAttachment(colorTextureView);
+        }
+
+        final GpuTextureView depthTextureView = this.renderTarget.getDepthTextureView();
+        if (this.renderTarget.useDepth && depthTextureView != null) {
+            descriptor.withDepthAttachment(depthTextureView);
+        }
+
+        descriptor.withRenderArea(new RenderPass.RenderArea(0, 0, this.renderTarget.width, this.renderTarget.height));
+        return descriptor;
     }
 
     protected record Submit(RenderUniforms uniforms, GpuTextureView textureView,

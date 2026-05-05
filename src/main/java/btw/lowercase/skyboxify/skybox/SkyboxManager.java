@@ -88,7 +88,13 @@ public final class SkyboxManager {
 
     public SkyFeatureRenderer getSkyFeatureRenderer() {
         if (this.skyFeatureRenderer == null) {
-            this.skyFeatureRenderer = new SkyFeatureRenderer();
+            this.skyFeatureRenderer = new SkyFeatureRenderer(
+                    //? >=26.2 {
+                    Minecraft.getInstance().gameRenderer.mainRenderTarget()
+                    //? } else {
+                    /*Minecraft.getInstance().getMainRenderTarget()
+                    *///? }
+            );
         }
 
         return this.skyFeatureRenderer;

@@ -41,7 +41,9 @@ import java.util.OptionalDouble;
 import java.util.OptionalInt;
 
 public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submit> {
-    private final RenderTarget renderTarget = Minecraft.getInstance().getMainRenderTarget();
+    public SkyFeatureRenderer(final RenderTarget renderTarget) {
+        super(renderTarget);
+    }
 
     @Override
     protected Submit createSubmit(final RenderUniforms uniforms, final Identifier location) {

@@ -28,7 +28,6 @@ import btw.lowercase.skyboxify.utils.BlendFunction;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.VertexBuffer;
-import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import org.joml.Vector4fc;
 
@@ -36,7 +35,9 @@ import java.util.List;
 import java.util.Map;
 
 public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submit> {
-    private final RenderTarget renderTarget = Minecraft.getInstance().getMainRenderTarget();
+    public SkyFeatureRenderer(final RenderTarget renderTarget) {
+        super(renderTarget);
+    }
 
     @Override
     protected Submit createSubmit(final RenderUniforms uniforms, final ResourceLocation location) {

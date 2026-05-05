@@ -23,6 +23,7 @@
 
 package btw.lowercase.skyboxify.skybox.renderer;
 
+import com.mojang.blaze3d.pipeline.RenderTarget;
 import net.minecraft.resources.Identifier;
 
 import java.util.ArrayList;
@@ -37,7 +38,12 @@ import com.mojang.blaze3d.pipeline.RenderPipeline;
 *///? }
 
 public abstract class FeatureRenderer<T extends FeatureRenderer.Submit> {
+    protected final RenderTarget renderTarget;
     protected final Map<Key, List<T>> submits = new HashMap<>();
+
+    protected FeatureRenderer(final RenderTarget renderTarget) {
+        this.renderTarget = renderTarget;
+    }
 
     protected abstract T createSubmit(final RenderUniforms uniforms, final Identifier location);
 
