@@ -50,8 +50,8 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
     private final BiFunction<ResourceLocation, BlendFunction, RenderType> RENDER_TYPE = Util.memoize((location, blendFunction) -> {
         final RenderType.CompositeState.CompositeStateBuilder builder = RenderType.CompositeState.builder();
         builder.setShaderState(SKYBOX_SHADER);
+        builder.setWriteMaskState(RenderStateShard.COLOR_WRITE);
         builder.setTextureState(new RenderStateShard.TextureStateShard(location, TriState.FALSE, false));
-        builder.setWriteMaskState(new RenderStateShard.WriteMaskStateShard(true, false));
         builder.setOutputState(new RenderStateShard.OutputStateShard("dynamic_target", () -> Objects.requireNonNullElseGet(this.renderTarget, () -> Minecraft.getInstance().getMainRenderTarget()).bindWrite(false), () -> Minecraft.getInstance().getMainRenderTarget().bindWrite(false)));
         if (blendFunction != null) {
             builder.setTransparencyState(new RenderStateShard.TransparencyStateShard("Dynamic Blend Function", () -> {
