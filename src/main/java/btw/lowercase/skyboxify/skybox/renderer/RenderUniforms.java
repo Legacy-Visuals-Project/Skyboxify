@@ -24,6 +24,7 @@
 package btw.lowercase.skyboxify.skybox.renderer;
 
 import org.joml.Matrix4f;
+import org.joml.Vector4fc;
 
-public record RenderUniforms(Matrix4f modelViewMatrix, int shaderColor) {
+public record RenderUniforms(Matrix4f modelViewMatrix, Vector4fc shaderColor) {
 }

@@ -23,20 +23,19 @@
 
 package btw.lowercase.skyboxify.skybox.renderer;
 
-import btw.lowercase.skyboxify.utils.CommonUtils;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.RenderPass;
+import com.mojang.blaze3d.systems.RenderPassDescriptor;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.textures.FilterMode;
 import com.mojang.blaze3d.textures.GpuTextureView;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.Identifier;
+import org.joml.Vector4f;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.OptionalDouble;
 
 public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submit> {
     private final RenderTarget renderTarget = Minecraft.getInstance().gameRenderer.mainRenderTarget();
@@ -44,16 +43,17 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
     @Override
     protected Submit createSubmit(final RenderUniforms uniforms, final Identifier location) {
         final GpuTextureView textureView = Minecraft.getInstance().getTextureManager().getTexture(location).getTextureView();
-        final GpuBufferSlice dynamicTransforms = RenderSystem.getDynamicUniforms().writeTransform(uniforms.modelViewMatrix(), CommonUtils.unpackARGB(uniforms.shaderColor()));
+        final GpuBufferSlice dynamicTransforms = RenderSystem.getDynamicUniforms().writeTransform(uniforms.modelViewMatrix(), (Vector4f) uniforms.shaderColor());
         return new Submit(uniforms, textureView, dynamicTransforms);
     }
 
     @Override
     public void endFrame() {
-        final GpuTextureView colorTextureView = this.renderTarget.getColorTextureView();
-        final GpuTextureView depthTextureView = this.renderTarget.useDepth ? this.renderTarget.getDepthTextureView() : null;
-        assert colorTextureView != null;
-        try (final RenderPass pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(() -> "Sky Feature End Frame", colorTextureView, Optional.empty(), depthTextureView, OptionalDouble.empty())) {
+        assert this.renderTarget.getColorTextureView() != null;
+        @SuppressWarnings("DataFlowIssue") final RenderPassDescriptor descriptor = RenderPassDescriptor.create((() -> "Sky Feature End Frame"))
+                .withColorAttachment(this.renderTarget.getColorTextureView())
+                .withDepthAttachment(this.renderTarget.useDepth ? this.renderTarget.getDepthTextureView() : null);
+        try (final RenderPass pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(descriptor)) {
             RenderSystem.bindDefaultUniforms(pass);
             for (final Map.Entry<Key, List<Submit>> entry : this.submits.entrySet()) {
                 final Key key = entry.getKey();

@@ -25,13 +25,12 @@ package btw.lowercase.skyboxify.skybox.renderer;
 
 import btw.lowercase.skyboxify.skybox.SkyStorage;
 import btw.lowercase.skyboxify.utils.BlendFunction;
-import btw.lowercase.skyboxify.utils.CommonUtils;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.VertexBuffer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
-import org.joml.Vector4f;
+import org.joml.Vector4fc;
 
 import java.util.List;
 import java.util.Map;
@@ -68,8 +67,8 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
             final VertexBuffer vertexBuffer = ((StaticGeometry) geometry).vertexBuffer();
             vertexBuffer.bind();
             for (final Submit submit : entry.getValue()) {
-                final Vector4f shaderColor = CommonUtils.unpackARGB(submit.uniforms.shaderColor());
-                RenderSystem.setShaderColor(shaderColor.x, shaderColor.y, shaderColor.z, shaderColor.w);
+                final Vector4fc shaderColor = submit.uniforms.shaderColor();
+                RenderSystem.setShaderColor(shaderColor.x(), shaderColor.y(), shaderColor.z(), shaderColor.w());
                 RenderSystem.setShaderTexture(0, submit.texture);
                 vertexBuffer.drawWithShader(submit.uniforms.modelViewMatrix(), RenderSystem.getProjectionMatrix(), RenderSystem.getShader());
             }

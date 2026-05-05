@@ -24,38 +24,38 @@
 package btw.lowercase.skyboxify.skybox.impl.components;
 
 import btw.lowercase.skyboxify.utils.BlendFunction;
-import btw.lowercase.skyboxify.utils.CommonUtils;
 import com.mojang.serialization.Codec;
 import lombok.Getter;
 import net.minecraft.util.StringRepresentable;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Vector4f;
 import org.lwjgl.opengl.GL11;
 
 import java.util.function.Function;
 
 public enum Blend implements StringRepresentable {
-    ADD(alpha -> CommonUtils.packARGB(1.0F, 1.0F, 1.0F, alpha), new BlendFunction(GL11.GL_SRC_ALPHA, GL11.GL_ONE)),
-    SUBTRACT(alpha -> CommonUtils.packARGB(alpha, alpha, alpha, 1.0F), new BlendFunction(GL11.GL_ONE_MINUS_DST_COLOR, GL11.GL_ZERO)),
-    MULTIPLY(alpha -> CommonUtils.packARGB(alpha, alpha, alpha, alpha), new BlendFunction(GL11.GL_DST_COLOR, GL11.GL_ONE_MINUS_SRC_ALPHA)),
-    DODGE(alpha -> CommonUtils.packARGB(alpha, alpha, alpha, 1.0F), new BlendFunction(GL11.GL_ONE, GL11.GL_ONE)),
-    BURN(alpha -> CommonUtils.packARGB(alpha, alpha, alpha, 1.0F), new BlendFunction(GL11.GL_ZERO, GL11.GL_ONE_MINUS_SRC_COLOR)),
-    SCREEN(alpha -> CommonUtils.packARGB(alpha, alpha, alpha, 1.0F), new BlendFunction(GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_COLOR)),
-    REPLACE(alpha -> CommonUtils.packARGB(1.0F, 1.0F, 1.0F, alpha), null),
-    OVERLAY(alpha -> CommonUtils.packARGB(alpha, alpha, alpha, 1.0F), new BlendFunction(GL11.GL_DST_COLOR, GL11.GL_SRC_COLOR)),
-    ALPHA(alpha -> CommonUtils.packARGB(1.0F, 1.0F, 1.0F, alpha), new BlendFunction(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA));
+    ADD(alpha -> new Vector4f(1.0F, 1.0F, 1.0F, alpha), new BlendFunction(GL11.GL_SRC_ALPHA, GL11.GL_ONE)),
+    SUBTRACT(alpha -> new Vector4f(alpha, alpha, alpha, 1.0F), new BlendFunction(GL11.GL_ONE_MINUS_DST_COLOR, GL11.GL_ZERO)),
+    MULTIPLY(alpha -> new Vector4f(alpha, alpha, alpha, alpha), new BlendFunction(GL11.GL_DST_COLOR, GL11.GL_ONE_MINUS_SRC_ALPHA)),
+    DODGE(alpha -> new Vector4f(alpha, alpha, alpha, 1.0F), new BlendFunction(GL11.GL_ONE, GL11.GL_ONE)),
+    BURN(alpha -> new Vector4f(alpha, alpha, alpha, 1.0F), new BlendFunction(GL11.GL_ZERO, GL11.GL_ONE_MINUS_SRC_COLOR)),
+    SCREEN(alpha -> new Vector4f(alpha, alpha, alpha, 1.0F), new BlendFunction(GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_COLOR)),
+    REPLACE(alpha -> new Vector4f(1.0F, 1.0F, 1.0F, alpha), null),
+    OVERLAY(alpha -> new Vector4f(alpha, alpha, alpha, 1.0F), new BlendFunction(GL11.GL_DST_COLOR, GL11.GL_SRC_COLOR)),
+    ALPHA(alpha -> new Vector4f(1.0F, 1.0F, 1.0F, alpha), new BlendFunction(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA));
 
     public static final Codec<Blend> CODEC = StringRepresentable.fromEnum(Blend::values).orElse(Blend.ADD);
 
-    private final Function<Float, Integer> colorConsumer;
+    private final Function<Float, Vector4f> colorConsumer;
     @Getter
     private final BlendFunction blendFunction;
 
-    Blend(final Function<Float, Integer> colorConsumer, final BlendFunction blendFunction) {
+    Blend(final Function<Float, Vector4f> colorConsumer, final BlendFunction blendFunction) {
         this.colorConsumer = colorConsumer;
         this.blendFunction = blendFunction;
     }
 
-    public int getShaderColor(final float alpha) {
+    public Vector4f getShaderColor(final float alpha) {
         return this.colorConsumer.apply(alpha);
     }
 

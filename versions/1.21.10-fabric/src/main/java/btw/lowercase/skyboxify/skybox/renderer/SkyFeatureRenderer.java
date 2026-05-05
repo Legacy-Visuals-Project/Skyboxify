@@ -23,7 +23,6 @@
 
 package btw.lowercase.skyboxify.skybox.renderer;
 
-import btw.lowercase.skyboxify.utils.CommonUtils;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.RenderPass;
@@ -33,6 +32,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 
 import java.util.List;
 import java.util.Map;
@@ -45,7 +45,7 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
     @Override
     protected Submit createSubmit(final RenderUniforms uniforms, final ResourceLocation location) {
         final GpuTextureView textureView = Minecraft.getInstance().getTextureManager().getTexture(location).getTextureView();
-        final GpuBufferSlice dynamicTransforms = RenderSystem.getDynamicUniforms().writeTransform(uniforms.modelViewMatrix(), CommonUtils.unpackARGB(uniforms.shaderColor()), new Vector3f(), new Matrix4f(), 1.0F);
+        final GpuBufferSlice dynamicTransforms = RenderSystem.getDynamicUniforms().writeTransform(uniforms.modelViewMatrix(), (Vector4f) uniforms.shaderColor(), new Vector3f(), new Matrix4f(), 1.0F);
         return new Submit(uniforms, textureView, dynamicTransforms);
     }
 

@@ -24,11 +24,9 @@
 package btw.lowercase.skyboxify.utils;
 
 import lombok.experimental.UtilityClass;
-import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import org.joml.Matrix4f;
 import org.joml.Vector3fc;
-import org.joml.Vector4f;
 
 import java.text.DecimalFormat;
 
@@ -100,13 +98,5 @@ public final class CommonUtils {
         final String y = VECTOR_FORMAT.format(vector3fc.y()).trim();
         final String z = VECTOR_FORMAT.format(vector3fc.z()).trim();
         return String.format("[x=%s, y=%s, z=%s]", x, y, z);
-    }
-
-    public static Vector4f unpackARGB(final int color) {
-        return new Vector4f(ARGB.redFloat(color), ARGB.greenFloat(color), ARGB.blueFloat(color), ARGB.alphaFloat(color));
-    }
-
-    public static int packARGB(final float red, final float green, final float blue, final float alpha) {
-        return ARGB.colorFromFloat(alpha, red, green, blue);
     }
 }
