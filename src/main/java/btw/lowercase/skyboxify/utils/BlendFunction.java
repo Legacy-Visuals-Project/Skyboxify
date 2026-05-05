@@ -23,12 +23,12 @@
 
 package btw.lowercase.skyboxify.utils;
 
-//? >=1.21.5 {
+//? >=1.21.6 {
 import org.lwjgl.opengl.GL11;
 //?}
 
 public record BlendFunction(int srcFactor, int dstFactor) {
-    //? >=1.21.5 {
+    //? >=1.21.6 {
     public com.mojang.blaze3d.pipeline.BlendFunction vanilla() {
         return new com.mojang.blaze3d.pipeline.BlendFunction(
                 switch (this.srcFactor) {

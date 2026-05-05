@@ -30,7 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-//? >=1.21.5 {
+//? >=1.21.6 {
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 //? } else {
 /*import btw.lowercase.skyboxify.utils.BlendFunction;
@@ -56,7 +56,7 @@ public abstract class FeatureRenderer<T extends FeatureRenderer.Submit> {
     }
 
     public record Pipeline(
-        //? >=1.21.5 {
+        //? >=1.21.6 {
         RenderPipeline pipeline
         //? } else {
         /*BlendFunction blendFunction

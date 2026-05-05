@@ -47,7 +47,7 @@ import org.joml.Vector3fc;
 
 import java.util.List;
 
-//? >=1.21.5 {
+//? >=1.21.6 {
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 //? }
 
@@ -79,7 +79,7 @@ public class SkyLayer {
     private final Loop loop;
     private final int transition;
     private final List<Weather> weatherConditions;
-    //? >=1.21.5
+    //? >=1.21.6
     private final RenderPipeline pipeline;
 
     public SkyLayer(
@@ -108,9 +108,8 @@ public class SkyLayer {
         this.loop = loop;
         this.transition = transition;
         this.weatherConditions = weatherConditions;
-        //? >=1.21.5 {
+        //? >=1.21.6
         this.pipeline = SkyStorage.createSkyboxPipeline(blend.getBlendFunction());
-        //? }
     }
 
     public void extract(
@@ -138,10 +137,11 @@ public class SkyLayer {
             }
 
             final SkyFeatureRenderer.Pipeline pipeline = new SkyFeatureRenderer.Pipeline(
-                    //? >=1.21.5
+                    //? >=1.21.6 {
                     this.pipeline
-                    //? <=1.21.4
-                    //this.blend.getBlendFunction()
+                    //? } else {
+                    /*this.blend.getBlendFunction()
+                    *///? }
             );
             final RenderUniforms uniforms = new RenderUniforms(modelViewMatrix, this.blend.getShaderColor(finalAlpha));
             skyFeatureRenderer.submit(pipeline, Geometry.DEFAULT, uniforms, this.texture);

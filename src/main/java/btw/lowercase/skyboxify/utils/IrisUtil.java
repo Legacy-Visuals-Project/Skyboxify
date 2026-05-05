@@ -25,7 +25,7 @@ package btw.lowercase.skyboxify.utils;
 
 import lombok.experimental.UtilityClass;
 
-//? >=1.21.5 {
+//? >=1.21.6 {
 import btw.lowercase.skyboxify.api.SkyboxifyImpl;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 
@@ -35,7 +35,7 @@ import java.util.Arrays;
 
 @UtilityClass
 public final class IrisUtil {
-    //? >=1.21.5 {
+    //? >=1.21.6 {
     private static Object IRIS_INSTANCE = null;
     private static Method IRIS_ASSIGN_PIPELINE_METHOD = null;
 

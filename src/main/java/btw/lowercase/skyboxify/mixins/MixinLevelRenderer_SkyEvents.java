@@ -82,31 +82,12 @@ public abstract class MixinLevelRenderer_SkyEvents {
         *///?}
     }
 
-    @WrapOperation(
-            method = "lambda$addSkyPass$0",
-            at = @At(
-                    value = "INVOKE",
-                    //? >=1.21.4 {
-                    target = "Lnet/minecraft/client/renderer/SkyRenderer;renderEndSky()V"
-                    //?} else {
-                    /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderEndSky(Lcom/mojang/blaze3d/vertex/PoseStack;)V"
-                    *///?}
-            )
-    )
+    @WrapOperation(method = "lambda$addSkyPass$0", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SkyRenderer;renderEndSky()V"))
     private
     //? >=1.21.11
     static
-    void skyboxify$renderEndSkybox(
-            net.minecraft.client.renderer.SkyRenderer instance,
-            //? <=1.21.3
-            //PoseStack poseStack,
-            Operation<Void> original
-    ) {
-        original.call(
-                instance
-                //? <=1.21.3
-                //, poseStack
-        );
+    void skyboxify$renderEndSkybox(net.minecraft.client.renderer.SkyRenderer instance, Operation<Void> original) {
+        original.call(instance);
         Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.EndSky.After(Minecraft.getInstance().level));
     }
 
@@ -116,10 +97,8 @@ public abstract class MixinLevelRenderer_SkyEvents {
                     value = "INVOKE",
                     //? >=1.21.9 {
                     target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunriseAndSunset(Lcom/mojang/blaze3d/vertex/PoseStack;FI)V"
-                    //?} else >=1.21.4 {
+                    //?} else {
                     /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunriseAndSunset(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;FI)V"
-                    *///?} else {
-                    /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunriseAndSunset(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/Tesselator;FI)V"
                     *///?}
             )
     )
@@ -131,8 +110,6 @@ public abstract class MixinLevelRenderer_SkyEvents {
             PoseStack poseStack,
             //? >=1.21.4 <1.21.9
             //net.minecraft.client.renderer.MultiBufferSource.BufferSource bufferSource,
-            //? <=1.21.3
-            //com.mojang.blaze3d.vertex.Tesselator tesselator,
             float sunAngle,
             int sunriseOrSunsetColor,
 			Operation<Void> original
@@ -143,8 +120,6 @@ public abstract class MixinLevelRenderer_SkyEvents {
 					poseStack,
 					//? >=1.21.4 <1.21.9
 					//bufferSource,
-					//? <=1.21.3
-					//tesselator,
 					sunAngle,
 					sunriseOrSunsetColor
 			);
@@ -165,10 +140,8 @@ public abstract class MixinLevelRenderer_SkyEvents {
                     /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunMoonAndStars(Lcom/mojang/blaze3d/vertex/PoseStack;FIFF)V"
                     *///?} else >=1.21.6 {
                     /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunMoonAndStars(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;FIFF)V"
-                    *///?} else >=1.21.4 {
-                    /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunMoonAndStars(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;FIFFLnet/minecraft/client/renderer/FogParameters;)V"
                     *///?} else {
-                    /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunMoonAndStars(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/Tesselator;FIFFLnet/minecraft/client/renderer/FogParameters;)V"
+                    /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunMoonAndStars(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;FIFFLnet/minecraft/client/renderer/FogParameters;)V"
                     *///?}
             )
     )
@@ -180,8 +153,6 @@ public abstract class MixinLevelRenderer_SkyEvents {
             PoseStack poseStack,
             //? >=1.21.4 <1.21.9
             //net.minecraft.client.renderer.MultiBufferSource.BufferSource bufferSource,
-            //? <=1.21.3
-            //com.mojang.blaze3d.vertex.Tesselator tesselator,
             float timeOfDay,
             //? <=1.21.10 {
             /*int moonPhase,

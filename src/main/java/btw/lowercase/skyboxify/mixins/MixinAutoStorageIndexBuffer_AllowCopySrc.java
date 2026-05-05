@@ -26,8 +26,8 @@ package btw.lowercase.skyboxify.mixins;
 import org.spongepowered.asm.mixin.Mixin;
 
 //? >=1.21.6 {
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.mojang.blaze3d.buffers.GpuBuffer;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.mojang.blaze3d.systems.RenderSystem;
 import org.spongepowered.asm.mixin.injection.At;
 
