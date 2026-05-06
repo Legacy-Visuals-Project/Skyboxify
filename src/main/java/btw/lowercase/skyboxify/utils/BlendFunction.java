@@ -37,30 +37,18 @@ public record BlendFunction(SrcFactor srcFactor, DstFactor dstFactor) {
     public enum SrcFactor {
         ZERO,
         ONE,
-        SRC_COLOR,
-        ONE_MINUS_SRC_COLOR,
         SRC_ALPHA,
-        ONE_MINUS_SRC_ALPHA,
-        DST_ALPHA,
-        ONE_MINUS_DST_ALPHA,
         DST_COLOR,
-        ONE_MINUS_DST_COLOR,
-        SRC_ALPHA_SATURATE;
+        ONE_MINUS_DST_COLOR;
 
         //~ if >=26.2 'SourceFactor' -> 'BlendFactor' {
         public BlendFactor vanilla() {
             return switch (this) {
-                case SRC_COLOR -> BlendFactor.SRC_COLOR;
+                case ZERO -> BlendFactor.ZERO;
+                case ONE -> BlendFactor.ONE;
                 case SRC_ALPHA -> BlendFactor.SRC_ALPHA;
                 case DST_COLOR -> BlendFactor.DST_COLOR;
-                case DST_ALPHA -> BlendFactor.DST_ALPHA;
-                case ONE_MINUS_SRC_COLOR -> BlendFactor.ONE_MINUS_SRC_COLOR;
-                case ONE_MINUS_SRC_ALPHA -> BlendFactor.ONE_MINUS_SRC_ALPHA;
                 case ONE_MINUS_DST_COLOR -> BlendFactor.ONE_MINUS_DST_COLOR;
-                case ONE_MINUS_DST_ALPHA -> BlendFactor.ONE_MINUS_DST_ALPHA;
-                case ONE -> BlendFactor.ONE;
-                case ZERO -> BlendFactor.ZERO;
-                case SRC_ALPHA_SATURATE -> BlendFactor.SRC_ALPHA_SATURATE;
             };
         }
         //~ }
@@ -71,26 +59,16 @@ public record BlendFunction(SrcFactor srcFactor, DstFactor dstFactor) {
         ONE,
         SRC_COLOR,
         ONE_MINUS_SRC_COLOR,
-        SRC_ALPHA,
-        ONE_MINUS_SRC_ALPHA,
-        DST_ALPHA,
-        ONE_MINUS_DST_ALPHA,
-        DST_COLOR,
-        ONE_MINUS_DST_COLOR;
+        ONE_MINUS_SRC_ALPHA;
 
         //~ if >=26.2 'DestFactor' -> 'BlendFactor' {
         public BlendFactor vanilla() {
             return switch (this) {
+                case ZERO -> BlendFactor.ZERO;
+                case ONE -> BlendFactor.ONE;
                 case SRC_COLOR -> BlendFactor.SRC_COLOR;
-                case SRC_ALPHA -> BlendFactor.SRC_ALPHA;
-                case DST_COLOR -> BlendFactor.DST_COLOR;
-                case DST_ALPHA -> BlendFactor.DST_ALPHA;
                 case ONE_MINUS_SRC_COLOR -> BlendFactor.ONE_MINUS_SRC_COLOR;
                 case ONE_MINUS_SRC_ALPHA -> BlendFactor.ONE_MINUS_SRC_ALPHA;
-                case ONE_MINUS_DST_COLOR -> BlendFactor.ONE_MINUS_DST_COLOR;
-                case ONE_MINUS_DST_ALPHA -> BlendFactor.ONE_MINUS_DST_ALPHA;
-                case ONE -> BlendFactor.ONE;
-                case ZERO -> BlendFactor.ZERO;
             };
         }
         //~ }
