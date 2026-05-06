@@ -56,7 +56,10 @@ public abstract class FeatureRenderer<T extends FeatureRenderer.Submit> {
         }
     }
 
-    public abstract void endFrame();
+    // Override and implement your rendering
+    public void endFrame() {
+        this.clear();
+    }
 
     public void clear() {
         this.submits.clear();

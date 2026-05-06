@@ -77,7 +77,7 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
             }
         }
 
-        this.clear();
+        super.endFrame();
     }
 
     private @NonNull RenderPassDescriptor createPassDescriptor() {

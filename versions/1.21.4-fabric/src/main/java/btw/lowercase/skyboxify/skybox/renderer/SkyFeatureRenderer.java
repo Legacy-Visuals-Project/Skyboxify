@@ -52,7 +52,7 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
         builder.setShaderState(SKYBOX_SHADER);
         builder.setWriteMaskState(RenderStateShard.COLOR_WRITE);
         builder.setTextureState(new RenderStateShard.TextureStateShard(location, TriState.FALSE, false));
-        builder.setOutputState(new RenderStateShard.OutputStateShard("dynamic_target", () -> Objects.requireNonNullElseGet(this.renderTarget, () -> Minecraft.getInstance().getMainRenderTarget()).bindWrite(false), () -> Minecraft.getInstance().getMainRenderTarget().bindWrite(false)));
+        builder.setOutputState(new RenderStateShard.OutputStateShard("Dynamic Output Target", () -> Objects.requireNonNullElseGet(this.renderTarget, () -> Minecraft.getInstance().getMainRenderTarget()).bindWrite(false), () -> Minecraft.getInstance().getMainRenderTarget().bindWrite(false)));
         if (blendFunction != null) {
             builder.setTransparencyState(new RenderStateShard.TransparencyStateShard("Dynamic Blend Function", () -> {
                 RenderSystem.enableBlend();
@@ -65,7 +65,12 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
             builder.setTransparencyState(RenderStateShard.NO_TRANSPARENCY);
         }
 
-        return RenderType.create("skyboxify_skybox", DefaultVertexFormat.POSITION_TEX, VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX.getVertexSize() * SkyPart.COUNT * 4, builder.createCompositeState(false));
+        return RenderType.create(
+                "skyboxify_skybox",
+                DefaultVertexFormat.POSITION_TEX, VertexFormat.Mode.QUADS,
+                DefaultVertexFormat.POSITION_TEX.getVertexSize() * SkyPart.COUNT * 4,
+                builder.createCompositeState(false)
+        );
     });
 
     public SkyFeatureRenderer(final RenderTarget renderTarget) {
@@ -100,7 +105,7 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
         }
 
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        this.clear();
+        super.endFrame();
     }
 
     protected record Submit(RenderType renderType, RenderUniforms uniforms) implements FeatureRenderer.Submit {

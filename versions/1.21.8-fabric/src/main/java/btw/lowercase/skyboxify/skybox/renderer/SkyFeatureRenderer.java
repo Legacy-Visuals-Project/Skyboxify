@@ -81,7 +81,7 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
             }
         }
 
-        this.clear();
+        super.endFrame();
     }
 
     protected record Submit(RenderUniforms uniforms, GpuTextureView textureView,
