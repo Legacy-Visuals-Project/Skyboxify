@@ -24,7 +24,6 @@
 package btw.lowercase.skyboxify.skybox.impl;
 
 import btw.lowercase.skyboxify.api.SkyboxifyImpl;
-import btw.lowercase.skyboxify.skybox.renderer.Geometry;
 import btw.lowercase.skyboxify.skybox.renderer.RenderUniforms;
 import btw.lowercase.skyboxify.skybox.SkyStorage;
 import btw.lowercase.skyboxify.skybox.impl.components.*;
@@ -144,7 +143,7 @@ public class SkyLayer {
                     *///? }
             );
             final RenderUniforms uniforms = new RenderUniforms(modelViewMatrix, this.blend.getShaderColor(finalAlpha));
-            skyFeatureRenderer.submit(pipeline, Geometry.DEFAULT, uniforms, this.texture);
+            skyFeatureRenderer.submit(pipeline, SkyStorage.GEOMETRY, uniforms, this.texture);
         }
     }
 

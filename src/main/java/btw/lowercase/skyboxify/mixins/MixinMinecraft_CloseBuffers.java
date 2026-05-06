@@ -23,7 +23,7 @@
 
 package btw.lowercase.skyboxify.mixins;
 
-import btw.lowercase.skyboxify.skybox.renderer.Geometry;
+import btw.lowercase.skyboxify.skybox.SkyStorage;
 import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -34,6 +34,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class MixinMinecraft_CloseBuffers {
     @Inject(method = "close", at = @At("HEAD"))
     private void skyboxify$closeBuffers(final CallbackInfo ci) {
-        Geometry.DEFAULT.close();
+        SkyStorage.GEOMETRY.close();
     }
 }

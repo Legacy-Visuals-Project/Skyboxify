@@ -56,13 +56,11 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
         if (blendFunction != null) {
             builder.setTransparencyState(new RenderStateShard.TransparencyStateShard("Dynamic Blend Function", () -> {
                 RenderSystem.enableBlend();
-                RenderSystem.blendFunc(blendFunction.srcFactor(), blendFunction.dstFactor());
+                RenderSystem.blendFunc(blendFunction.srcFactor().vanilla(), blendFunction.dstFactor().vanilla());
             }, () -> {
                 RenderSystem.disableBlend();
                 RenderSystem.defaultBlendFunc();
             }));
-        } else {
-            builder.setTransparencyState(RenderStateShard.NO_TRANSPARENCY);
         }
 
         return RenderType.create(

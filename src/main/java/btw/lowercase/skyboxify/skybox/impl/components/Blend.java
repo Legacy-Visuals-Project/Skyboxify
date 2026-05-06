@@ -29,20 +29,19 @@ import lombok.Getter;
 import net.minecraft.util.StringRepresentable;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector4f;
-import org.lwjgl.opengl.GL11;
 
 import java.util.function.Function;
 
 public enum Blend implements StringRepresentable {
-    ADD(alpha -> new Vector4f(1.0F, 1.0F, 1.0F, alpha), new BlendFunction(GL11.GL_SRC_ALPHA, GL11.GL_ONE)),
-    SUBTRACT(alpha -> new Vector4f(alpha, alpha, alpha, 1.0F), new BlendFunction(GL11.GL_ONE_MINUS_DST_COLOR, GL11.GL_ZERO)),
-    MULTIPLY(alpha -> new Vector4f(alpha, alpha, alpha, alpha), new BlendFunction(GL11.GL_DST_COLOR, GL11.GL_ONE_MINUS_SRC_ALPHA)),
-    DODGE(alpha -> new Vector4f(alpha, alpha, alpha, 1.0F), new BlendFunction(GL11.GL_ONE, GL11.GL_ONE)),
-    BURN(alpha -> new Vector4f(alpha, alpha, alpha, 1.0F), new BlendFunction(GL11.GL_ZERO, GL11.GL_ONE_MINUS_SRC_COLOR)),
-    SCREEN(alpha -> new Vector4f(alpha, alpha, alpha, 1.0F), new BlendFunction(GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_COLOR)),
+    ADD(alpha -> new Vector4f(1.0F, 1.0F, 1.0F, alpha), new BlendFunction(BlendFunction.SrcFactor.SRC_ALPHA, BlendFunction.DstFactor.ONE)),
+    SUBTRACT(alpha -> new Vector4f(alpha, alpha, alpha, 1.0F), new BlendFunction(BlendFunction.SrcFactor.ONE_MINUS_DST_COLOR, BlendFunction.DstFactor.ZERO)),
+    MULTIPLY(alpha -> new Vector4f(alpha, alpha, alpha, alpha), new BlendFunction(BlendFunction.SrcFactor.DST_COLOR, BlendFunction.DstFactor.ONE_MINUS_SRC_ALPHA)),
+    DODGE(alpha -> new Vector4f(alpha, alpha, alpha, 1.0F), new BlendFunction(BlendFunction.SrcFactor.ONE, BlendFunction.DstFactor.ONE)),
+    BURN(alpha -> new Vector4f(alpha, alpha, alpha, 1.0F), new BlendFunction(BlendFunction.SrcFactor.ZERO, BlendFunction.DstFactor.ONE_MINUS_SRC_COLOR)),
+    SCREEN(alpha -> new Vector4f(alpha, alpha, alpha, 1.0F), new BlendFunction(BlendFunction.SrcFactor.ONE, BlendFunction.DstFactor.ONE_MINUS_SRC_COLOR)),
     REPLACE(alpha -> new Vector4f(1.0F, 1.0F, 1.0F, alpha), null),
-    OVERLAY(alpha -> new Vector4f(alpha, alpha, alpha, 1.0F), new BlendFunction(GL11.GL_DST_COLOR, GL11.GL_SRC_COLOR)),
-    ALPHA(alpha -> new Vector4f(1.0F, 1.0F, 1.0F, alpha), new BlendFunction(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA));
+    OVERLAY(alpha -> new Vector4f(alpha, alpha, alpha, 1.0F), new BlendFunction(BlendFunction.SrcFactor.DST_COLOR, BlendFunction.DstFactor.SRC_COLOR)),
+    ALPHA(alpha -> new Vector4f(1.0F, 1.0F, 1.0F, alpha), new BlendFunction(BlendFunction.SrcFactor.SRC_ALPHA, BlendFunction.DstFactor.ONE_MINUS_SRC_ALPHA));
 
     public static final Codec<Blend> CODEC = StringRepresentable.fromEnum(Blend::values).orElse(Blend.ADD);
 
