@@ -82,6 +82,8 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
 
     @Override
     public void endFrame() {
+        if (this.submits.isEmpty()) return;
+
         for (final Map.Entry<Key, List<Submit>> entry : this.submits.entrySet()) {
             final Key key = entry.getKey();
             final Geometry geometry = key.geometry();

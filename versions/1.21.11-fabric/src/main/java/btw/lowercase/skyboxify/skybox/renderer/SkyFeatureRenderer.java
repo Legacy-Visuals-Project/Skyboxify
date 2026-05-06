@@ -53,6 +53,8 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
 
     @Override
     public void endFrame() {
+        if (this.submits.isEmpty()) return;
+
         final GpuTextureView colorTextureView = this.renderTarget.getColorTextureView();
         final GpuTextureView depthTextureView = this.renderTarget.useDepth ? this.renderTarget.getDepthTextureView() : null;
         assert colorTextureView != null;

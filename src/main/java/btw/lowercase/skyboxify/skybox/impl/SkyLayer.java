@@ -24,13 +24,16 @@
 package btw.lowercase.skyboxify.skybox.impl;
 
 import btw.lowercase.skyboxify.api.SkyboxifyImpl;
-import btw.lowercase.skyboxify.skybox.renderer.RenderUniforms;
 import btw.lowercase.skyboxify.skybox.SkyStorage;
 import btw.lowercase.skyboxify.skybox.impl.components.*;
+import btw.lowercase.skyboxify.skybox.renderer.Geometry;
+import btw.lowercase.skyboxify.skybox.renderer.RenderUniforms;
 import btw.lowercase.skyboxify.skybox.renderer.SkyFeatureRenderer;
 import btw.lowercase.skyboxify.utils.CommonUtils;
 import btw.lowercase.skyboxify.utils.ParserCodecs;
 import com.google.common.collect.ImmutableList;
+//? >=1.21.6
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.Minecraft;
@@ -45,10 +48,6 @@ import org.joml.Quaternionf;
 import org.joml.Vector3fc;
 
 import java.util.List;
-
-//? >=1.21.6 {
-import com.mojang.blaze3d.pipeline.RenderPipeline;
-//? }
 
 public class SkyLayer {
     public static final Codec<SkyLayer> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -143,7 +142,8 @@ public class SkyLayer {
                     *///? }
             );
             final RenderUniforms uniforms = new RenderUniforms(modelViewMatrix, this.blend.getShaderColor(finalAlpha));
-            skyFeatureRenderer.submit(pipeline, SkyStorage.GEOMETRY, uniforms, this.texture);
+            skyFeatureRenderer.submit(pipeline, Geometry.DEFAULT, uniforms, this.texture);
+            skyFeatureRenderer.endFrame();
         }
     }
 

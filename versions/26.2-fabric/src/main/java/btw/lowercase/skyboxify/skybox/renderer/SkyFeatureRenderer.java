@@ -52,6 +52,8 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
 
     @Override
     public void endFrame() {
+        if (this.submits.isEmpty()) return;
+
         try (final RenderPass pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(this.createPassDescriptor())) {
             RenderSystem.bindDefaultUniforms(pass);
             for (final Map.Entry<Key, List<Submit>> entry : this.submits.entrySet()) {

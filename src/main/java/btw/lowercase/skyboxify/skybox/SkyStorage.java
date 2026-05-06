@@ -24,16 +24,8 @@
 package btw.lowercase.skyboxify.skybox;
 
 import btw.lowercase.skyboxify.Skyboxify;
-import btw.lowercase.skyboxify.skybox.impl.components.UV;
-import btw.lowercase.skyboxify.skybox.renderer.StaticGeometry;
 import btw.lowercase.skyboxify.utils.*;
 import com.mojang.blaze3d.vertex.*;
-
-//? >=26.2 {
-import com.mojang.blaze3d.PrimitiveTopology;
-//? } else {
-/*import com.mojang.blaze3d.vertex.VertexFormat;
- *///? }
 
 //? >=1.21.6 {
 //? <=26.1
@@ -44,25 +36,6 @@ import java.util.HashMap;
 //?}
 
 public final class SkyStorage {
-    public static final StaticGeometry GEOMETRY = StaticGeometry.create(
-            DefaultVertexFormat.POSITION_TEX,
-            //? >=26.2 {
-            PrimitiveTopology.QUADS,
-            //? } else {
-            /*VertexFormat.Mode.QUADS,
-             *///? }
-            SkyPart.COUNT * 4,
-            vertexConsumer -> {
-                for (final SkyPart part : SkyPart.VALUES) {
-                    final UV uv = part.getUv();
-                    final float size = 100.0F; // Bigger the value, the less view-bobbing affects it, but it starts clipping which is bad
-                    vertexConsumer.addVertex(part.getRotationMatrix(), -size, -size, -size).setUv(uv.minU(), uv.minV());
-                    vertexConsumer.addVertex(part.getRotationMatrix(), -size, -size, size).setUv(uv.minU(), uv.maxV());
-                    vertexConsumer.addVertex(part.getRotationMatrix(), size, -size, size).setUv(uv.maxU(), uv.maxV());
-                    vertexConsumer.addVertex(part.getRotationMatrix(), size, -size, -size).setUv(uv.maxU(), uv.minV());
-                }
-            });
-
     //? >=1.21.6 {
     private static final Map<BlendFunction, RenderPipeline> renderPipelineCache = new HashMap<>();
 

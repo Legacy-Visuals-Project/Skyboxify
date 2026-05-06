@@ -39,7 +39,7 @@ public abstract class MixinAutoStorageIndexBuffer_AllowCopySrc {
     //? >=1.21.6 {
     @ModifyExpressionValue(method = "ensureStorage", at = @At(value = "CONSTANT", args = "intValue=64"))
     private int skyboxify$modifyIndexFlags(final int original) {
-        return original | GpuBuffer.USAGE_COPY_SRC;
+        return original | GpuBuffer.USAGE_COPY_SRC | GpuBuffer.USAGE_COPY_DST;
     }
     //? }
 }
