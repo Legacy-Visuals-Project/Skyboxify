@@ -24,6 +24,7 @@
 package btw.lowercase.skyboxify.skybox.renderer;
 
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderPassDescriptor;
@@ -35,51 +36,44 @@ import net.minecraft.resources.Identifier;
 import org.joml.Vector4f;
 import org.jspecify.annotations.NonNull;
 
-import java.util.List;
-import java.util.Map;
-
 public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submit> {
     public SkyFeatureRenderer(final RenderTarget renderTarget) {
         super(renderTarget);
     }
 
     @Override
-    protected Submit createSubmit(final Key key, final RenderUniforms uniforms, final Identifier location) {
+    protected Submit createSubmit(final Pipeline pipeline, final Geometry geometry, final RenderUniforms uniforms, final Identifier location) {
         final GpuTextureView textureView = Minecraft.getInstance().getTextureManager().getTexture(location).getTextureView();
         final GpuBufferSlice dynamicTransforms = RenderSystem.getDynamicUniforms().writeTransform(uniforms.modelViewMatrix(), (Vector4f) uniforms.shaderColor());
-        return new Submit(uniforms, textureView, dynamicTransforms);
+        return new Submit(pipeline.pipeline(), geometry, uniforms, textureView, dynamicTransforms);
     }
 
     @Override
     public void endFrame() {
-        if (this.submits.isEmpty()) return;
+        if (!this.submits.isEmpty()) {
+            try (final RenderPass pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(this.createPassDescriptor())) {
+                RenderSystem.bindDefaultUniforms(pass);
+                for (final Submit submit : this.submits) {
+                    if (submit.geometry.isClosed()) {
+                        throw new RuntimeException("Cannot render closed geometry!");
+                    }
 
-        try (final RenderPass pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(this.createPassDescriptor())) {
-            RenderSystem.bindDefaultUniforms(pass);
-            for (final Map.Entry<Key, List<Submit>> entry : this.submits.entrySet()) {
-                final Key key = entry.getKey();
-                final Geometry geometry = key.geometry();
-                if (geometry.isClosed()) {
-                    throw new RuntimeException("Cannot render closed geometry!");
-                }
+                    pass.setPipeline(submit.pipeline);
+                    if (submit.geometry instanceof StaticGeometry staticGeometry) {
+                        pass.setVertexBuffer(0, staticGeometry.vertexBuffer().slice());
+                        pass.setIndexBuffer(staticGeometry.indexBuffer(), staticGeometry.indexType());
+                    }
 
-                pass.setPipeline(key.pipeline().pipeline());
-                if (geometry instanceof StaticGeometry staticGeometry) {
-                    pass.setVertexBuffer(0, staticGeometry.vertexBuffer().slice());
-                    pass.setIndexBuffer(staticGeometry.indexBuffer(), staticGeometry.indexType());
-                }
-
-                for (final Submit submit : entry.getValue()) {
                     pass.setUniform("DynamicTransforms", submit.dynamicTransforms);
                     pass.bindTexture("Sampler0", submit.textureView, RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST));
-                    if (geometry instanceof StaticGeometry staticGeometry) {
-                        pass.drawIndexed(0, 0, staticGeometry.indexCount(), 1);
+                    if (submit.geometry instanceof StaticGeometry staticGeometry) {
+                        pass.drawIndexed(staticGeometry.indexCount(), 1, 0, 0, 0);
                     }
                 }
             }
-        }
 
-        super.endFrame();
+            super.endFrame();
+        }
     }
 
     private @NonNull RenderPassDescriptor createPassDescriptor() {
@@ -99,7 +93,8 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
         return descriptor;
     }
 
-    protected record Submit(RenderUniforms uniforms, GpuTextureView textureView,
+    protected record Submit(RenderPipeline pipeline, Geometry geometry,
+                            RenderUniforms uniforms, GpuTextureView textureView,
                             GpuBufferSlice dynamicTransforms) implements FeatureRenderer.Submit {
     }
 }

@@ -48,7 +48,7 @@ public class StaticGeometry implements Geometry {
     }
 
     public static StaticGeometry create(final VertexFormat vertexFormat, final PrimitiveTopology topology, final int vertexCount, final Consumer<VertexConsumer> vertexConsumer) {
-        try (final ByteBufferBuilder byteBufferBuilder = new ByteBufferBuilder(vertexFormat.getVertexSize() * vertexCount)) {
+        try (final ByteBufferBuilder byteBufferBuilder = ByteBufferBuilder.exactlySized(vertexFormat.getVertexSize() * vertexCount)) {
             final BufferBuilder builder = new BufferBuilder(byteBufferBuilder, topology, vertexFormat);
             vertexConsumer.accept(builder);
             try (final MeshData meshData = builder.buildOrThrow()) {

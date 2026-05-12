@@ -143,7 +143,6 @@ public class SkyLayer {
             );
             final RenderUniforms uniforms = new RenderUniforms(modelViewMatrix, this.blend.getShaderColor(finalAlpha));
             skyFeatureRenderer.submit(pipeline, Geometry.DEFAULT, uniforms, this.texture);
-            skyFeatureRenderer.endFrame();
         }
     }
 

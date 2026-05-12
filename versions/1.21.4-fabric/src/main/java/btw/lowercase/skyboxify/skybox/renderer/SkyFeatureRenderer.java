@@ -38,8 +38,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.TriState;
 import org.joml.Vector4fc;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiFunction;
 
@@ -76,23 +74,19 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
     }
 
     @Override
-    protected Submit createSubmit(final Key key, final RenderUniforms uniforms, final ResourceLocation location) {
-        return new Submit(RENDER_TYPE.apply(location, key.pipeline().blendFunction()), uniforms);
+    protected Submit createSubmit(final Pipeline pipeline, final Geometry geometry, final RenderUniforms uniforms, final ResourceLocation location) {
+        return new Submit(RENDER_TYPE.apply(location, pipeline.blendFunction()), geometry, uniforms);
     }
 
     @Override
     public void endFrame() {
-        if (this.submits.isEmpty()) return;
+        if (!this.submits.isEmpty()) {
+            for (final Submit submit : this.submits) {
+                if (submit.geometry.isClosed()) {
+                    throw new RuntimeException("Cannot render closed geometry!");
+                }
 
-        for (final Map.Entry<Key, List<Submit>> entry : this.submits.entrySet()) {
-            final Key key = entry.getKey();
-            final Geometry geometry = key.geometry();
-            if (geometry.isClosed()) {
-                throw new RuntimeException("Cannot render closed geometry!");
-            }
-
-            final VertexBuffer vertexBuffer = ((StaticGeometry) geometry).vertexBuffer();
-            for (final Submit submit : entry.getValue()) {
+                final VertexBuffer vertexBuffer = ((StaticGeometry) submit.geometry).vertexBuffer();
                 final Vector4fc shaderColor = submit.uniforms.shaderColor();
                 RenderSystem.setShaderColor(shaderColor.x(), shaderColor.y(), shaderColor.z(), shaderColor.w());
 
@@ -102,13 +96,14 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
                 VertexBuffer.unbind();
                 submit.renderType.clearRenderState();
             }
-        }
 
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        super.endFrame();
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+            super.endFrame();
+        }
     }
 
-    protected record Submit(RenderType renderType, RenderUniforms uniforms) implements FeatureRenderer.Submit {
+    protected record Submit(RenderType renderType, Geometry geometry,
+                            RenderUniforms uniforms) implements FeatureRenderer.Submit {
     }
 
     static {

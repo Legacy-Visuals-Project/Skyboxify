@@ -26,10 +26,7 @@ package btw.lowercase.skyboxify.skybox.renderer;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import net.minecraft.resources.Identifier;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 //? >=1.21.6 {
 import com.mojang.blaze3d.pipeline.RenderPipeline;
@@ -39,18 +36,17 @@ import com.mojang.blaze3d.pipeline.RenderPipeline;
 
 public abstract class FeatureRenderer<T extends FeatureRenderer.Submit> {
     protected final RenderTarget renderTarget;
-    protected final Map<Key, List<T>> submits = new HashMap<>();
+    protected final List<T> submits = new ArrayList<>();
 
     protected FeatureRenderer(final RenderTarget renderTarget) {
         this.renderTarget = renderTarget;
     }
 
-    protected abstract T createSubmit(final Key key, final RenderUniforms uniforms, final Identifier location);
+    protected abstract T createSubmit(final Pipeline pipeline, final Geometry geometry, final RenderUniforms uniforms, final Identifier location);
 
     public void submit(final Pipeline pipeline, final Geometry geometry, final RenderUniforms uniforms, final Identifier location) {
         if (geometry != null && !geometry.isClosed()) {
-            final Key key = new Key(pipeline, geometry);
-            this.submits.computeIfAbsent(key, it -> new ArrayList<>()).add(createSubmit(key, uniforms, location));
+            this.submits.add(createSubmit(pipeline, geometry, uniforms, location));
         } else {
             throw new IllegalStateException("Cannot call submit with " + (geometry == null ? "null" : "closed") + " geometry!");
         }
@@ -75,8 +71,5 @@ public abstract class FeatureRenderer<T extends FeatureRenderer.Submit> {
     }
 
     protected interface Submit {
-    }
-
-    protected record Key(Pipeline pipeline, Geometry geometry) {
     }
 }
