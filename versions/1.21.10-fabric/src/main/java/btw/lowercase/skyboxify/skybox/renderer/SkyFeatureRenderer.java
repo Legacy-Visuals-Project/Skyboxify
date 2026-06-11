@@ -29,6 +29,7 @@ import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.textures.GpuTextureView;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import org.joml.Matrix4f;
@@ -55,6 +56,8 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
             final GpuTextureView colorTextureView = this.renderTarget.getColorTextureView();
             final GpuTextureView depthTextureView = this.renderTarget.useDepth ? this.renderTarget.getDepthTextureView() : null;
             assert colorTextureView != null;
+
+            final RenderSystem.AutoStorageIndexBuffer indexBuffer = RenderSystem.getSequentialBuffer(VertexFormat.Mode.QUADS);
             try (final RenderPass pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(() -> "Sky Feature End Frame", colorTextureView, OptionalInt.empty(), depthTextureView, OptionalDouble.empty())) {
                 RenderSystem.bindDefaultUniforms(pass);
                 for (final Submit submit : this.submits) {
@@ -65,7 +68,7 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
                     pass.setPipeline(submit.pipeline);
                     if (submit.geometry instanceof StaticGeometry staticGeometry) {
                         pass.setVertexBuffer(0, staticGeometry.vertexBuffer());
-                        pass.setIndexBuffer(staticGeometry.indexBuffer(), staticGeometry.indexType());
+                        pass.setIndexBuffer(indexBuffer.getBuffer(staticGeometry.indexCount()), indexBuffer.type());
                     }
 
                     pass.setUniform("DynamicTransforms", submit.dynamicTransforms);

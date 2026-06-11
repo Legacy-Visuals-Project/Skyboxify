@@ -41,7 +41,7 @@ import net.minecraft.world.level.Level;
 import org.joml.Matrix4f;
 
 @UtilityClass
-public class Skyboxify {
+public final class Skyboxify {
     @Getter
     private final EventManager globalEventManager = new EventManager();
 

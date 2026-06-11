@@ -28,6 +28,7 @@ import btw.lowercase.skyboxify.skybox.AbstractSkybox;
 import btw.lowercase.skyboxify.skybox.renderer.SkyFeatureRenderer;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import it.unimi.dsi.fastutil.objects.Object2FloatOpenHashMap;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -36,7 +37,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import org.joml.Matrix4f;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -53,7 +53,7 @@ public class Skybox extends AbstractSkybox {
     private final List<SkyLayer> layers;
     @Getter
     private final ResourceKey<Level> dimension;
-    private final Map<SkyLayer, Float> alphaMap = new HashMap<>();
+    private final Map<SkyLayer, Float> alphaMap = new Object2FloatOpenHashMap<>();
     @Getter
     private boolean active = true;
 

@@ -4,7 +4,6 @@
 	"package": "btw.lowercase.skyboxify.mixins",
 	"compatibilityLevel": "JAVA_21",
 	"client": [
-		"MixinAutoStorageIndexBuffer_AllowCopySrc",
 		"MixinGameRenderer_NetherSkies",
 		"MixinLevelRenderer_SkyEvents",
 		"MixinMinecraft_CloseBuffers",

@@ -23,6 +23,7 @@
 
 package btw.lowercase.skyboxify.skybox.renderer;
 
+import com.mojang.blaze3d.PrimitiveTopology;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.pipeline.RenderTarget;
@@ -51,6 +52,7 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
     @Override
     public void endFrame() {
         if (!this.submits.isEmpty()) {
+            final RenderSystem.AutoStorageIndexBuffer indexBuffer = RenderSystem.getSequentialBuffer(PrimitiveTopology.QUADS);
             try (final RenderPass pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(this.createPassDescriptor())) {
                 RenderSystem.bindDefaultUniforms(pass);
                 for (final Submit submit : this.submits) {
@@ -61,7 +63,7 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
                     pass.setPipeline(submit.pipeline);
                     if (submit.geometry instanceof StaticGeometry staticGeometry) {
                         pass.setVertexBuffer(0, staticGeometry.vertexBuffer().slice());
-                        pass.setIndexBuffer(staticGeometry.indexBuffer(), staticGeometry.indexType());
+                        pass.setIndexBuffer(indexBuffer.getBuffer(staticGeometry.indexCount()), indexBuffer.type());
                     }
 
                     pass.setUniform("DynamicTransforms", submit.dynamicTransforms);

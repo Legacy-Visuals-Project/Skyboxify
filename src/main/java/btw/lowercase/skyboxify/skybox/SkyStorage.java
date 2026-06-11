@@ -31,13 +31,14 @@ import com.mojang.blaze3d.vertex.*;
 //? <=26.1
 //import btw.lowercase.skyboxify.mixins.RenderPipelinesAccessor;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+
 import java.util.Map;
-import java.util.HashMap;
 //?}
 
 public final class SkyStorage {
     //? >=1.21.6 {
-    private static final Map<BlendFunction, RenderPipeline> renderPipelineCache = new HashMap<>();
+    private static final Map<BlendFunction, RenderPipeline> renderPipelineCache = new Object2ObjectOpenHashMap<>();
 
     public static RenderPipeline createSkyboxPipeline(final @org.jetbrains.annotations.Nullable BlendFunction blendFunction) {
         if (renderPipelineCache.containsKey(blendFunction)) {

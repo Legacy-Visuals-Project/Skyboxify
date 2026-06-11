@@ -45,7 +45,7 @@ public interface Geometry extends AutoCloseable {
             vertexConsumer -> {
                 for (final SkyPart part : SkyPart.VALUES) {
                     final UV uv = part.getUv();
-                    final float size = 100.0F; // Bigger the value, the less view-bobbing affects it, but it starts clipping which is bad
+                    final float size = 100.0F; // Bigger the value, the less bad view-bobbing affects it, but it starts clipping which is bad
                     vertexConsumer.addVertex(part.getRotationMatrix(), -size, -size, -size).setUv(uv.minU(), uv.minV());
                     vertexConsumer.addVertex(part.getRotationMatrix(), -size, -size, size).setUv(uv.minU(), uv.maxV());
                     vertexConsumer.addVertex(part.getRotationMatrix(), size, -size, size).setUv(uv.maxU(), uv.maxV());
