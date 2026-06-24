@@ -42,14 +42,14 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
-import org.joml.AxisAngle4f;
-import org.joml.Matrix4f;
-import org.joml.Quaternionf;
-import org.joml.Vector3fc;
+import org.joml.*;
 
+import java.lang.Math;
 import java.util.List;
 
 public class SkyLayer {
+    private static final float MIN_ALPHA_ALLOWED = 1.0E-4F;
+
     public static final Codec<SkyLayer> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Identifier.CODEC.fieldOf("properties").forGetter(SkyLayer::properties),
             Identifier.CODEC.fieldOf("texture").forGetter(SkyLayer::texture),
@@ -114,24 +114,18 @@ public class SkyLayer {
             final SkyFeatureRenderer skyFeatureRenderer,
             final ClientLevel level,
             final Matrix4f modelViewMatrix,
-            final int timeOfDay,
+            final int clampedTimeOfDay,
             final float skyAngle,
             final float rainLevel,
             final float thunderLevel,
             final float conditionAlpha
     ) {
         final float weatherAlpha = Weather.getAlpha(this.weatherConditions, rainLevel, thunderLevel);
-        final float fadeAlpha = this.fade.getAlpha(timeOfDay);
+        final float fadeAlpha = this.fade.getAlpha(clampedTimeOfDay);
         final float finalAlpha = Mth.clamp(conditionAlpha * weatherAlpha * fadeAlpha, 0.0F, 1.0F);
-        if (!(finalAlpha < 1.0E-4F)) {
+        if (finalAlpha >= MIN_ALPHA_ALLOWED) {
             if (this.rotate) {
-                final float angle = this.getAngle(level, skyAngle);
-                if (SkyboxifyImpl.config().debug && SkyboxifyImpl.config().legacyRotationLogic) {
-                    CommonUtils.mulPose(modelViewMatrix, angle, this.axis);
-                } else {
-                    // NOTE: Using `mulPose` directly gives a different result.
-                    modelViewMatrix.rotate(new Quaternionf(new AxisAngle4f(angle, this.axis)));
-                }
+                modelViewMatrix.rotate(this.getAngle(level, skyAngle) * Mth.DEG_TO_RAD, this.axis.normalize(new Vector3f()));
             }
 
             final SkyFeatureRenderer.Pipeline pipeline = new SkyFeatureRenderer.Pipeline(
@@ -188,12 +182,11 @@ public class SkyLayer {
         float angleDayStart = 0.0F;
         if (this.speed != (float) Math.round(this.speed)) {
             final long currentWorldDay = (level.getOverworldClockTime() + 18000L) / 24000L;
-            final double anglePerDay = this.speed % 1.0F;
-            final double currentAngle = (double) currentWorldDay * anglePerDay;
-            angleDayStart = (float) (currentAngle % 1.0D);
+            final float currentAngle = (float) currentWorldDay * (this.speed % 1.0F);
+            angleDayStart = currentAngle % 1.0F;
         }
 
-        return (float) Math.toRadians(360.0F * (angleDayStart + skyAngle * this.speed));
+        return 360.0F * (angleDayStart + skyAngle * this.speed);
     }
 
     public Identifier properties() {

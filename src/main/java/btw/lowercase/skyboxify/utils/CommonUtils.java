@@ -23,14 +23,11 @@
 
 package btw.lowercase.skyboxify.utils;
 
-import lombok.experimental.UtilityClass;
 import net.minecraft.util.Mth;
-import org.joml.Matrix4f;
 import org.joml.Vector3fc;
 
 import java.text.DecimalFormat;
 
-@UtilityClass
 public final class CommonUtils {
     public static int normalizeTickTime(final int tickTime) {
         int result = tickTime % 24000;
@@ -63,32 +60,6 @@ public final class CommonUtils {
             final float result = in ? lastAlpha + alphaChange : lastAlpha - alphaChange;
             return Mth.clamp(result, minAlpha, maxAlpha);
         }
-    }
-
-    // This method replicates the old Mojang-made Quaternion mulPose method, which was
-    // used for the initial sky transformations which did not have any bobbing issues.
-    // See https://github.com/sp614x/optifine/issues/7235#issuecomment-1581930719
-    public static void mulPose(final Matrix4f srcMatrix, final float angle, final Vector3fc axis) {
-        // Create Rotation Matrix
-        final Matrix4f rotationMatrix = Quaternion.rotation(axis, angle);
-        // Multiply
-        final float f = srcMatrix.m00() * rotationMatrix.m00() + srcMatrix.m01() * rotationMatrix.m10() + srcMatrix.m02() * rotationMatrix.m20() + srcMatrix.m03() * rotationMatrix.m30();
-        final float g = srcMatrix.m00() * rotationMatrix.m01() + srcMatrix.m01() * rotationMatrix.m11() + srcMatrix.m02() * rotationMatrix.m21() + srcMatrix.m03() * rotationMatrix.m31();
-        final float h = srcMatrix.m00() * rotationMatrix.m02() + srcMatrix.m01() * rotationMatrix.m12() + srcMatrix.m02() * rotationMatrix.m22() + srcMatrix.m03() * rotationMatrix.m32();
-        final float i = srcMatrix.m00() * rotationMatrix.m03() + srcMatrix.m01() * rotationMatrix.m13() + srcMatrix.m02() * rotationMatrix.m23() + srcMatrix.m03() * rotationMatrix.m33();
-        final float j = srcMatrix.m10() * rotationMatrix.m00() + srcMatrix.m11() * rotationMatrix.m10() + srcMatrix.m12() * rotationMatrix.m20() + srcMatrix.m13() * rotationMatrix.m30();
-        final float k = srcMatrix.m10() * rotationMatrix.m01() + srcMatrix.m11() * rotationMatrix.m11() + srcMatrix.m12() * rotationMatrix.m21() + srcMatrix.m13() * rotationMatrix.m31();
-        final float l = srcMatrix.m10() * rotationMatrix.m02() + srcMatrix.m11() * rotationMatrix.m12() + srcMatrix.m12() * rotationMatrix.m22() + srcMatrix.m13() * rotationMatrix.m32();
-        final float m = srcMatrix.m10() * rotationMatrix.m03() + srcMatrix.m11() * rotationMatrix.m13() + srcMatrix.m12() * rotationMatrix.m23() + srcMatrix.m13() * rotationMatrix.m33();
-        final float n = srcMatrix.m20() * rotationMatrix.m00() + srcMatrix.m21() * rotationMatrix.m10() + srcMatrix.m22() * rotationMatrix.m20() + srcMatrix.m23() * rotationMatrix.m30();
-        final float o = srcMatrix.m20() * rotationMatrix.m01() + srcMatrix.m21() * rotationMatrix.m11() + srcMatrix.m22() * rotationMatrix.m21() + srcMatrix.m23() * rotationMatrix.m31();
-        final float p = srcMatrix.m20() * rotationMatrix.m02() + srcMatrix.m21() * rotationMatrix.m12() + srcMatrix.m22() * rotationMatrix.m22() + srcMatrix.m23() * rotationMatrix.m32();
-        final float q = srcMatrix.m20() * rotationMatrix.m03() + srcMatrix.m21() * rotationMatrix.m13() + srcMatrix.m22() * rotationMatrix.m23() + srcMatrix.m23() * rotationMatrix.m33();
-        final float r = srcMatrix.m30() * rotationMatrix.m00() + srcMatrix.m31() * rotationMatrix.m10() + srcMatrix.m32() * rotationMatrix.m20() + srcMatrix.m33() * rotationMatrix.m30();
-        final float s = srcMatrix.m30() * rotationMatrix.m01() + srcMatrix.m31() * rotationMatrix.m11() + srcMatrix.m32() * rotationMatrix.m21() + srcMatrix.m33() * rotationMatrix.m31();
-        final float t = srcMatrix.m30() * rotationMatrix.m02() + srcMatrix.m31() * rotationMatrix.m12() + srcMatrix.m32() * rotationMatrix.m22() + srcMatrix.m33() * rotationMatrix.m32();
-        final float u = srcMatrix.m30() * rotationMatrix.m03() + srcMatrix.m31() * rotationMatrix.m13() + srcMatrix.m32() * rotationMatrix.m23() + srcMatrix.m33() * rotationMatrix.m33();
-        srcMatrix.m00(f).m01(g).m02(h).m03(i).m10(j).m11(k).m12(l).m13(m).m20(n).m21(o).m22(p).m23(q).m30(r).m31(s).m32(t).m33(u);
     }
 
     private static final DecimalFormat VECTOR_FORMAT = new DecimalFormat("# .##");

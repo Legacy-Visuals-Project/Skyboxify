@@ -29,16 +29,19 @@ import btw.lowercase.skyboxify.skybox.renderer.SkyFeatureRenderer;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.objects.Object2FloatOpenHashMap;
-import lombok.Getter;
-import lombok.Setter;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import org.joml.Matrix4f;
 
 import java.util.List;
 import java.util.Map;
+
+//? >=1.21.11 {
+import net.minecraft.world.attribute.EnvironmentAttributes;
+//? }
 
 public class Skybox extends AbstractSkybox {
     public static final Codec<Skybox> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -46,15 +49,10 @@ public class Skybox extends AbstractSkybox {
             SkyLayer.CODEC.listOf().fieldOf("layers").forGetter(Skybox::getLayers)
     ).apply(instance, Skybox::new));
 
-    @Getter
-    @Setter
     private String packName = null;
-    @Getter
     private final List<SkyLayer> layers;
-    @Getter
     private final ResourceKey<Level> dimension;
     private final Map<SkyLayer, Float> alphaMap = new Object2FloatOpenHashMap<>();
-    @Getter
     private boolean active = true;
 
     public Skybox(final ResourceKey<Level> dimension, final List<SkyLayer> layers) {
@@ -62,14 +60,34 @@ public class Skybox extends AbstractSkybox {
         this.layers = layers;
     }
 
+    public String getPackName() {
+        return this.packName;
+    }
+
+    public void setPackName(final String packName) {
+        this.packName = packName;
+    }
+
+    public List<SkyLayer> getLayers() {
+        return this.layers;
+    }
+
+    public ResourceKey<Level> getDimension() {
+        return this.dimension;
+    }
+
+    public boolean isActive() {
+        return this.active;
+    }
+
     @Override
     public void extract(final SkyFeatureRenderer skyFeatureRenderer, final ClientLevel level, final Matrix4f modelViewMatrix, final float tickDelta) {
         final long dayTime = level.getOverworldClockTime();
         final int clampedTimeOfDay = (int) (dayTime % 24000L);
-        final float skyAngle = getTimeOfDay(level);
-        final float rainLevel = level.getRainLevel(tickDelta);
+        final float skyAngle = this.getSkyAngle(tickDelta);
 
         float thunderLevel = level.getThunderLevel(tickDelta);
+        final float rainLevel = level.getRainLevel(tickDelta);
         if (rainLevel > 0.0F) {
             thunderLevel /= rainLevel;
         }
@@ -81,13 +99,16 @@ public class Skybox extends AbstractSkybox {
 
     @Override
     public void tick(final ClientLevel level) {
-        this.active = true;
-        final boolean allowOtherDimensions = SkyboxifyImpl.config().showOverworldForUnknownDimension && this.dimension.equals(Level.OVERWORLD) && !level.dimension().equals(Level.NETHER) && !level.dimension().equals(Level.END);
+        final boolean allowOtherDimensions = SkyboxifyImpl.config().showOverworldForUnknownDimension &&
+                this.dimension.equals(Level.OVERWORLD) &&
+                !level.dimension().equals(Level.NETHER) &&
+                !level.dimension().equals(Level.END);
         if (this.dimension.equals(level.dimension()) || allowOtherDimensions) {
+            this.active = true;
             this.layers.forEach(layer -> alphaMap.put(layer, layer.getPositionBrightness(level, this.getConditionAlphaFor(layer))));
         } else {
-            this.layers.forEach(layer -> alphaMap.put(layer, -1.0F));
             this.active = false;
+            this.layers.forEach(layer -> alphaMap.put(layer, -1.0F));
         }
     }
 
@@ -95,22 +116,17 @@ public class Skybox extends AbstractSkybox {
         return this.alphaMap.getOrDefault(layer, -1.0F);
     }
 
-    private float getTimeOfDay(final ClientLevel level) {
+    private float getSkyAngle(final float tickDelta) {
+        final Camera camera =
+                //? >=26.2 {
+                Minecraft.getInstance().gameRenderer.mainCamera();
+                //? } else {
+                /*Minecraft.getInstance().gameRenderer.getMainCamera();
+                 *///? }
         //? >=1.21.11 {
-        long fixedTime = level.getOverworldClockTime();
-        if (level.dimensionType().hasFixedTime()) {
-            if (level.dimension().equals(Level.NETHER)) {
-                fixedTime = 18000L;
-            } else if (level.dimension().equals(Level.END)) {
-                fixedTime = 6000L;
-            }
-        }
-
-        final double frac = Mth.frac(fixedTime / 24000.0 - 0.25);
-        final double mul = 0.5 - Math.cos(frac * Math.PI) / 2.0;
-        return (float)(frac * 2.0 + mul) / 3.0F;
+        return camera.attributeProbe().getValue(EnvironmentAttributes.SUN_ANGLE, tickDelta) / 360.0F;
         //?} else {
-        /*return level.getTimeOfDay(1.0F);
+        /*return camera.getEntity().level().getTimeOfDay(tickDelta);
          *///?}
     }
 }

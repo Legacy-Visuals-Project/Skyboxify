@@ -10,7 +10,5 @@
 	"options.skyboxify.renderStars.tooltip": "Force enable rendering of stars when a Skybox resource pack is enabled & active.",
 	"options.skyboxify.debug": "Debug Mode",
 	"options.skyboxify.debug.tooltip": "Enable debug logging & other debugging aspects.",
-	"options.skyboxify.legacyRotationLogic": "[DM] Legacy Rotation Logic",
-	"options.skyboxify.legacyRotationLogic.tooltip": "Enables legacy rotation logic when rotating the sky from PR #24.\nNOTE: Requires \"Debug Mode\" to be on.",
 	"options.reset": "Reset"
 }

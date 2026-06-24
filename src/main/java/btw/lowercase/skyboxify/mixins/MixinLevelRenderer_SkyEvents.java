@@ -60,18 +60,18 @@ public abstract class MixinLevelRenderer_SkyEvents {
 
     @Inject(method = "addSkyPass", at = @At("HEAD"))
     private void skyboxify$getLocals(
-            FrameGraphBuilder frameGraphBuilder,
+            final FrameGraphBuilder frame,
             //? >=26.1 {
-            CameraRenderState camera,
+            final CameraRenderState cameraState,
             //? } else {
-            /*Camera camera,
+            /*final Camera camera,
             *///? }
             //? <=1.21.8
-            //float tickDelta,
+            //final float tickDelta,
             //? >=1.21.6 {
-            com.mojang.blaze3d.buffers.GpuBufferSlice gpuBufferSlice,
+            final com.mojang.blaze3d.buffers.GpuBufferSlice skyFog,
             //?} else {
-            /*net.minecraft.client.renderer.FogParameters gpuBufferSlice,
+            /*final net.minecraft.client.renderer.FogParameters skyFog,
              *///?}
             CallbackInfo ci) {
         skyboxify$tickDelta =
@@ -82,12 +82,17 @@ public abstract class MixinLevelRenderer_SkyEvents {
         *///?}
     }
 
-    @WrapOperation(method = "lambda$addSkyPass$0", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SkyRenderer;renderEndSky()V"))
+    @Inject(method = "lambda$addSkyPass$0", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SkyRenderer;renderEndSky()V", shift = At.Shift.AFTER))
     private
     //? >=1.21.11
     static
-    void skyboxify$renderEndSkybox(net.minecraft.client.renderer.SkyRenderer instance, Operation<Void> original) {
-        original.call(instance);
+    void skyboxify$renderEndSkybox(
+            //? >=1.21.10 {
+            final com.mojang.blaze3d.buffers.GpuBufferSlice skyFog,
+            final net.minecraft.client.renderer.state.level.SkyRenderState state,
+            //? }
+            final CallbackInfo ci
+    ) {
         Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.EndSky.After(Minecraft.getInstance().level));
     }
 
@@ -106,13 +111,13 @@ public abstract class MixinLevelRenderer_SkyEvents {
     //? >=1.21.11
     static
     void skyboxify$endBatchSunrise(
-            net.minecraft.client.renderer.SkyRenderer instance,
-            PoseStack poseStack,
+            final net.minecraft.client.renderer.SkyRenderer instance,
+            final PoseStack poseStack,
             //? >=1.21.4 <1.21.9
-            //net.minecraft.client.renderer.MultiBufferSource.BufferSource bufferSource,
-            float sunAngle,
-            int sunriseOrSunsetColor,
-			Operation<Void> original
+            //final net.minecraft.client.renderer.MultiBufferSource.BufferSource bufferSource,
+            final float sunAngle,
+            final int sunriseAndSunsetColor,
+			final Operation<Void> original
     ) {
         if (!Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.SunriseSunset()).isCancelled()) {
 			original.call(
@@ -121,7 +126,7 @@ public abstract class MixinLevelRenderer_SkyEvents {
 					//? >=1.21.4 <1.21.9
 					//bufferSource,
 					sunAngle,
-					sunriseOrSunsetColor
+					sunriseAndSunsetColor
 			);
 			Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.SunriseSunset.After(
 					//? >=1.21.4 <1.21.9
@@ -149,23 +154,23 @@ public abstract class MixinLevelRenderer_SkyEvents {
     //? >=1.21.11
     static
     boolean skyboxify$renderSkyboxes(
-            net.minecraft.client.renderer.SkyRenderer instance,
-            PoseStack poseStack,
+            final net.minecraft.client.renderer.SkyRenderer instance,
+            final PoseStack poseStack,
             //? >=1.21.4 <1.21.9
-            //net.minecraft.client.renderer.MultiBufferSource.BufferSource bufferSource,
-            float timeOfDay,
+            //final net.minecraft.client.renderer.MultiBufferSource.BufferSource bufferSource,
+            final float sunAngle,
             //? <=1.21.10 {
-            /*int moonPhase,
+            /*final int moonPhase,
             *///?}
-            float moonAngle,
-            float starAngle
+            final float moonAngle,
+            final float starAngle
             //? >=1.21.11 {
-            ,net.minecraft.world.level.MoonPhase moonPhase,
-            float rainBrightness,
-            float starBrightness
+            , final net.minecraft.world.level.MoonPhase moonPhase,
+            final float rainBrightness,
+            final float starBrightness
             //?}
             //? <1.21.6
-            //,net.minecraft.client.renderer.FogParameters fog
+            //,final net.minecraft.client.renderer.FogParameters fog
     ) {
         return !Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.SunMoonStars(Minecraft.getInstance().level, skyboxify$tickDelta)).isCancelled();
     }
@@ -194,11 +199,11 @@ public abstract class MixinLevelRenderer_SkyEvents {
     *///?}
     skyboxify$allowNetherSky(
             //? >= 1.21.9 {
-            net.minecraft.client.renderer.state.level.SkyRenderState instance,
+            final net.minecraft.client.renderer.state.level.SkyRenderState instance,
              //?} else {
-            /*DimensionSpecialEffects instance,
+            /*final DimensionSpecialEffects instance,
             *///?}
-            Operation<
+            final Operation<
                     //? >=1.21.11 {
                     DimensionType.Skybox
                      //?} else {

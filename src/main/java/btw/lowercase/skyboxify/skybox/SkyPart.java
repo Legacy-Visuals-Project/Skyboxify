@@ -24,55 +24,60 @@
 package btw.lowercase.skyboxify.skybox;
 
 import btw.lowercase.skyboxify.skybox.impl.components.UV;
-import lombok.Getter;
 import org.joml.Matrix4f;
 
 public enum SkyPart {
-	BOTTOM(
-			new Matrix4f()
-					.rotateY((float) Math.toRadians(90.0F)),
-			new UV(0.0F, 0.0F, 0.33333334F, 0.5F)
-	),
-	TOP(
-			new Matrix4f()
-					.rotateX((float) Math.toRadians(180.0F))
-					.rotateY((float) Math.toRadians(-90.0F)),
-			new UV(0.33333334F, 0.0F, 0.6666667F, 0.5F)
-	),
-	EAST(
-			new Matrix4f()
-					.rotateX((float) Math.toRadians(90.0F))
-					.rotateZ((float) Math.toRadians(90.0F)),
-			new UV(0.6666667F, 0.0F, 1.0F, 0.5F)
-	),
-	SOUTH(
-			new Matrix4f()
-					.rotateX((float) Math.toRadians(90.0F))
-					.rotateZ((float) Math.toRadians(180.0F)),
-			new UV(0.0F, 0.5F, 0.33333334F, 1.0F)
-	),
-	WEST(
-			new Matrix4f()
-					.rotateX((float) Math.toRadians(90.0F))
-					.rotateZ((float) Math.toRadians(-90.0F)),
-			new UV(0.33333334F, 0.5F, 0.6666667F, 1.0F)
-	),
-	NORTH(
-			new Matrix4f()
-					.rotateX((float) Math.toRadians(90.0F)),
-			new UV(0.6666667F, 0.5F, 1.0F, 1.0F)
-	);
+    BOTTOM(
+            new Matrix4f()
+                    .rotateY((float) Math.toRadians(90.0F)),
+            new UV(0.0F, 0.0F, 0.33333334F, 0.5F)
+    ),
+    TOP(
+            new Matrix4f()
+                    .rotateX((float) Math.toRadians(180.0F))
+                    .rotateY((float) Math.toRadians(-90.0F)),
+            new UV(0.33333334F, 0.0F, 0.6666667F, 0.5F)
+    ),
+    EAST(
+            new Matrix4f()
+                    .rotateX((float) Math.toRadians(90.0F))
+                    .rotateZ((float) Math.toRadians(90.0F)),
+            new UV(0.6666667F, 0.0F, 1.0F, 0.5F)
+    ),
+    SOUTH(
+            new Matrix4f()
+                    .rotateX((float) Math.toRadians(90.0F))
+                    .rotateZ((float) Math.toRadians(180.0F)),
+            new UV(0.0F, 0.5F, 0.33333334F, 1.0F)
+    ),
+    WEST(
+            new Matrix4f()
+                    .rotateX((float) Math.toRadians(90.0F))
+                    .rotateZ((float) Math.toRadians(-90.0F)),
+            new UV(0.33333334F, 0.5F, 0.6666667F, 1.0F)
+    ),
+    NORTH(
+            new Matrix4f()
+                    .rotateX((float) Math.toRadians(90.0F)),
+            new UV(0.6666667F, 0.5F, 1.0F, 1.0F)
+    );
 
-	public static final SkyPart[] VALUES = values();
-	public static final int COUNT = VALUES.length;
+    public static final SkyPart[] VALUES = values();
+    public static final int COUNT = VALUES.length;
 
-	@Getter
-	private final Matrix4f rotationMatrix;
-	@Getter
-	private final UV uv;
+    private final Matrix4f rotationMatrix;
+    private final UV uv;
 
-	SkyPart(final Matrix4f rotationMatrix, final UV uv) {
-		this.rotationMatrix = rotationMatrix;
-		this.uv = uv;
-	}
+    SkyPart(final Matrix4f rotationMatrix, final UV uv) {
+        this.rotationMatrix = rotationMatrix;
+        this.uv = uv;
+    }
+
+    public Matrix4f getRotationMatrix() {
+        return this.rotationMatrix;
+    }
+
+    public UV getUv() {
+        return this.uv;
+    }
 }

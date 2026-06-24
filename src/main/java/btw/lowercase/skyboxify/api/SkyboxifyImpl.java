@@ -93,7 +93,6 @@ public final class SkyboxifyImpl implements SkyboxifyApi {
             category.option(option("renderStars", defaults.renderStars, () -> config.renderStars, val -> config.renderStars = val));
             category.option(option("showOverworldForUnknownDimension", defaults.showOverworldForUnknownDimension, () -> config.showOverworldForUnknownDimension, val -> config.showOverworldForUnknownDimension = val));
             category.option(option("debug", defaults.debug, () -> config.debug, val -> config.debug = val));
-            category.option(option("legacyRotationLogic", defaults.legacyRotationLogic, () -> config.legacyRotationLogic, val -> config.legacyRotationLogic = val));
             builder.category(category.build());
 
             return builder;

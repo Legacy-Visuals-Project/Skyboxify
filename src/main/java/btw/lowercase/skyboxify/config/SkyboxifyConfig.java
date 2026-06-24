@@ -36,6 +36,4 @@ public class SkyboxifyConfig {
     public boolean showOverworldForUnknownDimension = true;
     @SerialEntry
     public boolean debug = false;
-    @SerialEntry
-    public boolean legacyRotationLogic = false;
 }

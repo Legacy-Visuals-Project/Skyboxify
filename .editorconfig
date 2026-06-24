@@ -5,6 +5,6 @@ end_of_line = lf
 charset = utf-8
 trim_trailing_whitespace = true
 
-[{*.json,*.mcmeta}]
+[{*.json,*.toml,*.mcmeta}]
 indent_style = tab
 indent_size = 4

@@ -61,7 +61,7 @@ public final class SkyboxManager {
     public void tick() {
         final ClientLevel level = Minecraft.getInstance().level;
         if (level != null) {
-            tick(level);
+            this.tick(level);
         }
     }
 
