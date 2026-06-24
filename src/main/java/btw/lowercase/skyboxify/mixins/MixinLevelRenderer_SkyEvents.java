@@ -87,10 +87,10 @@ public abstract class MixinLevelRenderer_SkyEvents {
     //? >=1.21.11
     static
     void skyboxify$renderEndSkybox(
-            //? >=1.21.10 {
-            final com.mojang.blaze3d.buffers.GpuBufferSlice skyFog,
+            //? =1.21.10 {
+            /*final com.mojang.blaze3d.buffers.GpuBufferSlice skyFog,
             final net.minecraft.client.renderer.state.level.SkyRenderState state,
-            //? }
+            *///? }
             final CallbackInfo ci
     ) {
         Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.EndSky.After(Minecraft.getInstance().level));

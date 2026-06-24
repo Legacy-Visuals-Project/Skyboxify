@@ -23,7 +23,6 @@
 
 package btw.lowercase.skyboxify.skybox.impl;
 
-import btw.lowercase.skyboxify.api.SkyboxifyImpl;
 import btw.lowercase.skyboxify.skybox.SkyStorage;
 import btw.lowercase.skyboxify.skybox.impl.components.*;
 import btw.lowercase.skyboxify.skybox.renderer.Geometry;

@@ -46,16 +46,16 @@ public abstract class MixinSkyRenderer_CelestialEvents {
             )
     )
     private boolean skyboxify$toggleSun(
-            SkyRenderer instance,
-            float rainLevel,
+            final SkyRenderer instance,
+            final float rainBrightness,
             //? <1.21.9 {
             /*//? >=1.21.4 {
-            net.minecraft.client.renderer.MultiBufferSource multiBufferSource,
+            final net.minecraft.client.renderer.MultiBufferSource multiBufferSource,
             //?} else {
-            /^com.mojang.blaze3d.vertex.Tesselator tesselator,
+            /^final com.mojang.blaze3d.vertex.Tesselator tesselator,
              ^///?}
             *///?}
-            PoseStack poseStack
+            final PoseStack poseStack
     ) {
         return !Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.Celestial(SkyRenderEvent.Celestial.Type.SUN)).isCancelled();
     }
@@ -76,19 +76,19 @@ public abstract class MixinSkyRenderer_CelestialEvents {
     private boolean skyboxify$toggleMoon(
             SkyRenderer instance,
             //? >=1.21.11 {
-            net.minecraft.world.level.MoonPhase moonPhases,
+            final net.minecraft.world.level.MoonPhase moonPhase,
              //?} else {
-            /*int moonPhases,
+            /*final int moonPhase,
             *///?}
-            float rainLevel,
+            final float rainBrightness,
             //? <1.21.9 {
             /*//? >=1.21.4 {
-            net.minecraft.client.renderer.MultiBufferSource multiBufferSource,
+            final net.minecraft.client.renderer.MultiBufferSource multiBufferSource,
             //?} else {
-            /^com.mojang.blaze3d.vertex.Tesselator tesselator,
+            /^final com.mojang.blaze3d.vertex.Tesselator tesselator,
              ^///?}
             *///?}
-            PoseStack poseStack
+            final PoseStack poseStack
     ) {
         return !Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.Celestial(SkyRenderEvent.Celestial.Type.MOON)).isCancelled();
     }
@@ -105,11 +105,11 @@ public abstract class MixinSkyRenderer_CelestialEvents {
             )
     )
     private boolean skyboxify$toggleStars(
-            SkyRenderer instance,
+            final SkyRenderer instance,
             //? <1.21.6
-            //net.minecraft.client.renderer.FogParameters fog,
-            float starBrightness,
-            PoseStack poseStack
+            //final net.minecraft.client.renderer.FogParameters fog,
+            final float starBrightness,
+            final PoseStack poseStack
     ) {
         return !Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.Celestial(SkyRenderEvent.Celestial.Type.STARS)).isCancelled();
     }
