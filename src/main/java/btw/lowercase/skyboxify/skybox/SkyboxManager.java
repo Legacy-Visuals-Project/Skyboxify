@@ -79,7 +79,7 @@ public final class SkyboxManager {
     }
 
     public List<Skybox> getSkiesFor(final ResourceKey<Level> resourceKey) {
-        return getActiveSkies().stream().filter(skybox -> resourceKey.equals(skybox.getDimension())).toList();
+        return getActiveSkies().stream().filter(skybox -> resourceKey.equals(skybox.dimension())).toList();
     }
 
     public boolean containsEnabled(final ResourceKey<Level> resourceKey) {

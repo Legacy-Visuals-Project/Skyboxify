@@ -40,7 +40,7 @@ public class SkyLayerListScreen extends DebugScreen {
 	private final Skybox skybox;
 
 	public SkyLayerListScreen(final Screen parent, final Skybox skybox) {
-		super(Component.literal(skybox.getDimension().identifier().toString()), parent);
+		super(Component.literal(skybox.dimension().identifier().toString()), parent);
 		this.skybox = skybox;
 	}
 
@@ -48,13 +48,13 @@ public class SkyLayerListScreen extends DebugScreen {
 	protected void init() {
 		super.init();
 
-		this.gidgets.add(Text.builder(this.title.getString() + " (" + this.skybox.getLayers().size() + " layer(s)" + ")")
+		this.gidgets.add(Text.builder(this.title.getString() + " (" + this.skybox.layers().size() + " layer(s)" + ")")
 				.position(this.width / 2, 12)
 				.centered()
 				.build(this.font));
 
 		final List<Gidget> gidgets = new ArrayList<>();
-		for (final SkyLayer skyLayer : this.skybox.getLayers()) {
+		for (final SkyLayer skyLayer : this.skybox.layers()) {
 			final Component title = Component.literal(skyLayer.properties().toString());
 			gidgets.add(SimpleButton.builder(title, button -> this.minecraft.gui.setScreen(new SkyLayerInfoScreen(this, skyLayer, title))).build());
 		}

@@ -86,18 +86,18 @@ public class SkyboxifyCommand extends LiteralArgumentBuilder<FabricClientCommand
 			}
 
 			for (final Skybox skybox : SkyboxifyImpl.skyboxManager().getLoadedSkies()) {
-				final Path packFolder = SkyboxifyInfo.DEBUG_FOLDER.resolve(skybox.getPackName().replaceAll("/", "+").replaceAll(" ", "_"));
+				final Path packFolder = SkyboxifyInfo.DEBUG_FOLDER.resolve(skybox.packName().replaceAll("/", "+").replaceAll(" ", "_"));
 				if (!Files.exists(packFolder)) {
 					Files.createDirectory(packFolder);
 				}
 
-				final Identifier dimension = skybox.getDimension().identifier();
+				final Identifier dimension = skybox.dimension().identifier();
 				final Path dimensionFolder = packFolder.resolve(dimension.getNamespace()).resolve(dimension.getPath());
 				if (!Files.exists(dimensionFolder)) {
 					Files.createDirectories(dimensionFolder);
 				}
 
-				for (final SkyLayer layer : skybox.getLayers()) {
+				for (final SkyLayer layer : skybox.layers()) {
 					try {
 						String id = Path.of(layer.properties().getPath()).getFileName().toString();
 						if (id.endsWith(".properties")) {

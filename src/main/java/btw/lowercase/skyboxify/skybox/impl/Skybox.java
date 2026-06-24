@@ -45,8 +45,8 @@ import net.minecraft.world.attribute.EnvironmentAttributes;
 
 public class Skybox extends AbstractSkybox {
     public static final Codec<Skybox> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Level.RESOURCE_KEY_CODEC.fieldOf("dimension").forGetter(Skybox::getDimension),
-            SkyLayer.CODEC.listOf().fieldOf("layers").forGetter(Skybox::getLayers)
+            Level.RESOURCE_KEY_CODEC.fieldOf("dimension").forGetter(Skybox::dimension),
+            SkyLayer.CODEC.listOf().fieldOf("layers").forGetter(Skybox::layers)
     ).apply(instance, Skybox::new));
 
     private String packName = null;
@@ -60,7 +60,7 @@ public class Skybox extends AbstractSkybox {
         this.layers = layers;
     }
 
-    public String getPackName() {
+    public String packName() {
         return this.packName;
     }
 
@@ -68,11 +68,11 @@ public class Skybox extends AbstractSkybox {
         this.packName = packName;
     }
 
-    public List<SkyLayer> getLayers() {
+    public List<SkyLayer> layers() {
         return this.layers;
     }
 
-    public ResourceKey<Level> getDimension() {
+    public ResourceKey<Level> dimension() {
         return this.dimension;
     }
 
@@ -105,10 +105,10 @@ public class Skybox extends AbstractSkybox {
                 !level.dimension().equals(Level.END);
         if (this.dimension.equals(level.dimension()) || allowOtherDimensions) {
             this.active = true;
-            this.layers.forEach(layer -> alphaMap.put(layer, layer.getPositionBrightness(level, this.getConditionAlphaFor(layer))));
+            this.layers.forEach(layer -> this.alphaMap.put(layer, layer.getPositionBrightness(level, this.getConditionAlphaFor(layer))));
         } else {
             this.active = false;
-            this.layers.forEach(layer -> alphaMap.put(layer, -1.0F));
+            this.layers.forEach(layer -> this.alphaMap.put(layer, -1.0F));
         }
     }
 
@@ -126,7 +126,7 @@ public class Skybox extends AbstractSkybox {
         //? >=1.21.11 {
         return camera.attributeProbe().getValue(EnvironmentAttributes.SUN_ANGLE, tickDelta) / 360.0F;
         //?} else {
-        /*return camera.getEntity().level().getTimeOfDay(tickDelta);
+        /*return camera.getEntity().level().getSunAngle(tickDelta);
          *///?}
     }
 }

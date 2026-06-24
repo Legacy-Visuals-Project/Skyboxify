@@ -56,7 +56,7 @@ public class SkyboxListScreen extends DebugScreen {
 
 		final List<Gidget> gidgets = new ArrayList<>();
 		for (final Skybox skybox : this.skyboxes) {
-			final Component name = Component.literal(StringUtil.stripColor(skybox.getPackName())).withColor(skybox.isActive() ? ARGB.color(155, 0x00FF00) : ARGB.color(155, 0xFF0000));
+			final Component name = Component.literal(StringUtil.stripColor(skybox.packName())).withColor(skybox.isActive() ? ARGB.color(155, 0x00FF00) : ARGB.color(155, 0xFF0000));
 			gidgets.add(SimpleButton.builder(name, button -> this.minecraft.gui.setScreen(new SkyLayerListScreen(this, skybox))).build());
 		}
 
