@@ -28,7 +28,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import org.joml.Matrix4f;
 
 public abstract class AbstractSkybox {
-    public abstract void extract(final SkyFeatureRenderer skyFeatureRenderer, final ClientLevel level, final Matrix4f modelViewMatrix, final float tickDelta);
+    public abstract void extractRenderState(final SkyFeatureRenderer skyFeatureRenderer, final ClientLevel level, final Matrix4f modelViewMatrix, final float tickDelta);
 
     public abstract void tick(final ClientLevel level);
 }

@@ -87,45 +87,36 @@ public final class SkyboxParser {
 
 		// Days Loop -> Loop
 		if (properties.containsKey("days")) {
-			parseLoop(
-					properties.getProperty("days"),
-					properties.getProperty("daysLoop", null),
-					output
-			);
+			parseLoop(properties.getProperty("days"), properties.getProperty("daysLoop", null), output);
 		}
 
-		// Blend
-		if (properties.containsKey("blend")) {
-			output.addProperty("blend", String.valueOf(properties.getProperty("blend")));
-		}
-
-		// Rotation
-		if (properties.containsKey("rotate")) {
-			output.addProperty("rotate", Boolean.parseBoolean(properties.getProperty("rotate")));
-		}
-
-		// Transition
-		if (properties.containsKey("transition")) {
-			output.addProperty("transition", Integer.parseInt(properties.getProperty("transition")));
-		}
-
-		// Axis
-		if (properties.containsKey("axis")) {
-			output.addProperty("axis", properties.getProperty("axis"));
-		}
-
-		// Weather
-		if (properties.containsKey("weather")) {
-			output.addProperty("weather", String.valueOf(properties.getProperty("weather")));
-		}
-
-		// Biomes
-		if (properties.containsKey("biomes")) {
-			output.addProperty("biomes", String.valueOf(properties.getProperty("biomes")));
-		}
+        copyString("blend", properties, output);
+        copyBoolean("rotate", properties, output);
+        copyInteger("transition", properties, output, 20);
+        copyString("axis", properties, output);
+        copyString("weather", properties, output);
+        copyString("biomes", properties, output);
 
 		return output;
 	}
+
+    private static void copyString(final String key, final Properties properties, final JsonObject output) {
+        if (properties.containsKey(key)) {
+            output.addProperty(key, String.valueOf(properties.getProperty(key)));
+        }
+    }
+
+    private static void copyBoolean(final String key, final Properties properties, final JsonObject output) {
+        if (properties.containsKey(key)) {
+            output.addProperty(key, Boolean.parseBoolean(properties.getProperty(key)));
+        }
+    }
+
+    private static void copyInteger(final String key, final Properties properties, final JsonObject output, final int multiplier) {
+        if (properties.containsKey(key)) {
+            output.addProperty(key, Integer.parseInt(properties.getProperty(key)) * multiplier);
+        }
+    }
 
 	private static String parseSourceTexture(final Properties properties, final Identifier propertiesIdentifier, final PackResources packResources) {
 		final String source = properties.getProperty("source", null);

@@ -24,7 +24,6 @@
 package btw.lowercase.skyboxify.utils;
 
 import btw.lowercase.skyboxify.skybox.impl.components.Range;
-import btw.lowercase.skyboxify.skybox.impl.components.Weather;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JavaOps;
@@ -59,14 +58,6 @@ public final class ParserCodecs {
 
 		return builder.toString().trim();
 	});
-
-	public static final Codec<List<Weather>> WEATHER = SPLIT_SPACE_TRIMMED.xmap(input -> {
-		if (!input.isEmpty()) {
-			return Weather.CODEC.listOf().parse(JavaOps.INSTANCE, input).getOrThrow();
-		} else {
-			return List.of(Weather.CLEAR);
-		}
-	}, list -> list.stream().map(Weather::getSerializedName).toList());
 
 	public static final Codec<Vector3fc> AXIS = TRIMMED_STRING.xmap(input -> {
 		final List<String> parts = SPLIT_SPACE_TRIMMED.parse(JavaOps.INSTANCE, input.replaceAll(" +", " ")).getOrThrow();

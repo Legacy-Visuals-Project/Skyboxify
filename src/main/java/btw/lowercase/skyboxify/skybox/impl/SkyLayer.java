@@ -31,8 +31,7 @@ import btw.lowercase.skyboxify.skybox.renderer.SkyFeatureRenderer;
 import btw.lowercase.skyboxify.utils.CommonUtils;
 import btw.lowercase.skyboxify.utils.ParserCodecs;
 import com.google.common.collect.ImmutableList;
-//? >=1.21.6
-import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.math.Axis;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.Minecraft;
@@ -46,70 +45,38 @@ import org.joml.*;
 import java.lang.Math;
 import java.util.List;
 
-public class SkyLayer {
+public record SkyLayer(
+        Identifier properties,
+        Identifier texture,
+        Biomes biomes,
+        Weather weather,
+        List<Range> heights,
+        Blend blend,
+        Fade fade,
+        Vector3fc axis,
+        Loop loop,
+        boolean rotate,
+        float speed,
+        int transition
+) {
     private static final float MIN_ALPHA_ALLOWED = 1.0E-4F;
 
     public static final Codec<SkyLayer> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Identifier.CODEC.fieldOf("properties").forGetter(SkyLayer::properties),
             Identifier.CODEC.fieldOf("texture").forGetter(SkyLayer::texture),
             Biomes.CODEC.optionalFieldOf("biomes", Biomes.DEFAULT).forGetter(SkyLayer::biomes),
+            Weather.CODEC.optionalFieldOf("weather", Weather.CLEAR).forGetter(SkyLayer::weather),
             Range.CODEC.listOf().optionalFieldOf("heights", ImmutableList.of()).forGetter(SkyLayer::heights),
             Blend.CODEC.optionalFieldOf("blend", Blend.ADD).forGetter(SkyLayer::blend),
             Fade.CODEC.optionalFieldOf("fade", Fade.DEFAULT).forGetter(SkyLayer::fade),
-            Codec.BOOL.optionalFieldOf("rotate", true).forGetter(SkyLayer::rotate),
-            Codec.FLOAT.optionalFieldOf("speed", 1.0F).forGetter(SkyLayer::speed),
             ParserCodecs.AXIS.optionalFieldOf("axis", Mth.X_AXIS).forGetter(SkyLayer::axis),
             Loop.CODEC.optionalFieldOf("loop", Loop.DEFAULT).forGetter(SkyLayer::loop),
-            Codec.INT.optionalFieldOf("transition", 1).forGetter(SkyLayer::transition),
-            ParserCodecs.WEATHER.optionalFieldOf("weather", ImmutableList.of(Weather.CLEAR)).forGetter(SkyLayer::weatherConditions)
+            Codec.BOOL.optionalFieldOf("rotate", true).forGetter(SkyLayer::rotate),
+            Codec.FLOAT.optionalFieldOf("speed", 1.0F).forGetter(SkyLayer::speed),
+            Codec.INT.optionalFieldOf("transition", 20).forGetter(SkyLayer::transition)
     ).apply(instance, SkyLayer::new));
 
-    private final Identifier properties;
-    private final Identifier texture;
-    private final Biomes biomes;
-    private final List<Range> heights;
-    private final Blend blend;
-    private final Fade fade;
-    private final boolean rotate;
-    private final float speed;
-    private final Vector3fc axis;
-    private final Loop loop;
-    private final int transition;
-    private final List<Weather> weatherConditions;
-    //? >=1.21.6
-    private final RenderPipeline pipeline;
-
-    public SkyLayer(
-            final Identifier properties,
-            final Identifier texture,
-            final Biomes biomes,
-            final List<Range> heights,
-            final Blend blend,
-            final Fade fade,
-            final boolean rotate,
-            final float speed,
-            final Vector3fc axis,
-            final Loop loop,
-            final int transition,
-            final List<Weather> weatherConditions
-    ) {
-        this.properties = properties;
-        this.texture = texture;
-        this.biomes = biomes;
-        this.heights = heights;
-        this.blend = blend;
-        this.fade = fade;
-        this.rotate = rotate;
-        this.speed = speed;
-        this.axis = axis;
-        this.loop = loop;
-        this.transition = transition;
-        this.weatherConditions = weatherConditions;
-        //? >=1.21.6
-        this.pipeline = SkyStorage.createSkyboxPipeline(blend.getBlendFunction());
-    }
-
-    public void extract(
+    public void extractRenderState(
             final SkyFeatureRenderer skyFeatureRenderer,
             final ClientLevel level,
             final Matrix4f modelViewMatrix,
@@ -119,17 +86,17 @@ public class SkyLayer {
             final float thunderLevel,
             final float conditionAlpha
     ) {
-        final float weatherAlpha = Weather.getAlpha(this.weatherConditions, rainLevel, thunderLevel);
+        final float weatherAlpha = this.weather.getAlpha(rainLevel, thunderLevel);
         final float fadeAlpha = this.fade.getAlpha(clampedTimeOfDay);
         final float finalAlpha = Mth.clamp(conditionAlpha * weatherAlpha * fadeAlpha, 0.0F, 1.0F);
         if (finalAlpha >= MIN_ALPHA_ALLOWED) {
             if (this.rotate) {
-                modelViewMatrix.rotate(this.getAngle(level, skyAngle) * Mth.DEG_TO_RAD, this.axis.normalize(new Vector3f()));
+                modelViewMatrix.rotate(Axis.of((Vector3f) this.axis).rotationDegrees(this.getAngle(level, skyAngle)));
             }
 
             final SkyFeatureRenderer.Pipeline pipeline = new SkyFeatureRenderer.Pipeline(
                     //? >=1.21.6 {
-                    this.pipeline
+                    SkyStorage.calculateSkyboxPipeline(this.blend.getBlendFunction())
                     //? } else {
                     /*this.blend.getBlendFunction()
                     *///? }
@@ -156,7 +123,7 @@ public class SkyLayer {
         } else if (conditionAlpha == -1.0F) {
             return this.getConditionCheck(level) ? 1.0F : 0.0F;
         } else {
-            return CommonUtils.calculateConditionAlphaValue(1.0F, 0.0F, conditionAlpha, this.transition * 20, this.getConditionCheck(level));
+            return CommonUtils.calculateConditionAlphaValue(1.0F, 0.0F, conditionAlpha, this.transition, this.getConditionCheck(level));
         }
     }
 
@@ -186,53 +153,5 @@ public class SkyLayer {
         }
 
         return 360.0F * (angleDayStart + skyAngle * this.speed);
-    }
-
-    public Identifier properties() {
-        return this.properties;
-    }
-
-    public Identifier texture() {
-        return this.texture;
-    }
-
-    public Biomes biomes() {
-        return this.biomes;
-    }
-
-    public List<Range> heights() {
-        return this.heights;
-    }
-
-    public Blend blend() {
-        return this.blend;
-    }
-
-    public Fade fade() {
-        return this.fade;
-    }
-
-    public boolean rotate() {
-        return this.rotate;
-    }
-
-    public float speed() {
-        return this.speed;
-    }
-
-    public Vector3fc axis() {
-        return this.axis;
-    }
-
-    public Loop loop() {
-        return this.loop;
-    }
-
-    public int transition() {
-        return this.transition;
-    }
-
-    public List<Weather> weatherConditions() {
-        return this.weatherConditions;
     }
 }

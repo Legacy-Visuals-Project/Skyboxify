@@ -25,9 +25,7 @@ package btw.lowercase.skyboxify.skybox;
 
 import btw.lowercase.skyboxify.api.SkyboxifyApi;
 import btw.lowercase.skyboxify.skybox.impl.Skybox;
-import btw.lowercase.skyboxify.skybox.renderer.SkyFeatureRenderer;
 import com.google.common.base.Preconditions;
-import lombok.Getter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.ResourceKey;
@@ -38,10 +36,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public final class SkyboxManager {
-    private SkyFeatureRenderer skyFeatureRenderer;
-    @Getter
     private final List<Skybox> loadedSkies = new ArrayList<>();
-    @Getter
     private final List<Skybox> activeSkies = new LinkedList<>();
     private final SkyboxifyApi api;
 
@@ -86,17 +81,11 @@ public final class SkyboxManager {
         return !getSkiesFor(resourceKey).isEmpty();
     }
 
-    public SkyFeatureRenderer getSkyFeatureRenderer() {
-        if (this.skyFeatureRenderer == null) {
-            this.skyFeatureRenderer = new SkyFeatureRenderer(
-                    //? >=26.2 {
-                    Minecraft.getInstance().gameRenderer.mainRenderTarget()
-                    //? } else {
-                    /*Minecraft.getInstance().getMainRenderTarget()
-                    *///? }
-            );
-        }
+    public List<Skybox> getActiveSkies() {
+        return this.activeSkies;
+    }
 
-        return this.skyFeatureRenderer;
+    public List<Skybox> getLoadedSkies() {
+        return this.loadedSkies;
     }
 }

@@ -24,6 +24,8 @@
 package btw.lowercase.skyboxify.utils;
 
 import net.minecraft.util.Mth;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
 import java.text.DecimalFormat;

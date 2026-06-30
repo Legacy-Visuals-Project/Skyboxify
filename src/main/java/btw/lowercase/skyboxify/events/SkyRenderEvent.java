@@ -23,13 +23,20 @@
 
 package btw.lowercase.skyboxify.events;
 
+import btw.lowercase.skyboxify.skybox.renderer.SkyFeatureRenderer;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.client.multiplayer.ClientLevel;
 
 public class SkyRenderEvent {
     public static final class EndSky {
-        public record After(ClientLevel level) implements Event {
+        @RequiredArgsConstructor
+        public static final class After implements Event {
+            @Getter
+            private final SkyFeatureRenderer skyFeatureRenderer;
+
+            @Getter
+            private final ClientLevel level;
         }
     }
 
@@ -46,6 +53,9 @@ public class SkyRenderEvent {
 
     @RequiredArgsConstructor
     public static final class SunMoonStars extends CancellableEvent {
+        @Getter
+        private final SkyFeatureRenderer skyFeatureRenderer;
+
         @Getter
         private final ClientLevel level;
 

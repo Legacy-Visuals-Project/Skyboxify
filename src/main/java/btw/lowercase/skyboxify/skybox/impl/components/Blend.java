@@ -25,7 +25,6 @@ package btw.lowercase.skyboxify.skybox.impl.components;
 
 import btw.lowercase.skyboxify.utils.BlendFunction;
 import com.mojang.serialization.Codec;
-import lombok.Getter;
 import net.minecraft.util.StringRepresentable;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector4f;
@@ -46,7 +45,6 @@ public enum Blend implements StringRepresentable {
     public static final Codec<Blend> CODEC = StringRepresentable.fromEnum(Blend::values).orElse(Blend.ADD);
 
     private final Function<Float, Vector4f> colorConsumer;
-    @Getter
     private final BlendFunction blendFunction;
 
     Blend(final Function<Float, Vector4f> colorConsumer, final BlendFunction blendFunction) {
@@ -56,6 +54,10 @@ public enum Blend implements StringRepresentable {
 
     public Vector4f getShaderColor(final float alpha) {
         return this.colorConsumer.apply(alpha);
+    }
+
+    public BlendFunction getBlendFunction() {
+        return this.blendFunction;
     }
 
     @NotNull

@@ -23,42 +23,56 @@
 
 package btw.lowercase.skyboxify.skybox.impl.components;
 
+import btw.lowercase.skyboxify.utils.ParserCodecs;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.JavaOps;
 import net.minecraft.util.Mth;
 import net.minecraft.util.StringRepresentable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public enum Weather implements StringRepresentable {
-	CLEAR,
-	RAIN,
-	THUNDER;
+public record Weather(List<Condition> conditions) {
+    public static final Weather CLEAR = new Weather(List.of(Condition.CLEAR));
 
-	public static final Codec<Weather> CODEC = StringRepresentable.fromEnum(Weather::values);
+    public static final Codec<Weather> CODEC = ParserCodecs.SPLIT_SPACE_TRIMMED.xmap(input -> {
+        if (!input.isEmpty()) {
+            return new Weather(Condition.CODEC.listOf().parse(JavaOps.INSTANCE, input).getOrThrow());
+        } else {
+            return CLEAR;
+        }
+    }, weather -> weather.conditions.stream().map(Condition::getSerializedName).toList());
 
-	public static float getAlpha(final List<Weather> weatherConditions, final float rainStrength, final float thunderStrength) {
-		final float alpha = 1.0F - rainStrength;
-		final float calculatedRainStrength = rainStrength - thunderStrength;
+    public float getAlpha(final float rainStrength, final float thunderStrength) {
+        final float alpha = 1.0F - rainStrength;
+        final float calculatedRainStrength = rainStrength - thunderStrength;
 
-		float weatherAlpha = 0.0F;
-		if (weatherConditions.contains(Weather.CLEAR)) {
-			weatherAlpha += alpha;
-		}
+        float weatherAlpha = 0.0F;
+        if (this.conditions.contains(Condition.CLEAR)) {
+            weatherAlpha += alpha;
+        }
 
-		if (weatherConditions.contains(Weather.RAIN)) {
-			weatherAlpha += calculatedRainStrength;
-		}
+        if (this.conditions.contains(Condition.RAIN)) {
+            weatherAlpha += calculatedRainStrength;
+        }
 
-		if (weatherConditions.contains(Weather.THUNDER)) {
-			weatherAlpha += thunderStrength;
-		}
+        if (this.conditions.contains(Condition.THUNDER)) {
+            weatherAlpha += thunderStrength;
+        }
 
-		return Mth.clamp(weatherAlpha, 0.0F, 1.0F);
-	}
+        return Mth.clamp(weatherAlpha, 0.0F, 1.0F);
+    }
 
-	@Override
-	public @NotNull String getSerializedName() {
-		return this.name().toLowerCase();
-	}
+    public enum Condition implements StringRepresentable {
+        CLEAR,
+        RAIN,
+        THUNDER;
+
+        public static final Codec<Condition> CODEC = StringRepresentable.fromEnum(Condition::values);
+
+        @Override
+        public @NotNull String getSerializedName() {
+            return this.name().toLowerCase();
+        }
+    }
 }

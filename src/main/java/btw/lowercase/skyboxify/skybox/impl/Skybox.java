@@ -41,7 +41,9 @@ import java.util.Map;
 
 //? >=1.21.11 {
 import net.minecraft.world.attribute.EnvironmentAttributes;
-//? }
+//? } else {
+/*import net.minecraft.util.Mth;
+*///? }
 
 public class Skybox extends AbstractSkybox {
     public static final Codec<Skybox> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -81,7 +83,7 @@ public class Skybox extends AbstractSkybox {
     }
 
     @Override
-    public void extract(final SkyFeatureRenderer skyFeatureRenderer, final ClientLevel level, final Matrix4f modelViewMatrix, final float tickDelta) {
+    public void extractRenderState(final SkyFeatureRenderer skyFeatureRenderer, final ClientLevel level, final Matrix4f modelViewMatrix, final float tickDelta) {
         final long dayTime = level.getOverworldClockTime();
         final int clampedTimeOfDay = (int) (dayTime % 24000L);
         final float skyAngle = this.getSkyAngle(tickDelta);
@@ -92,8 +94,10 @@ public class Skybox extends AbstractSkybox {
             thunderLevel /= rainLevel;
         }
 
-        for (final SkyLayer skyLayer : this.layers.stream().filter(layer -> layer.isActive(dayTime, clampedTimeOfDay)).toList()) {
-            skyLayer.extract(skyFeatureRenderer, level, new Matrix4f(modelViewMatrix), clampedTimeOfDay, skyAngle, rainLevel, thunderLevel, this.getConditionAlphaFor(skyLayer));
+        for (final SkyLayer layer : this.layers) {
+            if (layer.isActive(dayTime, clampedTimeOfDay)) {
+                layer.extractRenderState(skyFeatureRenderer, level, new Matrix4f(modelViewMatrix), clampedTimeOfDay, skyAngle, rainLevel, thunderLevel, this.getConditionAlphaFor(layer));
+            }
         }
     }
 
@@ -126,7 +130,7 @@ public class Skybox extends AbstractSkybox {
         //? >=1.21.11 {
         return camera.attributeProbe().getValue(EnvironmentAttributes.SUN_ANGLE, tickDelta) / 360.0F;
         //?} else {
-        /*return camera.getEntity().level().getSunAngle(tickDelta);
+        /*return camera.getEntity().level().getTimeOfDay(tickDelta);
          *///?}
     }
 }

@@ -58,7 +58,7 @@ public class SkyLayerInfoScreen extends DebugScreen {
 		addLine("Loop: " + this.skyLayer.loop());
 		addLine("Biomes: " + this.skyLayer.biomes());
 		addLine("Heights: " + this.skyLayer.heights());
-		addLine("Weather Conditions: " + this.skyLayer.weatherConditions());
+		addLine("Weather Conditions: " + this.skyLayer.weather());
 
 		this.gidgets.add(SimpleButton.builder(CommonComponents.GUI_BACK, button -> this.onClose())
 				.position((this.width / 2) - (SimpleButton.DEFAULT_WIDTH / 2), this.height - SimpleButton.DEFAULT_HEIGHT - 4)

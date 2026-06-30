@@ -35,6 +35,7 @@ import com.mojang.math.Axis;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
@@ -76,35 +77,33 @@ public final class Skyboxify {
         //? >=1.21.4 <1.21.9 {
 		/*globalEventManager.listen(SkyRenderEvent.SunriseSunset.After.class, event -> {
 			if (SkyboxifyImpl.skyboxManager().isEnabled()) {
-				event.getBufferSource().endBatch();
+				event.getBufferSource().endBatch(); // Fix horizon rendering over the skybox
 			}
 		});
 		*///?}
 
         globalEventManager.listen(SkyRenderEvent.EndSky.After.class, event -> {
             if (SkyboxifyImpl.skyboxManager().isEnabled()) {
-                renderSkyboxes(event.level(), 0.0F);
+                renderSkyboxes(event.getSkyFeatureRenderer(), event.getLevel(), 0.0F);
             }
         });
 
         globalEventManager.listen(SkyRenderEvent.SunMoonStars.class, event -> {
             final ClientLevel level = event.getLevel();
             if (SkyboxifyImpl.skyboxManager().isEnabled()) {
-                renderSkyboxes(level, event.getTickDelta());
-                // Disable Sun, Moon, & Stars in the Nether
-                if (SkyboxifyImpl.skyboxManager().containsEnabled(Level.NETHER) && level.dimension().equals(Level.NETHER)) {
+                renderSkyboxes(event.getSkyFeatureRenderer(), level, event.getTickDelta());
+                if (level.dimension().equals(Level.NETHER)) {
                     event.setCancelled(true);
                 }
             }
         });
     }
 
-    private void renderSkyboxes(final ClientLevel level, final float tickDelta) {
-        final SkyFeatureRenderer skyFeatureRenderer = SkyboxifyImpl.skyboxManager().getSkyFeatureRenderer();
+    private void renderSkyboxes(final SkyFeatureRenderer skyFeatureRenderer, final ClientLevel level, final float tickDelta) {
         final Matrix4f modelViewMatrix = new Matrix4f(RenderSystem.getModelViewStack());
         modelViewMatrix.rotate(Axis.YP.rotationDegrees(-90.0F));
         for (final Skybox skybox : SkyboxifyImpl.skyboxManager().getActiveSkies()) {
-            skybox.extract(skyFeatureRenderer, level, modelViewMatrix, tickDelta);
+            skybox.extractRenderState(skyFeatureRenderer, level, modelViewMatrix, tickDelta);
         }
 
         skyFeatureRenderer.endFrame();

@@ -40,7 +40,7 @@ public final class SkyStorage {
     //? >=1.21.6 {
     private static final Map<BlendFunction, RenderPipeline> renderPipelineCache = new Object2ObjectOpenHashMap<>();
 
-    public static RenderPipeline createSkyboxPipeline(final @org.jetbrains.annotations.Nullable BlendFunction blendFunction) {
+    public static RenderPipeline calculateSkyboxPipeline(final @org.jetbrains.annotations.Nullable BlendFunction blendFunction) {
         if (renderPipelineCache.containsKey(blendFunction)) {
             return renderPipelineCache.get(blendFunction);
         } else {

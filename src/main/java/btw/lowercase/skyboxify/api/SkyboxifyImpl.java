@@ -135,6 +135,7 @@ public final class SkyboxifyImpl implements SkyboxifyApi {
             for (final int key : this.dimensionMapping.keySet()) {
                 if (Objects.equals(this.dimensionMapping.get(key), modernId)) {
                     currentId = key;
+                    break;
                 }
             }
 

@@ -26,6 +26,7 @@ package btw.lowercase.skyboxify.mixins;
 import btw.lowercase.skyboxify.Skyboxify;
 import btw.lowercase.skyboxify.api.SkyboxifyImpl;
 import btw.lowercase.skyboxify.events.SkyRenderEvent;
+import btw.lowercase.skyboxify.skybox.renderer.SkyFeatureRenderer;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -57,6 +58,15 @@ import net.minecraft.world.level.dimension.DimensionType;
 public abstract class MixinLevelRenderer_SkyEvents {
     @Unique
     private static float skyboxify$tickDelta = 0.0F;
+
+    @Unique
+    private static final SkyFeatureRenderer skyboxify$skyFeatureRenderer = new SkyFeatureRenderer(
+            //? >=26.2 {
+            Minecraft.getInstance().gameRenderer.mainRenderTarget()
+            //? } else {
+            /*Minecraft.getInstance().getMainRenderTarget()
+             *///? }
+    );
 
     @Inject(method = "addSkyPass", at = @At("HEAD"))
     private void skyboxify$getLocals(
@@ -93,7 +103,7 @@ public abstract class MixinLevelRenderer_SkyEvents {
             *///? }
             final CallbackInfo ci
     ) {
-        Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.EndSky.After(Minecraft.getInstance().level));
+        Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.EndSky.After(skyboxify$skyFeatureRenderer, Minecraft.getInstance().level));
     }
 
     @WrapOperation(
@@ -172,7 +182,7 @@ public abstract class MixinLevelRenderer_SkyEvents {
             //? <1.21.6
             //,final net.minecraft.client.renderer.FogParameters fog
     ) {
-        return !Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.SunMoonStars(Minecraft.getInstance().level, skyboxify$tickDelta)).isCancelled();
+        return !Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.SunMoonStars(skyboxify$skyFeatureRenderer, Minecraft.getInstance().level, skyboxify$tickDelta)).isCancelled();
     }
 
     @WrapOperation(
