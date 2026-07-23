@@ -32,12 +32,12 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public final class SkyboxManager {
     private final List<Skybox> loadedSkies = new ArrayList<>();
-    private final List<Skybox> activeSkies = new LinkedList<>();
+    private final List<Skybox> activeSkies = new CopyOnWriteArrayList<>();
     private final SkyboxifyApi api;
 
     public SkyboxManager(final SkyboxifyApi api) {
