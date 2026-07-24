@@ -60,13 +60,7 @@ public abstract class MixinLevelRenderer_SkyEvents {
     private static float skyboxify$tickDelta = 0.0F;
 
     @Unique
-    private static final SkyFeatureRenderer skyboxify$skyFeatureRenderer = new SkyFeatureRenderer(
-            //? >=26.2 {
-            Minecraft.getInstance().gameRenderer.mainRenderTarget()
-            //? } else {
-            /*Minecraft.getInstance().getMainRenderTarget()
-             *///? }
-    );
+    private static SkyFeatureRenderer skyboxify$skyFeatureRenderer = null;
 
     @Inject(method = "addSkyPass", at = @At("HEAD"))
     private void skyboxify$getLocals(
@@ -84,6 +78,16 @@ public abstract class MixinLevelRenderer_SkyEvents {
             /*final net.minecraft.client.renderer.FogParameters skyFog,
              *///?}
             CallbackInfo ci) {
+        if (skyboxify$skyFeatureRenderer == null) {
+            skyboxify$skyFeatureRenderer = new SkyFeatureRenderer(
+                    //? >=26.2 {
+                    Minecraft.getInstance().gameRenderer.mainRenderTarget()
+                    //? } else {
+                    /*Minecraft.getInstance().getMainRenderTarget()
+                     *///? }
+            );;
+        }
+
         skyboxify$tickDelta =
                 //? >=1.21.9 {
                 net.minecraft.client.Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);

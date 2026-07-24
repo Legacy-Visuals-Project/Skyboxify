@@ -72,7 +72,12 @@ public final class SkyStorage {
             *///? }
 
             //? >=26.2 {
-            builder.withBindGroupLayout(net.minecraft.client.renderer.BindGroupLayouts.MATRICES_PROJECTION);
+            //? >=26.3 {
+            builder.withBindGroupLayout(net.minecraft.client.renderer.BindGroupLayouts.DYNAMIC_TRANSFORMS);
+            builder.withBindGroupLayout(net.minecraft.client.renderer.BindGroupLayouts.PROJECTION);
+            //? } else {
+            /*builder.withBindGroupLayout(net.minecraft.client.renderer.BindGroupLayouts.MATRICES_PROJECTION);
+            *///? }
             builder.withBindGroupLayout(net.minecraft.client.renderer.BindGroupLayouts.SAMPLER0);
             //? } else {
             /*builder.withSampler("Sampler0");

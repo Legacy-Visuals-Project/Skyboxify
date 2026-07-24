@@ -273,6 +273,7 @@ publishMods {
             minecraftVersions.addAll(mod.minecraftVersionRange.split(' '))
             if (loader.isFabric) {
                 requires("fabric-api")
+                requires("yacl")
                 optional("modmenu")
             }
         }
@@ -285,6 +286,7 @@ publishMods {
             minecraftVersions.addAll(mod.minecraftVersionRange.split(' '))
             if (loader.isFabric) {
                 requires("fabric-api")
+                requires("yacl")
                 optional("modmenu")
             }
         }
