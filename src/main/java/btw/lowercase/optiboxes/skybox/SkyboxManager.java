@@ -5,14 +5,14 @@ import com.google.common.base.Preconditions;
 import net.minecraft.client.multiplayer.ClientLevel;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class SkyboxManager {
     public static final SkyboxManager INSTANCE = new SkyboxManager();
 
     private final List<OptiFineSkybox> loadedSkyboxes = new ArrayList<>();
-    private final List<OptiFineSkybox> activeSkyboxes = new LinkedList<>();
+    private final List<OptiFineSkybox> activeSkyboxes = new CopyOnWriteArrayList<>();
 
     public void addSkybox(OptiFineSkybox optiFineSkybox) {
         Preconditions.checkNotNull(optiFineSkybox, "Skybox was null");
