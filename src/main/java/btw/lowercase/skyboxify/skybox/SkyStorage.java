@@ -30,7 +30,11 @@ import com.mojang.blaze3d.vertex.*;
 //? >=1.21.6 {
 //? <=26.1
 //import btw.lowercase.skyboxify.mixins.RenderPipelinesAccessor;
+//? >=26.3 {
+/*import com.mojang.renderpearl.api.pipeline.RenderPipeline;
+*///? } else {
 import com.mojang.blaze3d.pipeline.RenderPipeline;
+//? }
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 import java.util.Map;
@@ -73,11 +77,11 @@ public final class SkyStorage {
 
             //? >=26.2 {
             //? >=26.3 {
-            builder.withBindGroupLayout(net.minecraft.client.renderer.BindGroupLayouts.DYNAMIC_TRANSFORMS);
+            /*builder.withBindGroupLayout(net.minecraft.client.renderer.BindGroupLayouts.DYNAMIC_TRANSFORMS);
             builder.withBindGroupLayout(net.minecraft.client.renderer.BindGroupLayouts.PROJECTION);
-            //? } else {
-            /*builder.withBindGroupLayout(net.minecraft.client.renderer.BindGroupLayouts.MATRICES_PROJECTION);
-            *///? }
+            *///? } else {
+            builder.withBindGroupLayout(net.minecraft.client.renderer.BindGroupLayouts.MATRICES_PROJECTION);
+            //? }
             builder.withBindGroupLayout(net.minecraft.client.renderer.BindGroupLayouts.SAMPLER0);
             //? } else {
             /*builder.withSampler("Sampler0");

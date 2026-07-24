@@ -54,6 +54,14 @@ import net.minecraft.world.level.dimension.DimensionType;
 /*import net.minecraft.client.renderer.DimensionSpecialEffects;
 *///?}
 
+//? >=1.21.6 {
+//? >=26.3 {
+/*import com.mojang.renderpearl.api.buffers.GpuBufferSlice;
+*///? } else {
+import com.mojang.blaze3d.buffers.GpuBufferSlice;
+//? }
+//? }
+
 @Mixin(value = LevelRenderer.class, priority = 900)
 public abstract class MixinLevelRenderer_SkyEvents {
     @Unique
@@ -73,7 +81,7 @@ public abstract class MixinLevelRenderer_SkyEvents {
             //? <=1.21.8
             //final float tickDelta,
             //? >=1.21.6 {
-            final com.mojang.blaze3d.buffers.GpuBufferSlice skyFog,
+            final GpuBufferSlice skyFog,
             //?} else {
             /*final net.minecraft.client.renderer.FogParameters skyFog,
              *///?}

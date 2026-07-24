@@ -23,15 +23,15 @@
 
 package btw.lowercase.skyboxify.skybox.renderer;
 
-import com.mojang.blaze3d.PrimitiveTopology;
-import com.mojang.blaze3d.buffers.GpuBufferSlice;
-import com.mojang.blaze3d.pipeline.CompiledRenderPipeline;
 import com.mojang.blaze3d.pipeline.RenderTarget;
-import com.mojang.blaze3d.systems.RenderPass;
-import com.mojang.blaze3d.systems.RenderPassDescriptor;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.textures.FilterMode;
-import com.mojang.blaze3d.textures.GpuTextureView;
+import com.mojang.renderpearl.api.buffers.GpuBufferSlice;
+import com.mojang.renderpearl.api.commands.RenderPass;
+import com.mojang.renderpearl.api.commands.RenderPassDescriptor;
+import com.mojang.renderpearl.api.pipeline.CompiledRenderPipeline;
+import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
+import com.mojang.renderpearl.api.textures.FilterMode;
+import com.mojang.renderpearl.api.textures.GpuTextureView;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.Identifier;
 import org.joml.Vector4f;
@@ -67,7 +67,7 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
                     }
 
                     pass.setUniform("DynamicTransforms", submit.dynamicTransforms);
-                    pass.bindTexture("Sampler0", submit.textureView, RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST));
+                    pass.setUniform("Sampler0", submit.textureView, RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST));
                     if (submit.geometry instanceof StaticGeometry staticGeometry) {
                         pass.drawIndexed(staticGeometry.indexCount(), 1, 0, 0, 0);
                     }
