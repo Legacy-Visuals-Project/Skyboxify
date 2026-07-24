@@ -188,9 +188,11 @@ repositories {
     maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1") // DevAuth
     maven("https://maven.neoforged.net/releases") // NeoForge
     maven("https://maven.bawnorton.com/releases") // MixinSquared
-    maven("https://maven.terraformersmc.com") // Mod Menu
     maven("https://api.modrinth.com/maven") // Modrinth
     maven("https://maven.isxander.dev/releases") // YACL
+    maven("https://maven.teamresourceful.com/repository/maven-public/") {
+        content { includeGroup("com.terraformersmc") } // Mod Menu
+    }
 }
 
 val loom: LoomGradleExtensionAPI by extensions
