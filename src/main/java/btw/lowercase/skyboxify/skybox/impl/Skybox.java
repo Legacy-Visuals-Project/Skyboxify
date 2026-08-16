@@ -28,7 +28,6 @@ import btw.lowercase.skyboxify.skybox.AbstractSkybox;
 import btw.lowercase.skyboxify.skybox.renderer.SkyFeatureRenderer;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import it.unimi.dsi.fastutil.objects.Object2FloatOpenHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -37,7 +36,6 @@ import net.minecraft.world.level.Level;
 import org.joml.Matrix4f;
 
 import java.util.List;
-import java.util.Map;
 
 //? >=1.21.11 {
 import net.minecraft.world.attribute.EnvironmentAttributes;
@@ -54,7 +52,6 @@ public class Skybox extends AbstractSkybox {
     private String packName = null;
     private final List<SkyLayer> layers;
     private final ResourceKey<Level> dimension;
-    private final Map<SkyLayer, Float> alphaMap = new Object2FloatOpenHashMap<>();
     private boolean active = true;
 
     public Skybox(final ResourceKey<Level> dimension, final List<SkyLayer> layers) {
@@ -96,7 +93,7 @@ public class Skybox extends AbstractSkybox {
 
         for (final SkyLayer layer : this.layers) {
             if (layer.isActive(dayTime, clampedTimeOfDay)) {
-                layer.extractRenderState(skyFeatureRenderer, level, new Matrix4f(modelViewMatrix), clampedTimeOfDay, skyAngle, rainLevel, thunderLevel, this.getConditionAlphaFor(layer));
+                layer.extractRenderState(skyFeatureRenderer, level, new Matrix4f(modelViewMatrix), clampedTimeOfDay, skyAngle, rainLevel, thunderLevel);
             }
         }
     }
@@ -107,17 +104,8 @@ public class Skybox extends AbstractSkybox {
                 this.dimension.equals(Level.OVERWORLD) &&
                 !level.dimension().equals(Level.NETHER) &&
                 !level.dimension().equals(Level.END);
-        if (this.dimension.equals(level.dimension()) || allowOtherDimensions) {
-            this.active = true;
-            this.layers.forEach(layer -> this.alphaMap.put(layer, layer.getPositionBrightness(level, this.getConditionAlphaFor(layer))));
-        } else {
-            this.active = false;
-            this.layers.forEach(layer -> this.alphaMap.put(layer, -1.0F));
-        }
-    }
-
-    public float getConditionAlphaFor(final SkyLayer layer) {
-        return this.alphaMap.getOrDefault(layer, -1.0F);
+        this.active = this.dimension.equals(level.dimension()) || allowOtherDimensions;
+        this.layers.forEach(layer -> layer.tick(this, level));
     }
 
     private float getSkyAngle(final float tickDelta) {

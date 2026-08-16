@@ -57,6 +57,12 @@ public final class Skyboxify {
         final SkyboxifyConfig config = impl.getConfig();
         ClientTickEvents.END_LEVEL_TICK.register(SkyboxifyImpl.skyboxManager()::tick);
 
+        globalEventManager.listen(SkyRenderEvent.Disc.class, event -> {
+            if (config.enabled && !config.renderSky) {
+                event.setCancelled(true);
+            }
+        });
+
         globalEventManager.listen(SkyRenderEvent.Celestial.class, event -> {
             if (config.enabled) {
                 final SkyRenderEvent.Celestial.Type type = event.getType();

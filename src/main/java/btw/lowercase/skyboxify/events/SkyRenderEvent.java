@@ -74,4 +74,15 @@ public class SkyRenderEvent {
             STARS
         }
     }
+
+    @RequiredArgsConstructor
+    public static final class Disc extends CancellableEvent {
+        @Getter
+        private final Type type;
+
+        public enum Type {
+            TOP,
+            BOTTOM
+        }
+    }
 }

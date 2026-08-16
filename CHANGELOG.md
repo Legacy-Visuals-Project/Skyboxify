@@ -1,6 +1,6 @@
-# Release 3.2
+# Release 3.3
 
 ### General
 
-- Fixed concurrent crash
-- Updated modmenu/yacl on 26.2
+- Add new "Render Sky" setting, disables the blue sky.
+- Modify internal alpha handling to fix crash

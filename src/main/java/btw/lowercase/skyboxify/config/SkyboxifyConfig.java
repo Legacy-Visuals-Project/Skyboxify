@@ -29,6 +29,8 @@ public class SkyboxifyConfig {
     @SerialEntry
     public boolean enabled = true;
     @SerialEntry
+    public boolean renderSky = true;
+    @SerialEntry
     public boolean renderSunMoon = true;
     @SerialEntry
     public boolean renderStars = false;

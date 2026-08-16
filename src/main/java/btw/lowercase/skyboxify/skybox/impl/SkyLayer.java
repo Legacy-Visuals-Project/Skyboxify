@@ -40,25 +40,13 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
-import org.joml.*;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
-import java.lang.Math;
 import java.util.List;
 
-public record SkyLayer(
-        Identifier properties,
-        Identifier texture,
-        Biomes biomes,
-        Weather weather,
-        List<Range> heights,
-        Blend blend,
-        Fade fade,
-        Vector3fc axis,
-        Loop loop,
-        boolean rotate,
-        float speed,
-        int transition
-) {
+public class SkyLayer {
     private static final float MIN_ALPHA_ALLOWED = 1.0E-4F;
 
     public static final Codec<SkyLayer> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -76,6 +64,49 @@ public record SkyLayer(
             Codec.INT.optionalFieldOf("transition", 20).forGetter(SkyLayer::transition)
     ).apply(instance, SkyLayer::new));
 
+    private final Identifier properties;
+    private final Identifier texture;
+    private final Biomes biomes;
+    private final Weather weather;
+    private final List<Range> heights;
+    private final Blend blend;
+    private final Fade fade;
+    private final Vector3fc axis;
+    private final Loop loop;
+    private final boolean rotate;
+    private final float speed;
+    private final int transition;
+
+    private float alpha = -1.0F;
+
+    public SkyLayer(
+            final Identifier properties,
+            final Identifier texture,
+            final Biomes biomes,
+            final Weather weather,
+            final List<Range> heights,
+            final Blend blend,
+            final Fade fade,
+            final Vector3fc axis,
+            final Loop loop,
+            final boolean rotate,
+            final float speed,
+            final int transition
+    ) {
+        this.properties = properties;
+        this.texture = texture;
+        this.biomes = biomes;
+        this.weather = weather;
+        this.heights = heights;
+        this.blend = blend;
+        this.fade = fade;
+        this.axis = axis;
+        this.loop = loop;
+        this.rotate = rotate;
+        this.speed = speed;
+        this.transition = transition;
+    }
+
     public void extractRenderState(
             final SkyFeatureRenderer skyFeatureRenderer,
             final ClientLevel level,
@@ -83,12 +114,11 @@ public record SkyLayer(
             final int clampedTimeOfDay,
             final float skyAngle,
             final float rainLevel,
-            final float thunderLevel,
-            final float conditionAlpha
+            final float thunderLevel
     ) {
         final float weatherAlpha = this.weather.getAlpha(rainLevel, thunderLevel);
         final float fadeAlpha = this.fade.getAlpha(clampedTimeOfDay);
-        final float finalAlpha = Mth.clamp(conditionAlpha * weatherAlpha * fadeAlpha, 0.0F, 1.0F);
+        final float finalAlpha = Mth.clamp(this.alpha * weatherAlpha * fadeAlpha, 0.0F, 1.0F);
         if (finalAlpha >= MIN_ALPHA_ALLOWED) {
             if (this.rotate) {
                 modelViewMatrix.rotate(Axis.of((Vector3f) this.axis).rotationDegrees(this.getAngle(level, skyAngle)));
@@ -99,11 +129,15 @@ public record SkyLayer(
                     SkyStorage.calculateSkyboxPipeline(this.blend.getBlendFunction())
                     //? } else {
                     /*this.blend.getBlendFunction()
-                    *///? }
+                     *///? }
             );
             final RenderUniforms uniforms = new RenderUniforms(modelViewMatrix, this.blend.getShaderColor(finalAlpha));
             skyFeatureRenderer.submit(pipeline, Geometry.DEFAULT, uniforms, this.texture);
         }
+    }
+
+    public void tick(final Skybox skybox, final ClientLevel level) {
+        this.alpha = skybox.isActive() ? this.getPositionBrightness(level) : -1.0F;
     }
 
     private boolean getConditionCheck(final ClientLevel level) {
@@ -117,13 +151,13 @@ public record SkyLayer(
         }
     }
 
-    public float getPositionBrightness(final ClientLevel level, final float conditionAlpha) {
+    public float getPositionBrightness(final ClientLevel level) {
         if (this.biomes.locations().isEmpty() && this.heights.isEmpty()) {
             return 1.0F;
-        } else if (conditionAlpha == -1.0F) {
+        } else if (this.alpha == -1.0F) {
             return this.getConditionCheck(level) ? 1.0F : 0.0F;
         } else {
-            return CommonUtils.calculateConditionAlphaValue(1.0F, 0.0F, conditionAlpha, this.transition, this.getConditionCheck(level));
+            return CommonUtils.calculateConditionAlphaValue(1.0F, 0.0F, this.alpha, this.transition, this.getConditionCheck(level));
         }
     }
 
@@ -153,5 +187,57 @@ public record SkyLayer(
         }
 
         return 360.0F * (angleDayStart + skyAngle * this.speed);
+    }
+
+    public Identifier properties() {
+        return this.properties;
+    }
+
+    public Identifier texture() {
+        return this.texture;
+    }
+
+    public Biomes biomes() {
+        return this.biomes;
+    }
+
+    public Weather weather() {
+        return this.weather;
+    }
+
+    public List<Range> heights() {
+        return this.heights;
+    }
+
+    public Blend blend() {
+        return this.blend;
+    }
+
+    public Fade fade() {
+        return this.fade;
+    }
+
+    public Vector3fc axis() {
+        return this.axis;
+    }
+
+    public Loop loop() {
+        return this.loop;
+    }
+
+    public boolean rotate() {
+        return this.rotate;
+    }
+
+    public float speed() {
+        return this.speed;
+    }
+
+    public int transition() {
+        return this.transition;
+    }
+
+    public float currentAlpha() {
+        return this.alpha;
     }
 }

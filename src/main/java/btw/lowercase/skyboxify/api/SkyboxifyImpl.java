@@ -89,6 +89,7 @@ public final class SkyboxifyImpl implements SkyboxifyApi {
             final ConfigCategory.Builder category = ConfigCategory.createBuilder();
             category.name(title);
             category.option(option("enabled", defaults.enabled, () -> config.enabled, val -> config.enabled = val));
+            category.option(option("renderSky", defaults.renderSky, () -> config.renderSky, val -> config.renderSky = val));
             category.option(option("renderSunMoon", defaults.renderSunMoon, () -> config.renderSunMoon, val -> config.renderSunMoon = val));
             category.option(option("renderStars", defaults.renderStars, () -> config.renderStars, val -> config.renderStars = val));
             category.option(option("showOverworldForUnknownDimension", defaults.showOverworldForUnknownDimension, () -> config.showOverworldForUnknownDimension, val -> config.showOverworldForUnknownDimension = val));

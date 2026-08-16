@@ -161,6 +161,23 @@ public abstract class MixinLevelRenderer_SkyEvents {
             method = "lambda$addSkyPass$0",
             at = @At(
                     value = "INVOKE",
+                    target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSkyDisc(I)V"
+            )
+    )
+    private
+    //? >=1.21.11
+    static
+    boolean skyboxify$skyDiscEvent$top(
+            final net.minecraft.client.renderer.SkyRenderer instance,
+            final int skyColor
+    ) {
+        return !Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.Disc(SkyRenderEvent.Disc.Type.TOP)).isCancelled();
+    }
+
+    @WrapWithCondition(
+            method = "lambda$addSkyPass$0",
+            at = @At(
+                    value = "INVOKE",
                     //? >=1.21.11 {
                     target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunMoonAndStars(Lcom/mojang/blaze3d/vertex/PoseStack;FFFLnet/minecraft/world/level/MoonPhase;FF)V"
                     //?} else >=1.21.9 {
@@ -195,6 +212,20 @@ public abstract class MixinLevelRenderer_SkyEvents {
             //,final net.minecraft.client.renderer.FogParameters fog
     ) {
         return !Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.SunMoonStars(skyboxify$skyFeatureRenderer, Minecraft.getInstance().level, skyboxify$tickDelta)).isCancelled();
+    }
+
+    @WrapWithCondition(
+            method = "lambda$addSkyPass$0",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/renderer/SkyRenderer;renderDarkDisc()V"
+            )
+    )
+    private
+            //? >=1.21.11
+    static
+    boolean skyboxify$skyDiscEvent$bottom(final net.minecraft.client.renderer.SkyRenderer instance) {
+        return !Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.Disc(SkyRenderEvent.Disc.Type.BOTTOM)).isCancelled();
     }
 
     @WrapOperation(
