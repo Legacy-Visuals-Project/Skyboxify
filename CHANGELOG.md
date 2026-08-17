@@ -1,6 +1,5 @@
-# Release 3.3
+# Release 3.3.1
 
 ### General
 
-- Add new "Render Sky" setting, disables the blue sky.
-- Modify internal alpha handling to fix crash
+- Fix crash in <=1.21.10

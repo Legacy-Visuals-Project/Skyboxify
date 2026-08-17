@@ -161,7 +161,11 @@ public abstract class MixinLevelRenderer_SkyEvents {
             method = "lambda$addSkyPass$0",
             at = @At(
                     value = "INVOKE",
+                    //? >=1.21.11 {
                     target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSkyDisc(I)V"
+                    //? } else {
+                    /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSkyDisc(FFF)V"
+                    *///? }
             )
     )
     private
@@ -169,7 +173,11 @@ public abstract class MixinLevelRenderer_SkyEvents {
     static
     boolean skyboxify$skyDiscEvent$top(
             final net.minecraft.client.renderer.SkyRenderer instance,
+            //? >=1.21.11 {
             final int skyColor
+            //? } else {
+            /*final float red, final float green, final float blue
+            *///? }
     ) {
         return !Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.Disc(SkyRenderEvent.Disc.Type.TOP)).isCancelled();
     }
@@ -218,13 +226,21 @@ public abstract class MixinLevelRenderer_SkyEvents {
             method = "lambda$addSkyPass$0",
             at = @At(
                     value = "INVOKE",
+                    //? >=1.21.8 {
                     target = "Lnet/minecraft/client/renderer/SkyRenderer;renderDarkDisc()V"
+                    //? } else {
+                    /*target = "Lnet/minecraft/client/renderer/SkyRenderer;renderDarkDisc(Lcom/mojang/blaze3d/vertex/PoseStack;)V"
+                    *///? }
             )
     )
     private
-            //? >=1.21.11
+    //? >=1.21.11
     static
-    boolean skyboxify$skyDiscEvent$bottom(final net.minecraft.client.renderer.SkyRenderer instance) {
+    boolean skyboxify$skyDiscEvent$bottom(
+            final net.minecraft.client.renderer.SkyRenderer instance
+            //? <=1.21.4
+            /*, final PoseStack poseStack*/
+    ) {
         return !Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.Disc(SkyRenderEvent.Disc.Type.BOTTOM)).isCancelled();
     }
 
