@@ -24,8 +24,6 @@
 package btw.lowercase.skyboxify.screen.widget;
 
 import btw.lowercase.skyboxify.screen.widget.components.Box;
-import lombok.Getter;
-import lombok.Setter;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
@@ -33,15 +31,9 @@ import net.minecraft.util.ARGB;
 
 public class Text extends Gidget {
     private final Font font;
-    @Getter
     private Component text;
-    @Getter
-    @Setter
     private Alignment alignment;
-    @Setter
     private boolean shadow;
-    @Getter
-    @Setter
     private int color;
 
     public Text(
@@ -67,6 +59,30 @@ public class Text extends Gidget {
 
     public static Builder builder(final String text) {
         return new Builder(text);
+    }
+
+    public Component getText() {
+        return this.text;
+    }
+
+    public Alignment getAlignment() {
+        return this.alignment;
+    }
+
+    public void setAlignment(final Alignment alignment) {
+        this.alignment = alignment;
+    }
+
+    public void setShadow(final boolean shadow) {
+        this.shadow = shadow;
+    }
+
+    public int getColor() {
+        return this.color;
+    }
+
+    public void setColor(final int color) {
+        this.color = color;
     }
 
     @Override

@@ -23,9 +23,9 @@
 
 package btw.lowercase.skyboxify.skybox.renderer;
 
+import btw.lowercase.skyboxify.Skyboxify;
 import btw.lowercase.skyboxify.api.SkyboxifyImpl;
 import btw.lowercase.skyboxify.skybox.SkyPart;
-import btw.lowercase.skyboxify.skybox.SkyboxResourceHelper;
 import btw.lowercase.skyboxify.utils.BlendFunction;
 import btw.lowercase.skyboxify.utils.FilteringMode;
 import com.mojang.blaze3d.pipeline.RenderTarget;
@@ -35,7 +35,8 @@ import com.mojang.blaze3d.vertex.VertexBuffer;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.RenderStateShard;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.TriState;
 import org.joml.Vector4fc;
@@ -44,12 +45,9 @@ import java.util.Objects;
 import java.util.function.Function;
 
 public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submit> {
-    private static final ShaderProgram CUSTOM_SKYBOX_SHADER_PROGRAM = new ShaderProgram(SkyboxResourceHelper.CUSTOM_SKYBOX_LOCATION, DefaultVertexFormat.POSITION_TEX, ShaderDefines.EMPTY);
-    private static final RenderStateShard.ShaderStateShard SKYBOX_SHADER = new RenderStateShard.ShaderStateShard(CUSTOM_SKYBOX_SHADER_PROGRAM);
-
     private final Function<RenderData, RenderType> RENDER_TYPE = Util.memoize(renderData -> {
         final RenderType.CompositeState.CompositeStateBuilder builder = RenderType.CompositeState.builder();
-        builder.setShaderState(SKYBOX_SHADER);
+        builder.setShaderState(RenderStateShard.POSITION_TEX_SHADER);
         builder.setWriteMaskState(RenderStateShard.COLOR_WRITE);
         builder.setTextureState(new RenderStateShard.TextureStateShard(renderData.location, renderData.blur ? TriState.TRUE : TriState.FALSE, false));
         builder.setOutputState(new RenderStateShard.OutputStateShard("Dynamic Output Target", () -> Objects.requireNonNullElseGet(this.renderTarget, () -> Minecraft.getInstance().getMainRenderTarget()).bindWrite(false), () -> Minecraft.getInstance().getMainRenderTarget().bindWrite(false)));
@@ -66,7 +64,7 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
         }
 
         return RenderType.create(
-                "skyboxify_skybox",
+                Skyboxify.locationOrNull("skybox").toString(),
                 DefaultVertexFormat.POSITION_TEX, VertexFormat.Mode.QUADS,
                 DefaultVertexFormat.POSITION_TEX.getVertexSize() * SkyPart.COUNT * 4,
                 builder.createCompositeState(false)
@@ -79,7 +77,7 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
 
     @Override
     protected Submit createSubmit(final Pipeline pipeline, final Geometry geometry, final RenderUniforms uniforms, final ResourceLocation location) {
-        return new Submit(RENDER_TYPE.apply(new RenderData(location, pipeline.blendFunction(), SkyboxifyImpl.config().filteringMode == FilteringMode.LINEAR)), geometry, uniforms);
+        return new Submit(RENDER_TYPE.apply(new RenderData(location, pipeline.blendFunction(), SkyboxifyImpl.config().filteringMode.getValue() == FilteringMode.LINEAR)), geometry, uniforms);
     }
 
     @Override
@@ -111,9 +109,5 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
 
     protected record Submit(RenderType renderType, Geometry geometry,
                             RenderUniforms uniforms) implements FeatureRenderer.Submit {
-    }
-
-    static {
-        CoreShaders.getProgramsToPreload().add(CUSTOM_SKYBOX_SHADER_PROGRAM);
     }
 }

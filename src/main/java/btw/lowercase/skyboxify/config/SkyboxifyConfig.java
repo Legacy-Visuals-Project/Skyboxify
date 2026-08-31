@@ -23,28 +23,33 @@
 
 package btw.lowercase.skyboxify.config;
 
+import btw.lowercase.skyboxify.SkyboxifyInfo;
 import btw.lowercase.skyboxify.utils.FilteringMode;
-import dev.isxander.yacl3.config.v2.api.SerialEntry;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import org.jetbrains.annotations.Nullable;
+import org.visuals.legacy.lightconfig.lib.v1.Config;
+import org.visuals.legacy.lightconfig.lib.v1.field.BooleanConfigField;
+import org.visuals.legacy.lightconfig.lib.v1.field.EnumConfigField;
+import org.visuals.legacy.lightconfig.lib.v1.screen.ConfigScreenBuilder;
 
-public class SkyboxifyConfig {
-    @SerialEntry
-    public boolean enabled = true;
+public class SkyboxifyConfig extends Config {
+    public BooleanConfigField enabled = this.booleanFieldOf("enabled", true);
+    public BooleanConfigField renderSky = this.booleanFieldOf("renderSky", true);
+    public BooleanConfigField renderSunMoon = this.booleanFieldOf("renderSunMoon", true);
+    public BooleanConfigField renderStars = this.booleanFieldOf("renderStars", false);
+    public BooleanConfigField showOverworldForUnknownDimension = this.booleanFieldOf("showOverworldForUnknownDimension", true);
+    public EnumConfigField<FilteringMode> filteringMode = this.enumFieldOf("filteringMode", FilteringMode.NEAREST);
+    public BooleanConfigField debug = this.booleanFieldOf("debug", false);
 
-    @SerialEntry
-    public boolean renderSky = true;
+    public SkyboxifyConfig() {
+        super(SkyboxifyInfo.MOD_ID);
+    }
 
-    @SerialEntry
-    public boolean renderSunMoon = true;
-
-    @SerialEntry
-    public boolean renderStars = false;
-
-    @SerialEntry
-    public boolean showOverworldForUnknownDimension = true;
-
-    @SerialEntry
-    public FilteringMode filteringMode = FilteringMode.NEAREST;
-
-    @SerialEntry
-    public boolean debug = false;
+    @Override
+    public Screen getConfigScreen(@Nullable final Screen parent) {
+        final ConfigScreenBuilder builder = ConfigScreenBuilder.builder(this);
+        builder.setTitle(Component.translatable("options.skyboxify.title"));
+        return builder.build(parent);
+    }
 }

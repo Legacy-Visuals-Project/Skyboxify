@@ -133,7 +133,7 @@ public final class SkyboxParser {
 
 		final ResourceLocation sourceTextureResourceLocation = sourceResult.getOrThrow();
 		try {
-			if (!SkyboxifyImpl.config().debug) {
+			if (!SkyboxifyImpl.config().debug.isEnabled()) {
 				final IoSupplier<InputStream> sourceTextureStream = packResources.getResource(PackType.CLIENT_RESOURCES, sourceTextureResourceLocation);
 				if (sourceTextureStream == null) {
 					LOGGER.error("Failed to load texture '{}', missing or corrupt image?", sourceTextureResourceLocation);
@@ -144,7 +144,7 @@ public final class SkyboxParser {
 			}
 		} catch (final Exception exception) {
 			LOGGER.error("Failed to load texture '{}'", sourceTextureResourceLocation);
-			if (SkyboxifyImpl.config().debug) {
+			if (SkyboxifyImpl.config().debug.isEnabled()) {
 				exception.printStackTrace();
 			}
 		}

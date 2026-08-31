@@ -8,11 +8,18 @@
 	"options.skyboxify.renderSunMoon.tooltip": "Enable/disable rendering of the sun and moon.",
 	"options.skyboxify.renderStars": "Render Stars",
 	"options.skyboxify.renderStars.tooltip": "Force enable rendering of stars when a Skybox resource pack is enabled & active.",
-	"options.skyboxify.showOverworldForUnknownDimension": "Show Overworld In Unknown Dimensions",
+	"options.skyboxify.showOverworldForUnknownDimension": "Fix Unknown Dimensions",
 	"options.skyboxify.showOverworldForUnknownDimension.tooltip": "Will show the overworld skyboxes in unknown dimensions. Will not show in nether/end though unless a skybox defines it.",
 	"options.skyboxify.filteringMode": "Filter Mode",
 	"options.skyboxify.filteringMode.tooltip": "Change which filtering mode the skybox should render with.",
 	"options.skyboxify.debug": "Debug Mode",
 	"options.skyboxify.debug.tooltip": "Enable debug logging & other debugging aspects.",
+
+	"options.skyboxify.filteringMode.NEAREST": "NEAREST",
+	"options.skyboxify.filteringMode.LINEAR": "LINEAR",
+
+	"options.template": "%s: %s",
+	"options.on": "ON",
+	"options.off": "OFF",
 	"options.reset": "Reset"
 }

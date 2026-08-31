@@ -35,7 +35,6 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.serialization.JsonOps;
-import lombok.SneakyThrows;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.ChatFormatting;
@@ -48,89 +47,100 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class SkyboxifyCommand extends LiteralArgumentBuilder<FabricClientCommandSource> implements Command<FabricClientCommandSource> {
-	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
-	public SkyboxifyCommand() {
-		super("skyboxify");
-		executes(this)
-				.then(ClientCommandManager.literal("debug").executes(new Debug()))
-				.then(ClientCommandManager.literal("dump").executes(new Dump()));
-	}
+    public SkyboxifyCommand() {
+        super("skyboxify");
+        executes(this)
+                .then(ClientCommandManager.literal("debug").executes(new Debug()))
+                .then(ClientCommandManager.literal("dump").executes(new Dump()));
+    }
 
-	@Override
-	public int run(final CommandContext<FabricClientCommandSource> context) {
-		final Minecraft minecraft = Minecraft.getInstance();
-		minecraft.schedule(() -> minecraft.setScreen(SkyboxifyImpl.getInstance().getConfigScreen(minecraft.screen)));
-		return Command.SINGLE_SUCCESS;
-	}
+    @Override
+    public int run(final CommandContext<FabricClientCommandSource> context) {
+        final Minecraft minecraft = Minecraft.getInstance();
+        minecraft.schedule(() -> minecraft.setScreen(SkyboxifyImpl.getInstance().getConfigScreen(minecraft.screen)));
+        return Command.SINGLE_SUCCESS;
+    }
 
-	private static class Debug implements Command<FabricClientCommandSource> {
-		@Override
-		public int run(final CommandContext<FabricClientCommandSource> context) {
-			final Minecraft minecraft = Minecraft.getInstance();
-			minecraft.schedule(() -> minecraft.setScreen(new SkyboxListScreen(minecraft.screen, SkyboxifyImpl.skyboxManager().getLoadedSkies())));
-			return Command.SINGLE_SUCCESS;
-		}
-	}
+    private static class Debug implements Command<FabricClientCommandSource> {
+        @Override
+        public int run(final CommandContext<FabricClientCommandSource> context) {
+            final Minecraft minecraft = Minecraft.getInstance();
+            minecraft.schedule(() -> minecraft.setScreen(new SkyboxListScreen(minecraft.screen, SkyboxifyImpl.skyboxManager().getLoadedSkies())));
+            return Command.SINGLE_SUCCESS;
+        }
+    }
 
-	private static class Dump implements Command<FabricClientCommandSource> {
-		@SneakyThrows
-		@Override
-		public int run(final CommandContext<FabricClientCommandSource> context) {
-			if (!Files.isDirectory(SkyboxifyInfo.DEBUG_FOLDER)) {
-				Files.delete(SkyboxifyInfo.DEBUG_FOLDER);
-			}
+    private static class Dump implements Command<FabricClientCommandSource> {
+        @Override
+        public int run(final CommandContext<FabricClientCommandSource> context) {
+            if (!Files.isDirectory(SkyboxifyInfo.DEBUG_FOLDER)) {
+                try {
+                    Files.delete(SkyboxifyInfo.DEBUG_FOLDER);
+                } catch (final IOException ignored) {
+                }
+            }
 
-			if (!Files.exists(SkyboxifyInfo.DEBUG_FOLDER)) {
-				Files.createDirectories(SkyboxifyInfo.DEBUG_FOLDER);
-			}
+            if (!Files.exists(SkyboxifyInfo.DEBUG_FOLDER)) {
+                try {
+                    Files.createDirectories(SkyboxifyInfo.DEBUG_FOLDER);
+                } catch (final IOException ignored) {
+                }
+            }
 
-			for (final Skybox skybox : SkyboxifyImpl.skyboxManager().getLoadedSkies()) {
-				final Path packFolder = SkyboxifyInfo.DEBUG_FOLDER.resolve(skybox.packName().replaceAll("/", "+").replaceAll(" ", "_"));
-				if (!Files.exists(packFolder)) {
-					Files.createDirectory(packFolder);
-				}
+            for (final Skybox skybox : SkyboxifyImpl.skyboxManager().getLoadedSkies()) {
+                final Path packFolder = SkyboxifyInfo.DEBUG_FOLDER.resolve(skybox.packName().replaceAll("/", "+").replaceAll(" ", "_"));
+                if (!Files.exists(packFolder)) {
+                    try {
+                        Files.createDirectory(packFolder);
+                    } catch (final IOException ignored) {
+                    }
+                }
 
-				final ResourceLocation dimension = skybox.dimension().location();
-				final Path dimensionFolder = packFolder.resolve(dimension.getNamespace()).resolve(dimension.getPath());
-				if (!Files.exists(dimensionFolder)) {
-					Files.createDirectories(dimensionFolder);
-				}
+                final ResourceLocation dimension = skybox.dimension().location();
+                final Path dimensionFolder = packFolder.resolve(dimension.getNamespace()).resolve(dimension.getPath());
+                if (!Files.exists(dimensionFolder)) {
+                    try {
+                        Files.createDirectories(dimensionFolder);
+                    } catch (final IOException ignored) {
+                    }
+                }
 
-				for (final SkyLayer layer : skybox.layers()) {
-					try {
-						String id = Path.of(layer.properties().getPath()).getFileName().toString();
-						if (id.endsWith(".properties")) {
-							id = id.substring(0, id.length() - 11);
-						}
+                for (final SkyLayer layer : skybox.layers()) {
+                    try {
+                        String id = Path.of(layer.properties().getPath()).getFileName().toString();
+                        if (id.endsWith(".properties")) {
+                            id = id.substring(0, id.length() - 11);
+                        }
 
-						final JsonElement element = SkyLayer.CODEC.encode(layer, JsonOps.INSTANCE, null).getOrThrow((message) -> {
-							error(context, message);
-							return null;
-						});
-						if (element == null) {
-							error(context, "Failed to encode layer \"" + id + "\"");
-							continue;
-						}
+                        final JsonElement element = SkyLayer.CODEC.encode(layer, JsonOps.INSTANCE, null).getOrThrow((message) -> {
+                            error(context, message);
+                            return null;
+                        });
+                        if (element == null) {
+                            error(context, "Failed to encode layer \"" + id + "\"");
+                            continue;
+                        }
 
-						Files.writeString(dimensionFolder.resolve(id + ".json"), GSON.toJson(element));
-					} catch (final IOException exception) {
-						error(context, "Failed to encode layer " + layer.properties());
-						error(context, exception.toString());
-					}
-				}
-			}
+                        Files.writeString(dimensionFolder.resolve(id + ".json"), GSON.toJson(element));
+                    } catch (final IOException exception) {
+                        error(context, "Failed to encode layer " + layer.properties());
+                        error(context, exception.toString());
+                    }
+                }
+            }
 
-			success(context, "Active Skybox's have been dumped to " + SkyboxifyInfo.DEBUG_FOLDER);
-			return Command.SINGLE_SUCCESS;
-		}
-	}
+            success(context, "Active Skybox's have been dumped to " + SkyboxifyInfo.DEBUG_FOLDER);
+            return Command.SINGLE_SUCCESS;
+        }
+    }
 
-	private static void error(final CommandContext<FabricClientCommandSource> context, final String message) {
-		context.getSource().sendFeedback(Component.literal(message).withStyle(ChatFormatting.RED));
-	}
+    private static void error(final CommandContext<FabricClientCommandSource> context, final String message) {
+        context.getSource().sendFeedback(Component.literal(message).withStyle(ChatFormatting.RED));
+    }
 
-	private static void success(final CommandContext<FabricClientCommandSource> context, final String message) {
-		context.getSource().sendFeedback(Component.literal(message).withStyle(ChatFormatting.GREEN));
-	}
+    private static void success(final CommandContext<FabricClientCommandSource> context, final String message) {
+        context.getSource().sendFeedback(Component.literal(message).withStyle(ChatFormatting.GREEN));
+    }
 }

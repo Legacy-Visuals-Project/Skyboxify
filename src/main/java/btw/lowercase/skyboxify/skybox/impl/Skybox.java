@@ -92,7 +92,7 @@ public class Skybox extends AbstractSkybox {
 
     @Override
     public void tick(final ClientLevel level) {
-        final boolean allowOtherDimensions = SkyboxifyImpl.config().showOverworldForUnknownDimension &&
+        final boolean allowOtherDimensions = SkyboxifyImpl.config().showOverworldForUnknownDimension.isEnabled() &&
                 this.dimension.equals(Level.OVERWORLD) &&
                 !level.dimension().equals(Level.NETHER) &&
                 !level.dimension().equals(Level.END);

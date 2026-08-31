@@ -37,16 +37,16 @@ import org.spongepowered.asm.mixin.injection.At;
 public abstract class MixinSkyRenderer_CelestialEvents {
     @WrapWithCondition(method = "renderSunMoonAndStars", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSun(FLnet/minecraft/client/renderer/MultiBufferSource;Lcom/mojang/blaze3d/vertex/PoseStack;)V"))
     private boolean skyboxify$toggleSun(final SkyRenderer instance, final float rainBrightness, final MultiBufferSource multiBufferSource, final PoseStack poseStack) {
-        return !Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.Celestial(SkyRenderEvent.Celestial.Type.SUN)).isCancelled();
+        return !Skyboxify.eventManager().dispatch(SkyRenderEvent.sun()).isCancelled();
     }
 
     @WrapWithCondition(method = "renderSunMoonAndStars", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SkyRenderer;renderMoon(IFLnet/minecraft/client/renderer/MultiBufferSource;Lcom/mojang/blaze3d/vertex/PoseStack;)V"))
     private boolean skyboxify$toggleMoon(final SkyRenderer instance, final int moonPhase, final float rainBrightness, final MultiBufferSource multiBufferSource, final PoseStack poseStack) {
-        return !Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.Celestial(SkyRenderEvent.Celestial.Type.MOON)).isCancelled();
+        return !Skyboxify.eventManager().dispatch(SkyRenderEvent.moon()).isCancelled();
     }
 
     @WrapWithCondition(method = "renderSunMoonAndStars", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SkyRenderer;renderStars(Lnet/minecraft/client/renderer/FogParameters;FLcom/mojang/blaze3d/vertex/PoseStack;)V"))
     private boolean skyboxify$toggleStars(final SkyRenderer instance, final FogParameters fog, final float starBrightness, final PoseStack poseStack) {
-        return !Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.Celestial(SkyRenderEvent.Celestial.Type.STARS)).isCancelled();
+        return !Skyboxify.eventManager().dispatch(SkyRenderEvent.stars()).isCancelled();
     }
 }

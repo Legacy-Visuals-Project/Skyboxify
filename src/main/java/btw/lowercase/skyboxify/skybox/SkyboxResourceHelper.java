@@ -103,7 +103,7 @@ public class SkyboxResourceHelper implements IdentifiableResourceReloadListener 
 
                 Pattern skyPattern = OPTIFINE_SKY_PATTERN;
                 if (optiFineSkies.isEmpty()) {
-                    if (SkyboxifyImpl.config().debug) {
+                    if (SkyboxifyImpl.config().debug.isEnabled()) {
                         LOGGER.info("Couldn't find any skies inside \"{}\" under \"optifine\", searching for skies under \"mcpatcher\" instead...", pack.packId());
                     }
 
@@ -113,7 +113,7 @@ public class SkyboxResourceHelper implements IdentifiableResourceReloadListener 
                 final List<ResourceLocation> skies = (skyPattern == OPTIFINE_SKY_PATTERN ? optiFineSkies : mcPatcherSkies);
                 if (!skies.isEmpty()) {
                     final int count = this.parseSkyboxesInPack(skyboxManager, pack, skies, skyPattern);
-                    if (count > 0 && SkyboxifyImpl.config().debug) {
+                    if (count > 0 && SkyboxifyImpl.config().debug.isEnabled()) {
                         LOGGER.info("Loaded {} {} from \"{}\"!", count, (count == 1 ? "skies" : "sky"), pack.packId());
                     }
                 }
@@ -138,7 +138,7 @@ public class SkyboxResourceHelper implements IdentifiableResourceReloadListener 
 
             if (name.equals("moon_phases") || name.equals("sun")) {
                 // TODO/NOTE: Support moon/sun? (apparently doesn't even work in OptiFine)
-                if (SkyboxifyImpl.config().debug) {
+                if (SkyboxifyImpl.config().debug.isEnabled()) {
                     LOGGER.warn("Skipping {}, moon_phases/sun aren't currently supported!", id);
                 }
 
@@ -174,7 +174,7 @@ public class SkyboxResourceHelper implements IdentifiableResourceReloadListener 
                 final int dimensionId = Integer.parseInt(entry.getKey().replace("world", ""));
                 final ResourceLocation dimension = SkyboxifyImpl.getInstance().getModernDimension(dimensionId);
                 if (dimension == null) {
-                    if (SkyboxifyImpl.config().debug) {
+                    if (SkyboxifyImpl.config().debug.isEnabled()) {
                         LOGGER.warn("Tried to load Skybox with legacy dimension properties {} but no modern dimension identifier mapping was found, skipping!", dimensionId);
                     }
 

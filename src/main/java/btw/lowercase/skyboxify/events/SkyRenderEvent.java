@@ -24,49 +24,56 @@
 package btw.lowercase.skyboxify.events;
 
 import btw.lowercase.skyboxify.skybox.renderer.SkyFeatureRenderer;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.MultiBufferSource;
+import org.visuals.legacy.lightconfig.lib.v1.events.CancellableEvent;
+import org.visuals.legacy.lightconfig.lib.v1.events.Event;
 
 public class SkyRenderEvent {
     public static final class EndSky {
-        @RequiredArgsConstructor
-        public static final class After implements Event {
-            @Getter
-            private final SkyFeatureRenderer skyFeatureRenderer;
-
-            @Getter
-            private final ClientLevel level;
+        public record After(SkyFeatureRenderer skyFeatureRenderer, ClientLevel level) implements Event {
         }
     }
 
-    @RequiredArgsConstructor
     public static final class SunriseSunset extends CancellableEvent {
-        @RequiredArgsConstructor
-        public static class After implements Event {
-            //? >=1.21.4 <1.21.9 {
-			@Getter
-			private final net.minecraft.client.renderer.MultiBufferSource.BufferSource bufferSource;
-			//?}
+        public record After(MultiBufferSource.BufferSource bufferSource) implements Event {
         }
     }
 
-    @RequiredArgsConstructor
     public static final class SunMoonStars extends CancellableEvent {
-        @Getter
         private final SkyFeatureRenderer skyFeatureRenderer;
-
-        @Getter
         private final ClientLevel level;
-
-        @Getter
         private final float tickDelta;
+
+        public SunMoonStars(final SkyFeatureRenderer skyFeatureRenderer, final ClientLevel level, final float tickDelta) {
+            this.skyFeatureRenderer = skyFeatureRenderer;
+            this.level = level;
+            this.tickDelta = tickDelta;
+        }
+
+        public SkyFeatureRenderer skyFeatureRenderer() {
+            return this.skyFeatureRenderer;
+        }
+
+        public ClientLevel level() {
+            return this.level;
+        }
+
+        public float tickDelta() {
+            return this.tickDelta;
+        }
     }
 
-    @RequiredArgsConstructor
     public static final class Celestial extends CancellableEvent {
-        @Getter
         private final Type type;
+
+        public Celestial(final Type type) {
+            this.type = type;
+        }
+
+        public Type getType() {
+            return this.type;
+        }
 
         public enum Type {
             SUN,
@@ -75,14 +82,40 @@ public class SkyRenderEvent {
         }
     }
 
-    @RequiredArgsConstructor
+    public static Celestial sun() {
+        return new Celestial(Celestial.Type.SUN);
+    }
+
+    public static Celestial moon() {
+        return new Celestial(Celestial.Type.MOON);
+    }
+
+    public static Celestial stars() {
+        return new Celestial(Celestial.Type.STARS);
+    }
+
     public static final class Disc extends CancellableEvent {
-        @Getter
         private final Type type;
+
+        public Disc(final Type type) {
+            this.type = type;
+        }
+
+        public Type getType() {
+            return this.type;
+        }
 
         public enum Type {
             TOP,
             BOTTOM
         }
+    }
+
+    public static Disc topDisc() {
+        return new Disc(Disc.Type.TOP);
+    }
+
+    public static Disc bottomDisc() {
+        return new Disc(Disc.Type.BOTTOM);
     }
 }

@@ -1,9 +1,10 @@
 /**
- * Skyboxify
- * A skybox mod that allows you to use OptiFine skies in Fabric 1.21+
+ * LightConfig
+ * A config library.
  * <p>
- * Copyright (C) 2025-2026 lowercasebtw
- * Copyright (C) 2025-2026 Contributors to the project retain their copyright
+ * Copyright (C) 2025 lowercasebtw
+ * Copyright (C) 2025 mixces
+ * Copyright (C) 2025 Contributors to the project retain their copyright
  * <p>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +22,7 @@
  * "MINECRAFT" LINKING EXCEPTION TO THE GPL
  */
 
-package btw.lowercase.skyboxify.events;
+package org.visuals.legacy.lightconfig.lib.v1.events;
 
 import java.util.List;
 import java.util.Map;
@@ -32,11 +33,11 @@ import java.util.function.Consumer;
 public final class EventManager {
     private final Map<Class<?>, List<Consumer<? super Event>>> listeners = new ConcurrentHashMap<>();
 
-    public <T extends Event> void listen(Class<T> eventClass, Consumer<? super T> consumer) {
+    public <T extends Event> void listen(final Class<T> eventClass, final Consumer<? super T> consumer) {
         listeners.computeIfAbsent(eventClass, __ -> new CopyOnWriteArrayList<>()).add((Consumer<? super Event>) consumer);
     }
 
-    public <T extends Event> T dispatch(T event) {
+    public <T extends Event> T dispatch(final T event) {
         final Class<?> eventClass = event.getClass();
         for (var entry : listeners.entrySet()) {
             if (!entry.getKey().isAssignableFrom(eventClass)) {

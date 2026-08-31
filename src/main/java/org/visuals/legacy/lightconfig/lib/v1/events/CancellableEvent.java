@@ -1,9 +1,10 @@
 /**
- * Skyboxify
- * A skybox mod that allows you to use OptiFine skies in Fabric 1.21+
+ * LightConfig
+ * A config library.
  * <p>
- * Copyright (C) 2025-2026 lowercasebtw
- * Copyright (C) 2025-2026 Contributors to the project retain their copyright
+ * Copyright (C) 2025 lowercasebtw
+ * Copyright (C) 2025 mixces
+ * Copyright (C) 2025 Contributors to the project retain their copyright
  * <p>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +22,16 @@
  * "MINECRAFT" LINKING EXCEPTION TO THE GPL
  */
 
-package btw.lowercase.skyboxify.events;
+package org.visuals.legacy.lightconfig.lib.v1.events;
 
-public interface Event {
+public abstract class CancellableEvent implements Event {
+    private boolean cancelled = false;
+
+    public boolean isCancelled() {
+        return this.cancelled;
+    }
+
+    public void setCancelled(boolean cancelled) {
+        this.cancelled = cancelled;
+    }
 }

@@ -25,35 +25,19 @@ package btw.lowercase.skyboxify.api;
 
 import btw.lowercase.skyboxify.config.SkyboxifyConfig;
 import btw.lowercase.skyboxify.skybox.SkyboxManager;
-import dev.isxander.yacl3.api.ConfigCategory;
-import dev.isxander.yacl3.api.Option;
-import dev.isxander.yacl3.api.OptionDescription;
-import dev.isxander.yacl3.api.YetAnotherConfigLib;
-import dev.isxander.yacl3.api.controller.EnumControllerBuilder;
-import dev.isxander.yacl3.config.v2.api.ConfigClassHandler;
-import dev.isxander.yacl3.config.v2.api.serializer.GsonConfigSerializerBuilder;
-import dev.isxander.yacl3.impl.controller.TickBoxControllerBuilderImpl;
-import dev.isxander.yacl3.platform.YACLPlatform;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public final class SkyboxifyImpl implements SkyboxifyApi {
     private static final SkyboxifyImpl INSTANCE = new SkyboxifyImpl();
 
     private final SkyboxManager skyboxManager = new SkyboxManager(this);
     private final Map<Integer, ResourceLocation> dimensionMapping = new Int2ObjectArrayMap<>();
-    private final ConfigClassHandler<SkyboxifyConfig> config = ConfigClassHandler.createBuilder(SkyboxifyConfig.class)
-            .serializer((config) -> GsonConfigSerializerBuilder.create(config)
-                    .setPath(YACLPlatform.getConfigDir().resolve("skyboxify.json"))
-                    .build()
-            ).build();
+    private final SkyboxifyConfig config = new SkyboxifyConfig();
 
     private SkyboxifyImpl() {
         this.registerDimensionMapping(-1, ResourceLocation.withDefaultNamespace("the_nether"));
@@ -73,57 +57,12 @@ public final class SkyboxifyImpl implements SkyboxifyApi {
 
     @Override
     public SkyboxifyConfig getConfig() {
-        return this.config.instance();
-    }
-
-    @Override
-    public ConfigClassHandler<SkyboxifyConfig> getConfigHandler() {
         return this.config;
     }
 
     @Override
     public Screen getConfigScreen(final Screen parent) {
-        return YetAnotherConfigLib.create(this.config, (defaults, config, builder) -> {
-            final Component title = Component.translatable("options.skyboxify.title");
-            builder.title(title);
-
-            final ConfigCategory.Builder category = ConfigCategory.createBuilder();
-            category.name(title);
-            category.option(option("enabled", defaults.enabled, () -> config.enabled, val -> config.enabled = val));
-            category.option(option("renderSky", defaults.renderSky, () -> config.renderSky, val -> config.renderSky = val));
-            category.option(option("renderSunMoon", defaults.renderSunMoon, () -> config.renderSunMoon, val -> config.renderSunMoon = val));
-            category.option(option("renderStars", defaults.renderStars, () -> config.renderStars, val -> config.renderStars = val));
-            category.option(option("showOverworldForUnknownDimension", defaults.showOverworldForUnknownDimension, () -> config.showOverworldForUnknownDimension, val -> config.showOverworldForUnknownDimension = val));
-            category.option(option("filteringMode", defaults.filteringMode, () -> config.filteringMode, val -> config.filteringMode = val));
-            category.option(option("debug", defaults.debug, () -> config.debug, val -> config.debug = val));
-            builder.category(category.build());
-
-            return builder;
-        }).generateScreen(parent);
-    }
-
-    private Option<Boolean> option(final String name, final boolean defaultValue, final Supplier<Boolean> getter, final Consumer<Boolean> setter) {
-        final Option.Builder<Boolean> builder = setupOption(name, defaultValue, getter, setter);
-        builder.controller(TickBoxControllerBuilderImpl::new);
-        return builder.build();
-    }
-
-    private <T extends Enum<T>> Option<T> option(final String name, final T defaultValue, final Supplier<T> getter, final Consumer<T> setter) {
-        final Option.Builder<T> builder = setupOption(name, defaultValue, getter, setter);
-        builder.controller(option -> EnumControllerBuilder.create(option).enumClass((Class<T>) defaultValue.getClass()));
-        return builder.build();
-    }
-
-    private <T> Option.Builder<T> setupOption(final String name, final T defaultValue, final Supplier<T> getter, final Consumer<T> setter) {
-        final String key = "options.skyboxify." + name;
-        final String tooltip = key + ".tooltip";
-
-        final Option.Builder<T> builder = Option.createBuilder();
-        builder.name(Component.translatable(key));
-        builder.description(OptionDescription.of(Component.translatable(tooltip)));
-        builder.binding(defaultValue, getter, setter);
-
-        return builder;
+        return this.config.getConfigScreen(parent);
     }
 
     public static SkyboxManager skyboxManager() {

@@ -30,7 +30,6 @@ class Dependencies {
     val fabricLoaderVersion = property("deps.fabric_loader_version") as String?
     val fabricApiVersion = property("deps.fabric_api_version") as String?
     val devAuthVersion = property("deps.devauth_version") as String?
-    val lombokVersion = property("deps.lombok_version") as String?
 }
 
 val mod = ModData()
@@ -77,9 +76,7 @@ repositories {
     maven("https://maven.parchmentmc.org") // Parchment
     maven("https://maven.nucleoid.xyz/") // Placeholder API - required by Mod Menu
     maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1") // DevAuth
-    maven("https://maven.bawnorton.com/releases") // MixinSquared
     maven("https://api.modrinth.com/maven") // Modrinth
-    maven("https://maven.isxander.dev/releases") // YACL
     maven("https://maven.teamresourceful.com/repository/maven-public/") {
         content { includeGroup("com.terraformersmc") } // Mod Menu
     }
@@ -96,18 +93,12 @@ dependencies {
         }
     })
 
-    compileOnly("org.projectlombok:lombok:${deps.lombokVersion}")
-    annotationProcessor("org.projectlombok:lombok:${deps.lombokVersion}")
     modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:${deps.devAuthVersion}")
     if (loader.isFabricLike) {
         modImplementation("net.fabricmc:fabric-loader:${deps.fabricLoaderVersion}")
         modImplementation("net.fabricmc.fabric-api:fabric-api:${deps.fabricApiVersion}")
         optionalProp("deps.modmenu_version") { prop ->
             modImplementation("com.terraformersmc:modmenu:${prop}")
-        }
-
-        optionalProp("deps.yacl_version") { prop ->
-            modImplementation("dev.isxander:yet-another-config-lib:$prop")
         }
     }
 }
@@ -143,8 +134,6 @@ publishMods {
             projectId = modrinthId
             accessToken = findProperty("modrinth.token").toString()
             minecraftVersions.addAll(mod.minecraftVersionRange.split(' '))
-
-            requires("yacl")
             if (loader.isFabricLike) {
                 requires("fabric-api")
                 optional("modmenu")
@@ -159,8 +148,6 @@ publishMods {
             accessToken = findProperty("curseforge.token").toString()
             minecraftVersions.addAll(mod.minecraftVersionRange.split(' '))
             client = true
-
-            requires("yacl")
             if (loader.isFabricLike) {
                 requires("fabric-api")
                 optional("modmenu")

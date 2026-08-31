@@ -25,14 +25,11 @@ package btw.lowercase.skyboxify.api;
 
 import btw.lowercase.skyboxify.config.SkyboxifyConfig;
 import btw.lowercase.skyboxify.skybox.SkyboxManager;
-import dev.isxander.yacl3.config.v2.api.ConfigClassHandler;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
 
 public interface SkyboxifyApi {
     SkyboxifyConfig getConfig();
-
-    ConfigClassHandler<SkyboxifyConfig> getConfigHandler();
 
     Screen getConfigScreen(final Screen parent);
 
