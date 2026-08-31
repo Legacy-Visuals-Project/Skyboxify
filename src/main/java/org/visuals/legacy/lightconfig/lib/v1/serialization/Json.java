@@ -24,13 +24,16 @@
 
 package org.visuals.legacy.lightconfig.lib.v1.serialization;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import org.jetbrains.annotations.Nullable;
 
 public class Json {
     protected static final Gson GSON = new GsonBuilder()
             .setPrettyPrinting()
-            .setStrictness(Strictness.LENIENT)
+            .setLenient()
             .create();
 
     public static class Serializer extends ConfigSerializer<JsonElement> {

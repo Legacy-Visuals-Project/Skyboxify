@@ -6,8 +6,7 @@
 	"client": [
 		"MixinGameRenderer_NetherSkies",
 		"MixinLevelRenderer_SkyEvents",
-		"MixinMinecraft_CloseBuffers",
-		"MixinSkyRenderer_CelestialEvents"
+		"MixinMinecraft_CloseBuffers"
 	],
 	"injectors": {
 		"defaultRequire": 1

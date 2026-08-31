@@ -79,22 +79,16 @@ public final class Skyboxify {
             }
         });
 
-        globalEventManager.listen(SkyRenderEvent.SunriseSunset.After.class, event -> {
-            if (SkyboxifyImpl.skyboxManager().isEnabled()) {
-                event.bufferSource().endBatch(); // Fix horizon rendering over the skybox
-            }
-        });
-
         globalEventManager.listen(SkyRenderEvent.EndSky.After.class, event -> {
             if (SkyboxifyImpl.skyboxManager().isEnabled()) {
-                renderSkyboxes(event.skyFeatureRenderer(), event.level(), 0.0F);
+                renderSkyboxes(event.skyFeatureRenderer(), event.level(), event.skyViewMatrix(), 0.0F);
             }
         });
 
         globalEventManager.listen(SkyRenderEvent.SunMoonStars.class, event -> {
             final ClientLevel level = event.level();
             if (SkyboxifyImpl.skyboxManager().isEnabled()) {
-                renderSkyboxes(event.skyFeatureRenderer(), level, event.tickDelta());
+                renderSkyboxes(event.skyFeatureRenderer(), level, event.skyViewMatrix(), event.tickDelta());
                 if (level.dimension().equals(Level.NETHER)) {
                     event.setCancelled(true);
                 }
@@ -102,8 +96,9 @@ public final class Skyboxify {
         });
     }
 
-    private static void renderSkyboxes(final SkyFeatureRenderer skyFeatureRenderer, final ClientLevel level, final float tickDelta) {
+    private static void renderSkyboxes(final SkyFeatureRenderer skyFeatureRenderer, final ClientLevel level, final Matrix4f skyViewMatrix, final float tickDelta) {
         final Matrix4f modelViewMatrix = new Matrix4f(RenderSystem.getModelViewStack());
+        modelViewMatrix.mul(skyViewMatrix);
         modelViewMatrix.rotate(Axis.YP.rotationDegrees(-90.0F));
         for (final Skybox skybox : SkyboxifyImpl.skyboxManager().getActiveSkies()) {
             skybox.extractRenderState(skyFeatureRenderer, level, modelViewMatrix, tickDelta);

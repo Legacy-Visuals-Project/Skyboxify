@@ -28,43 +28,43 @@ import btw.lowercase.skyboxify.screen.widget.ScrollableList;
 import btw.lowercase.skyboxify.screen.widget.SimpleButton;
 import btw.lowercase.skyboxify.screen.widget.Text;
 import btw.lowercase.skyboxify.skybox.impl.Skybox;
+import btw.lowercase.skyboxify.utils.ARGB;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.ARGB;
 import net.minecraft.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class SkyboxListScreen extends DebugScreen {
-	private final List<Skybox> skyboxes;
+    private final List<Skybox> skyboxes;
 
-	public SkyboxListScreen(final Screen parent, final List<Skybox> skyboxes) {
-		super(Component.literal(skyboxes.isEmpty() ? "No skies enabled..." : skyboxes.size() + " Total Skyboxes"), parent);
-		this.skyboxes = skyboxes;
-	}
+    public SkyboxListScreen(final Screen parent, final List<Skybox> skyboxes) {
+        super(Component.literal(skyboxes.isEmpty() ? "No skies enabled..." : skyboxes.size() + " Total Skyboxes"), parent);
+        this.skyboxes = skyboxes;
+    }
 
-	@Override
-	protected void init() {
-		super.init();
+    @Override
+    protected void init() {
+        super.init();
 
-		this.gidgets.add(Text.builder(this.title.copy())
-				.position(this.width / 2, 12)
-				.centered()
-				.build(this.font));
+        this.gidgets.add(Text.builder(this.title.copy())
+                .position(this.width / 2, 12)
+                .centered()
+                .build(this.font));
 
-		final List<Gidget> gidgets = new ArrayList<>();
-		for (final Skybox skybox : this.skyboxes) {
-			final Component name = Component.literal(StringUtil.stripColor(skybox.packName())).withColor(skybox.isActive() ? ARGB.color(155, 0x00FF00) : ARGB.color(155, 0xFF0000));
-			gidgets.add(SimpleButton.builder(name, button -> this.minecraft.setScreen(new SkyLayerListScreen(this, skybox))).build());
-		}
+        final List<Gidget> gidgets = new ArrayList<>();
+        for (final Skybox skybox : this.skyboxes) {
+            final Component name = Component.literal(StringUtil.stripColor(skybox.packName())).withColor(skybox.isActive() ? ARGB.color(155, 0x00FF00) : ARGB.color(155, 0xFF0000));
+            gidgets.add(SimpleButton.builder(name, button -> this.minecraft.setScreen(new SkyLayerListScreen(this, skybox))).build());
+        }
 
-		final int pad = 20 + this.font.lineHeight;
-		this.gidgets.add(new ScrollableList(gidgets, 0, pad, this.width, this.height - pad - SimpleButton.DEFAULT_HEIGHT - 8));
+        final int pad = 20 + this.font.lineHeight;
+        this.gidgets.add(new ScrollableList(gidgets, 0, pad, this.width, this.height - pad - SimpleButton.DEFAULT_HEIGHT - 8));
 
-		this.gidgets.add(SimpleButton.builder(CommonComponents.GUI_BACK, button -> this.onClose())
-				.position((this.width / 2) - (SimpleButton.DEFAULT_WIDTH / 2), this.height - SimpleButton.DEFAULT_HEIGHT - 4)
-				.build());
-	}
+        this.gidgets.add(SimpleButton.builder(CommonComponents.GUI_BACK, button -> this.onClose())
+                .position((this.width / 2) - (SimpleButton.DEFAULT_WIDTH / 2), this.height - SimpleButton.DEFAULT_HEIGHT - 4)
+                .build());
+    }
 }

@@ -30,14 +30,19 @@ import btw.lowercase.skyboxify.skybox.renderer.SkyFeatureRenderer;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import com.mojang.blaze3d.framegraph.FrameGraphBuilder;
-import com.mojang.blaze3d.vertex.PoseStack;
+import com.llamalad7.mixinextras.sugar.Local;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.MeshData;
+import com.mojang.blaze3d.vertex.VertexBuffer;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.DimensionSpecialEffects;
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix4f;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -56,54 +61,60 @@ public abstract class MixinLevelRenderer_SkyEvents {
     private static SkyFeatureRenderer skyboxify$skyFeatureRenderer = null;
 
     @Unique
-    private static float skyboxify$tickDelta = 0.0F;
-
-    @Unique
     private static ClientLevel skyboxify$level = null;
 
-    @Inject(method = "addSkyPass", at = @At("HEAD"))
-    private void skyboxify$getLocals(final FrameGraphBuilder frame, final Camera camera, final float tickDelta, final FogParameters skyFog, final CallbackInfo ci) {
+    @Inject(method = "renderSky", at = @At("HEAD"))
+    private void skyboxify$getLocals(final Matrix4f frustumMatrix, final Matrix4f projectionMatrix, final float tickDelta, final Camera camera, final boolean isFoggy, final Runnable skyFogSetup, final CallbackInfo ci) {
         if (skyboxify$skyFeatureRenderer == null) {
             skyboxify$skyFeatureRenderer = new SkyFeatureRenderer(Minecraft.getInstance().getMainRenderTarget());
         }
 
-        skyboxify$tickDelta = tickDelta;
         skyboxify$level = this.level;
     }
 
-    @Inject(method = "method_62215", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SkyRenderer;renderEndSky()V", shift = At.Shift.AFTER))
-    private void skyboxify$renderEndSkybox(final CallbackInfo ci) {
-        Skyboxify.eventManager().dispatch(new SkyRenderEvent.EndSky.After(skyboxify$skyFeatureRenderer, skyboxify$level));
+    @Inject(method = "renderSky", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/LevelRenderer;renderEndSky(Lcom/mojang/blaze3d/vertex/PoseStack;)V", shift = At.Shift.AFTER))
+    private void skyboxify$renderEndSkybox(final CallbackInfo ci, @Local(argsOnly = true, ordinal = 0) final Matrix4f skyViewMatrix) {
+        Skyboxify.eventManager().dispatch(new SkyRenderEvent.EndSky.After(skyboxify$skyFeatureRenderer, skyboxify$level, skyViewMatrix));
     }
 
-    @WrapWithCondition(method = "method_62215", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSkyDisc(FFF)V"))
-    private boolean skyboxify$skyDiscEvent$top(final SkyRenderer instance, final float red, final float green, final float blue) {
+    @WrapWithCondition(method = "renderSky", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/VertexBuffer;drawWithShader(Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;Lnet/minecraft/client/renderer/ShaderInstance;)V", ordinal = 0))
+    private boolean skyboxify$skyDiscEvent$top(final VertexBuffer instance, final Matrix4f modelViewMatrix, final Matrix4f projectionMatrix, final ShaderInstance shader) {
         return !Skyboxify.eventManager().dispatch(SkyRenderEvent.topDisc()).isCancelled();
     }
 
-    @WrapOperation(method = "method_62215", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunriseAndSunset(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;FI)V"))
-    private void skyboxify$endBatchSunrise(final SkyRenderer instance, final PoseStack poseStack, final MultiBufferSource.BufferSource bufferSource, final float sunAngle, final int sunriseAndSunsetColor, final Operation<Void> original) {
-        if (!Skyboxify.eventManager().dispatch(new SkyRenderEvent.SunriseSunset()).isCancelled()) {
-            original.call(instance, poseStack, bufferSource, sunAngle, sunriseAndSunsetColor);
-            Skyboxify.eventManager().dispatch(new SkyRenderEvent.SunriseSunset.After(bufferSource));
-        }
+    @Unique
+    private boolean skyboxify$renderSunMoonStars = true;
+
+    @Inject(method = "renderSky", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;setShaderColor(FFFF)V", ordinal = 2, shift = At.Shift.AFTER))
+    private void skyboxify$renderSkyboxes(final Matrix4f skyViewMatrix, final Matrix4f projectionMatrix, final float tickDelta, final Camera camera, final boolean isFoggy, final Runnable skyFogSetup, final CallbackInfo ci) {
+        skyboxify$renderSunMoonStars = !Skyboxify.eventManager().dispatch(new SkyRenderEvent.SunMoonStars(skyboxify$skyFeatureRenderer, skyboxify$level, skyViewMatrix, tickDelta)).isCancelled();
     }
 
-    @WrapWithCondition(method = "method_62215", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunMoonAndStars(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;FIFFLnet/minecraft/client/renderer/FogParameters;)V"))
-    private boolean skyboxify$renderSkyboxes(final SkyRenderer instance, final PoseStack poseStack, final MultiBufferSource.BufferSource bufferSource, final float sunAngle, final int moonPhase, final float moonAngle, final float starAngle, final FogParameters fog) {
-        return !Skyboxify.eventManager().dispatch(new SkyRenderEvent.SunMoonStars(skyboxify$skyFeatureRenderer, skyboxify$level, skyboxify$tickDelta)).isCancelled();
+    @WrapWithCondition(method = "renderSky", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/BufferUploader;drawWithShader(Lcom/mojang/blaze3d/vertex/MeshData;)V", ordinal = 1))
+    private boolean skyboxify$toggleSun(final MeshData meshData) {
+        return !Skyboxify.eventManager().dispatch(SkyRenderEvent.sun()).isCancelled() && skyboxify$renderSunMoonStars;
     }
 
-    @WrapWithCondition(method = "method_62215", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SkyRenderer;renderDarkDisc(Lcom/mojang/blaze3d/vertex/PoseStack;)V"))
-    private boolean skyboxify$skyDiscEvent$bottom(final SkyRenderer instance, final PoseStack poseStack) {
+    @WrapWithCondition(method = "renderSky", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/BufferUploader;drawWithShader(Lcom/mojang/blaze3d/vertex/MeshData;)V", ordinal = 2))
+    private boolean skyboxify$toggleMoon(final MeshData meshData) {
+        return !Skyboxify.eventManager().dispatch(SkyRenderEvent.moon()).isCancelled() && skyboxify$renderSunMoonStars;
+    }
+
+    @WrapWithCondition(method = "renderSky", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/VertexBuffer;drawWithShader(Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;Lnet/minecraft/client/renderer/ShaderInstance;)V", ordinal = 1))
+    private boolean skyboxify$toggleStars(final VertexBuffer instance, final Matrix4f modelViewMatrix, final Matrix4f projectionMatrix, final ShaderInstance shader) {
+        return !Skyboxify.eventManager().dispatch(SkyRenderEvent.stars()).isCancelled() && skyboxify$renderSunMoonStars;
+    }
+
+    @WrapWithCondition(method = "renderSky", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/VertexBuffer;drawWithShader(Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;Lnet/minecraft/client/renderer/ShaderInstance;)V", ordinal = 2))
+    private boolean skyboxify$skyDiscEvent$bottom(final VertexBuffer instance, final Matrix4f modelViewMatrix, final Matrix4f projectionMatrix, final ShaderInstance shader) {
         return !Skyboxify.eventManager().dispatch(SkyRenderEvent.bottomDisc()).isCancelled();
     }
 
-    @WrapOperation(method = "addSkyPass", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/DimensionSpecialEffects;skyType()Lnet/minecraft/client/renderer/DimensionSpecialEffects$SkyType;", opcode = Opcodes.GETFIELD))
+    @WrapOperation(method = "renderSky", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/DimensionSpecialEffects;skyType()Lnet/minecraft/client/renderer/DimensionSpecialEffects$SkyType;", opcode = Opcodes.GETFIELD))
     private DimensionSpecialEffects.SkyType skyboxify$allowNetherSky(final DimensionSpecialEffects instance, final Operation<DimensionSpecialEffects.SkyType> original) {
         //noinspection DataFlowIssue
         if (SkyboxifyImpl.skyboxManager().isEnabled() && SkyboxifyImpl.skyboxManager().containsEnabled(Level.NETHER) && skyboxify$level.dimension().equals(Level.NETHER)) {
-            return DimensionSpecialEffects.SkyType.OVERWORLD;
+            return DimensionSpecialEffects.SkyType.NORMAL;
         } else {
             return original.call(instance);
         }

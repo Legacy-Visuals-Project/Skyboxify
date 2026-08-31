@@ -23,7 +23,6 @@
 
 package btw.lowercase.skyboxify.skybox.renderer;
 
-import com.mojang.blaze3d.buffers.BufferUsage;
 import com.mojang.blaze3d.vertex.*;
 
 import java.util.function.Consumer;
@@ -41,7 +40,7 @@ public class StaticGeometry implements Geometry {
             final BufferBuilder builder = new BufferBuilder(byteBufferBuilder, vertexMode, vertexFormat);
             vertexConsumer.accept(builder);
             try (final MeshData meshData = builder.buildOrThrow()) {
-                final VertexBuffer vertexBuffer = new VertexBuffer(BufferUsage.STATIC_WRITE);
+                final VertexBuffer vertexBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
                 vertexBuffer.bind();
                 vertexBuffer.upload(meshData);
                 VertexBuffer.unbind();

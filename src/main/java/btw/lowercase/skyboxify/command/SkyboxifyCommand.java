@@ -56,10 +56,11 @@ public class SkyboxifyCommand extends LiteralArgumentBuilder<FabricClientCommand
                 .then(ClientCommandManager.literal("dump").executes(new Dump()));
     }
 
+    // TODO/NOTE: check if tell is same as schedule
     @Override
     public int run(final CommandContext<FabricClientCommandSource> context) {
         final Minecraft minecraft = Minecraft.getInstance();
-        minecraft.schedule(() -> minecraft.setScreen(SkyboxifyImpl.getInstance().getConfigScreen(minecraft.screen)));
+        minecraft.tell(() -> minecraft.setScreen(SkyboxifyImpl.getInstance().getConfigScreen(minecraft.screen)));
         return Command.SINGLE_SUCCESS;
     }
 
@@ -67,7 +68,7 @@ public class SkyboxifyCommand extends LiteralArgumentBuilder<FabricClientCommand
         @Override
         public int run(final CommandContext<FabricClientCommandSource> context) {
             final Minecraft minecraft = Minecraft.getInstance();
-            minecraft.schedule(() -> minecraft.setScreen(new SkyboxListScreen(minecraft.screen, SkyboxifyImpl.skyboxManager().getLoadedSkies())));
+            minecraft.tell(() -> minecraft.setScreen(new SkyboxListScreen(minecraft.screen, SkyboxifyImpl.skyboxManager().getLoadedSkies())));
             return Command.SINGLE_SUCCESS;
         }
     }

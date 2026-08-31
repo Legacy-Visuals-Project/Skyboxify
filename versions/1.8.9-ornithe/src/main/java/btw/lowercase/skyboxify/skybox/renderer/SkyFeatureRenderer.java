@@ -38,7 +38,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.TriState;
 import org.joml.Vector4fc;
 
 import java.util.Objects;
@@ -49,7 +48,7 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
         final RenderType.CompositeState.CompositeStateBuilder builder = RenderType.CompositeState.builder();
         builder.setShaderState(RenderStateShard.POSITION_TEX_SHADER);
         builder.setWriteMaskState(RenderStateShard.COLOR_WRITE);
-        builder.setTextureState(new RenderStateShard.TextureStateShard(renderData.location, renderData.blur ? TriState.TRUE : TriState.FALSE, false));
+        builder.setTextureState(new RenderStateShard.TextureStateShard(renderData.location, renderData.blur, false));
         builder.setOutputState(new RenderStateShard.OutputStateShard("Dynamic Output Target", () -> Objects.requireNonNullElseGet(this.renderTarget, () -> Minecraft.getInstance().getMainRenderTarget()).bindWrite(false), () -> Minecraft.getInstance().getMainRenderTarget().bindWrite(false)));
 
         final BlendFunction blendFunction = renderData.blend;
@@ -100,6 +99,7 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
             }
 
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+            RenderSystem.enableBlend();
             super.endFrame();
         }
     }

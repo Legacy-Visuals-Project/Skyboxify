@@ -25,29 +25,26 @@ package btw.lowercase.skyboxify.events;
 
 import btw.lowercase.skyboxify.skybox.renderer.SkyFeatureRenderer;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.MultiBufferSource;
+import org.joml.Matrix4f;
 import org.visuals.legacy.lightconfig.lib.v1.events.CancellableEvent;
 import org.visuals.legacy.lightconfig.lib.v1.events.Event;
 
 public class SkyRenderEvent {
     public static final class EndSky {
-        public record After(SkyFeatureRenderer skyFeatureRenderer, ClientLevel level) implements Event {
-        }
-    }
-
-    public static final class SunriseSunset extends CancellableEvent {
-        public record After(MultiBufferSource.BufferSource bufferSource) implements Event {
+        public record After(SkyFeatureRenderer skyFeatureRenderer, ClientLevel level, Matrix4f skyViewMatrix) implements Event {
         }
     }
 
     public static final class SunMoonStars extends CancellableEvent {
         private final SkyFeatureRenderer skyFeatureRenderer;
         private final ClientLevel level;
+        private final Matrix4f skyViewMatrix;
         private final float tickDelta;
 
-        public SunMoonStars(final SkyFeatureRenderer skyFeatureRenderer, final ClientLevel level, final float tickDelta) {
+        public SunMoonStars(final SkyFeatureRenderer skyFeatureRenderer, final ClientLevel level, final Matrix4f skyViewMatrix, final float tickDelta) {
             this.skyFeatureRenderer = skyFeatureRenderer;
             this.level = level;
+            this.skyViewMatrix = skyViewMatrix;
             this.tickDelta = tickDelta;
         }
 
@@ -57,6 +54,10 @@ public class SkyRenderEvent {
 
         public ClientLevel level() {
             return this.level;
+        }
+
+        public Matrix4f skyViewMatrix() {
+            return this.skyViewMatrix;
         }
 
         public float tickDelta() {

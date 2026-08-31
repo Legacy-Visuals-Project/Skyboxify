@@ -55,7 +55,8 @@ public class DebugScreen extends Screen {
         }
     }
 
-    private boolean mouseClickedInternal(final double mouseX, final double mouseY) {
+    @Override
+    public boolean mouseClicked(final double mouseX, final double mouseY, final int button) {
         for (final Gidget gidget : this.gidgets) {
             if (gidget.box().contains((int) mouseX, (int) mouseY) && gidget.onMouseClicked(mouseX, mouseY)) {
                 return true;
@@ -63,11 +64,6 @@ public class DebugScreen extends Screen {
         }
 
         return false;
-    }
-
-    @Override
-    public boolean mouseClicked(final double mouseX, final double mouseY, final int button) {
-        return this.mouseClickedInternal(mouseX, mouseY);
     }
 
     @Override
@@ -90,7 +86,8 @@ public class DebugScreen extends Screen {
         return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
     }
 
-    private boolean keyPressedInternal(final int keyCode, final int scanCode, final int modifiers) {
+    @Override
+    public boolean keyPressed(final int keyCode, final int scanCode, final int modifiers) {
         if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
             this.minecraft.setScreen(null);
             return true;
@@ -106,11 +103,7 @@ public class DebugScreen extends Screen {
     }
 
     @Override
-    public boolean keyPressed(final int keyCode, final int scanCode, final int modifiers) {
-        return this.keyPressedInternal(keyCode, scanCode, modifiers);
-    }
-
-    private boolean keyReleasedInternal(final int keyCode, final int scanCode, final int modifiers) {
+    public boolean keyReleased(final int keyCode, final int scanCode, final int modifiers) {
         for (final Gidget gidget : this.gidgets) {
             if (gidget.onKeyUp(scanCode, keyCode, modifiers)) {
                 return true;
@@ -118,11 +111,6 @@ public class DebugScreen extends Screen {
         }
 
         return false;
-    }
-
-    @Override
-    public boolean keyReleased(final int keyCode, final int scanCode, final int modifiers) {
-        return this.keyReleasedInternal(keyCode, scanCode, modifiers);
     }
 
     @Override

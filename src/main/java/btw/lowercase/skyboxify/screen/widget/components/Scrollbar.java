@@ -25,10 +25,10 @@ package btw.lowercase.skyboxify.screen.widget.components;
 
 import btw.lowercase.skyboxify.Skyboxify;
 import btw.lowercase.skyboxify.screen.widget.Gidget;
+import btw.lowercase.skyboxify.utils.ARGB;
+import btw.lowercase.skyboxify.utils.ShaderUtil;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.ARGB;
 
 public class Scrollbar extends Gidget {
     public static final ResourceLocation BAR_TEXTURE = Skyboxify.locationOrNull("widget/scrollbar/bar");
@@ -55,15 +55,16 @@ public class Scrollbar extends Gidget {
 
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        ShaderUtil.applyColor(ARGB.color(128, 0xFFFFFF));
         guiGraphics.blitSprite(
-                RenderType::guiTextured,
                 BAR_TEXTURE,
                 this.box().left(),
                 this.box().top(),
+                0,
                 this.box().width(),
-                this.box().height(),
-                ARGB.color(128, 0xFFFFFF)
+                this.box().height()
         );
+        ShaderUtil.applyWhite();
     }
 
     public void setScrollY(double scrollY) {
@@ -94,7 +95,6 @@ public class Scrollbar extends Gidget {
         @Override
         public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY) {
             guiGraphics.blitSprite(
-                    RenderType::guiTextured,
                     KNOB_TEXTURE,
                     this.box().left(),
                     this.box().top(),

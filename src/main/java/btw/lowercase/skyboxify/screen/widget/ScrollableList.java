@@ -25,127 +25,127 @@ package btw.lowercase.skyboxify.screen.widget;
 
 import btw.lowercase.skyboxify.screen.widget.components.Box;
 import btw.lowercase.skyboxify.screen.widget.components.Scrollbar;
+import btw.lowercase.skyboxify.utils.ARGB;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.util.ARGB;
 
 import java.util.List;
 
 public class ScrollableList extends Gidget {
-	private final List<Gidget> gidgets;
-	private final Scrollbar scrollbar;
+    private final List<Gidget> gidgets;
+    private final Scrollbar scrollbar;
 
-	public ScrollableList(List<Gidget> gidgets, int x, int y, int width, int height) {
-		super(new Box(x, y, width, height));
-		this.gidgets = gidgets;
-		this.scrollbar = new Scrollbar(width - Scrollbar.DEFAULT_WIDTH - 8, y + 1, height - 1);
-		this.updateGidgetsPosition();
-	}
+    public ScrollableList(List<Gidget> gidgets, int x, int y, int width, int height) {
+        super(new Box(x, y, width, height));
+        this.gidgets = gidgets;
+        this.scrollbar = new Scrollbar(width - Scrollbar.DEFAULT_WIDTH - 8, y + 1, height - 1);
+        this.updateGidgetsPosition();
+    }
 
-	private void updateGidgetsPosition() {
-		final int rowHeight = SimpleButton.DEFAULT_HEIGHT + SimpleButton.DEFAULT_PADDING;
-		final int contentHeight = this.gidgets.size() * rowHeight;
-		final int scrollableHeight = Math.max(0, contentHeight - this.box().height());
-		for (final Gidget gidget : this.gidgets) {
-			final Box box = this.box();
-			gidget.move(
-					box.left() + ((box.width() - gidget.box().width()) / 2),
-					(box.top() + (SimpleButton.DEFAULT_PADDING + 1)) +
-							(this.gidgets.indexOf(gidget) * rowHeight) -
-							(int) (this.scrollbar.getScrollY() * scrollableHeight)
-			);
-		}
-	}
+    private void updateGidgetsPosition() {
+        final int rowHeight = SimpleButton.DEFAULT_HEIGHT + SimpleButton.DEFAULT_PADDING;
+        final int contentHeight = this.gidgets.size() * rowHeight;
+        final int scrollableHeight = Math.max(0, contentHeight - this.box().height());
+        for (final Gidget gidget : this.gidgets) {
+            final Box box = this.box();
+            gidget.move(
+                    box.left() + ((box.width() - gidget.box().width()) / 2),
+                    (box.top() + (SimpleButton.DEFAULT_PADDING + 1)) +
+                            (this.gidgets.indexOf(gidget) * rowHeight) -
+                            (int) (this.scrollbar.getScrollY() * scrollableHeight)
+            );
+        }
+    }
 
-	@Override
-	public void render(final GuiGraphics guiGraphics, int mouseX, int mouseY) {
-		super.render(guiGraphics, mouseX, mouseY);
-		this.scrollbar.render(guiGraphics, mouseX, mouseY);
-		guiGraphics.enableScissor(this.box().left(), this.box().top(), this.box().right(), this.box().bottom());
-		for (Gidget gidget : this.gidgets) {
-			gidget.render(guiGraphics, mouseX, mouseY);
-		}
-		guiGraphics.disableScissor();
-	}
+    @Override
+    public void render(final GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        super.render(guiGraphics, mouseX, mouseY);
+        this.scrollbar.render(guiGraphics, mouseX, mouseY);
+        guiGraphics.enableScissor(this.box().left(), this.box().top(), this.box().right(), this.box().bottom());
+        for (Gidget gidget : this.gidgets) {
+            gidget.render(guiGraphics, mouseX, mouseY);
+        }
+        guiGraphics.disableScissor();
+    }
 
-	@Override
-	public void renderBackground(final GuiGraphics guiGraphics, int mouseX, int mouseY) {
-		guiGraphics.fill(this.box().left(), this.box().top(), this.box().right(), this.box().bottom(), ARGB.color(76, 0));
-		final int lineColor = ARGB.color(170, 0xA0A0A0);
-		guiGraphics.hLine(this.box().left(), this.box().right(), this.box().top(), lineColor);
-		guiGraphics.hLine(this.box().left(), this.box().right(), this.box().top() + this.box().height(), lineColor);
-	}
+    @Override
+    public void renderBackground(final GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        guiGraphics.fill(this.box().left(), this.box().top(), this.box().right(), this.box().bottom(), ARGB.color(76, 0));
+        final int lineColor = ARGB.color(170, 0xA0A0A0);
+        guiGraphics.hLine(this.box().left(), this.box().right(), this.box().top(), lineColor);
+        guiGraphics.hLine(this.box().left(), this.box().right(), this.box().top() + this.box().height(), lineColor);
+    }
 
-	@Override
-	public boolean onMouseMove(double mouseX, double mouseY) {
-		for (Gidget gidget : this.gidgets) {
-			if (this.box().contains((int) mouseX, (int) mouseY) && gidget.onMouseMove(mouseX, mouseY)) {
-				return true;
-			}
-		}
+    @Override
+    public boolean onMouseMove(double mouseX, double mouseY) {
+        for (Gidget gidget : this.gidgets) {
+            if (this.box().contains((int) mouseX, (int) mouseY) && gidget.onMouseMove(mouseX, mouseY)) {
+                return true;
+            }
+        }
 
-		if (this.scrollbar.box().contains((int) mouseX, (int) mouseY)) {
-			this.scrollbar.onMouseMove(mouseX, mouseY);
-		}
+        if (this.scrollbar.box().contains((int) mouseX, (int) mouseY)) {
+            this.scrollbar.onMouseMove(mouseX, mouseY);
+        }
 
-		return super.onMouseMove(mouseX, mouseY);
-	}
+        return super.onMouseMove(mouseX, mouseY);
+    }
 
-	@Override
-	public boolean onMouseClicked(double mouseX, double mouseY) {
-		super.onMouseClicked(mouseX, mouseY);
-		for (Gidget gidget : this.gidgets) {
-			if (this.box().contains((int) mouseX, (int) mouseY) && gidget.box().contains((int) mouseX, (int) mouseY) && gidget.onMouseClicked(mouseX, mouseY)) {
-				return true;
-			}
-		}
+    @Override
+    public boolean onMouseClicked(double mouseX, double mouseY) {
+        super.onMouseClicked(mouseX, mouseY);
+        for (Gidget gidget : this.gidgets) {
+            if (this.box().contains((int) mouseX, (int) mouseY) && gidget.box().contains((int) mouseX, (int) mouseY) && gidget.onMouseClicked(mouseX, mouseY)) {
+                return true;
+            }
+        }
 
-		if (this.scrollbar.box().contains((int) mouseX, (int) mouseY)) {
-			this.scrollbar.onMouseClicked(mouseX, mouseY);
-		}
+        if (this.scrollbar.box().contains((int) mouseX, (int) mouseY)) {
+            this.scrollbar.onMouseClicked(mouseX, mouseY);
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	@Override
-	public boolean onMouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
-		for (Gidget gidget : this.gidgets) {
-			if (gidget.box().contains((int) mouseX, (int) mouseY) && gidget.onMouseScrolled(mouseX, mouseY, scrollX, scrollY)) {
-				return true;
-			}
-		}
+    @Override
+    public boolean onMouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        for (Gidget gidget : this.gidgets) {
+            if (gidget.box().contains((int) mouseX, (int) mouseY) && gidget.onMouseScrolled(mouseX, mouseY, scrollX, scrollY)) {
+                return true;
+            }
+        }
 
-		final int rowHeight = SimpleButton.DEFAULT_HEIGHT + SimpleButton.DEFAULT_PADDING;
-		final int scrollableHeight = Math.max(0, (this.gidgets.size() * rowHeight) - this.box().height());
-		final double scrollAmount = (double) rowHeight / scrollableHeight;
-		if (scrollY > 0.0) {
-			this.scrollbar.setScrollY(this.scrollbar.getScrollY() - scrollAmount);
-		} else {
-			this.scrollbar.setScrollY(this.scrollbar.getScrollY() + scrollAmount);
-		}
+        final int rowHeight = SimpleButton.DEFAULT_HEIGHT + SimpleButton.DEFAULT_PADDING;
+        final int scrollableHeight = Math.max(0, (this.gidgets.size() * rowHeight) - this.box().height());
+        final double scrollAmount = (double) rowHeight / scrollableHeight;
+        if (scrollY > 0.0) {
+            this.scrollbar.setScrollY(this.scrollbar.getScrollY() - scrollAmount);
+        } else {
+            this.scrollbar.setScrollY(this.scrollbar.getScrollY() + scrollAmount);
+        }
 
-		this.updateGidgetsPosition();
-		return super.onMouseScrolled(mouseX, mouseY, scrollX, scrollY);
-	}
+        this.updateGidgetsPosition();
+        return super.onMouseScrolled(mouseX, mouseY, scrollX, scrollY);
+    }
 
-	@Override
-	public boolean onKeyDown(int scancode, int key, int modifiers) {
-		for (Gidget gidget : this.gidgets) {
-			if (gidget.onKeyDown(scancode, key, modifiers)) {
-				return true;
-			}
-		}
+    @Override
+    public boolean onKeyDown(int scancode, int key, int modifiers) {
+        for (Gidget gidget : this.gidgets) {
+            if (gidget.onKeyDown(scancode, key, modifiers)) {
+                return true;
+            }
+        }
 
-		return super.onKeyDown(scancode, key, modifiers);
-	}
+        return super.onKeyDown(scancode, key, modifiers);
+    }
 
-	@Override
-	public boolean onKeyUp(int scancode, int key, int modifiers) {
-		for (Gidget gidget : this.gidgets) {
-			if (gidget.onKeyUp(scancode, key, modifiers)) {
-				return true;
-			}
-		}
+    @Override
+    public boolean onKeyUp(int scancode, int key, int modifiers) {
+        for (Gidget gidget : this.gidgets) {
+            if (gidget.onKeyUp(scancode, key, modifiers)) {
+                return true;
+            }
+        }
 
-		return super.onKeyUp(scancode, key, modifiers);
-	}
+        return super.onKeyUp(scancode, key, modifiers);
+    }
 }

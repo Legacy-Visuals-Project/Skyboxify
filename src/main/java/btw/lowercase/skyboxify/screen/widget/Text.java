@@ -24,10 +24,10 @@
 package btw.lowercase.skyboxify.screen.widget;
 
 import btw.lowercase.skyboxify.screen.widget.components.Box;
+import btw.lowercase.skyboxify.utils.ARGB;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.ARGB;
 
 public class Text extends Gidget {
     private final Font font;
@@ -61,8 +61,21 @@ public class Text extends Gidget {
         return new Builder(text);
     }
 
+    public Builder builder() {
+        return new Builder(this.text)
+                .position(this.box().left(), this.box().top())
+                .aligned(this.alignment)
+                .withColor(this.color)
+                .withShadow(this.shadow);
+    }
+
     public Component getText() {
         return this.text;
+    }
+
+    public void setText(final Component text) {
+        this.text = text;
+        this.resize(this.font.width(text.getString()), this.box().height());
     }
 
     public Alignment getAlignment() {
@@ -71,6 +84,10 @@ public class Text extends Gidget {
 
     public void setAlignment(final Alignment alignment) {
         this.alignment = alignment;
+    }
+
+    public boolean hasShadow() {
+        return this.shadow;
     }
 
     public void setShadow(final boolean shadow) {
@@ -98,30 +115,6 @@ public class Text extends Gidget {
         }
 
         guiGraphics.drawString(this.font, this.text, finalX, finalY, this.color, this.shadow);
-    }
-
-    public Builder builder() {
-        return new Builder(this.text)
-                .position(this.box().left(), this.box().top())
-                .aligned(this.alignment)
-                .withColor(this.color)
-                .withShadow(this.shadow);
-    }
-
-    public boolean hasShadow() {
-        return this.shadow;
-    }
-
-    public void setText(final Component text) {
-        this.text = text;
-        this.resize(this.font.width(text.getString()), this.box().height());
-    }
-
-    public enum Alignment {
-        CENTER_VERTICAL,
-        CENTER_HORIZONTAL,
-        BOTH,
-        NONE
     }
 
     public static class Builder {
@@ -170,5 +163,12 @@ public class Text extends Gidget {
         public Text build(final Font font) {
             return new Text(font, this.text, this.x, this.y, this.alignment, this.shadow, this.color);
         }
+    }
+
+    public enum Alignment {
+        CENTER_VERTICAL,
+        CENTER_HORIZONTAL,
+        BOTH,
+        NONE
     }
 }
