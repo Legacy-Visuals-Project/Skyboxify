@@ -37,7 +37,7 @@ import dev.isxander.yacl3.platform.YACLPlatform;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.Map;
 import java.util.Objects;
@@ -48,7 +48,7 @@ public final class SkyboxifyImpl implements SkyboxifyApi {
     private static final SkyboxifyImpl INSTANCE = new SkyboxifyImpl();
 
     private final SkyboxManager skyboxManager = new SkyboxManager(this);
-    private final Map<Integer, Identifier> dimensionMapping = new Int2ObjectArrayMap<>();
+    private final Map<Integer, ResourceLocation> dimensionMapping = new Int2ObjectArrayMap<>();
     private final ConfigClassHandler<SkyboxifyConfig> config = ConfigClassHandler.createBuilder(SkyboxifyConfig.class)
             .serializer((config) -> GsonConfigSerializerBuilder.create(config)
                     .setPath(YACLPlatform.getConfigDir().resolve("skyboxify.json"))
@@ -56,11 +56,11 @@ public final class SkyboxifyImpl implements SkyboxifyApi {
             ).build();
 
     private SkyboxifyImpl() {
-        this.registerDimensionMapping(-1, Identifier.withDefaultNamespace("the_nether"));
-        this.registerDimensionMapping(0, Identifier.withDefaultNamespace("overworld"));
-        this.registerDimensionMapping(1, Identifier.withDefaultNamespace("the_end"));
-        this.registerDimensionMapping(4, Identifier.fromNamespaceAndPath("aether", "the_aether"));
-        this.registerDimensionMapping(7, Identifier.fromNamespaceAndPath("twilightforest", "twilight_forest"));
+        this.registerDimensionMapping(-1, ResourceLocation.withDefaultNamespace("the_nether"));
+        this.registerDimensionMapping(0, ResourceLocation.withDefaultNamespace("overworld"));
+        this.registerDimensionMapping(1, ResourceLocation.withDefaultNamespace("the_end"));
+        this.registerDimensionMapping(4, ResourceLocation.fromNamespaceAndPath("aether", "the_aether"));
+        this.registerDimensionMapping(7, ResourceLocation.fromNamespaceAndPath("twilightforest", "twilight_forest"));
     }
 
     public static SkyboxifyApi getInstance() {
@@ -136,12 +136,12 @@ public final class SkyboxifyImpl implements SkyboxifyApi {
     }
 
     @Override
-    public Identifier getModernDimension(final int legacyId) {
+    public ResourceLocation getModernDimension(final int legacyId) {
         return this.dimensionMapping.getOrDefault(legacyId, null);
     }
 
     @Override
-    public void registerDimensionMapping(final int legacyId, final Identifier modernId) {
+    public void registerDimensionMapping(final int legacyId, final ResourceLocation modernId) {
         if (this.dimensionMapping.containsKey(legacyId)) {
             throw new IllegalArgumentException("Cannot register dimension mapping, world with legacy properties " + legacyId + " is already taken by \"" + dimensionMapping.get(legacyId) + "\"!");
         }

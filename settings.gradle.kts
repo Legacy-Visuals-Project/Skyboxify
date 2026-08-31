@@ -25,15 +25,9 @@ stonecutter {
             }
         }
 
-		mc("1.21.4", listOf("fabric"))
-		mc("1.21.8", listOf("fabric"))
-		mc("1.21.10", listOf("fabric"))
-		mc("1.21.11", listOf("fabric"))
-		mc("26.1", listOf("fabric"))
-		mc("26.2", listOf("fabric"))
-		//mc("26.3", listOf("fabric"))
+		mc("1.8.9", listOf("ornithe"))
 
-		vcsVersion = "26.2-fabric"
+		vcsVersion = "1.8.9-ornithe"
 	}
 }
 

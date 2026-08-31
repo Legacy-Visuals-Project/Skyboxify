@@ -25,18 +25,18 @@ package btw.lowercase.skyboxify.screen.widget;
 
 import btw.lowercase.skyboxify.screen.widget.components.Box;
 import lombok.RequiredArgsConstructor;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.util.ARGB;
 
 @RequiredArgsConstructor
 public abstract class Gidget {
 	protected final Box box;
 
-	public void extractRenderState(final GuiGraphicsExtractor guiGraphics, final int mouseX, final int mouseY) {
+	public void render(final GuiGraphics guiGraphics, final int mouseX, final int mouseY) {
 		this.renderBackground(guiGraphics, mouseX, mouseY);
 	}
 
-	public void renderBackground(final GuiGraphicsExtractor guiGraphics, final int mouseX, final int mouseY) {
+	public void renderBackground(final GuiGraphics guiGraphics, final int mouseX, final int mouseY) {
 		final int backgroundColor = this.box.contains(mouseX, mouseY) ? ARGB.white(0.7F) : ARGB.white(0.58F);
 		guiGraphics.fill(this.box.left(), this.box.top(), this.box.right(), this.box.bottom(), backgroundColor);
 	}

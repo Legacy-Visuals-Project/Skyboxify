@@ -37,7 +37,7 @@ import lombok.experimental.UtilityClass;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import org.joml.Matrix4f;
 
@@ -46,8 +46,8 @@ public final class Skyboxify {
     @Getter
     private final EventManager globalEventManager = new EventManager();
 
-    public Identifier locationOrNull(final String path) {
-        return Identifier.fromNamespaceAndPath(SkyboxifyInfo.MOD_ID, path);
+    public ResourceLocation locationOrNull(final String path) {
+        return ResourceLocation.fromNamespaceAndPath(SkyboxifyInfo.MOD_ID, path);
     }
 
     public void initialize() {
@@ -55,7 +55,7 @@ public final class Skyboxify {
         impl.getConfigHandler().load();
 
         final SkyboxifyConfig config = impl.getConfig();
-        ClientTickEvents.END_LEVEL_TICK.register(SkyboxifyImpl.skyboxManager()::tick);
+        ClientTickEvents.END_WORLD_TICK.register(SkyboxifyImpl.skyboxManager()::tick);
 
         globalEventManager.listen(SkyRenderEvent.Disc.class, event -> {
             if (config.enabled && !config.renderSky) {
@@ -80,13 +80,11 @@ public final class Skyboxify {
             }
         });
 
-        //? >=1.21.4 <1.21.9 {
-		/*globalEventManager.listen(SkyRenderEvent.SunriseSunset.After.class, event -> {
+		globalEventManager.listen(SkyRenderEvent.SunriseSunset.After.class, event -> {
 			if (SkyboxifyImpl.skyboxManager().isEnabled()) {
 				event.getBufferSource().endBatch(); // Fix horizon rendering over the skybox
 			}
 		});
-		*///?}
 
         globalEventManager.listen(SkyRenderEvent.EndSky.After.class, event -> {
             if (SkyboxifyImpl.skyboxManager().isEnabled()) {

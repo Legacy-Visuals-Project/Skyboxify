@@ -4,17 +4,11 @@ plugins {
     alias(libs.plugins.spotless)
 }
 
-stonecutter active "26.2-fabric" /* [SC] DO NOT EDIT */
+stonecutter active "1.8.9-ornithe" /* [SC] DO NOT EDIT */
 
 stonecutter {
     tasks {
         order("publishMods", versionComparator)
-    }
-
-    parameters {
-        val loader = node.project.property("loader.platform")
-        constants["fabric"] = loader == "fabric"
-        constants["neoforge"] = loader == "neoforge"
     }
 }
 

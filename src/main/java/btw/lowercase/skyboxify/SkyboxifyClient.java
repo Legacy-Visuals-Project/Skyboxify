@@ -25,27 +25,16 @@ package btw.lowercase.skyboxify;
 
 import btw.lowercase.skyboxify.command.SkyboxifyCommand;
 import btw.lowercase.skyboxify.skybox.SkyboxResourceHelper;
-import dev.kikugie.fletching_table.annotation.fabric.Entrypoint;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.server.packs.PackType;
 
-@Entrypoint
 public final class SkyboxifyClient implements ClientModInitializer {
-	@Override
-	public void onInitializeClient() {
-		Skyboxify.initialize();
-		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(new SkyboxifyCommand()));
-		//? >=1.21.10 {
-		net.fabricmc.fabric.api.resource.v1.ResourceLoader.get(PackType.CLIENT_RESOURCES)
-                //? >=26.1 {
-                .registerReloadListener
-                //? } else {
-                /*.registerReloader
-                *///? }
-                (Skyboxify.locationOrNull("skybox_reader"), new SkyboxResourceHelper());
-		//?} else {
-		/*net.fabricmc.fabric.api.resource.ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new SkyboxResourceHelper());
-		 *///?}
-	}
+    @Override
+    public void onInitializeClient() {
+        Skyboxify.initialize();
+        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(new SkyboxifyCommand()));
+        ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new SkyboxResourceHelper());
+    }
 }

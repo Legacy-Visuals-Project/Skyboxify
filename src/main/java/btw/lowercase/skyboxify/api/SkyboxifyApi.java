@@ -27,7 +27,7 @@ import btw.lowercase.skyboxify.config.SkyboxifyConfig;
 import btw.lowercase.skyboxify.skybox.SkyboxManager;
 import dev.isxander.yacl3.config.v2.api.ConfigClassHandler;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public interface SkyboxifyApi {
     SkyboxifyConfig getConfig();
@@ -38,7 +38,7 @@ public interface SkyboxifyApi {
 
     SkyboxManager getSkyboxManager();
 
-    Identifier getModernDimension(final int legacyId);
+    ResourceLocation getModernDimension(final int legacyId);
 
-    void registerDimensionMapping(final int legacyId, final Identifier modernId);
+    void registerDimensionMapping(final int legacyId, final ResourceLocation modernId);
 }

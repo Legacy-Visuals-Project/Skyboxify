@@ -26,21 +26,12 @@ package btw.lowercase.skyboxify.skybox.renderer;
 import btw.lowercase.skyboxify.skybox.SkyPart;
 import btw.lowercase.skyboxify.skybox.impl.components.UV;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-
-//? >=26.2 {
-import com.mojang.blaze3d.PrimitiveTopology;
-//? } else {
-/*import com.mojang.blaze3d.vertex.VertexFormat;
- *///? }
+import com.mojang.blaze3d.vertex.VertexFormat;
 
 public interface Geometry extends AutoCloseable {
     StaticGeometry DEFAULT = StaticGeometry.create(
             DefaultVertexFormat.POSITION_TEX,
-            //? >=26.2 {
-            PrimitiveTopology.QUADS,
-            //? } else {
-            /*VertexFormat.Mode.QUADS,
-             *///? }
+            VertexFormat.Mode.QUADS,
             SkyPart.COUNT * 4,
             vertexConsumer -> {
                 for (final SkyPart part : SkyPart.VALUES) {

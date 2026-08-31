@@ -28,20 +28,12 @@ import btw.lowercase.skyboxify.skybox.AbstractSkybox;
 import btw.lowercase.skyboxify.skybox.renderer.SkyFeatureRenderer;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import org.joml.Matrix4f;
 
 import java.util.List;
-
-//? >=1.21.11 {
-import net.minecraft.world.attribute.EnvironmentAttributes;
-//? } else {
-/*import net.minecraft.util.Mth;
-*///? }
 
 public class Skybox extends AbstractSkybox {
     public static final Codec<Skybox> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -81,9 +73,9 @@ public class Skybox extends AbstractSkybox {
 
     @Override
     public void extractRenderState(final SkyFeatureRenderer skyFeatureRenderer, final ClientLevel level, final Matrix4f modelViewMatrix, final float tickDelta) {
-        final long dayTime = level.getOverworldClockTime();
+        final long dayTime = level.getDayTime();
         final int clampedTimeOfDay = (int) (dayTime % 24000L);
-        final float skyAngle = this.getSkyAngle(tickDelta);
+        final float skyAngle = level.getTimeOfDay(tickDelta);
 
         float thunderLevel = level.getThunderLevel(tickDelta);
         final float rainLevel = level.getRainLevel(tickDelta);
@@ -106,19 +98,5 @@ public class Skybox extends AbstractSkybox {
                 !level.dimension().equals(Level.END);
         this.active = this.dimension.equals(level.dimension()) || allowOtherDimensions;
         this.layers.forEach(layer -> layer.tick(this, level));
-    }
-
-    private float getSkyAngle(final float tickDelta) {
-        final Camera camera =
-                //? >=26.2 {
-                Minecraft.getInstance().gameRenderer.mainCamera();
-                //? } else {
-                /*Minecraft.getInstance().gameRenderer.getMainCamera();
-                 *///? }
-        //? >=1.21.11 {
-        return camera.attributeProbe().getValue(EnvironmentAttributes.SUN_ANGLE, tickDelta) / 360.0F;
-        //?} else {
-        /*return camera.getEntity().level().getTimeOfDay(tickDelta);
-         *///?}
     }
 }

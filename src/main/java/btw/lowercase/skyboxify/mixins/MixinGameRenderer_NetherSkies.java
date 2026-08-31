@@ -23,28 +23,21 @@
 
 package btw.lowercase.skyboxify.mixins;
 
-import org.spongepowered.asm.mixin.Mixin;
-
-//? <=1.21.10 {
-/*import btw.lowercase.skyboxify.api.SkyboxifyImpl;
+import btw.lowercase.skyboxify.api.SkyboxifyImpl;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.DimensionSpecialEffects;
+import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-*///?}
 
-//? >=1.21.6 {
-@Mixin(net.minecraft.client.renderer.GameRenderer.class)
-//?} else {
-/*@Mixin(net.minecraft.client.renderer.LevelRenderer.class)
- *///?}
+@Mixin(LevelRenderer.class)
 public abstract class MixinGameRenderer_NetherSkies {
-    //? <=1.21.10 {
-    /*@Shadow
+    @Shadow
     @Final
     private Minecraft minecraft;
 
@@ -56,5 +49,4 @@ public abstract class MixinGameRenderer_NetherSkies {
             return original.call(instance, x, y);
         }
     }
-    *///?}
 }

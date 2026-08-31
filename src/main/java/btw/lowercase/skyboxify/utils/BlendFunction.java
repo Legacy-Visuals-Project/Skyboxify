@@ -23,15 +23,8 @@
 
 package btw.lowercase.skyboxify.utils;
 
-//? >=26.2 {
-import com.mojang.blaze3d.platform.BlendFactor;
-//? } else >=1.21.6 {
-/*import com.mojang.blaze3d.platform.SourceFactor;
-import com.mojang.blaze3d.platform.DestFactor;
-*///? } else {
-/*import static com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import static com.mojang.blaze3d.platform.GlStateManager.DestFactor;
-*///? }
+import static com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 
 public record BlendFunction(SrcFactor srcFactor, DstFactor dstFactor) {
     public enum SrcFactor {
@@ -41,17 +34,15 @@ public record BlendFunction(SrcFactor srcFactor, DstFactor dstFactor) {
         DST_COLOR,
         ONE_MINUS_DST_COLOR;
 
-        //~ if >=26.2 'SourceFactor' -> 'BlendFactor' {
-        public BlendFactor vanilla() {
+        public SourceFactor vanilla() {
             return switch (this) {
-                case ZERO -> BlendFactor.ZERO;
-                case ONE -> BlendFactor.ONE;
-                case SRC_ALPHA -> BlendFactor.SRC_ALPHA;
-                case DST_COLOR -> BlendFactor.DST_COLOR;
-                case ONE_MINUS_DST_COLOR -> BlendFactor.ONE_MINUS_DST_COLOR;
+                case ZERO -> SourceFactor.ZERO;
+                case ONE -> SourceFactor.ONE;
+                case SRC_ALPHA -> SourceFactor.SRC_ALPHA;
+                case DST_COLOR -> SourceFactor.DST_COLOR;
+                case ONE_MINUS_DST_COLOR -> SourceFactor.ONE_MINUS_DST_COLOR;
             };
         }
-        //~ }
     }
 
     public enum DstFactor {
@@ -61,22 +52,14 @@ public record BlendFunction(SrcFactor srcFactor, DstFactor dstFactor) {
         ONE_MINUS_SRC_COLOR,
         ONE_MINUS_SRC_ALPHA;
 
-        //~ if >=26.2 'DestFactor' -> 'BlendFactor' {
-        public BlendFactor vanilla() {
+        public DestFactor vanilla() {
             return switch (this) {
-                case ZERO -> BlendFactor.ZERO;
-                case ONE -> BlendFactor.ONE;
-                case SRC_COLOR -> BlendFactor.SRC_COLOR;
-                case ONE_MINUS_SRC_COLOR -> BlendFactor.ONE_MINUS_SRC_COLOR;
-                case ONE_MINUS_SRC_ALPHA -> BlendFactor.ONE_MINUS_SRC_ALPHA;
+                case ZERO -> DestFactor.ZERO;
+                case ONE -> DestFactor.ONE;
+                case SRC_COLOR -> DestFactor.SRC_COLOR;
+                case ONE_MINUS_SRC_COLOR -> DestFactor.ONE_MINUS_SRC_COLOR;
+                case ONE_MINUS_SRC_ALPHA -> DestFactor.ONE_MINUS_SRC_ALPHA;
             };
         }
-        //~ }
     }
-
-    //? >=1.21.6 {
-    public com.mojang.blaze3d.pipeline.BlendFunction vanilla() {
-        return new com.mojang.blaze3d.pipeline.BlendFunction(this.srcFactor.vanilla(), this.dstFactor.vanilla());
-    }
-    //?}
 }

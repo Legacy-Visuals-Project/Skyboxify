@@ -23,7 +23,6 @@
 
 package btw.lowercase.skyboxify.skybox.impl;
 
-import btw.lowercase.skyboxify.skybox.SkyStorage;
 import btw.lowercase.skyboxify.skybox.impl.components.*;
 import btw.lowercase.skyboxify.skybox.renderer.Geometry;
 import btw.lowercase.skyboxify.skybox.renderer.RenderUniforms;
@@ -36,7 +35,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
@@ -50,8 +49,8 @@ public class SkyLayer {
     private static final float MIN_ALPHA_ALLOWED = 1.0E-4F;
 
     public static final Codec<SkyLayer> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Identifier.CODEC.fieldOf("properties").forGetter(SkyLayer::properties),
-            Identifier.CODEC.fieldOf("texture").forGetter(SkyLayer::texture),
+            ResourceLocation.CODEC.fieldOf("properties").forGetter(SkyLayer::properties),
+            ResourceLocation.CODEC.fieldOf("texture").forGetter(SkyLayer::texture),
             Biomes.CODEC.optionalFieldOf("biomes", Biomes.DEFAULT).forGetter(SkyLayer::biomes),
             Weather.CODEC.optionalFieldOf("weather", Weather.CLEAR).forGetter(SkyLayer::weather),
             Range.CODEC.listOf().optionalFieldOf("heights", ImmutableList.of()).forGetter(SkyLayer::heights),
@@ -64,8 +63,8 @@ public class SkyLayer {
             Codec.INT.optionalFieldOf("transition", 20).forGetter(SkyLayer::transition)
     ).apply(instance, SkyLayer::new));
 
-    private final Identifier properties;
-    private final Identifier texture;
+    private final ResourceLocation properties;
+    private final ResourceLocation texture;
     private final Biomes biomes;
     private final Weather weather;
     private final List<Range> heights;
@@ -80,8 +79,8 @@ public class SkyLayer {
     private float alpha = -1.0F;
 
     public SkyLayer(
-            final Identifier properties,
-            final Identifier texture,
+            final ResourceLocation properties,
+            final ResourceLocation texture,
             final Biomes biomes,
             final Weather weather,
             final List<Range> heights,
@@ -124,13 +123,7 @@ public class SkyLayer {
                 modelViewMatrix.rotate(Axis.of((Vector3f) this.axis).rotationDegrees(this.getAngle(level, skyAngle)));
             }
 
-            final SkyFeatureRenderer.Pipeline pipeline = new SkyFeatureRenderer.Pipeline(
-                    //? >=1.21.6 {
-                    SkyStorage.calculateSkyboxPipeline(this.blend.getBlendFunction())
-                    //? } else {
-                    /*this.blend.getBlendFunction()
-                     *///? }
-            );
+            final SkyFeatureRenderer.Pipeline pipeline = new SkyFeatureRenderer.Pipeline(this.blend.getBlendFunction());
             final RenderUniforms uniforms = new RenderUniforms(modelViewMatrix, this.blend.getShaderColor(finalAlpha));
             skyFeatureRenderer.submit(pipeline, Geometry.DEFAULT, uniforms, this.texture);
         }
@@ -181,7 +174,7 @@ public class SkyLayer {
     private float getAngle(final Level level, final float skyAngle) {
         float angleDayStart = 0.0F;
         if (this.speed != (float) Math.round(this.speed)) {
-            final long currentWorldDay = (level.getOverworldClockTime() + 18000L) / 24000L;
+            final long currentWorldDay = (level.getDayTime() + 18000L) / 24000L;
             final float currentAngle = (float) currentWorldDay * (this.speed % 1.0F);
             angleDayStart = currentAngle % 1.0F;
         }
@@ -189,11 +182,11 @@ public class SkyLayer {
         return 360.0F * (angleDayStart + skyAngle * this.speed);
     }
 
-    public Identifier properties() {
+    public ResourceLocation properties() {
         return this.properties;
     }
 
-    public Identifier texture() {
+    public ResourceLocation texture() {
         return this.texture;
     }
 

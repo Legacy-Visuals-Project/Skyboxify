@@ -1,19 +1,13 @@
 @file:OptIn(StonecutterExperimentalAPI::class)
 
-import com.google.devtools.ksp.processing.parseBoolean
 import dev.kikugie.stonecutter.StonecutterExperimentalAPI
-import net.fabricmc.loom.api.LoomGradleExtensionAPI
-import net.fabricmc.loom.api.fabricapi.FabricApiExtension
 
 plugins {
     alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.loom) apply false
-    alias(libs.plugins.loom.remap) apply false
+    alias(libs.plugins.loom.remap)
     alias(libs.plugins.publishing)
     alias(libs.plugins.blossom)
     alias(libs.plugins.ksp)
-    alias(libs.plugins.fletchingtable.fabric)
-    alias(libs.plugins.fletchingtable.neoforge)
 }
 
 class ModData {
@@ -28,35 +22,25 @@ class ModData {
     val modrinth = property("mod.modrinth") as String
     val curseforge = property("mod.curseforge") as String
     val discord = property("mod.discord") as String
-    val obfuscated = parseBoolean(property("mod.obfuscated") as String)
     val minecraftVersion = property("mod.minecraft_version") as String
     val minecraftVersionRange = property("mod.minecraft_version_range") as String
 }
 
 class Dependencies {
-    val neoForgeVersion = property("deps.neoforge_version") as String?
     val fabricLoaderVersion = property("deps.fabric_loader_version") as String?
     val fabricApiVersion = property("deps.fabric_api_version") as String?
     val devAuthVersion = property("deps.devauth_version") as String?
-    val mixinconstraintsVersion = property("deps.mixinconstraints_version") as String?
-    val mixinsquaredVersion = property("deps.mixinsquared_version") as String?
     val lombokVersion = property("deps.lombok_version") as String?
 }
 
 val mod = ModData()
 val deps = Dependencies()
 
-// Apply specific loom
-if (mod.obfuscated) {
-    apply(plugin = "net.fabricmc.fabric-loom-remap")
-} else {
-    apply(plugin = "net.fabricmc.fabric-loom")
-}
-
 class LoaderData {
     val name = property("loader.platform") as String?
     val isFabric = "fabric".equals(name, ignoreCase = true)
-    val isNeoForge = "neoforge".equals(name, ignoreCase = true)
+    val isOrnithe = "ornithe".equals(name, ignoreCase = true)
+    val isFabricLike = isFabric || isOrnithe
 }
 
 val loader = LoaderData()
@@ -67,90 +51,7 @@ base {
     archivesName.set("${mod.id}-${versionString}")
 }
 
-stonecutter {
-    replacements.string {
-        direction = eval(current.version, ">=26.2")
-        replace(".setScreen", ".gui.setScreen")
-    }
-
-    replacements.string {
-        direction = eval(current.version, ">=26.2")
-        replace("minecraft.screen", "minecraft.gui.screen()")
-    }
-
-    replacements.string {
-        direction = eval(current.version, ">=26.1")
-        replace("level.getDayTime", "level.getOverworldClockTime")
-    }
-
-    replacements.string {
-        direction = eval(current.version, ">=26.1")
-        replace("method_62215", $$"lambda$addSkyPass$0")
-    }
-
-    replacements.string {
-        direction = eval(current.version, ">=26.1")
-        replace("Lnet/minecraft/client/renderer/state/SkyRenderState", "Lnet/minecraft/client/renderer/state/level/SkyRenderState")
-    }
-
-    replacements.string {
-        direction = eval(current.version, ">=26.1")
-        replace("net.minecraft.client.renderer.state.SkyRenderState", "net.minecraft.client.renderer.state.level.SkyRenderState")
-    }
-
-    replacements.string {
-        direction = eval(current.version, ">=26.1")
-        replace("ClientCommandManager", "ClientCommands")
-    }
-
-    replacements.string {
-        direction = eval(current.version, ">=26.1")
-        replace(".render(guiGraphics", ".extractRenderState(guiGraphics")
-    }
-
-    replacements.string {
-        direction = eval(current.version, ">=26.1")
-        replace("public void render(final GuiGraphics guiGraphics", "public void extractRenderState(final GuiGraphicsExtractor guiGraphics")
-    }
-
-    replacements.string {
-        direction = eval(current.version, ">=26.1")
-        replace("GuiGraphics guiGraphics", "GuiGraphicsExtractor guiGraphics")
-    }
-
-    replacements.string {
-        direction = eval(current.version, ">=26.1")
-        replace("guiGraphics.drawString", "guiGraphics.text")
-    }
-
-    replacements.string {
-        direction = eval(current.version, ">=26.1")
-        replace("guiGraphics.hLine", "guiGraphics.horizontalLine")
-    }
-
-    replacements.string {
-        direction = eval(current.version, ">=26.1")
-        replace("net.minecraft.client.gui.GuiGraphics", "net.minecraft.client.gui.GuiGraphicsExtractor")
-    }
-
-    replacements.string {
-        direction = eval(current.version, ">=26.1")
-        replace("ClientTickEvents.END_WORLD_TICK", "ClientTickEvents.END_LEVEL_TICK")
-    }
-
-    replacements.string {
-        direction = eval(current.version, ">=1.21.11")
-        replace("ResourceLocation", "Identifier")
-    }
-
-    replacements.string {
-        direction = eval(current.version, ">=1.21.11")
-        replace(".location()", ".identifier()")
-    }
-}
-
-// loom {
-extensions.configure<LoomGradleExtensionAPI> {
+loom {
     runConfigs.all {
         ideConfigGenerated(stonecutter.current.isActive)
         runDir = "../../run"
@@ -170,23 +71,12 @@ extensions.configure<LoomGradleExtensionAPI> {
     }
 }
 
-fletchingTable {
-    mixins.create("main") {
-        mixin("default", "${mod.id}.mixins.json")
-    }
-
-    lang.create("main") {
-        patterns.add("assets/${mod.id}/lang/**")
-    }
-}
-
 repositories {
     mavenCentral()
     mavenLocal()
     maven("https://maven.parchmentmc.org") // Parchment
     maven("https://maven.nucleoid.xyz/") // Placeholder API - required by Mod Menu
     maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1") // DevAuth
-    maven("https://maven.neoforged.net/releases") // NeoForge
     maven("https://maven.bawnorton.com/releases") // MixinSquared
     maven("https://api.modrinth.com/maven") // Modrinth
     maven("https://maven.isxander.dev/releases") // YACL
@@ -195,38 +85,21 @@ repositories {
     }
 }
 
-val loom: LoomGradleExtensionAPI by extensions
-val fabricApi: FabricApiExtension by extensions
-val minecraft by configurations.existing
-val include by configurations.existing
-val modImplementation: NamedDomainObjectProvider<Configuration> =
-    configurations.named(if (mod.obfuscated) "modImplementation" else "implementation")
-val modRuntimeOnly: NamedDomainObjectProvider<Configuration> =
-    configurations.named(if (mod.obfuscated) "modRuntimeOnly" else "runtimeOnly")
-
 dependencies {
     minecraft("com.mojang:minecraft:${mod.minecraftVersion}")
 
-    if (mod.obfuscated) {
-        val mappings by configurations.existing
-
-        @Suppress("UnstableApiUsage")
-        mappings(loom.layered {
-            officialMojangMappings()
-
-            optionalProp("deps.parchment_version") {
-                parchment("org.parchmentmc.data:parchment-${mod.minecraftVersion}:$it@zip")
-            }
-        })
-    }
+    @Suppress("UnstableApiUsage")
+    mappings(loom.layered {
+        officialMojangMappings()
+        optionalProp("deps.parchment_version") {
+            parchment("org.parchmentmc.data:parchment-${mod.minecraftVersion}:$it@zip")
+        }
+    })
 
     compileOnly("org.projectlombok:lombok:${deps.lombokVersion}")
     annotationProcessor("org.projectlombok:lombok:${deps.lombokVersion}")
-    modRuntimeOnly("me.djtheredstoner:DevAuth-${loader.name}:${deps.devAuthVersion}")
-
-    include(implementation("com.moulberry:mixinconstraints:${deps.mixinconstraintsVersion}")!!)!!
-    include(implementation(annotationProcessor("com.github.bawnorton.mixinsquared:mixinsquared-${loader.name}:${deps.mixinsquaredVersion}")!!)!!)
-    if (loader.isFabric) {
+    modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:${deps.devAuthVersion}")
+    if (loader.isFabricLike) {
         modImplementation("net.fabricmc:fabric-loader:${deps.fabricLoaderVersion}")
         modImplementation("net.fabricmc.fabric-api:fabric-api:${deps.fabricApiVersion}")
         optionalProp("deps.modmenu_version") { prop ->
@@ -236,8 +109,6 @@ dependencies {
         optionalProp("deps.yacl_version") { prop ->
             modImplementation("dev.isxander:yet-another-config-lib:$prop")
         }
-    } else if (loader.isNeoForge) {
-        // TODO: "neoForge"("net.neoforged:neoforge:${deps.neoForgeVersion}")
     }
 }
 
@@ -250,8 +121,7 @@ val curseforgeId = findProperty("publish.curseforge")?.toString()?.takeIf { it.i
 // modrinth.token=
 // curseforge.token=
 publishMods {
-    file =
-        (if (mod.obfuscated) tasks.named<net.fabricmc.loom.task.RemapJarTask>("remapJar") else tasks.jar).flatMap { it.archiveFile }
+    file = tasks.remapJar.flatMap { it.archiveFile }
 
     val niceVersionRangeTitle = if (mod.minecraftVersionRange.contains(' ')) {
         val parts = mod.minecraftVersionRange.trim().split(' ')
@@ -273,9 +143,10 @@ publishMods {
             projectId = modrinthId
             accessToken = findProperty("modrinth.token").toString()
             minecraftVersions.addAll(mod.minecraftVersionRange.split(' '))
-            if (loader.isFabric) {
+
+            requires("yacl")
+            if (loader.isFabricLike) {
                 requires("fabric-api")
-                requires("yacl")
                 optional("modmenu")
             }
         }
@@ -288,9 +159,10 @@ publishMods {
             accessToken = findProperty("curseforge.token").toString()
             minecraftVersions.addAll(mod.minecraftVersionRange.split(' '))
             client = true
-            if (loader.isFabric) {
+
+            requires("yacl")
+            if (loader.isFabricLike) {
                 requires("fabric-api")
-                requires("yacl")
                 optional("modmenu")
             }
         }
@@ -305,19 +177,9 @@ publishMods {
 }
 
 java {
-    val requiredJava = when {
-        stonecutter.eval(stonecutter.current.version, ">=26.1") -> JavaVersion.VERSION_25
-        stonecutter.eval(stonecutter.current.version, ">=1.20.5") -> JavaVersion.VERSION_21
-        stonecutter.eval(stonecutter.current.version, ">=1.18") -> JavaVersion.VERSION_17
-        stonecutter.eval(stonecutter.current.version, ">=1.17") -> JavaVersion.VERSION_16
-        else -> JavaVersion.VERSION_1_8
-    }
-
+    val requiredJava = JavaVersion.VERSION_21
     sourceCompatibility = requiredJava
     targetCompatibility = requiredJava
-    if (!mod.obfuscated) {
-        withSourcesJar()
-    }
 }
 
 tasks {
@@ -333,28 +195,17 @@ tasks {
             put("modrinth", mod.modrinth)
             put("curseforge", mod.curseforge)
             put("discord", mod.discord)
-            if (loader.isFabric) {
-                put("fabric_loader_version", deps.fabricLoaderVersion)
-                put(
-                    "fabric_resource_loader_dep", if (stonecutter.eval(stonecutter.current.version, ">=1.21.10"))
-                        "fabric-resource-loader-v1"
-                    else
-                        "fabric-resource-loader-v0"
-                )
-            }
 
-            if (loader.isNeoForge) {
-                put("neoforge_version", deps.neoForgeVersion)
-            }
-
-            val minecraftVersionRange = if (mod.minecraftVersionRange.contains(' ')) {
+            put("minecraft_version_range", if (mod.minecraftVersionRange.contains(' ')) {
                 val parts = mod.minecraftVersionRange.trim().split(' ')
                 ">=" + parts.first() + ' ' + "<=" + parts.last()
             } else {
                 mod.minecraftVersionRange
-            }
+            })
 
-            put("minecraft_version_range", minecraftVersionRange)
+            if (loader.isFabricLike) {
+                put("fabric_loader_version", deps.fabricLoaderVersion)
+            }
         }
 
         props.forEach(inputs::property)
@@ -363,29 +214,14 @@ tasks {
             filteringCharset = "UTF-8"
         }
 
-        if (loader.isFabric) {
+        if (loader.isFabricLike) {
             filesMatching("fabric.mod.json") { expand(props) }
-            exclude(listOf("META-INF/neoforge.mods.toml"))
-        }
-
-        if (loader.isNeoForge) {
-            filesMatching("META-INF/neoforge.mods.toml") { expand(props) }
-            exclude("fabric.mod.json")
         }
     }
 
     register<Copy>("buildAndCollect") {
         group = "build"
-
-        if (mod.obfuscated) {
-            val remapJar by existing(net.fabricmc.loom.task.RemapJarTask::class)
-            val remapSourcesJar by existing(net.fabricmc.loom.task.RemapSourcesJarTask::class)
-            from(remapJar, remapSourcesJar)
-        } else {
-            val sourcesJar by existing
-            from(jar, sourcesJar)
-        }
-
+        from(remapJar, remapSourcesJar)
         into(rootProject.layout.buildDirectory.file("libs/${mod.version}"))
         dependsOn("build")
     }

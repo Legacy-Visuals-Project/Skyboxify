@@ -28,13 +28,13 @@ import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JavaOps;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
 
 import java.util.List;
 import java.util.Objects;
 
-public record Biomes(ImmutableList<Identifier> locations, boolean exclusion) {
+public record Biomes(ImmutableList<ResourceLocation> locations, boolean exclusion) {
 	public static Biomes DEFAULT = new Biomes(ImmutableList.of(), false);
 
 	public static Codec<Biomes> CODEC = ParserCodecs.TRIMMED_STRING.xmap(input -> {
@@ -45,8 +45,8 @@ public record Biomes(ImmutableList<Identifier> locations, boolean exclusion) {
 
 		final List<String> entries = ParserCodecs.SPLIT_SPACE_TRIMMED.parse(JavaOps.INSTANCE, input).getOrThrow();
 		if (!entries.isEmpty()) {
-			final ImmutableList.Builder<Identifier> builder = new ImmutableList.Builder<>();
-			entries.stream().map(Identifier::tryParse).filter(Objects::nonNull).forEach(builder::add);
+			final ImmutableList.Builder<ResourceLocation> builder = new ImmutableList.Builder<>();
+			entries.stream().map(ResourceLocation::tryParse).filter(Objects::nonNull).forEach(builder::add);
 			return new Biomes(builder.build(), exclusion);
 		} else {
 			return Biomes.DEFAULT;
@@ -57,7 +57,7 @@ public record Biomes(ImmutableList<Identifier> locations, boolean exclusion) {
 			builder.append("!");
 		}
 
-		for (final Identifier location : biomes.locations) {
+		for (final ResourceLocation location : biomes.locations) {
 			builder.append(location).append(" ");
 		}
 
@@ -68,7 +68,7 @@ public record Biomes(ImmutableList<Identifier> locations, boolean exclusion) {
         if (!currentBiome.isBound()) {
             return false;
         } else {
-            final boolean hasBiome = this.locations().contains(currentBiome.unwrapKey().orElseThrow().identifier());
+            final boolean hasBiome = this.locations().contains(currentBiome.unwrapKey().orElseThrow().location());
             return (!this.exclusion() || !hasBiome) && (this.exclusion() || hasBiome);
         }
     }

@@ -40,7 +40,7 @@ public class SkyLayerListScreen extends DebugScreen {
 	private final Skybox skybox;
 
 	public SkyLayerListScreen(final Screen parent, final Skybox skybox) {
-		super(Component.literal(skybox.dimension().identifier().toString()), parent);
+		super(Component.literal(skybox.dimension().location().toString()), parent);
 		this.skybox = skybox;
 	}
 
@@ -56,7 +56,7 @@ public class SkyLayerListScreen extends DebugScreen {
 		final List<Gidget> gidgets = new ArrayList<>();
 		for (final SkyLayer skyLayer : this.skybox.layers()) {
 			final Component title = Component.literal(skyLayer.properties().toString());
-			gidgets.add(SimpleButton.builder(title, button -> this.minecraft.gui.setScreen(new SkyLayerInfoScreen(this, skyLayer, title))).build());
+			gidgets.add(SimpleButton.builder(title, button -> this.minecraft.setScreen(new SkyLayerInfoScreen(this, skyLayer, title))).build());
 		}
 
 		final int pad = 20 + font.lineHeight;

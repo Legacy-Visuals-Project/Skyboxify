@@ -36,12 +36,12 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.serialization.JsonOps;
 import lombok.SneakyThrows;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommands;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -53,14 +53,14 @@ public class SkyboxifyCommand extends LiteralArgumentBuilder<FabricClientCommand
 	public SkyboxifyCommand() {
 		super("skyboxify");
 		executes(this)
-				.then(ClientCommands.literal("debug").executes(new Debug()))
-				.then(ClientCommands.literal("dump").executes(new Dump()));
+				.then(ClientCommandManager.literal("debug").executes(new Debug()))
+				.then(ClientCommandManager.literal("dump").executes(new Dump()));
 	}
 
 	@Override
 	public int run(final CommandContext<FabricClientCommandSource> context) {
 		final Minecraft minecraft = Minecraft.getInstance();
-		minecraft.schedule(() -> minecraft.gui.setScreen(SkyboxifyImpl.getInstance().getConfigScreen(minecraft.gui.screen())));
+		minecraft.schedule(() -> minecraft.setScreen(SkyboxifyImpl.getInstance().getConfigScreen(minecraft.screen)));
 		return Command.SINGLE_SUCCESS;
 	}
 
@@ -68,7 +68,7 @@ public class SkyboxifyCommand extends LiteralArgumentBuilder<FabricClientCommand
 		@Override
 		public int run(final CommandContext<FabricClientCommandSource> context) {
 			final Minecraft minecraft = Minecraft.getInstance();
-			minecraft.schedule(() -> minecraft.gui.setScreen(new SkyboxListScreen(minecraft.gui.screen(), SkyboxifyImpl.skyboxManager().getLoadedSkies())));
+			minecraft.schedule(() -> minecraft.setScreen(new SkyboxListScreen(minecraft.screen, SkyboxifyImpl.skyboxManager().getLoadedSkies())));
 			return Command.SINGLE_SUCCESS;
 		}
 	}
@@ -91,7 +91,7 @@ public class SkyboxifyCommand extends LiteralArgumentBuilder<FabricClientCommand
 					Files.createDirectory(packFolder);
 				}
 
-				final Identifier dimension = skybox.dimension().identifier();
+				final ResourceLocation dimension = skybox.dimension().location();
 				final Path dimensionFolder = packFolder.resolve(dimension.getNamespace()).resolve(dimension.getPath());
 				if (!Files.exists(dimensionFolder)) {
 					Files.createDirectories(dimensionFolder);

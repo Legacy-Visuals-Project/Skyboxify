@@ -45,9 +45,9 @@ public class SkyRenderEvent {
         @RequiredArgsConstructor
         public static class After implements Event {
             //? >=1.21.4 <1.21.9 {
-			/*@Getter
+			@Getter
 			private final net.minecraft.client.renderer.MultiBufferSource.BufferSource bufferSource;
-			*///?}
+			//?}
         }
     }
 

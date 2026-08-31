@@ -12,10 +12,15 @@
 	"icon": "assets/${id}/icon.png",
 	"license": "${license}",
 	"environment": "client",
+	"mixins": "${id}.mixins.json",
+	"entrypoints": {
+		"client": ["btw.lowercase.skyboxify.SkyboxifyClient"],
+		"modmenu": ["btw.lowercase.skyboxify.config.ModMenuIntegration"]
+	},
 	"depends": {
 		"fabricloader": ">=${fabric_loader_version}",
 		"minecraft": "${minecraft_version_range}",
-		"${fabric_resource_loader_dep}": "*",
+		"fabric-resource-loader-v0": "*",
 		"fabric-command-api-v2": "*",
 		"yet_another_config_lib_v3": "*"
 	},
