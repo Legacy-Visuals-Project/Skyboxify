@@ -21,30 +21,9 @@
  * "MINECRAFT" LINKING EXCEPTION TO THE GPL
  */
 
-package btw.lowercase.skyboxify.config;
+package btw.lowercase.skyboxify.utils;
 
-import btw.lowercase.skyboxify.utils.FilteringMode;
-import dev.isxander.yacl3.config.v2.api.SerialEntry;
-
-public class SkyboxifyConfig {
-    @SerialEntry
-    public boolean enabled = true;
-
-    @SerialEntry
-    public boolean renderSky = true;
-
-    @SerialEntry
-    public boolean renderSunMoon = true;
-
-    @SerialEntry
-    public boolean renderStars = false;
-
-    @SerialEntry
-    public boolean showOverworldForUnknownDimension = true;
-
-    @SerialEntry
-    public FilteringMode filteringMode = FilteringMode.NEAREST;
-
-    @SerialEntry
-    public boolean debug = false;
+public enum FilteringMode {
+    NEAREST,
+    LINEAR
 }

@@ -23,6 +23,8 @@
 
 package btw.lowercase.skyboxify.skybox.renderer;
 
+import btw.lowercase.skyboxify.api.SkyboxifyImpl;
+import btw.lowercase.skyboxify.utils.FilteringMode;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.renderpearl.api.buffers.GpuBufferSlice;
@@ -31,6 +33,7 @@ import com.mojang.renderpearl.api.commands.RenderPassDescriptor;
 import com.mojang.renderpearl.api.pipeline.CompiledRenderPipeline;
 import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
 import com.mojang.renderpearl.api.textures.FilterMode;
+import com.mojang.renderpearl.api.textures.GpuSampler;
 import com.mojang.renderpearl.api.textures.GpuTextureView;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.Identifier;
@@ -53,6 +56,10 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
     public void endFrame() {
         if (!this.submits.isEmpty()) {
             final RenderSystem.AutoStorageIndexBuffer indexBuffer = RenderSystem.getSequentialBuffer(PrimitiveTopology.QUADS);
+
+            final FilteringMode filteringMode = SkyboxifyImpl.config().filteringMode;
+            final GpuSampler sampler = RenderSystem.getSamplerCache().getClampToEdge(filteringMode == FilteringMode.LINEAR ? FilterMode.LINEAR : FilterMode.NEAREST);
+
             try (final RenderPass pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(this.createPassDescriptor())) {
                 RenderSystem.bindDefaultUniforms(pass);
                 for (final Submit submit : this.submits) {
@@ -67,7 +74,7 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
                     }
 
                     pass.setUniform("DynamicTransforms", submit.dynamicTransforms);
-                    pass.setUniform("Sampler0", submit.textureView, RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST));
+                    pass.setUniform("Sampler0", submit.textureView, sampler);
                     if (submit.geometry instanceof StaticGeometry staticGeometry) {
                         pass.drawIndexed(staticGeometry.indexCount(), 1, 0, 0, 0);
                     }

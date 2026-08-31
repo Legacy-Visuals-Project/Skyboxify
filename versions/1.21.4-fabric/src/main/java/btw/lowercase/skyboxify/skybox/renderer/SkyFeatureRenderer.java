@@ -23,9 +23,11 @@
 
 package btw.lowercase.skyboxify.skybox.renderer;
 
+import btw.lowercase.skyboxify.api.SkyboxifyImpl;
 import btw.lowercase.skyboxify.skybox.SkyPart;
 import btw.lowercase.skyboxify.skybox.SkyboxResourceHelper;
 import btw.lowercase.skyboxify.utils.BlendFunction;
+import btw.lowercase.skyboxify.utils.FilteringMode;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
@@ -39,18 +41,20 @@ import net.minecraft.util.TriState;
 import org.joml.Vector4fc;
 
 import java.util.Objects;
-import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submit> {
     private static final ShaderProgram CUSTOM_SKYBOX_SHADER_PROGRAM = new ShaderProgram(SkyboxResourceHelper.CUSTOM_SKYBOX_LOCATION, DefaultVertexFormat.POSITION_TEX, ShaderDefines.EMPTY);
     private static final RenderStateShard.ShaderStateShard SKYBOX_SHADER = new RenderStateShard.ShaderStateShard(CUSTOM_SKYBOX_SHADER_PROGRAM);
 
-    private final BiFunction<ResourceLocation, BlendFunction, RenderType> RENDER_TYPE = Util.memoize((location, blendFunction) -> {
+    private final Function<RenderData, RenderType> RENDER_TYPE = Util.memoize(renderData -> {
         final RenderType.CompositeState.CompositeStateBuilder builder = RenderType.CompositeState.builder();
         builder.setShaderState(SKYBOX_SHADER);
         builder.setWriteMaskState(RenderStateShard.COLOR_WRITE);
-        builder.setTextureState(new RenderStateShard.TextureStateShard(location, TriState.FALSE, false));
+        builder.setTextureState(new RenderStateShard.TextureStateShard(renderData.location, renderData.blur ? TriState.TRUE : TriState.FALSE, false));
         builder.setOutputState(new RenderStateShard.OutputStateShard("Dynamic Output Target", () -> Objects.requireNonNullElseGet(this.renderTarget, () -> Minecraft.getInstance().getMainRenderTarget()).bindWrite(false), () -> Minecraft.getInstance().getMainRenderTarget().bindWrite(false)));
+
+        final BlendFunction blendFunction = renderData.blend;
         if (blendFunction != null) {
             builder.setTransparencyState(new RenderStateShard.TransparencyStateShard("Dynamic Blend Function", () -> {
                 RenderSystem.enableBlend();
@@ -75,7 +79,7 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
 
     @Override
     protected Submit createSubmit(final Pipeline pipeline, final Geometry geometry, final RenderUniforms uniforms, final ResourceLocation location) {
-        return new Submit(RENDER_TYPE.apply(location, pipeline.blendFunction()), geometry, uniforms);
+        return new Submit(RENDER_TYPE.apply(new RenderData(location, pipeline.blendFunction(), SkyboxifyImpl.config().filteringMode == FilteringMode.LINEAR)), geometry, uniforms);
     }
 
     @Override
@@ -100,6 +104,9 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             super.endFrame();
         }
+    }
+
+    private record RenderData(ResourceLocation location, BlendFunction blend, boolean blur) {
     }
 
     protected record Submit(RenderType renderType, Geometry geometry,

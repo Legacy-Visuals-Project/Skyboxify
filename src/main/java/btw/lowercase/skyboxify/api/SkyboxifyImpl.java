@@ -29,6 +29,7 @@ import dev.isxander.yacl3.api.ConfigCategory;
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionDescription;
 import dev.isxander.yacl3.api.YetAnotherConfigLib;
+import dev.isxander.yacl3.api.controller.EnumControllerBuilder;
 import dev.isxander.yacl3.config.v2.api.ConfigClassHandler;
 import dev.isxander.yacl3.config.v2.api.serializer.GsonConfigSerializerBuilder;
 import dev.isxander.yacl3.impl.controller.TickBoxControllerBuilderImpl;
@@ -93,6 +94,7 @@ public final class SkyboxifyImpl implements SkyboxifyApi {
             category.option(option("renderSunMoon", defaults.renderSunMoon, () -> config.renderSunMoon, val -> config.renderSunMoon = val));
             category.option(option("renderStars", defaults.renderStars, () -> config.renderStars, val -> config.renderStars = val));
             category.option(option("showOverworldForUnknownDimension", defaults.showOverworldForUnknownDimension, () -> config.showOverworldForUnknownDimension, val -> config.showOverworldForUnknownDimension = val));
+            category.option(option("filteringMode", defaults.filteringMode, () -> config.filteringMode, val -> config.filteringMode = val));
             category.option(option("debug", defaults.debug, () -> config.debug, val -> config.debug = val));
             builder.category(category.build());
 
@@ -101,14 +103,27 @@ public final class SkyboxifyImpl implements SkyboxifyApi {
     }
 
     private Option<Boolean> option(final String name, final boolean defaultValue, final Supplier<Boolean> getter, final Consumer<Boolean> setter) {
+        final Option.Builder<Boolean> builder = setupOption(name, defaultValue, getter, setter);
+        builder.controller(TickBoxControllerBuilderImpl::new);
+        return builder.build();
+    }
+
+    private <T extends Enum<T>> Option<T> option(final String name, final T defaultValue, final Supplier<T> getter, final Consumer<T> setter) {
+        final Option.Builder<T> builder = setupOption(name, defaultValue, getter, setter);
+        builder.controller(option -> EnumControllerBuilder.create(option).enumClass((Class<T>) defaultValue.getClass()));
+        return builder.build();
+    }
+
+    private <T> Option.Builder<T> setupOption(final String name, final T defaultValue, final Supplier<T> getter, final Consumer<T> setter) {
         final String key = "options.skyboxify." + name;
         final String tooltip = key + ".tooltip";
-        final Option.Builder<Boolean> builder = Option.createBuilder();
+
+        final Option.Builder<T> builder = Option.createBuilder();
         builder.name(Component.translatable(key));
         builder.description(OptionDescription.of(Component.translatable(tooltip)));
         builder.binding(defaultValue, getter, setter);
-        builder.controller(TickBoxControllerBuilderImpl::new);
-        return builder.build();
+
+        return builder;
     }
 
     public static SkyboxManager skyboxManager() {

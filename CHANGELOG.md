@@ -1,5 +1,5 @@
-# Release 3.3.1
+# Release 3.4
 
 ### General
 
-- Fix crash in <=1.21.10
+- Add "Filter Mode" option to change filtering/upscaling of the texture when rendering (NEAREST/LINEAR)
