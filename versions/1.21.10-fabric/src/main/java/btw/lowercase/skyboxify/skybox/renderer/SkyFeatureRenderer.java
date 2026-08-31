@@ -23,6 +23,8 @@
 
 package btw.lowercase.skyboxify.skybox.renderer;
 
+import btw.lowercase.skyboxify.api.SkyboxifyImpl;
+import btw.lowercase.skyboxify.utils.FilteringMode;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.pipeline.RenderTarget;
@@ -31,6 +33,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.textures.GpuTextureView;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.resources.ResourceLocation;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -45,9 +48,10 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
 
     @Override
     protected Submit createSubmit(final Pipeline pipeline, final Geometry geometry, final RenderUniforms uniforms, final ResourceLocation location) {
-        final GpuTextureView textureView = Minecraft.getInstance().getTextureManager().getTexture(location).getTextureView();
+        final AbstractTexture texture = Minecraft.getInstance().getTextureManager().getTexture(location);
+        texture.setFilter(SkyboxifyImpl.config().filteringMode == FilteringMode.LINEAR, false);
         final GpuBufferSlice dynamicTransforms = RenderSystem.getDynamicUniforms().writeTransform(uniforms.modelViewMatrix(), uniforms.shaderColor(), new Vector3f(), new Matrix4f(), 1.0F);
-        return new Submit(pipeline.pipeline(), geometry, uniforms, textureView, dynamicTransforms);
+        return new Submit(pipeline.pipeline(), geometry, uniforms, texture.getTextureView(), dynamicTransforms);
     }
 
     @Override

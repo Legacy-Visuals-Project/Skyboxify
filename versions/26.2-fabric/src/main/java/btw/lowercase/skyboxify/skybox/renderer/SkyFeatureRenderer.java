@@ -23,6 +23,8 @@
 
 package btw.lowercase.skyboxify.skybox.renderer;
 
+import btw.lowercase.skyboxify.api.SkyboxifyImpl;
+import btw.lowercase.skyboxify.utils.FilteringMode;
 import com.mojang.blaze3d.PrimitiveTopology;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
@@ -31,6 +33,7 @@ import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderPassDescriptor;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.textures.FilterMode;
+import com.mojang.blaze3d.textures.GpuSampler;
 import com.mojang.blaze3d.textures.GpuTextureView;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.Identifier;
@@ -53,6 +56,10 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
     public void endFrame() {
         if (!this.submits.isEmpty()) {
             final RenderSystem.AutoStorageIndexBuffer indexBuffer = RenderSystem.getSequentialBuffer(PrimitiveTopology.QUADS);
+
+            final FilteringMode filteringMode = SkyboxifyImpl.config().filteringMode;
+            final GpuSampler sampler = RenderSystem.getSamplerCache().getClampToEdge(filteringMode == FilteringMode.LINEAR ? FilterMode.LINEAR : FilterMode.NEAREST);
+
             try (final RenderPass pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(this.createPassDescriptor())) {
                 RenderSystem.bindDefaultUniforms(pass);
                 for (final Submit submit : this.submits) {
@@ -66,8 +73,9 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
                         pass.setIndexBuffer(indexBuffer.getBuffer(staticGeometry.indexCount()), indexBuffer.type());
                     }
 
+
                     pass.setUniform("DynamicTransforms", submit.dynamicTransforms);
-                    pass.bindTexture("Sampler0", submit.textureView, RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST));
+                    pass.bindTexture("Sampler0", submit.textureView, sampler);
                     if (submit.geometry instanceof StaticGeometry staticGeometry) {
                         pass.drawIndexed(staticGeometry.indexCount(), 1, 0, 0, 0);
                     }
