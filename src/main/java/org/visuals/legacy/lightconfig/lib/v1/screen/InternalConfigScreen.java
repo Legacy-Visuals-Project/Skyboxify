@@ -28,7 +28,6 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.layouts.GridLayout;
 import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
-import net.minecraft.client.gui.layouts.LayoutSettings;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
@@ -62,8 +61,9 @@ public class InternalConfigScreen extends Screen {
     }
 
     private void setupHeader(final HeaderAndFooterLayout layout) {
-        LinearLayout linearLayout = layout.addToHeader(LinearLayout.vertical().spacing(8));
-        linearLayout.addChild(new StringWidget(this.getTitle(), this.font), LayoutSettings::alignHorizontallyCenter);
+        // TODO: .spacing(8)
+        final LinearLayout linearLayout = layout.addToHeader(new LinearLayout(0, 0, LinearLayout.Orientation.VERTICAL));
+        linearLayout.addChild(new StringWidget(this.getTitle(), this.font), linearLayout.defaultChildLayoutSetting().alignHorizontallyCenter());
     }
 
     // TODO: Custom Entry Setup

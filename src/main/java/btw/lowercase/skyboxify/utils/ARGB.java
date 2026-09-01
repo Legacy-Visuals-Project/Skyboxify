@@ -23,8 +23,6 @@
 
 package btw.lowercase.skyboxify.utils;
 
-import net.minecraft.util.Mth;
-
 public final class ARGB {
     private ARGB() {
     }
@@ -70,6 +68,6 @@ public final class ARGB {
     }
 
     public static int as8BitChannel(final float value) {
-        return Mth.floor(value * 255.0F);
+        return (int) Math.floor(value * 255.0F);
     }
 }

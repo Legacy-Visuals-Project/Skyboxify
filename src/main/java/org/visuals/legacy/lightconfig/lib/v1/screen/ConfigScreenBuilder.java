@@ -24,25 +24,26 @@
 
 package org.visuals.legacy.lightconfig.lib.v1.screen;
 
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.Component;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
 import org.visuals.legacy.lightconfig.lib.v1.Config;
 
 public class ConfigScreenBuilder {
     private final Config config;
-    private Component title;
+    private Text title;
 
     private ConfigScreenBuilder(final Config config) {
         this.config = config;
-        this.title = Component.empty();
+        this.title = new LiteralText("");
     }
 
     public static ConfigScreenBuilder builder(final Config config) {
         return new ConfigScreenBuilder(config);
     }
 
-    public ConfigScreenBuilder setTitle(final Component title) {
+    public ConfigScreenBuilder setTitle(final Text title) {
         this.title = title;
         return this;
     }

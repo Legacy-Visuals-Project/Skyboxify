@@ -27,6 +27,7 @@ import btw.lowercase.skyboxify.utils.BlendFunction;
 import com.mojang.serialization.Codec;
 import net.minecraft.util.StringRepresentable;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector4f;
 
 import java.util.function.Function;
@@ -56,7 +57,7 @@ public enum Blend implements StringRepresentable {
         return this.colorConsumer.apply(alpha);
     }
 
-    public BlendFunction getBlendFunction() {
+    public @Nullable BlendFunction getBlendFunction() {
         return this.blendFunction;
     }
 

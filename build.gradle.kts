@@ -7,7 +7,7 @@ plugins {
     alias(libs.plugins.loom.remap)
     alias(libs.plugins.publishing)
     alias(libs.plugins.blossom)
-    alias(libs.plugins.ksp)
+    alias(libs.plugins.ploceus)
 }
 
 class ModData {
@@ -28,7 +28,9 @@ class ModData {
 
 class Dependencies {
     val fabricLoaderVersion = property("deps.fabric_loader_version") as String?
-    val fabricApiVersion = property("deps.fabric_api_version") as String?
+    val ornitheApiVersion = property("deps.ornithe_api_version") as String?
+    val featherVersion = property("deps.feather_version") as String?
+    val oslVersion = property("deps.osl_version") as String?
     val devAuthVersion = property("deps.devauth_version") as String?
 }
 
@@ -50,13 +52,16 @@ base {
     archivesName.set("${mod.id}-${versionString}")
 }
 
+ploceus {
+    setIntermediaryGeneration(2)
+}
+
 loom {
+    runConfigs.remove(runConfigs["server"]) // Removes server run configs
     runConfigs.all {
         ideConfigGenerated(stonecutter.current.isActive)
         runDir = "../../run"
     }
-
-    runConfigs.remove(runConfigs["server"]) // Removes server run configs
 
     runs {
         afterEvaluate {
@@ -73,13 +78,8 @@ loom {
 repositories {
     mavenCentral()
     mavenLocal()
-    maven("https://maven.parchmentmc.org") // Parchment
-    maven("https://maven.nucleoid.xyz/") // Placeholder API - required by Mod Menu
     maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1") // DevAuth
-    maven("https://api.modrinth.com/maven") // Modrinth
-    maven("https://maven.teamresourceful.com/repository/maven-public/") {
-        content { includeGroup("com.terraformersmc") } // Mod Menu
-    }
+    maven("https://libraries.minecraft.net/") // DataFixerUpper
 }
 
 dependencies {
@@ -87,18 +87,22 @@ dependencies {
 
     @Suppress("UnstableApiUsage")
     mappings(loom.layered {
-        officialMojangMappings()
-        optionalProp("deps.parchment_version") {
-            parchment("org.parchmentmc.data:parchment-${mod.minecraftVersion}:$it@zip")
-        }
+        mappings(ploceus.featherMappings(deps.featherVersion))
+        mappings(rootProject.file("gradle/feather-overrides.tiny"))
     })
+
+    include(implementation("com.mojang:datafixerupper:10.0.21")!!)
+    include(implementation("org.joml:joml:1.10.8")!!)
 
     modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:${deps.devAuthVersion}")
     if (loader.isFabricLike) {
         modImplementation("net.fabricmc:fabric-loader:${deps.fabricLoaderVersion}")
-        modImplementation("net.fabricmc.fabric-api:fabric-api:${deps.fabricApiVersion}")
+        if (loader.isOrnithe) {
+            ploceus.dependOsl(deps.oslVersion)
+        }
+
         optionalProp("deps.modmenu_version") { prop ->
-            modImplementation("com.terraformersmc:modmenu:${prop}")
+            modImplementation("com.terraformersmc:modmenu:$prop+mc${mod.minecraftVersion}")
         }
     }
 }
@@ -164,7 +168,7 @@ publishMods {
 }
 
 java {
-    val requiredJava = JavaVersion.VERSION_21
+    val requiredJava = JavaVersion.VERSION_25
     sourceCompatibility = requiredJava
     targetCompatibility = requiredJava
 }
@@ -183,12 +187,14 @@ tasks {
             put("curseforge", mod.curseforge)
             put("discord", mod.discord)
 
-            put("minecraft_version_range", if (mod.minecraftVersionRange.contains(' ')) {
-                val parts = mod.minecraftVersionRange.trim().split(' ')
-                ">=" + parts.first() + ' ' + "<=" + parts.last()
-            } else {
-                mod.minecraftVersionRange
-            })
+            put(
+                "minecraft_version_range", if (mod.minecraftVersionRange.contains(' ')) {
+                    val parts = mod.minecraftVersionRange.trim().split(' ')
+                    ">=" + parts.first() + ' ' + "<=" + parts.last()
+                } else {
+                    mod.minecraftVersionRange
+                }
+            )
 
             if (loader.isFabricLike) {
                 put("fabric_loader_version", deps.fabricLoaderVersion)

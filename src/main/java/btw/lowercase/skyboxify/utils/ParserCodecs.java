@@ -27,8 +27,7 @@ import btw.lowercase.skyboxify.skybox.impl.components.Range;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JavaOps;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
+import net.minecraft.resource.Identifier;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.slf4j.Logger;
@@ -40,121 +39,121 @@ import java.util.List;
 import java.util.Objects;
 
 public final class ParserCodecs {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ParserCodecs.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ParserCodecs.class);
 
-	public static final Codec<String> TRIMMED_STRING = Codec.STRING.xmap(String::trim, String::trim);
+    public static final Codec<String> TRIMMED_STRING = Codec.STRING.xmap(String::trim, String::trim);
 
-	public static final Codec<List<String>> SPLIT_SPACE_TRIMMED = TRIMMED_STRING.xmap(input -> {
-		//noinspection CodeBlock2Expr
-		return Arrays.stream(input.split(" "))
-				.map(String::trim)
-				.filter(s -> !s.isEmpty())
-				.toList();
-	}, list -> {
-		final StringBuilder builder = new StringBuilder();
-		for (final String entry : list) {
-			builder.append(entry).append(" ");
-		}
+    public static final Codec<List<String>> SPLIT_SPACE_TRIMMED = TRIMMED_STRING.xmap(input -> {
+        //noinspection CodeBlock2Expr
+        return Arrays.stream(input.split(" "))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .toList();
+    }, list -> {
+        final StringBuilder builder = new StringBuilder();
+        for (final String entry : list) {
+            builder.append(entry).append(" ");
+        }
 
-		return builder.toString().trim();
-	});
+        return builder.toString().trim();
+    });
 
-	public static final Codec<Vector3fc> AXIS = TRIMMED_STRING.xmap(input -> {
-		final List<String> parts = SPLIT_SPACE_TRIMMED.parse(JavaOps.INSTANCE, input.replaceAll(" +", " ")).getOrThrow();
-		if (parts.size() == 3) {
-			final Vector3f vector3f = new Vector3f(
-					safeParseFloat(parts.get(0), Float.MIN_VALUE),
-					safeParseFloat(parts.get(1), Float.MIN_VALUE),
-					safeParseFloat(parts.get(2), Float.MIN_VALUE)
-			);
-			if (vector3f.lengthSquared() > Mth.EPSILON) {
-				return new Vector3f(vector3f.z, vector3f.y, -vector3f.x);
-			}
-		}
+    public static final Codec<Vector3fc> AXIS = TRIMMED_STRING.xmap(input -> {
+        final List<String> parts = SPLIT_SPACE_TRIMMED.parse(JavaOps.INSTANCE, input.replaceAll(" +", " ")).getOrThrow();
+        if (parts.size() == 3) {
+            final Vector3f vector3f = new Vector3f(
+                    safeParseFloat(parts.get(0), Float.MIN_VALUE),
+                    safeParseFloat(parts.get(1), Float.MIN_VALUE),
+                    safeParseFloat(parts.get(2), Float.MIN_VALUE)
+            );
+            if (vector3f.lengthSquared() > 1.0E-5F) {
+                return new Vector3f(vector3f.z, vector3f.y, -vector3f.x);
+            }
+        }
 
-		LOGGER.warn("Invalid axis provided in skybox, returning default axis (Mth.X_AXIS).");
-		return Mth.X_AXIS;
-	}, output -> String.format("%s %s %s", -output.z(), output.y(), output.x()));
+        LOGGER.warn("Invalid axis provided in skybox, returning default axis (Mth.X_AXIS).");
+        return CommonUtils.X_AXIS;
+    }, output -> String.format("%s %s %s", -output.z(), output.y(), output.x()));
 
-	private static Codec<Range> getRangeEntryCodec(final boolean allowNegative) {
-		final int minValue = allowNegative ? Integer.MIN_VALUE : -1;
-		return TRIMMED_STRING.xmap(input -> {
-			if (input.contains("-")) {
-				final String[] parts = input.split("-");
-				if (parts.length == 2) {
-					final int min = safeParseInteger(parts[0], minValue);
-					final int max = safeParseInteger(parts[1], minValue);
-					if (!allowNegative ? (min >= 0 && max >= 0) : (min != Integer.MIN_VALUE && max != Integer.MIN_VALUE)) {
-						return new Range(min, max);
-					}
-				}
-			} else {
-				final String croppedInput = !allowNegative ? input : (input.startsWith("(") && input.endsWith(")") ? input.substring(1, input.length() - 1) : input);
-				final int value = safeParseInteger(croppedInput, minValue);
-				if (!allowNegative ? (value >= 0) : (value != Integer.MIN_VALUE)) {
-					return new Range(value, value);
-				}
-			}
+    private static Codec<Range> getRangeEntryCodec(final boolean allowNegative) {
+        final int minValue = allowNegative ? Integer.MIN_VALUE : -1;
+        return TRIMMED_STRING.xmap(input -> {
+            if (input.contains("-")) {
+                final String[] parts = input.split("-");
+                if (parts.length == 2) {
+                    final int min = safeParseInteger(parts[0], minValue);
+                    final int max = safeParseInteger(parts[1], minValue);
+                    if (!allowNegative ? (min >= 0 && max >= 0) : (min != Integer.MIN_VALUE && max != Integer.MIN_VALUE)) {
+                        return new Range(min, max);
+                    }
+                }
+            } else {
+                final String croppedInput = !allowNegative ? input : (input.startsWith("(") && input.endsWith(")") ? input.substring(1, input.length() - 1) : input);
+                final int value = safeParseInteger(croppedInput, minValue);
+                if (!allowNegative ? (value >= 0) : (value != Integer.MIN_VALUE)) {
+                    return new Range(value, value);
+                }
+            }
 
-			return null;
-		}, range -> range != null ? range.toString() : "");
-	}
+            return null;
+        }, range -> range != null ? range.toString() : "");
+    }
 
-	public static Codec<List<Range>> getRangeEntriesCodec(final boolean allowNegative) {
-		return TRIMMED_STRING.xmap(input -> {
-			final List<Range> entries = new ArrayList<>();
-			Arrays.stream(input.split("\\s*,\\s*|\\s+"))
-					.map(it -> getRangeEntryCodec(allowNegative).parse(JavaOps.INSTANCE, it).getOrThrow())
-					.filter(Objects::nonNull)
-					.forEach(entries::add);
-			return entries;
-		}, output -> Arrays.toString(output.stream().map(Range::toString).toArray()));
-	}
+    public static Codec<List<Range>> getRangeEntriesCodec(final boolean allowNegative) {
+        return TRIMMED_STRING.xmap(input -> {
+            final List<Range> entries = new ArrayList<>();
+            Arrays.stream(input.split("\\s*,\\s*|\\s+"))
+                    .map(it -> getRangeEntryCodec(allowNegative).parse(JavaOps.INSTANCE, it).getOrThrow())
+                    .filter(Objects::nonNull)
+                    .forEach(entries::add);
+            return entries;
+        }, output -> Arrays.toString(output.stream().map(Range::toString).toArray()));
+    }
 
-	public static Codec<ResourceLocation> getSourceTextureCodec(final ResourceLocation propertiesLocation) {
-		return Codec.STRING.comapFlatMap(input -> {
-			if (input == null) {
-				return DataResult.success(propertiesLocation.withPath(propertiesLocation.getPath().replace(".properties", ".png")));
-			} else if (input.startsWith("./")) {
-				final String fileName = propertiesLocation.getPath().split("/")[propertiesLocation.getPath().split("/").length - 1];
-				return DataResult.success(propertiesLocation.withPath(propertiesLocation.getPath().replace(fileName, input.substring(2))));
-			} else {
-				final String[] parts = input.split("/", 3);
-				if (parts.length == 3 && parts[0].equals("assets")) {
-					return DataResult.success(ResourceLocation.fromNamespaceAndPath(parts[1], parts[2]));
-				} else {
-					final ResourceLocation result = ResourceLocation.tryParse(input);
-					if (result != null) {
-						return DataResult.success(result);
-					} else {
-						return DataResult.error(() -> String.format("Failed to read texture texture '%s' as resource location", input));
-					}
-				}
-			}
-		}, ResourceLocation::toString);
-	}
+    public static Codec<Identifier> getSourceTextureCodec(final Identifier propertiesLocation) {
+        return Codec.STRING.comapFlatMap(input -> {
+            if (input == null) {
+                return DataResult.success(IdentifierUtil.withPath(propertiesLocation, propertiesLocation.getPath().replace(".properties", ".png")));
+            } else if (input.startsWith("./")) {
+                final String fileName = propertiesLocation.getPath().split("/")[propertiesLocation.getPath().split("/").length - 1];
+                return DataResult.success(IdentifierUtil.withPath(propertiesLocation, propertiesLocation.getPath().replace(fileName, input.substring(2))));
+            } else {
+                final String[] parts = input.split("/", 3);
+                if (parts.length == 3 && parts[0].equals("assets")) {
+                    return DataResult.success(new Identifier(parts[1], parts[2]));
+                } else {
+                    final Identifier result = IdentifierUtil.tryParse(input);
+                    if (result != null) {
+                        return DataResult.success(result);
+                    } else {
+                        return DataResult.error(() -> String.format("Failed to read texture texture '%s' as resource location", input));
+                    }
+                }
+            }
+        }, Identifier::toString);
+    }
 
-	public static final Codec<Float> SAFE_FLOAT = TRIMMED_STRING.comapFlatMap(input -> {
-		try {
-			return DataResult.success(Float.parseFloat(input));
-		} catch (final NumberFormatException exception) {
-			return DataResult.error(exception::toString);
-		}
-	}, String::valueOf);
+    public static final Codec<Float> SAFE_FLOAT = TRIMMED_STRING.comapFlatMap(input -> {
+        try {
+            return DataResult.success(Float.parseFloat(input));
+        } catch (final NumberFormatException exception) {
+            return DataResult.error(exception::toString);
+        }
+    }, String::valueOf);
 
-	public static float safeParseFloat(final String value, final float defaultValue) {
-		return SAFE_FLOAT.orElse(defaultValue).parse(JavaOps.INSTANCE, value).getOrThrow();
-	}
+    public static float safeParseFloat(final String value, final float defaultValue) {
+        return SAFE_FLOAT.orElse(defaultValue).parse(JavaOps.INSTANCE, value).getOrThrow();
+    }
 
-	public static final Codec<Integer> SAFE_INTEGER = TRIMMED_STRING.comapFlatMap(input -> {
-		try {
-			return DataResult.success(Integer.parseInt(input));
-		} catch (final NumberFormatException exception) {
-			return DataResult.error(exception::toString);
-		}
-	}, String::valueOf);
+    public static final Codec<Integer> SAFE_INTEGER = TRIMMED_STRING.comapFlatMap(input -> {
+        try {
+            return DataResult.success(Integer.parseInt(input));
+        } catch (final NumberFormatException exception) {
+            return DataResult.error(exception::toString);
+        }
+    }, String::valueOf);
 
-	public static int safeParseInteger(final String value, final int defaultValue) {
-		return SAFE_INTEGER.orElse(defaultValue).parse(JavaOps.INSTANCE, value).getOrThrow();
-	}
+    public static int safeParseInteger(final String value, final int defaultValue) {
+        return SAFE_INTEGER.orElse(defaultValue).parse(JavaOps.INSTANCE, value).getOrThrow();
+    }
 }

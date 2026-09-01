@@ -28,19 +28,17 @@ import btw.lowercase.skyboxify.skybox.renderer.Geometry;
 import btw.lowercase.skyboxify.skybox.renderer.RenderUniforms;
 import btw.lowercase.skyboxify.skybox.renderer.SkyFeatureRenderer;
 import btw.lowercase.skyboxify.utils.CommonUtils;
+import btw.lowercase.skyboxify.utils.IdentifierUtil;
 import btw.lowercase.skyboxify.utils.ParserCodecs;
 import com.google.common.collect.ImmutableList;
-import com.mojang.math.Axis;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.Level;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.entity.Entity;
+import net.minecraft.resource.Identifier;
+import net.minecraft.util.math.BlockPos;
 import org.joml.Matrix4f;
-import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
 import java.util.List;
@@ -49,22 +47,22 @@ public class SkyLayer {
     private static final float MIN_ALPHA_ALLOWED = 1.0E-4F;
 
     public static final Codec<SkyLayer> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            ResourceLocation.CODEC.fieldOf("properties").forGetter(SkyLayer::properties),
-            ResourceLocation.CODEC.fieldOf("texture").forGetter(SkyLayer::texture),
+            IdentifierUtil.CODEC.fieldOf("properties").forGetter(SkyLayer::properties),
+            IdentifierUtil.CODEC.fieldOf("texture").forGetter(SkyLayer::texture),
             Biomes.CODEC.optionalFieldOf("biomes", Biomes.DEFAULT).forGetter(SkyLayer::biomes),
             Weather.CODEC.optionalFieldOf("weather", Weather.CLEAR).forGetter(SkyLayer::weather),
             Range.CODEC.listOf().optionalFieldOf("heights", ImmutableList.of()).forGetter(SkyLayer::heights),
             Blend.CODEC.optionalFieldOf("blend", Blend.ADD).forGetter(SkyLayer::blend),
             Fade.CODEC.optionalFieldOf("fade", Fade.DEFAULT).forGetter(SkyLayer::fade),
-            ParserCodecs.AXIS.optionalFieldOf("axis", Mth.X_AXIS).forGetter(SkyLayer::axis),
+            ParserCodecs.AXIS.optionalFieldOf("axis", CommonUtils.X_AXIS).forGetter(SkyLayer::axis),
             Loop.CODEC.optionalFieldOf("loop", Loop.DEFAULT).forGetter(SkyLayer::loop),
             Codec.BOOL.optionalFieldOf("rotate", true).forGetter(SkyLayer::rotate),
             Codec.FLOAT.optionalFieldOf("speed", 1.0F).forGetter(SkyLayer::speed),
             Codec.INT.optionalFieldOf("transition", 20).forGetter(SkyLayer::transition)
     ).apply(instance, SkyLayer::new));
 
-    private final ResourceLocation properties;
-    private final ResourceLocation texture;
+    private final Identifier properties;
+    private final Identifier texture;
     private final Biomes biomes;
     private final Weather weather;
     private final List<Range> heights;
@@ -79,8 +77,8 @@ public class SkyLayer {
     private float alpha = -1.0F;
 
     public SkyLayer(
-            final ResourceLocation properties,
-            final ResourceLocation texture,
+            final Identifier properties,
+            final Identifier texture,
             final Biomes biomes,
             final Weather weather,
             final List<Range> heights,
@@ -108,7 +106,7 @@ public class SkyLayer {
 
     public void extractRenderState(
             final SkyFeatureRenderer skyFeatureRenderer,
-            final ClientLevel level,
+            final ClientWorld level,
             final Matrix4f modelViewMatrix,
             final int clampedTimeOfDay,
             final float skyAngle,
@@ -117,10 +115,10 @@ public class SkyLayer {
     ) {
         final float weatherAlpha = this.weather.getAlpha(rainLevel, thunderLevel);
         final float fadeAlpha = this.fade.getAlpha(clampedTimeOfDay);
-        final float finalAlpha = Mth.clamp(this.alpha * weatherAlpha * fadeAlpha, 0.0F, 1.0F);
+        final float finalAlpha = Math.clamp(this.alpha * weatherAlpha * fadeAlpha, 0.0F, 1.0F);
         if (finalAlpha >= MIN_ALPHA_ALLOWED) {
             if (this.rotate) {
-                modelViewMatrix.rotate(Axis.of((Vector3f) this.axis).rotationDegrees(this.getAngle(level, skyAngle)));
+                modelViewMatrix.rotate(this.getAngle(level, skyAngle), this.axis);
             }
 
             final SkyFeatureRenderer.Pipeline pipeline = new SkyFeatureRenderer.Pipeline(this.blend.getBlendFunction());
@@ -129,22 +127,23 @@ public class SkyLayer {
         }
     }
 
-    public void tick(final Skybox skybox, final ClientLevel level) {
+    public void tick(final Skybox skybox, final ClientWorld level) {
         this.alpha = skybox.isActive() ? this.getPositionBrightness(level) : -1.0F;
     }
 
-    private boolean getConditionCheck(final ClientLevel level) {
-        final Entity cameraEntity = Minecraft.getInstance().getCameraEntity();
-        if (cameraEntity == null) {
+    private boolean getConditionCheck(final ClientWorld level) {
+        final Entity cameraEntity = Minecraft.getInstance().getCamera();
+        final BlockPos blockPos = cameraEntity != null ? new BlockPos(cameraEntity) : null;
+        if (blockPos == null) {
             return false;
-        } else if (!this.biomes.locations().isEmpty() && !this.biomes.contains(level.getBiome(cameraEntity.blockPosition()))) {
+        } else if (!this.biomes.locations().isEmpty() && !this.biomes.contains(level.getBiome(blockPos))) {
             return false;
         } else {
-            return this.heights == null || this.heights.isEmpty() || Range.contains(this.heights, cameraEntity.getOnPos().getY());
+            return this.heights == null || this.heights.isEmpty() || Range.contains(this.heights, blockPos.getY());
         }
     }
 
-    public float getPositionBrightness(final ClientLevel level) {
+    public float getPositionBrightness(final ClientWorld level) {
         if (this.biomes.locations().isEmpty() && this.heights.isEmpty()) {
             return 1.0F;
         } else if (this.alpha == -1.0F) {
@@ -171,10 +170,10 @@ public class SkyLayer {
         }
     }
 
-    private float getAngle(final Level level, final float skyAngle) {
+    private float getAngle(final ClientWorld level, final float skyAngle) {
         float angleDayStart = 0.0F;
         if (this.speed != (float) Math.round(this.speed)) {
-            final long currentWorldDay = (level.getDayTime() + 18000L) / 24000L;
+            final long currentWorldDay = (level.getTime() + 18000L) / 24000L;
             final float currentAngle = (float) currentWorldDay * (this.speed % 1.0F);
             angleDayStart = currentAngle % 1.0F;
         }
@@ -182,11 +181,11 @@ public class SkyLayer {
         return 360.0F * (angleDayStart + skyAngle * this.speed);
     }
 
-    public ResourceLocation properties() {
+    public Identifier properties() {
         return this.properties;
     }
 
-    public ResourceLocation texture() {
+    public Identifier texture() {
         return this.texture;
     }
 

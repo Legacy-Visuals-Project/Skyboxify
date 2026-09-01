@@ -26,8 +26,8 @@ package btw.lowercase.skyboxify.api;
 import btw.lowercase.skyboxify.config.SkyboxifyConfig;
 import btw.lowercase.skyboxify.skybox.SkyboxManager;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.resource.Identifier;
 
 import java.util.Map;
 import java.util.Objects;
@@ -36,15 +36,15 @@ public final class SkyboxifyImpl implements SkyboxifyApi {
     private static final SkyboxifyImpl INSTANCE = new SkyboxifyImpl();
 
     private final SkyboxManager skyboxManager = new SkyboxManager(this);
-    private final Map<Integer, ResourceLocation> dimensionMapping = new Int2ObjectArrayMap<>();
+    private final Map<Integer, Identifier> dimensionMapping = new Int2ObjectArrayMap<>();
     private final SkyboxifyConfig config = new SkyboxifyConfig();
 
     private SkyboxifyImpl() {
-        this.registerDimensionMapping(-1, ResourceLocation.withDefaultNamespace("the_nether"));
-        this.registerDimensionMapping(0, ResourceLocation.withDefaultNamespace("overworld"));
-        this.registerDimensionMapping(1, ResourceLocation.withDefaultNamespace("the_end"));
-        this.registerDimensionMapping(4, ResourceLocation.fromNamespaceAndPath("aether", "the_aether"));
-        this.registerDimensionMapping(7, ResourceLocation.fromNamespaceAndPath("twilightforest", "twilight_forest"));
+        this.registerDimensionMapping(-1, new Identifier("the_nether"));
+        this.registerDimensionMapping(0, new Identifier("overworld"));
+        this.registerDimensionMapping(1, new Identifier("the_end"));
+        this.registerDimensionMapping(4, new Identifier("aether", "the_aether"));
+        this.registerDimensionMapping(7, new Identifier("twilightforest", "twilight_forest"));
     }
 
     public static SkyboxifyApi getInstance() {
@@ -75,12 +75,12 @@ public final class SkyboxifyImpl implements SkyboxifyApi {
     }
 
     @Override
-    public ResourceLocation getModernDimension(final int legacyId) {
+    public Identifier getModernDimension(final int legacyId) {
         return this.dimensionMapping.getOrDefault(legacyId, null);
     }
 
     @Override
-    public void registerDimensionMapping(final int legacyId, final ResourceLocation modernId) {
+    public void registerDimensionMapping(final int legacyId, final Identifier modernId) {
         if (this.dimensionMapping.containsKey(legacyId)) {
             throw new IllegalArgumentException("Cannot register dimension mapping, world with legacy properties " + legacyId + " is already taken by \"" + dimensionMapping.get(legacyId) + "\"!");
         }

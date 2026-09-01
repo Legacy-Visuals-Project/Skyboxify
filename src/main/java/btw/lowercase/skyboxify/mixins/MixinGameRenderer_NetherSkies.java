@@ -23,30 +23,22 @@
 
 package btw.lowercase.skyboxify.mixins;
 
-import btw.lowercase.skyboxify.api.SkyboxifyImpl;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.DimensionSpecialEffects;
-import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.world.level.Level;
-import org.spongepowered.asm.mixin.Final;
+import net.minecraft.client.render.world.WorldRenderer;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
 
-@Mixin(LevelRenderer.class)
+@Mixin(WorldRenderer.class)
 public abstract class MixinGameRenderer_NetherSkies {
-    @Shadow
-    @Final
-    private Minecraft minecraft;
-
-    @WrapOperation(method = "renderLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/DimensionSpecialEffects;isFoggyAt(II)Z"))
-    private boolean skyboxify$allowNetherSky(final DimensionSpecialEffects instance, final int x, final int y, final Operation<Boolean> original) {
-        if (SkyboxifyImpl.skyboxManager().isEnabled() && SkyboxifyImpl.skyboxManager().containsEnabled(Level.NETHER) && minecraft.level.effects() instanceof DimensionSpecialEffects.NetherEffects) {
-            return false;
-        } else {
-            return original.call(instance, x, y);
-        }
-    }
+    // TODO
+//    @Shadow
+//    @Final
+//    private Minecraft minecraft;
+//
+//    @WrapOperation(method = "renderLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/DimensionSpecialEffects;isFoggyAt(II)Z"))
+//    private boolean skyboxify$allowNetherSky(final DimensionSpecialEffects instance, final int x, final int y, final Operation<Boolean> original) {
+//        if (SkyboxifyImpl.skyboxManager().isEnabled() && SkyboxifyImpl.skyboxManager().containsEnabled(Level.NETHER) && minecraft.level.effects() instanceof DimensionSpecialEffects.NetherEffects) {
+//            return false;
+//        } else {
+//            return original.call(instance, x, y);
+//        }
+//    }
 }

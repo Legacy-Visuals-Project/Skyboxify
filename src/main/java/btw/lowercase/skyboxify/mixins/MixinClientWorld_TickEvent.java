@@ -21,17 +21,20 @@
  * "MINECRAFT" LINKING EXCEPTION TO THE GPL
  */
 
-package btw.lowercase.skyboxify;
+package btw.lowercase.skyboxify.mixins;
 
-import btw.lowercase.skyboxify.skybox.SkyboxResourceHelper;
-import net.fabricmc.api.ClientModInitializer;
-import net.ornithemc.osl.resource.loader.api.client.ClientResourceLoaderEvents;
+import btw.lowercase.skyboxify.Skyboxify;
+import btw.lowercase.skyboxify.events.WorldTickEvent;
+import net.minecraft.client.world.ClientWorld;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-public final class SkyboxifyClient implements ClientModInitializer {
-    @Override
-    public void onInitializeClient() {
-        Skyboxify.initialize();
-//        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(new SkyboxifyCommand()));
-        ClientResourceLoaderEvents.INIT_RESOURCE_MANAGER.register(resources -> resources.addReloader(new SkyboxResourceHelper()));
+@Mixin(ClientWorld.class)
+public abstract class MixinClientWorld_TickEvent {
+    @Inject(method = "tick", at = @At("TAIL"))
+    private void skyboxify$endTickEvent(final CallbackInfo ci) {
+        Skyboxify.eventManager().dispatch(new WorldTickEvent.End());
     }
 }

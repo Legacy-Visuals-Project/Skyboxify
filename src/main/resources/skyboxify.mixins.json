@@ -4,9 +4,10 @@
 	"package": "btw.lowercase.skyboxify.mixins",
 	"compatibilityLevel": "JAVA_21",
 	"client": [
+		"MixinClientWorld_TickEvent",
 		"MixinGameRenderer_NetherSkies",
-		"MixinLevelRenderer_SkyEvents",
-		"MixinMinecraft_CloseBuffers"
+		"MixinMinecraft_CloseBuffers",
+		"MixinWorldRenderer_SkyEvents"
 	],
 	"injectors": {
 		"defaultRequire": 1

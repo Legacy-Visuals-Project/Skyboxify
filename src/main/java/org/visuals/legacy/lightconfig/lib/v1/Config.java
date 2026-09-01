@@ -26,7 +26,7 @@ package org.visuals.legacy.lightconfig.lib.v1;
 
 import com.google.gson.JsonObject;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screen.Screen;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -168,5 +168,5 @@ public abstract class Config {
         return this.configFile;
     }
 
-    public abstract Screen getConfigScreen(@Nullable Screen parent);
+    public abstract Screen getConfigScreen(final @Nullable Screen parent);
 }

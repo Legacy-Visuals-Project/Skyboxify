@@ -23,60 +23,33 @@
 
 package btw.lowercase.skyboxify.skybox.renderer;
 
-import btw.lowercase.skyboxify.Skyboxify;
 import btw.lowercase.skyboxify.api.SkyboxifyImpl;
-import btw.lowercase.skyboxify.skybox.SkyPart;
 import btw.lowercase.skyboxify.utils.BlendFunction;
 import btw.lowercase.skyboxify.utils.FilteringMode;
-import com.mojang.blaze3d.pipeline.RenderTarget;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.VertexBuffer;
-import com.mojang.blaze3d.vertex.VertexFormat;
-import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.RenderStateShard;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.render.pipeline.RenderTarget;
+import net.minecraft.client.render.platform.GlStateManager;
+import net.minecraft.client.render.texture.Texture;
+import net.minecraft.client.render.vertex.VertexBuffer;
+import net.minecraft.resource.Identifier;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector4fc;
-
-import java.util.Objects;
-import java.util.function.Function;
+import org.lwjgl.opengl.GL11;
 
 public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submit> {
-    private final Function<RenderData, RenderType> RENDER_TYPE = Util.memoize(renderData -> {
-        final RenderType.CompositeState.CompositeStateBuilder builder = RenderType.CompositeState.builder();
-        builder.setShaderState(RenderStateShard.POSITION_TEX_SHADER);
-        builder.setWriteMaskState(RenderStateShard.COLOR_WRITE);
-        builder.setTextureState(new RenderStateShard.TextureStateShard(renderData.location, renderData.blur, false));
-        builder.setOutputState(new RenderStateShard.OutputStateShard("Dynamic Output Target", () -> Objects.requireNonNullElseGet(this.renderTarget, () -> Minecraft.getInstance().getMainRenderTarget()).bindWrite(false), () -> Minecraft.getInstance().getMainRenderTarget().bindWrite(false)));
-
-        final BlendFunction blendFunction = renderData.blend;
-        if (blendFunction != null) {
-            builder.setTransparencyState(new RenderStateShard.TransparencyStateShard("Dynamic Blend Function", () -> {
-                RenderSystem.enableBlend();
-                RenderSystem.blendFunc(blendFunction.srcFactor().vanilla(), blendFunction.dstFactor().vanilla());
-            }, () -> {
-                RenderSystem.disableBlend();
-                RenderSystem.defaultBlendFunc();
-            }));
-        }
-
-        return RenderType.create(
-                Skyboxify.locationOrNull("skybox").toString(),
-                DefaultVertexFormat.POSITION_TEX, VertexFormat.Mode.QUADS,
-                DefaultVertexFormat.POSITION_TEX.getVertexSize() * SkyPart.COUNT * 4,
-                builder.createCompositeState(false)
-        );
-    });
-
     public SkyFeatureRenderer(final RenderTarget renderTarget) {
         super(renderTarget);
     }
 
     @Override
-    protected Submit createSubmit(final Pipeline pipeline, final Geometry geometry, final RenderUniforms uniforms, final ResourceLocation location) {
-        return new Submit(RENDER_TYPE.apply(new RenderData(location, pipeline.blendFunction(), SkyboxifyImpl.config().filteringMode.getValue() == FilteringMode.LINEAR)), geometry, uniforms);
+    protected Submit createSubmit(final Pipeline pipeline, final Geometry geometry, final RenderUniforms uniforms, final Identifier location) {
+        return new Submit(
+                location,
+                pipeline.blendFunction(),
+                SkyboxifyImpl.config().filteringMode.getValue() == FilteringMode.LINEAR,
+                geometry,
+                uniforms
+        );
     }
 
     @Override
@@ -89,25 +62,61 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
 
                 final VertexBuffer vertexBuffer = ((StaticGeometry) submit.geometry).vertexBuffer();
                 final Vector4fc shaderColor = submit.uniforms.shaderColor();
-                RenderSystem.setShaderColor(shaderColor.x(), shaderColor.y(), shaderColor.z(), shaderColor.w());
+                GlStateManager.color4f(shaderColor.x(), shaderColor.y(), shaderColor.z(), shaderColor.w());
 
-                submit.renderType.setupRenderState();
+                this.setupGlState(submit);
                 vertexBuffer.bind();
-                vertexBuffer.drawWithShader(submit.uniforms.modelViewMatrix(), RenderSystem.getProjectionMatrix(), RenderSystem.getShader());
-                VertexBuffer.unbind();
-                submit.renderType.clearRenderState();
+                vertexBuffer.draw(GL11.GL_QUADS);
+                vertexBuffer.unbind();
+                this.resetGlState(submit);
             }
 
-            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-            RenderSystem.enableBlend();
+            GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+            GlStateManager.enableBlend();
             super.endFrame();
         }
     }
 
-    private record RenderData(ResourceLocation location, BlendFunction blend, boolean blur) {
+    private void setupGlState(final Submit submit) {
+        final Minecraft minecraft = Minecraft.getInstance();
+        final Texture texture = minecraft.getTextureManager().get(submit.location);
+        GlStateManager.bindTexture(texture.getGlId());
+        texture.pushFilter(submit.blur, false);
+
+        GlStateManager.depthMask(false);
+
+        final BlendFunction blendFunction = submit.blend;
+        if (blendFunction != null) {
+            GlStateManager.enableBlend();
+            GlStateManager.blendFunc(blendFunction.srcFactor().vanilla(), blendFunction.dstFactor().vanilla());
+        }
+
+        this.renderTarget.bindWrite(true);
     }
 
-    protected record Submit(RenderType renderType, Geometry geometry,
-                            RenderUniforms uniforms) implements FeatureRenderer.Submit {
+    private void resetGlState(final Submit submit) {
+        this.renderTarget.unbindWrite();
+
+        final BlendFunction blendFunction = submit.blend;
+        if (blendFunction != null) {
+            GlStateManager.disableBlend();
+            GlStateManager.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
+        }
+
+        GlStateManager.depthMask(true);
+
+        final Minecraft minecraft = Minecraft.getInstance();
+        final Texture texture = minecraft.getTextureManager().get(submit.location);
+        GlStateManager.bindTexture(0);
+        texture.popFilter();
+    }
+
+    protected record Submit(
+            Identifier location,
+            @Nullable BlendFunction blend,
+            boolean blur,
+            Geometry geometry,
+            RenderUniforms uniforms
+    ) implements FeatureRenderer.Submit {
     }
 }

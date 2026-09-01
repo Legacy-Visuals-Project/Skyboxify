@@ -23,7 +23,9 @@
 
 package btw.lowercase.skyboxify.skybox.renderer;
 
-import com.mojang.blaze3d.vertex.*;
+import net.minecraft.client.render.vertex.BufferBuilder;
+import net.minecraft.client.render.vertex.VertexBuffer;
+import net.minecraft.client.render.vertex.VertexFormat;
 
 import java.util.function.Consumer;
 
@@ -35,18 +37,16 @@ public class StaticGeometry implements Geometry {
         this.vertexBuffer = vertexBuffer;
     }
 
-    public static StaticGeometry create(final VertexFormat vertexFormat, final VertexFormat.Mode vertexMode, final int vertexCount, final Consumer<VertexConsumer> vertexConsumer) {
-        try (final ByteBufferBuilder byteBufferBuilder = new ByteBufferBuilder(vertexFormat.getVertexSize() * vertexCount)) {
-            final BufferBuilder builder = new BufferBuilder(byteBufferBuilder, vertexMode, vertexFormat);
-            vertexConsumer.accept(builder);
-            try (final MeshData meshData = builder.buildOrThrow()) {
-                final VertexBuffer vertexBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
-                vertexBuffer.bind();
-                vertexBuffer.upload(meshData);
-                VertexBuffer.unbind();
-                return new StaticGeometry(vertexBuffer);
-            }
-        }
+    public static StaticGeometry create(final VertexFormat vertexFormat, final int vertexMode, final int vertexCount, final Consumer<BufferBuilder> vertexConsumer) {
+        final BufferBuilder builder = new BufferBuilder(vertexFormat.getVertexSize() * vertexCount);
+        vertexConsumer.accept(builder);
+        builder.end();
+
+        final VertexBuffer vertexBuffer = new VertexBuffer(vertexFormat);
+        vertexBuffer.bind();
+        vertexBuffer.upload(builder.getBuffer());
+        vertexBuffer.unbind();
+        return new StaticGeometry(vertexBuffer);
     }
 
     public VertexBuffer vertexBuffer() {
@@ -62,7 +62,7 @@ public class StaticGeometry implements Geometry {
     public void close() {
         if (!this.closed) {
             this.closed = true;
-            this.vertexBuffer.close();
+            this.vertexBuffer.delete();
         }
     }
 }

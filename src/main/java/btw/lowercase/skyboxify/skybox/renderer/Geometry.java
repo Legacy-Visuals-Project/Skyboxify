@@ -25,22 +25,23 @@ package btw.lowercase.skyboxify.skybox.renderer;
 
 import btw.lowercase.skyboxify.skybox.SkyPart;
 import btw.lowercase.skyboxify.skybox.impl.components.UV;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.VertexFormat;
+import btw.lowercase.skyboxify.utils.ShaderUtil;
+import net.minecraft.client.render.vertex.DefaultVertexFormat;
+import org.lwjgl.opengl.GL11;
 
 public interface Geometry extends AutoCloseable {
     StaticGeometry DEFAULT = StaticGeometry.create(
             DefaultVertexFormat.POSITION_TEX,
-            VertexFormat.Mode.QUADS,
+            GL11.GL_QUADS,
             SkyPart.COUNT * 4,
             vertexConsumer -> {
                 for (final SkyPart part : SkyPart.VALUES) {
                     final UV uv = part.getUv();
                     final float size = 100.0F; // Bigger the value, the less bad view-bobbing affects it, but it starts clipping which is bad
-                    vertexConsumer.addVertex(part.getRotationMatrix(), -size, -size, -size).setUv(uv.minU(), uv.minV());
-                    vertexConsumer.addVertex(part.getRotationMatrix(), -size, -size, size).setUv(uv.minU(), uv.maxV());
-                    vertexConsumer.addVertex(part.getRotationMatrix(), size, -size, size).setUv(uv.maxU(), uv.maxV());
-                    vertexConsumer.addVertex(part.getRotationMatrix(), size, -size, -size).setUv(uv.maxU(), uv.minV());
+                    ShaderUtil.addVertex(vertexConsumer, ShaderUtil.transform(part.getRotationMatrix(), -size, -size, -size)).texture(uv.minU(), uv.minV()).nextVertex();
+                    ShaderUtil.addVertex(vertexConsumer, ShaderUtil.transform(part.getRotationMatrix(), -size, -size, size)).texture(uv.minU(), uv.maxV()).nextVertex();
+                    ShaderUtil.addVertex(vertexConsumer, ShaderUtil.transform(part.getRotationMatrix(), size, -size, size)).texture(uv.maxU(), uv.maxV()).nextVertex();
+                    ShaderUtil.addVertex(vertexConsumer, ShaderUtil.transform(part.getRotationMatrix(), size, -size, -size)).texture(uv.maxU(), uv.minV()).nextVertex();
                 }
             });
 

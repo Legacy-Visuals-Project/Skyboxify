@@ -2,9 +2,10 @@ pluginManagement {
 	repositories {
 		mavenCentral()
 		gradlePluginPortal()
-		maven("https://maven.fabricmc.net")
-		maven("https://maven.neoforged.net/releases")
-		maven("https://maven.architectury.dev")
+
+        maven("https://maven.fabricmc.net/")
+        maven("https://maven.ornithemc.net/releases")
+
 		maven("https://maven.kikugie.dev/snapshots")
 		maven("https://maven.kikugie.dev/releases")
         maven("https://repo.polyfrost.cc/releases")

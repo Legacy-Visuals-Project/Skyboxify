@@ -23,7 +23,14 @@
 
 package btw.lowercase.skyboxify.utils;
 
-import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.render.platform.GlStateManager;
+import net.minecraft.client.render.vertex.BufferBuilder;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
+
+import java.nio.FloatBuffer;
 
 public final class ShaderUtil {
     private ShaderUtil() {
@@ -34,10 +41,33 @@ public final class ShaderUtil {
         final float green = ARGB.greenFloat(color);
         final float blue = ARGB.blueFloat(color);
         final float alpha = ARGB.alphaFloat(color);
-        RenderSystem.setShaderColor(red, green, blue, alpha);
+        GlStateManager.color4f(red, green, blue, alpha);
     }
 
     public static void applyWhite() {
         applyColor(0xFFFFFFFF);
+    }
+
+    public static Vector3f transform(final Matrix4f matrix4f, final float x, final float y, final float z) {
+        return matrix4f.transformPosition(new Vector3f(x, y, z));
+    }
+
+    public static BufferBuilder addVertex(final BufferBuilder builder, final Vector3f vector3f) {
+        return builder.vertex(vector3f.x, vector3f.y, vector3f.z);
+    }
+
+    private static final FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
+
+    public static Matrix4f extractModelView() {
+        matrixBuffer.reset();
+        GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX, matrixBuffer);
+        return new Matrix4f(matrixBuffer);
+    }
+
+    public static void applyModelView(final Matrix4f matrix4f) {
+        matrixBuffer.reset();
+        matrix4f.get(matrixBuffer);
+        matrixBuffer.flip();
+        GL11.glMultMatrix(matrixBuffer);
     }
 }

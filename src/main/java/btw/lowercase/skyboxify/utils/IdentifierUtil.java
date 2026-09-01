@@ -21,17 +21,23 @@
  * "MINECRAFT" LINKING EXCEPTION TO THE GPL
  */
 
-package btw.lowercase.skyboxify;
+package btw.lowercase.skyboxify.utils;
 
-import btw.lowercase.skyboxify.skybox.SkyboxResourceHelper;
-import net.fabricmc.api.ClientModInitializer;
-import net.ornithemc.osl.resource.loader.api.client.ClientResourceLoaderEvents;
+import com.mojang.serialization.Codec;
+import net.minecraft.resource.Identifier;
 
-public final class SkyboxifyClient implements ClientModInitializer {
-    @Override
-    public void onInitializeClient() {
-        Skyboxify.initialize();
-//        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(new SkyboxifyCommand()));
-        ClientResourceLoaderEvents.INIT_RESOURCE_MANAGER.register(resources -> resources.addReloader(new SkyboxResourceHelper()));
+public final class IdentifierUtil {
+    public static Codec<Identifier> CODEC = null;
+
+    public static Identifier withNamespace(final Identifier base, final String namespace) {
+        return new Identifier(namespace, base.getPath());
+    }
+
+    public static Identifier withPath(final Identifier base, final String path) {
+        return new Identifier(base.getNamespace(), path);
+    }
+
+    public static Identifier tryParse(final String input) {
+        return null; // TODO
     }
 }

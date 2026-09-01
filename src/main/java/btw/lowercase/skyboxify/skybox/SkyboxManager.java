@@ -27,9 +27,7 @@ import btw.lowercase.skyboxify.api.SkyboxifyApi;
 import btw.lowercase.skyboxify.skybox.impl.Skybox;
 import com.google.common.base.Preconditions;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.level.Level;
+import net.minecraft.client.world.ClientWorld;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,13 +52,13 @@ public final class SkyboxManager {
     }
 
     public void tick() {
-        final ClientLevel level = Minecraft.getInstance().level;
+        final ClientWorld level = Minecraft.getInstance().world;
         if (level != null) {
             this.tick(level);
         }
     }
 
-    public void tick(final ClientLevel level) {
+    public void tick(final ClientWorld level) {
         for (final Skybox skybox : this.loadedSkies) {
             skybox.tick(level);
         }
@@ -73,11 +71,11 @@ public final class SkyboxManager {
         return this.api.getConfig().enabled.isEnabled() && !this.activeSkies.isEmpty();
     }
 
-    public List<Skybox> getSkiesFor(final ResourceKey<Level> resourceKey) {
+    public List<Skybox> getSkiesFor(final ResourceKey<ClientWorld> resourceKey) {
         return getActiveSkies().stream().filter(skybox -> resourceKey.equals(skybox.dimension())).toList();
     }
 
-    public boolean containsEnabled(final ResourceKey<Level> resourceKey) {
+    public boolean containsEnabled(final ResourceKey<ClientWorld> resourceKey) {
         return !getSkiesFor(resourceKey).isEmpty();
     }
 

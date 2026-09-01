@@ -21,17 +21,11 @@
  * "MINECRAFT" LINKING EXCEPTION TO THE GPL
  */
 
-package btw.lowercase.skyboxify;
+package btw.lowercase.skyboxify.events;
 
-import btw.lowercase.skyboxify.skybox.SkyboxResourceHelper;
-import net.fabricmc.api.ClientModInitializer;
-import net.ornithemc.osl.resource.loader.api.client.ClientResourceLoaderEvents;
+import org.visuals.legacy.lightconfig.lib.v1.events.Event;
 
-public final class SkyboxifyClient implements ClientModInitializer {
-    @Override
-    public void onInitializeClient() {
-        Skyboxify.initialize();
-//        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(new SkyboxifyCommand()));
-        ClientResourceLoaderEvents.INIT_RESOURCE_MANAGER.register(resources -> resources.addReloader(new SkyboxResourceHelper()));
+public class WorldTickEvent {
+    public static class End implements Event {
     }
 }

@@ -23,8 +23,7 @@
 
 package btw.lowercase.skyboxify.utils;
 
-import static com.mojang.blaze3d.platform.GlStateManager.DestFactor;
-import static com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
+import org.lwjgl.opengl.GL11;
 
 public record BlendFunction(SrcFactor srcFactor, DstFactor dstFactor) {
     public enum SrcFactor {
@@ -34,13 +33,13 @@ public record BlendFunction(SrcFactor srcFactor, DstFactor dstFactor) {
         DST_COLOR,
         ONE_MINUS_DST_COLOR;
 
-        public SourceFactor vanilla() {
+        public int vanilla() {
             return switch (this) {
-                case ZERO -> SourceFactor.ZERO;
-                case ONE -> SourceFactor.ONE;
-                case SRC_ALPHA -> SourceFactor.SRC_ALPHA;
-                case DST_COLOR -> SourceFactor.DST_COLOR;
-                case ONE_MINUS_DST_COLOR -> SourceFactor.ONE_MINUS_DST_COLOR;
+                case ZERO -> GL11.GL_ZERO;
+                case ONE -> GL11.GL_ONE;
+                case SRC_ALPHA -> GL11.GL_SRC_ALPHA;
+                case DST_COLOR -> GL11.GL_DST_COLOR;
+                case ONE_MINUS_DST_COLOR -> GL11.GL_ONE_MINUS_DST_COLOR;
             };
         }
     }
@@ -52,13 +51,13 @@ public record BlendFunction(SrcFactor srcFactor, DstFactor dstFactor) {
         ONE_MINUS_SRC_COLOR,
         ONE_MINUS_SRC_ALPHA;
 
-        public DestFactor vanilla() {
+        public int vanilla() {
             return switch (this) {
-                case ZERO -> DestFactor.ZERO;
-                case ONE -> DestFactor.ONE;
-                case SRC_COLOR -> DestFactor.SRC_COLOR;
-                case ONE_MINUS_SRC_COLOR -> DestFactor.ONE_MINUS_SRC_COLOR;
-                case ONE_MINUS_SRC_ALPHA -> DestFactor.ONE_MINUS_SRC_ALPHA;
+                case ZERO -> GL11.GL_ZERO;
+                case ONE -> GL11.GL_ONE;
+                case SRC_COLOR -> GL11.GL_SRC_COLOR;
+                case ONE_MINUS_SRC_COLOR -> GL11.GL_ONE_MINUS_SRC_COLOR;
+                case ONE_MINUS_SRC_ALPHA -> GL11.GL_ONE_MINUS_SRC_ALPHA;
             };
         }
     }

@@ -27,14 +27,12 @@ import btw.lowercase.skyboxify.api.SkyboxifyApi;
 import btw.lowercase.skyboxify.api.SkyboxifyImpl;
 import btw.lowercase.skyboxify.config.SkyboxifyConfig;
 import btw.lowercase.skyboxify.events.SkyRenderEvent;
+import btw.lowercase.skyboxify.events.WorldTickEvent;
 import btw.lowercase.skyboxify.skybox.impl.Skybox;
 import btw.lowercase.skyboxify.skybox.renderer.SkyFeatureRenderer;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.math.Axis;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.Level;
+import btw.lowercase.skyboxify.utils.ShaderUtil;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.resource.Identifier;
 import org.joml.Matrix4f;
 import org.visuals.legacy.lightconfig.lib.v1.events.EventManager;
 
@@ -45,16 +43,16 @@ public final class Skyboxify {
         return globalEventManager;
     }
 
-    public static ResourceLocation locationOrNull(final String path) {
-        return ResourceLocation.fromNamespaceAndPath(SkyboxifyInfo.MOD_ID, path);
+    public static Identifier locationOrNull(final String path) {
+        return new Identifier(SkyboxifyInfo.MOD_ID, path);
     }
 
     public static void initialize() {
         final SkyboxifyApi impl = SkyboxifyImpl.getInstance();
-        impl.getConfig().load();
-
         final SkyboxifyConfig config = impl.getConfig();
-        ClientTickEvents.END_WORLD_TICK.register(SkyboxifyImpl.skyboxManager()::tick);
+        config.load();
+
+        globalEventManager.listen(WorldTickEvent.End.class, event -> impl.getSkyboxManager().tick());
 
         globalEventManager.listen(SkyRenderEvent.Disc.class, event -> {
             if (config.enabled.isEnabled() && !config.renderSky.isEnabled()) {
@@ -81,25 +79,27 @@ public final class Skyboxify {
 
         globalEventManager.listen(SkyRenderEvent.EndSky.After.class, event -> {
             if (SkyboxifyImpl.skyboxManager().isEnabled()) {
-                renderSkyboxes(event.skyFeatureRenderer(), event.level(), event.skyViewMatrix(), 0.0F);
+                renderSkyboxes(event.skyFeatureRenderer(), event.level(), 0.0F);
             }
         });
 
         globalEventManager.listen(SkyRenderEvent.SunMoonStars.class, event -> {
-            final ClientLevel level = event.level();
+            final ClientWorld level = event.level();
             if (SkyboxifyImpl.skyboxManager().isEnabled()) {
-                renderSkyboxes(event.skyFeatureRenderer(), level, event.skyViewMatrix(), event.tickDelta());
-                if (level.dimension().equals(Level.NETHER)) {
+                renderSkyboxes(event.skyFeatureRenderer(), level, event.tickDelta());
+                if (level.dimension.getId() == -1) {
                     event.setCancelled(true);
                 }
             }
         });
     }
 
-    private static void renderSkyboxes(final SkyFeatureRenderer skyFeatureRenderer, final ClientLevel level, final Matrix4f skyViewMatrix, final float tickDelta) {
-        final Matrix4f modelViewMatrix = new Matrix4f(RenderSystem.getModelViewStack());
+    private static void renderSkyboxes(final SkyFeatureRenderer skyFeatureRenderer, final ClientWorld level, final float tickDelta) {
+        final Matrix4f skyViewMatrix = ShaderUtil.extractModelView();
+
+        final Matrix4f modelViewMatrix = new Matrix4f();
         modelViewMatrix.mul(skyViewMatrix);
-        modelViewMatrix.rotate(Axis.YP.rotationDegrees(-90.0F));
+        modelViewMatrix.rotateY((float) Math.toRadians(-90.0F));
         for (final Skybox skybox : SkyboxifyImpl.skyboxManager().getActiveSkies()) {
             skybox.extractRenderState(skyFeatureRenderer, level, modelViewMatrix, tickDelta);
         }
