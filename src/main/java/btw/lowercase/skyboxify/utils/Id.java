@@ -27,20 +27,16 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import net.minecraft.resource.Identifier;
 import net.ornithemc.osl.core.api.util.NamespacedIdentifier;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public final class Id {
+public record Id(String namespace, String path) {
     public static final Codec<Id> CODEC = Codec.STRING.comapFlatMap(Id::read, Id::toString).stable();
     public static final String DEFAULT_NAMESPACE = "minecraft";
 
-    private final String namespace;
-    private final String path;
-
-    private Id(String string, String string2) {
-        assert isValidNamespace(string);
-        assert isValidPath(string2);
-        this.namespace = string;
-        this.path = string2;
+    public Id {
+        assert isValidNamespace(namespace);
+        assert isValidPath(path);
     }
 
     public static Id fromVanilla(final NamespacedIdentifier identifier) {
@@ -126,19 +122,8 @@ public final class Id {
     }
 
     @Override
-    public String toString() {
+    public @NotNull String toString() {
         return this.namespace + ":" + this.path;
-    }
-
-    @Override
-    public boolean equals(final Object object) {
-        if (this == object) {
-            return true;
-        } else {
-            return !(object instanceof Id resourceLocation)
-                    ? false
-                    : this.namespace.equals(resourceLocation.namespace) && this.path.equals(resourceLocation.path);
-        }
     }
 
     @Override
