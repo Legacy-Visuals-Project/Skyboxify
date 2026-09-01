@@ -23,17 +23,12 @@
 
 package btw.lowercase.skyboxify.mixins;
 
-import net.minecraft.client.render.world.WorldRenderer;
+import net.minecraft.client.render.GameRenderer;
 import org.spongepowered.asm.mixin.Mixin;
 
-@Mixin(WorldRenderer.class)
+@Mixin(GameRenderer.class)
 public abstract class MixinGameRenderer_NetherSkies {
-    // TODO
-//    @Shadow
-//    @Final
-//    private Minecraft minecraft;
-//
-//    @WrapOperation(method = "renderLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/DimensionSpecialEffects;isFoggyAt(II)Z"))
+//    @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/DimensionSpecialEffects;isFoggyAt(II)Z"))
 //    private boolean skyboxify$allowNetherSky(final DimensionSpecialEffects instance, final int x, final int y, final Operation<Boolean> original) {
 //        if (SkyboxifyImpl.skyboxManager().isEnabled() && SkyboxifyImpl.skyboxManager().containsEnabled(Level.NETHER) && minecraft.level.effects() instanceof DimensionSpecialEffects.NetherEffects) {
 //            return false;

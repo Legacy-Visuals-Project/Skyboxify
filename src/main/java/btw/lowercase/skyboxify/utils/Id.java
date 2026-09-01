@@ -30,9 +30,10 @@ import net.ornithemc.osl.core.api.util.NamespacedIdentifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public record Id(String namespace, String path) {
+public record Id(String namespace, String path) implements NamespacedIdentifier {
     public static final Codec<Id> CODEC = Codec.STRING.comapFlatMap(Id::read, Id::toString).stable();
     public static final String DEFAULT_NAMESPACE = "minecraft";
+    public static final char SPLIT_DELIMINATOR = ':';
 
     public Id {
         assert isValidNamespace(namespace);
@@ -52,7 +53,7 @@ public record Id(String namespace, String path) {
     }
 
     public static Id parse(final String input) {
-        return bySeparator(input, ':');
+        return bySeparator(input, SPLIT_DELIMINATOR);
     }
 
     public static Id withDefaultNamespace(final String path) {
@@ -61,18 +62,18 @@ public record Id(String namespace, String path) {
 
     @Nullable
     public static Id tryParse(final String input) {
-        return tryBySeparator(input, ':');
+        return tryBySeparator(input, SPLIT_DELIMINATOR);
     }
 
     public static Id bySeparator(final String input, final char del) {
-        int index = input.indexOf(del);
+        final int index = input.indexOf(del);
         if (index >= 0) {
-            String string2 = input.substring(index + 1);
+            final String path = input.substring(index + 1);
             if (index != 0) {
-                String string3 = input.substring(0, index);
-                return createUntrusted(string3, string2);
+                final String namespace = input.substring(0, index);
+                return createUntrusted(namespace, path);
             } else {
-                return withDefaultNamespace(string2);
+                return withDefaultNamespace(path);
             }
         } else {
             return withDefaultNamespace(input);
@@ -105,8 +106,13 @@ public record Id(String namespace, String path) {
         }
     }
 
-    public NamespacedIdentifier vanilla() {
+    public Identifier vanilla() {
         return new Identifier(this.namespace, this.path);
+    }
+
+    @Override
+    public String identifier() {
+        return this.path;
     }
 
     public Id withPath(final String path) {

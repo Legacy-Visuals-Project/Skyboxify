@@ -49,16 +49,16 @@ public final class SkyboxManager {
     public void addSkybox(final Skybox skybox) {
         this.loadedSkies.add(Preconditions.checkNotNull(skybox, "Skybox was null"));
         for (final SkyLayer layer : skybox.layers()) {
-            final Identifier identifier = (Identifier) layer.texture().vanilla();
-            Minecraft.getInstance().getTextureManager().register(identifier, new SimpleTexture(identifier));
+            final Identifier id = layer.texture().vanilla();
+            Minecraft.getInstance().getTextureManager().register(id, new SimpleTexture(id));
         }
     }
 
     public void clearSkyboxes() {
         for (final Skybox skybox : this.loadedSkies) {
             for (final SkyLayer layer : skybox.layers()) {
-                final Identifier identifier = (Identifier) layer.texture().vanilla();
-                Minecraft.getInstance().getTextureManager().close(identifier);
+                final Identifier id = layer.texture().vanilla();
+                Minecraft.getInstance().getTextureManager().close(id);
             }
         }
 
@@ -67,15 +67,15 @@ public final class SkyboxManager {
     }
 
     public void tick() {
-        final ClientWorld level = Minecraft.getInstance().world;
-        if (level != null) {
-            this.tick(level);
+        final ClientWorld world = Minecraft.getInstance().world;
+        if (world != null) {
+            this.tick(world);
         }
     }
 
-    public void tick(final ClientWorld level) {
+    public void tick(final ClientWorld world) {
         for (final Skybox skybox : this.loadedSkies) {
-            skybox.tick(level);
+            skybox.tick(world);
         }
 
         this.activeSkies.removeIf(optiFineSkybox -> !optiFineSkybox.isActive());

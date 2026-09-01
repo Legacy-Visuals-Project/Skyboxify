@@ -46,7 +46,7 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
     @Override
     protected Submit createSubmit(final Pipeline pipeline, final Geometry geometry, final RenderUniforms uniforms, final Id location) {
         return new Submit(
-                (Identifier) location.vanilla(),
+                location.vanilla(),
                 pipeline.blendFunction(),
                 SkyboxifyImpl.config().filteringMode.getValue() == FilteringMode.LINEAR,
                 geometry,

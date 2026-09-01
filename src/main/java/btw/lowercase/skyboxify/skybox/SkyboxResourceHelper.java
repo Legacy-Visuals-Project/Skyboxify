@@ -133,7 +133,7 @@ public class SkyboxResourceHelper implements ResourceReloadListener {
                 return;
             }
 
-            final IOSupplier<InputStream> resource = packResources.getResource(ResourceType.CLIENT_ASSETS, id.vanilla());
+            final IOSupplier<InputStream> resource = packResources.getResource(ResourceType.CLIENT_ASSETS, id);
             if (resource == null) {
                 LOGGER.error("Error trying to read namespaced identifier: {}", id);
                 return;

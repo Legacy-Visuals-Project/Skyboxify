@@ -101,12 +101,17 @@ public class SkyRenderEvent {
 
         public enum Type {
             TOP,
+            VOID,
             BOTTOM
         }
     }
 
     public static Disc topDisc() {
         return new Disc(Disc.Type.TOP);
+    }
+
+    public static Disc voidDisc() {
+        return new Disc(Disc.Type.VOID);
     }
 
     public static Disc bottomDisc() {
