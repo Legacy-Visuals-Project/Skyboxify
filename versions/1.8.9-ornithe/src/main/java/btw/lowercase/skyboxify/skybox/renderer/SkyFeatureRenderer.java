@@ -33,7 +33,6 @@ import net.minecraft.client.render.pipeline.RenderTarget;
 import net.minecraft.client.render.platform.GlStateManager;
 import net.minecraft.client.render.texture.Texture;
 import net.minecraft.client.render.texture.TextureManager;
-import net.minecraft.client.render.vertex.VertexBuffer;
 import net.minecraft.resource.Identifier;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
@@ -64,11 +63,8 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
                     throw new RuntimeException("Cannot render closed geometry!");
                 }
 
-                final VertexBuffer vertexBuffer = ((StaticGeometry) submit.geometry).vertexBuffer();
                 this.setupGlState(submit);
-                vertexBuffer.bind();
-                vertexBuffer.draw(GL11.GL_QUADS);
-                vertexBuffer.unbind();
+                submit.geometry.draw();
                 this.resetGlState(submit);
             }
 

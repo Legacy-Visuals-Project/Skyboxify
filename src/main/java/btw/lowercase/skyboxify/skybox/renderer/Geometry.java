@@ -45,6 +45,8 @@ public interface Geometry extends AutoCloseable {
                 }
             });
 
+    void draw();
+
     boolean isClosed();
 
     void close();
