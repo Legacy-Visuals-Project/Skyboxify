@@ -24,10 +24,15 @@
 package btw.lowercase.skyboxify.utils;
 
 import net.minecraft.world.biome.Biome;
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
 public final class CommonUtils {
     public static final Vector3f X_AXIS = new Vector3f(1.0F, 0.0F, 0.0F);
+    public static final Vector3f Y_AXIS = new Vector3f(0.0F, 1.0F, 0.0F);
+    public static final float EPSILON = 1.0E-5F;
 
     public static int normalizeTickTime(final int tickTime) {
         int result = tickTime % 24000;
@@ -60,6 +65,10 @@ public final class CommonUtils {
             final float result = in ? lastAlpha + alphaChange : lastAlpha - alphaChange;
             return Math.clamp(result, minAlpha, maxAlpha);
         }
+    }
+
+    public static void rotate(final Matrix4f matrix4f, final Vector3fc axis, final float angle) {
+        matrix4f.rotate(new Quaternionf().rotateAxis((float) Math.toRadians(angle), axis));
     }
 
     public static final int NETHER = -1;

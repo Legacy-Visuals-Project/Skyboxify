@@ -92,7 +92,7 @@ public final class Skyboxify {
 
     private static void renderSkyboxes(final SkyFeatureRenderer skyFeatureRenderer, final ClientWorld level, final float tickDelta) {
         final Matrix4f modelViewMatrix = new Matrix4f(ShaderUtil.captureModelView());
-        modelViewMatrix.rotateY((float) Math.toDegrees(-90.0F));
+        CommonUtils.rotate(modelViewMatrix, CommonUtils.Y_AXIS, -90.0F);
         for (final Skybox skybox : SkyboxifyImpl.skyboxManager().getActiveSkies()) {
             skybox.extractRenderState(skyFeatureRenderer, level, modelViewMatrix, tickDelta);
         }

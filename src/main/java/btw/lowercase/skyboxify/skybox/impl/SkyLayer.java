@@ -38,7 +38,6 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import org.joml.Matrix4f;
-import org.joml.Quaternionf;
 import org.joml.Vector3fc;
 
 import java.util.List;
@@ -118,7 +117,7 @@ public class SkyLayer {
         final float finalAlpha = Math.clamp(this.alpha * weatherAlpha * fadeAlpha, 0.0F, 1.0F);
         if (finalAlpha >= MIN_ALPHA_ALLOWED) {
             if (this.rotate) {
-                modelViewMatrix.rotate(new Quaternionf().rotateAxis((float) Math.toRadians(this.getAngle(world, skyAngle)), this.axis));
+                CommonUtils.rotate(modelViewMatrix, this.axis, this.getAngle(world, skyAngle));
             }
 
             final SkyFeatureRenderer.Pipeline pipeline = new SkyFeatureRenderer.Pipeline(this.blend.getBlendFunction());
@@ -127,29 +126,29 @@ public class SkyLayer {
         }
     }
 
-    public void tick(final Skybox skybox, final ClientWorld level) {
-        this.alpha = skybox.isActive() ? this.getPositionBrightness(level) : -1.0F;
+    public void tick(final Skybox skybox, final ClientWorld world) {
+        this.alpha = skybox.isActive() ? this.getPositionBrightness(world) : -1.0F;
     }
 
-    private boolean getConditionCheck(final ClientWorld level) {
+    private boolean getConditionCheck(final ClientWorld world) {
         final Entity cameraEntity = Minecraft.getInstance().getCamera();
         final BlockPos blockPos = cameraEntity != null ? new BlockPos(cameraEntity) : null;
         if (blockPos == null) {
             return false;
-        } else if (!this.biomes.locations().isEmpty() && !this.biomes.contains(level.getBiome(blockPos))) {
+        } else if (!this.biomes.locations().isEmpty() && !this.biomes.contains(world.getBiome(blockPos))) {
             return false;
         } else {
             return this.heights == null || this.heights.isEmpty() || Range.contains(this.heights, blockPos.getY());
         }
     }
 
-    public float getPositionBrightness(final ClientWorld level) {
+    public float getPositionBrightness(final ClientWorld world) {
         if (this.biomes.locations().isEmpty() && this.heights.isEmpty()) {
             return 1.0F;
         } else if (this.alpha == -1.0F) {
-            return this.getConditionCheck(level) ? 1.0F : 0.0F;
+            return this.getConditionCheck(world) ? 1.0F : 0.0F;
         } else {
-            return CommonUtils.calculateConditionAlphaValue(1.0F, 0.0F, this.alpha, this.transition, this.getConditionCheck(level));
+            return CommonUtils.calculateConditionAlphaValue(1.0F, 0.0F, this.alpha, this.transition, this.getConditionCheck(world));
         }
     }
 
@@ -170,10 +169,10 @@ public class SkyLayer {
         }
     }
 
-    private float getAngle(final ClientWorld level, final float skyAngle) {
+    private float getAngle(final ClientWorld world, final float skyAngle) {
         float angleDayStart = 0.0F;
         if (this.speed != (float) Math.round(this.speed)) {
-            final long currentWorldDay = (level.getTime() + 18000L) / 24000L;
+            final long currentWorldDay = (world.getTime() + 18000L) / 24000L;
             final float currentAngle = (float) currentWorldDay * (this.speed % 1.0F);
             angleDayStart = currentAngle % 1.0F;
         }

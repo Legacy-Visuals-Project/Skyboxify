@@ -65,7 +65,7 @@ public final class ParserCodecs {
                     safeParseFloat(parts.get(1), Float.MIN_VALUE),
                     safeParseFloat(parts.get(2), Float.MIN_VALUE)
             );
-            if (vector3f.lengthSquared() > 1.0E-5F) {
+            if (vector3f.lengthSquared() > CommonUtils.EPSILON) {
                 return new Vector3f(vector3f.z, vector3f.y, -vector3f.x);
             }
         }
