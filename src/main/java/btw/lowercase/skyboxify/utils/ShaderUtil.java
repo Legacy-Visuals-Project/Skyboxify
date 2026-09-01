@@ -41,23 +41,12 @@ public final class ShaderUtil {
         GlStateManager.color4f(color.x(), color.y(), color.z(), color.w());
     }
 
-    public static void applyColor(final int color) {
-        final float red = ARGB.redFloat(color);
-        final float green = ARGB.greenFloat(color);
-        final float blue = ARGB.blueFloat(color);
-        final float alpha = ARGB.alphaFloat(color);
-        GlStateManager.color4f(red, green, blue, alpha);
-    }
-
     public static void applyWhite() {
-        applyColor(0xFFFFFFFF);
+        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
     }
 
-    public static Vector3f transform(final Matrix4f matrix4f, final float x, final float y, final float z) {
-        return matrix4f.transformPosition(new Vector3f(x, y, z));
-    }
-
-    public static BufferBuilder addVertex(final BufferBuilder builder, final Vector3f vector3f) {
+    public static BufferBuilder addVertex(final BufferBuilder builder, final Matrix4f matrix4f, final float x, final float y, final float z) {
+        final Vector3f vector3f = matrix4f.transformPosition(new Vector3f(x, y, z));
         return builder.vertex(vector3f.x, vector3f.y, vector3f.z);
     }
 

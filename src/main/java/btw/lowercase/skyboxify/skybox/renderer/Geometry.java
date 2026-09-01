@@ -38,10 +38,10 @@ public interface Geometry extends AutoCloseable {
                 for (final SkyPart part : SkyPart.VALUES) {
                     final UV uv = part.getUv();
                     final float size = 100.0F;
-                    ShaderUtil.addVertex(vertexConsumer, ShaderUtil.transform(part.getRotationMatrix(), -size, -size, -size)).texture(uv.minU(), uv.minV()).nextVertex();
-                    ShaderUtil.addVertex(vertexConsumer, ShaderUtil.transform(part.getRotationMatrix(), -size, -size, size)).texture(uv.minU(), uv.maxV()).nextVertex();
-                    ShaderUtil.addVertex(vertexConsumer, ShaderUtil.transform(part.getRotationMatrix(), size, -size, size)).texture(uv.maxU(), uv.maxV()).nextVertex();
-                    ShaderUtil.addVertex(vertexConsumer, ShaderUtil.transform(part.getRotationMatrix(), size, -size, -size)).texture(uv.maxU(), uv.minV()).nextVertex();
+                    ShaderUtil.addVertex(vertexConsumer, part.getRotationMatrix(), -size, -size, -size).texture(uv.minU(), uv.minV()).nextVertex();
+                    ShaderUtil.addVertex(vertexConsumer, part.getRotationMatrix(), -size, -size, size).texture(uv.minU(), uv.maxV()).nextVertex();
+                    ShaderUtil.addVertex(vertexConsumer, part.getRotationMatrix(), size, -size, size).texture(uv.maxU(), uv.maxV()).nextVertex();
+                    ShaderUtil.addVertex(vertexConsumer, part.getRotationMatrix(), size, -size, -size).texture(uv.maxU(), uv.minV()).nextVertex();
                 }
             });
 
