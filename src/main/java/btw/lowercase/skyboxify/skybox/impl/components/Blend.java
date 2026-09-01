@@ -24,15 +24,15 @@
 package btw.lowercase.skyboxify.skybox.impl.components;
 
 import btw.lowercase.skyboxify.utils.BlendFunction;
+import btw.lowercase.skyboxify.utils.EnumSerializable;
 import com.mojang.serialization.Codec;
-import net.minecraft.util.StringRepresentable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector4f;
 
 import java.util.function.Function;
 
-public enum Blend implements StringRepresentable {
+public enum Blend implements EnumSerializable {
     ADD(alpha -> new Vector4f(1.0F, 1.0F, 1.0F, alpha), new BlendFunction(BlendFunction.SrcFactor.SRC_ALPHA, BlendFunction.DstFactor.ONE)),
     SUBTRACT(alpha -> new Vector4f(alpha, alpha, alpha, 1.0F), new BlendFunction(BlendFunction.SrcFactor.ONE_MINUS_DST_COLOR, BlendFunction.DstFactor.ZERO)),
     MULTIPLY(alpha -> new Vector4f(alpha, alpha, alpha, alpha), new BlendFunction(BlendFunction.SrcFactor.DST_COLOR, BlendFunction.DstFactor.ONE_MINUS_SRC_ALPHA)),
@@ -43,7 +43,7 @@ public enum Blend implements StringRepresentable {
     OVERLAY(alpha -> new Vector4f(alpha, alpha, alpha, 1.0F), new BlendFunction(BlendFunction.SrcFactor.DST_COLOR, BlendFunction.DstFactor.SRC_COLOR)),
     ALPHA(alpha -> new Vector4f(1.0F, 1.0F, 1.0F, alpha), new BlendFunction(BlendFunction.SrcFactor.SRC_ALPHA, BlendFunction.DstFactor.ONE_MINUS_SRC_ALPHA));
 
-    public static final Codec<Blend> CODEC = StringRepresentable.fromEnum(Blend::values).orElse(Blend.ADD);
+    public static final Codec<Blend> CODEC = EnumSerializable.of(Blend::values).orElse(Blend.ADD);
 
     private final Function<Float, Vector4f> colorConsumer;
     private final BlendFunction blendFunction;
@@ -61,9 +61,8 @@ public enum Blend implements StringRepresentable {
         return this.blendFunction;
     }
 
-    @NotNull
     @Override
-    public String getSerializedName() {
+    public @NotNull String serializedName() {
         return this.name().toLowerCase();
     }
 }

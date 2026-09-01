@@ -20,7 +20,7 @@
 	"depends": {
 		"fabricloader": ">=${fabric_loader_version}",
 		"minecraft": "${minecraft_version_range}",
-		"fabric": "*"
+		"osl": "*"
 	},
 	"custom": {
 		"modmenu": {

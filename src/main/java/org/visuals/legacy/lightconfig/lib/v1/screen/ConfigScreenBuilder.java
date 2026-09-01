@@ -25,25 +25,25 @@
 package org.visuals.legacy.lightconfig.lib.v1.screen;
 
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
+import net.ornithemc.osl.text.api.TextComponent;
+import net.ornithemc.osl.text.impl.LiteralTextComponent;
 import org.jetbrains.annotations.Nullable;
 import org.visuals.legacy.lightconfig.lib.v1.Config;
 
 public class ConfigScreenBuilder {
     private final Config config;
-    private Text title;
+    private TextComponent title;
 
     private ConfigScreenBuilder(final Config config) {
         this.config = config;
-        this.title = new LiteralText("");
+        this.title = new LiteralTextComponent("");
     }
 
     public static ConfigScreenBuilder builder(final Config config) {
         return new ConfigScreenBuilder(config);
     }
 
-    public ConfigScreenBuilder setTitle(final Text title) {
+    public ConfigScreenBuilder setTitle(final TextComponent title) {
         this.title = title;
         return this;
     }

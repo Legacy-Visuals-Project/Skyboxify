@@ -24,8 +24,8 @@
 package btw.lowercase.skyboxify.skybox.renderer;
 
 import btw.lowercase.skyboxify.utils.BlendFunction;
+import btw.lowercase.skyboxify.utils.Id;
 import net.minecraft.client.render.pipeline.RenderTarget;
-import net.minecraft.resource.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -39,9 +39,9 @@ public abstract class FeatureRenderer<T extends FeatureRenderer.Submit> {
         this.renderTarget = renderTarget;
     }
 
-    protected abstract T createSubmit(final Pipeline pipeline, final Geometry geometry, final RenderUniforms uniforms, final Identifier location);
+    protected abstract T createSubmit(final Pipeline pipeline, final Geometry geometry, final RenderUniforms uniforms, final Id location);
 
-    public void submit(final Pipeline pipeline, final Geometry geometry, final RenderUniforms uniforms, final Identifier location) {
+    public void submit(final Pipeline pipeline, final Geometry geometry, final RenderUniforms uniforms, final Id location) {
         if (geometry != null && !geometry.isClosed()) {
             this.submits.add(createSubmit(pipeline, geometry, uniforms, location));
         } else {

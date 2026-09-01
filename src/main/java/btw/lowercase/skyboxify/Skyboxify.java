@@ -30,10 +30,9 @@ import btw.lowercase.skyboxify.events.SkyRenderEvent;
 import btw.lowercase.skyboxify.events.WorldTickEvent;
 import btw.lowercase.skyboxify.skybox.impl.Skybox;
 import btw.lowercase.skyboxify.skybox.renderer.SkyFeatureRenderer;
-import btw.lowercase.skyboxify.utils.ShaderUtil;
+import btw.lowercase.skyboxify.utils.CommonUtils;
+import net.minecraft.client.render.platform.GlStateManager;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.resource.Identifier;
-import org.joml.Matrix4f;
 import org.visuals.legacy.lightconfig.lib.v1.events.EventManager;
 
 public final class Skyboxify {
@@ -41,10 +40,6 @@ public final class Skyboxify {
 
     public static EventManager eventManager() {
         return globalEventManager;
-    }
-
-    public static Identifier locationOrNull(final String path) {
-        return new Identifier(SkyboxifyInfo.MOD_ID, path);
     }
 
     public static void initialize() {
@@ -87,7 +82,7 @@ public final class Skyboxify {
             final ClientWorld level = event.level();
             if (SkyboxifyImpl.skyboxManager().isEnabled()) {
                 renderSkyboxes(event.skyFeatureRenderer(), level, event.tickDelta());
-                if (level.dimension.getId() == -1) {
+                if (level.dimension.getId() == CommonUtils.NETHER) {
                     event.setCancelled(true);
                 }
             }
@@ -95,15 +90,12 @@ public final class Skyboxify {
     }
 
     private static void renderSkyboxes(final SkyFeatureRenderer skyFeatureRenderer, final ClientWorld level, final float tickDelta) {
-        final Matrix4f skyViewMatrix = ShaderUtil.extractModelView();
-
-        final Matrix4f modelViewMatrix = new Matrix4f();
-        modelViewMatrix.mul(skyViewMatrix);
-        modelViewMatrix.rotateY((float) Math.toRadians(-90.0F));
+        GlStateManager.pushMatrix();
+        GlStateManager.rotatef(-90.0F, 0.0F, 1.0F, 0.0F);
         for (final Skybox skybox : SkyboxifyImpl.skyboxManager().getActiveSkies()) {
-            skybox.extractRenderState(skyFeatureRenderer, level, modelViewMatrix, tickDelta);
+            skybox.extractRenderState(skyFeatureRenderer, level, tickDelta);
         }
-
+        GlStateManager.popMatrix();
         skyFeatureRenderer.endFrame();
     }
 }

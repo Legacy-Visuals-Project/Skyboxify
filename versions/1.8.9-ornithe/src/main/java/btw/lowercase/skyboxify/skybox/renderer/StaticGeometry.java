@@ -39,6 +39,7 @@ public class StaticGeometry implements Geometry {
 
     public static StaticGeometry create(final VertexFormat vertexFormat, final int vertexMode, final int vertexCount, final Consumer<BufferBuilder> vertexConsumer) {
         final BufferBuilder builder = new BufferBuilder(vertexFormat.getVertexSize() * vertexCount);
+        builder.begin(vertexMode, vertexFormat);
         vertexConsumer.accept(builder);
         builder.end();
 

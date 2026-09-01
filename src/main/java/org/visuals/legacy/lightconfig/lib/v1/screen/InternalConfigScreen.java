@@ -24,72 +24,65 @@
 
 package org.visuals.legacy.lightconfig.lib.v1.screen;
 
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.StringWidget;
-import net.minecraft.client.gui.layouts.GridLayout;
-import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
-import net.minecraft.client.gui.layouts.LinearLayout;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.network.chat.Component;
+import net.minecraft.client.gui.screen.Screen;
+import net.ornithemc.osl.text.api.TextComponent;
 import org.jetbrains.annotations.ApiStatus;
 import org.visuals.legacy.lightconfig.lib.v1.Config;
-import org.visuals.legacy.lightconfig.lib.v1.Translations;
-import org.visuals.legacy.lightconfig.lib.v1.field.AbstractConfigField;
 
 @ApiStatus.Internal
 public class InternalConfigScreen extends Screen {
+    private final TextComponent title;
     protected final Screen parent;
     protected final Config config;
 
-    public InternalConfigScreen(final Component title, final Config config, final Screen parent) {
-        super(title);
+    public InternalConfigScreen(final TextComponent title, final Config config, final Screen parent) {
+        super();
+        this.title = title;
         this.parent = parent;
         this.config = config;
     }
 
     @Override
-    protected void init() {
-        final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this, 61, 33);
-
-        this.setupHeader(layout);
-        this.setupConfigList(layout);
-        this.setupFooter(layout);
-
-        layout.visitWidgets(this::addRenderableWidget);
-        layout.arrangeElements();
+    public void init() {
+//        final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this, 61, 33);
+//
+//        this.setupHeader(layout);
+//        this.setupConfigList(layout);
+//        this.setupFooter(layout);
+//
+//        layout.visitWidgets(this::addRenderableWidget);
+//        layout.arrangeElements();
     }
 
-    private void setupHeader(final HeaderAndFooterLayout layout) {
-        // TODO: .spacing(8)
-        final LinearLayout linearLayout = layout.addToHeader(new LinearLayout(0, 0, LinearLayout.Orientation.VERTICAL));
-        linearLayout.addChild(new StringWidget(this.getTitle(), this.font), linearLayout.defaultChildLayoutSetting().alignHorizontallyCenter());
-    }
+//    private void setupHeader(final HeaderAndFooterLayout layout) {
+//        // TODO: .spacing(8)
+//        final LinearLayout linearLayout = layout.addToHeader(new LinearLayout(0, 0, LinearLayout.Orientation.VERTICAL));
+//        linearLayout.addChild(new StringWidget(this.getTitle(), this.font), linearLayout.defaultChildLayoutSetting().alignHorizontallyCenter());
+//    }
+//
+//    // TODO: Custom Entry Setup
+//    private void setupConfigList(final HeaderAndFooterLayout layout) {
+//        final GridLayout gridLayout = layout.addToContents(new GridLayout());
+//        gridLayout.defaultCellSetting().paddingHorizontal(4).paddingBottom(4).alignHorizontallyCenter().alignVerticallyMiddle();
+//
+//        final GridLayout.RowHelper rowHelper = gridLayout.createRowHelper(2);
+//        for (final AbstractConfigField<?> child : this.config.getConfigFields()) {
+//            rowHelper.addChild(child.createWidget());
+//        }
+//    }
+//
+//    private void setupFooter(final HeaderAndFooterLayout layout) {
+//        final GridLayout footerGridLayout = layout.addToFooter(new GridLayout());
+//        footerGridLayout.defaultCellSetting().paddingHorizontal(4).paddingBottom(4).alignHorizontallyCenter();
+//
+//        final GridLayout.RowHelper footerRowHelper = footerGridLayout.createRowHelper(2);
+//        footerRowHelper.addChild(Button.builder(Translations.RESET, (button) -> this.config.reset()).width(125).build());
+//        footerRowHelper.addChild(Button.builder(CommonComponents.GUI_DONE, (button) -> this.onClose()).width(125).build());
+//    }
 
-    // TODO: Custom Entry Setup
-    private void setupConfigList(final HeaderAndFooterLayout layout) {
-        final GridLayout gridLayout = layout.addToContents(new GridLayout());
-        gridLayout.defaultCellSetting().paddingHorizontal(4).paddingBottom(4).alignHorizontallyCenter().alignVerticallyMiddle();
-
-        final GridLayout.RowHelper rowHelper = gridLayout.createRowHelper(2);
-        for (final AbstractConfigField<?> child : this.config.getConfigFields()) {
-            rowHelper.addChild(child.createWidget());
-        }
-    }
-
-    private void setupFooter(final HeaderAndFooterLayout layout) {
-        final GridLayout footerGridLayout = layout.addToFooter(new GridLayout());
-        footerGridLayout.defaultCellSetting().paddingHorizontal(4).paddingBottom(4).alignHorizontallyCenter();
-
-        final GridLayout.RowHelper footerRowHelper = footerGridLayout.createRowHelper(2);
-        footerRowHelper.addChild(Button.builder(Translations.RESET, (button) -> this.config.reset()).width(125).build());
-        footerRowHelper.addChild(Button.builder(CommonComponents.GUI_DONE, (button) -> this.onClose()).width(125).build());
-    }
-
-    @Override
     @SuppressWarnings("DataFlowIssue")
     public void onClose() {
         this.config.save();
-        this.minecraft.setScreen(this.parent);
+        this.minecraft.openScreen(this.parent);
     }
 }

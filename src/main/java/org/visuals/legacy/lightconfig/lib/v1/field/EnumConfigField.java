@@ -24,10 +24,9 @@
 
 package org.visuals.legacy.lightconfig.lib.v1.field;
 
-import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.network.chat.Component;
+import net.minecraft.client.gui.widget.ButtonWidget;
+import net.ornithemc.osl.text.api.TextComponent;
+import net.ornithemc.osl.text.impl.TranslatableTextComponent;
 import org.visuals.legacy.lightconfig.lib.v1.Config;
 import org.visuals.legacy.lightconfig.lib.v1.Translations;
 import org.visuals.legacy.lightconfig.lib.v1.serialization.ConfigDeserializer;
@@ -63,20 +62,21 @@ public class EnumConfigField<T extends Enum<T>> extends AbstractConfigField<T> {
     }
 
     @Override
-    public AbstractWidget createWidget() {
+    public ButtonWidget createWidget() {
         final String translationKey = this.getTranslationKey();
-        final Component translate = Component.translatable(translationKey);
-        return Button.builder(getDisplayText(translate, translationKey), (button) -> {
-                    T[] constants = this.enumClass.getEnumConstants();
-                    T next = constants[(this.value.ordinal() + 1) % constants.length];
-                    this.setValue(next);
-                    button.setMessage(getDisplayText(translate, translationKey));
-                })
-                .tooltip(Tooltip.create(Translations.tooltip(translationKey)))
-                .build();
+        final TextComponent translate = new TranslatableTextComponent(translationKey);
+//        return Button.builder(getDisplayText(translate, translationKey), (button) -> {
+//                    T[] constants = this.enumClass.getEnumConstants();
+//                    T next = constants[(this.value.ordinal() + 1) % constants.length];
+//                    this.setValue(next);
+//                    button.setMessage(getDisplayText(translate, translationKey));
+//                })
+//                .tooltip(Tooltip.create(Translations.tooltip(translationKey)))
+//                .build();
+        return null;
     }
 
-    private Component getDisplayText(final Component translate, final String translationKey) {
-        return Translations.TEMPLATE.apply(translate, Component.translatable(translationKey + '.' + this.getValue().name()));
+    private TextComponent getDisplayText(final TextComponent translate, final String translationKey) {
+        return Translations.TEMPLATE.apply(translate, new TranslatableTextComponent(translationKey + '.' + this.getValue().name()));
     }
 }

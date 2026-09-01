@@ -23,11 +23,8 @@
 
 package btw.lowercase.skyboxify.utils;
 
-import net.minecraft.resource.Identifier;
+import net.minecraft.world.biome.Biome;
 import org.joml.Vector3f;
-import org.joml.Vector3fc;
-
-import java.text.DecimalFormat;
 
 public final class CommonUtils {
     public static final Vector3f X_AXIS = new Vector3f(1.0F, 0.0F, 0.0F);
@@ -65,16 +62,24 @@ public final class CommonUtils {
         }
     }
 
-    private static final DecimalFormat VECTOR_FORMAT = new DecimalFormat("# .##");
+    public static final int NETHER = -1;
+    public static final int OVERWORLD = 0;
+    public static final int END = 1;
 
-    public static String vectorToString(final Vector3fc vector3fc) {
-        final String x = VECTOR_FORMAT.format(vector3fc.x()).trim();
-        final String y = VECTOR_FORMAT.format(vector3fc.y()).trim();
-        final String z = VECTOR_FORMAT.format(vector3fc.z()).trim();
-        return String.format("[x=%s, y=%s, z=%s]", x, y, z);
+    public static final Id NETHER_ID = Id.withDefaultNamespace("the_nether");
+    public static final Id OVERWORLD_ID = Id.withDefaultNamespace("overworld");
+    public static final Id END_ID = Id.withDefaultNamespace("the_end");
+
+    public static Id dimensionIdentifier(final int dimId) {
+        return switch (dimId) {
+            case NETHER -> NETHER_ID;
+            case OVERWORLD -> OVERWORLD_ID;
+            case END -> END_ID;
+            default -> Id.withDefaultNamespace("unknown");
+        };
     }
 
-    public static Identifier getBiomeLocation(final int biomeId) {
-        return new Identifier("minecraft", "plains"); // TODO
+    public static Id getBiomeId(final Biome biome) {
+        return Id.withDefaultNamespace(biome.name.toLowerCase().replace(" ", "_")); // TODO
     }
 }

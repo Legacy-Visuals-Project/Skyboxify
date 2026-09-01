@@ -23,11 +23,10 @@
 
 package btw.lowercase.skyboxify.skybox.impl.components;
 
+import btw.lowercase.skyboxify.utils.EnumSerializable;
 import btw.lowercase.skyboxify.utils.ParserCodecs;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JavaOps;
-import net.minecraft.util.Mth;
-import net.minecraft.util.StringRepresentable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -41,7 +40,7 @@ public record Weather(List<Condition> conditions) {
         } else {
             return CLEAR;
         }
-    }, weather -> weather.conditions.stream().map(Condition::getSerializedName).toList());
+    }, weather -> weather.conditions.stream().map(Condition::serializedName).toList());
 
     public float getAlpha(final float rainStrength, final float thunderStrength) {
         final float alpha = 1.0F - rainStrength;
@@ -60,18 +59,18 @@ public record Weather(List<Condition> conditions) {
             weatherAlpha += thunderStrength;
         }
 
-        return Mth.clamp(weatherAlpha, 0.0F, 1.0F);
+        return Math.clamp(weatherAlpha, 0.0F, 1.0F);
     }
 
-    public enum Condition implements StringRepresentable {
+    public enum Condition implements EnumSerializable {
         CLEAR,
         RAIN,
         THUNDER;
 
-        public static final Codec<Condition> CODEC = StringRepresentable.fromEnum(Condition::values);
+        public static final Codec<Condition> CODEC = EnumSerializable.of(Condition::values);
 
         @Override
-        public @NotNull String getSerializedName() {
+        public @NotNull String serializedName() {
             return this.name().toLowerCase();
         }
     }

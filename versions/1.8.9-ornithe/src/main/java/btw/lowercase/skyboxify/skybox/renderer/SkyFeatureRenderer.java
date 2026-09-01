@@ -26,14 +26,17 @@ package btw.lowercase.skyboxify.skybox.renderer;
 import btw.lowercase.skyboxify.api.SkyboxifyImpl;
 import btw.lowercase.skyboxify.utils.BlendFunction;
 import btw.lowercase.skyboxify.utils.FilteringMode;
+import btw.lowercase.skyboxify.utils.Id;
+import btw.lowercase.skyboxify.utils.ShaderUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.render.pipeline.RenderTarget;
 import net.minecraft.client.render.platform.GlStateManager;
 import net.minecraft.client.render.texture.Texture;
+import net.minecraft.client.render.texture.TextureManager;
 import net.minecraft.client.render.vertex.VertexBuffer;
 import net.minecraft.resource.Identifier;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Vector4fc;
+import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submit> {
@@ -42,9 +45,9 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
     }
 
     @Override
-    protected Submit createSubmit(final Pipeline pipeline, final Geometry geometry, final RenderUniforms uniforms, final Identifier location) {
+    protected Submit createSubmit(final Pipeline pipeline, final Geometry geometry, final RenderUniforms uniforms, final Id location) {
         return new Submit(
-                location,
+                (Identifier) location.vanilla(),
                 pipeline.blendFunction(),
                 SkyboxifyImpl.config().filteringMode.getValue() == FilteringMode.LINEAR,
                 geometry,
@@ -55,15 +58,13 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
     @Override
     public void endFrame() {
         if (!this.submits.isEmpty()) {
+            final Matrix4f backupModelView = ShaderUtil.extractModelView();
             for (final Submit submit : this.submits) {
                 if (submit.geometry.isClosed()) {
                     throw new RuntimeException("Cannot render closed geometry!");
                 }
 
                 final VertexBuffer vertexBuffer = ((StaticGeometry) submit.geometry).vertexBuffer();
-                final Vector4fc shaderColor = submit.uniforms.shaderColor();
-                GlStateManager.color4f(shaderColor.x(), shaderColor.y(), shaderColor.z(), shaderColor.w());
-
                 this.setupGlState(submit);
                 vertexBuffer.bind();
                 vertexBuffer.draw(GL11.GL_QUADS);
@@ -71,18 +72,21 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
                 this.resetGlState(submit);
             }
 
-            GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+            ShaderUtil.applyWhite();
             GlStateManager.enableBlend();
+            GlStateManager.depthMask(false);
+            ShaderUtil.applyModelView(backupModelView);
             super.endFrame();
         }
     }
 
     private void setupGlState(final Submit submit) {
-        final Minecraft minecraft = Minecraft.getInstance();
-        final Texture texture = minecraft.getTextureManager().get(submit.location);
-        GlStateManager.bindTexture(texture.getGlId());
+        final TextureManager textureManager = Minecraft.getInstance().getTextureManager();
+        final Texture texture = textureManager.get(submit.location);
         texture.pushFilter(submit.blur, false);
 
+        ShaderUtil.applyColor(submit.uniforms.shaderColor());
+        GlStateManager.bindTexture(texture.getGlId());
         GlStateManager.depthMask(false);
 
         final BlendFunction blendFunction = submit.blend;
@@ -91,11 +95,12 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
             GlStateManager.blendFunc(blendFunction.srcFactor().vanilla(), blendFunction.dstFactor().vanilla());
         }
 
-        this.renderTarget.bindWrite(true);
+        this.renderTarget.bindWrite(false);
+        ShaderUtil.applyModelView(submit.uniforms.modelViewMatrix());
     }
 
     private void resetGlState(final Submit submit) {
-        this.renderTarget.unbindWrite();
+        Minecraft.getInstance().getRenderTarget().bindWrite(false);
 
         final BlendFunction blendFunction = submit.blend;
         if (blendFunction != null) {
@@ -104,11 +109,11 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
         }
 
         GlStateManager.depthMask(true);
-
-        final Minecraft minecraft = Minecraft.getInstance();
-        final Texture texture = minecraft.getTextureManager().get(submit.location);
         GlStateManager.bindTexture(0);
-        texture.popFilter();
+        ShaderUtil.applyWhite();
+
+        final TextureManager textureManager = Minecraft.getInstance().getTextureManager();
+        textureManager.get(submit.location).popFilter();
     }
 
     protected record Submit(

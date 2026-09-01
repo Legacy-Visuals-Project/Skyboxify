@@ -26,7 +26,7 @@ package btw.lowercase.skyboxify.config;
 import btw.lowercase.skyboxify.SkyboxifyInfo;
 import btw.lowercase.skyboxify.utils.FilteringMode;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.TranslatableText;
+import net.ornithemc.osl.text.impl.TranslatableTextComponent;
 import org.jetbrains.annotations.Nullable;
 import org.visuals.legacy.lightconfig.lib.v1.Config;
 import org.visuals.legacy.lightconfig.lib.v1.field.BooleanConfigField;
@@ -49,7 +49,7 @@ public class SkyboxifyConfig extends Config {
     @Override
     public Screen getConfigScreen(@Nullable final Screen parent) {
         final ConfigScreenBuilder builder = ConfigScreenBuilder.builder(this);
-        builder.setTitle(new TranslatableText("options.skyboxify.title"));
+        builder.setTitle(new TranslatableTextComponent("options.skyboxify.title"));
         return builder.build(parent);
     }
 }

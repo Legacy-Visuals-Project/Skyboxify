@@ -24,10 +24,14 @@
 package btw.lowercase.skyboxify.skybox;
 
 import btw.lowercase.skyboxify.api.SkyboxifyApi;
+import btw.lowercase.skyboxify.skybox.impl.SkyLayer;
 import btw.lowercase.skyboxify.skybox.impl.Skybox;
+import btw.lowercase.skyboxify.utils.Id;
 import com.google.common.base.Preconditions;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.render.texture.SimpleTexture;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.resource.Identifier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,9 +48,20 @@ public final class SkyboxManager {
 
     public void addSkybox(final Skybox skybox) {
         this.loadedSkies.add(Preconditions.checkNotNull(skybox, "Skybox was null"));
+        for (final SkyLayer layer : skybox.layers()) {
+            final Identifier identifier = (Identifier) layer.texture().vanilla();
+            Minecraft.getInstance().getTextureManager().register(identifier, new SimpleTexture(identifier));
+        }
     }
 
     public void clearSkyboxes() {
+        for (final Skybox skybox : this.loadedSkies) {
+            for (final SkyLayer layer : skybox.layers()) {
+                final Identifier identifier = (Identifier) layer.texture().vanilla();
+                Minecraft.getInstance().getTextureManager().close(identifier);
+            }
+        }
+
         this.loadedSkies.clear();
         this.activeSkies.clear();
     }
@@ -71,12 +86,12 @@ public final class SkyboxManager {
         return this.api.getConfig().enabled.isEnabled() && !this.activeSkies.isEmpty();
     }
 
-    public List<Skybox> getSkiesFor(final ResourceKey<ClientWorld> resourceKey) {
-        return getActiveSkies().stream().filter(skybox -> resourceKey.equals(skybox.dimension())).toList();
+    public List<Skybox> getSkiesFor(final Id dimensionId) {
+        return getActiveSkies().stream().filter(skybox -> dimensionId.equals(skybox.dimension())).toList();
     }
 
-    public boolean containsEnabled(final ResourceKey<ClientWorld> resourceKey) {
-        return !getSkiesFor(resourceKey).isEmpty();
+    public boolean containsEnabled(final Id dimensionId) {
+        return !getSkiesFor(dimensionId).isEmpty();
     }
 
     public List<Skybox> getActiveSkies() {

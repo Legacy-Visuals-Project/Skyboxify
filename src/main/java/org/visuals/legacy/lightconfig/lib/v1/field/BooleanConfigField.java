@@ -24,11 +24,10 @@
 
 package org.visuals.legacy.lightconfig.lib.v1.field;
 
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.network.chat.Component;
+import net.minecraft.client.gui.widget.ButtonWidget;
+import net.ornithemc.osl.text.api.TextComponent;
+import net.ornithemc.osl.text.impl.TranslatableTextComponent;
 import org.visuals.legacy.lightconfig.lib.v1.Config;
-import org.visuals.legacy.lightconfig.lib.v1.Translations;
 import org.visuals.legacy.lightconfig.lib.v1.serialization.ConfigDeserializer;
 import org.visuals.legacy.lightconfig.lib.v1.serialization.ConfigSerializer;
 import org.visuals.legacy.lightconfig.lib.v1.type.Types;
@@ -56,20 +55,21 @@ public class BooleanConfigField extends AbstractConfigField<Boolean> {
     }
 
     @Override
-    public Button createWidget() {
+    public ButtonWidget createWidget() {
         return this.createWidget(Function::identity);
     }
 
-    public Button createWidget(final Runnable onClick) {
+    public ButtonWidget createWidget(final Runnable onClick) {
         final String translationKey = this.getTranslationKey();
-        final Component translate = Component.translatable(translationKey);
-        return Button.builder(Translations.TEMPLATE.apply(translate, Translations.toggle(this.isEnabled())), (button) -> {
-                    this.toggle();
-                    onClick.run();
-                    button.setMessage(Translations.TEMPLATE.apply(translate, Translations.toggle(this.isEnabled())));
-                })
-                .tooltip(Tooltip.create(Translations.tooltip(translationKey)))
-                .build();
+        final TextComponent translate = new TranslatableTextComponent(translationKey);
+//        return Button.builder(Translations.TEMPLATE.apply(translate, Translations.toggle(this.isEnabled())), (button) -> {
+//                    this.toggle();
+//                    onClick.run();
+//                    button.setMessage(Translations.TEMPLATE.apply(translate, Translations.toggle(this.isEnabled())));
+//                })
+//                .tooltip(Tooltip.create(Translations.tooltip(translationKey)))
+//                .build();
+        return null;
     }
 
     public void toggle() {

@@ -24,7 +24,7 @@
 
 package org.visuals.legacy.lightconfig.lib.v1.field;
 
-import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.GuiElement;
 import org.visuals.legacy.lightconfig.lib.v1.Config;
 import org.visuals.legacy.lightconfig.lib.v1.serialization.ConfigDeserializer;
 import org.visuals.legacy.lightconfig.lib.v1.serialization.ConfigSerializer;
@@ -54,7 +54,7 @@ public class NumericConfigField<T extends Number> extends AbstractConfigField<T>
     }
 
     @Override
-    public AbstractWidget createWidget() {
+    public GuiElement createWidget() {
         return null; // TODO
     }
 }

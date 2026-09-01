@@ -24,24 +24,25 @@
 
 package org.visuals.legacy.lightconfig.lib.v1;
 
-import net.minecraft.network.chat.Component;
+import net.ornithemc.osl.text.api.TextComponent;
+import net.ornithemc.osl.text.impl.TranslatableTextComponent;
 
 import java.util.function.BiFunction;
 
 public final class Translations {
-    public static final Component RESET = Component.translatable("options.reset");
-    public static final BiFunction<Component, Component, Component> TEMPLATE = (a, b) -> Component.translatable("options.template", a, b);
-    public static final Component ON = Component.translatable("options.on");
-    public static final Component OFF = Component.translatable("options.off");
+    public static final TextComponent RESET = new TranslatableTextComponent("options.reset");
+    public static final BiFunction<TextComponent, TextComponent, TextComponent> TEMPLATE = (a, b) -> new TranslatableTextComponent("options.template", a, b);
+    public static final TextComponent ON = new TranslatableTextComponent("options.on");
+    public static final TextComponent OFF = new TranslatableTextComponent("options.off");
 
     private Translations() {
     }
 
-    public static Component tooltip(final String translate) {
-        return Component.translatable(translate + ".tooltip");
+    public static TextComponent tooltip(final String translate) {
+        return new TranslatableTextComponent(translate + ".tooltip");
     }
 
-    public static Component toggle(final boolean value) {
+    public static TextComponent toggle(final boolean value) {
         return value ? ON : OFF;
     }
 }

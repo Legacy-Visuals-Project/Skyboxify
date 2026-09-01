@@ -24,7 +24,7 @@
 
 package org.visuals.legacy.lightconfig.lib.v1.field;
 
-import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.GuiElement;
 import org.visuals.legacy.lightconfig.lib.v1.Config;
 import org.visuals.legacy.lightconfig.lib.v1.events.ConfigFieldReset;
 import org.visuals.legacy.lightconfig.lib.v1.events.ConfigValueChanged;
@@ -52,7 +52,7 @@ public abstract class AbstractConfigField<T> {
 
     public abstract void save(final ConfigSerializer<?> serializer) throws Exception;
 
-    public abstract AbstractWidget createWidget();
+    public abstract GuiElement createWidget();
 
     public String getTranslationKey() {
         return String.format("options.%s.%s", this.config.getId(), this.getName());

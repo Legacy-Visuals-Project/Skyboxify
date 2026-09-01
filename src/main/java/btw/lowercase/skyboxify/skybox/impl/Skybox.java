@@ -26,25 +26,26 @@ package btw.lowercase.skyboxify.skybox.impl;
 import btw.lowercase.skyboxify.api.SkyboxifyImpl;
 import btw.lowercase.skyboxify.skybox.AbstractSkybox;
 import btw.lowercase.skyboxify.skybox.renderer.SkyFeatureRenderer;
+import btw.lowercase.skyboxify.utils.CommonUtils;
+import btw.lowercase.skyboxify.utils.Id;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.world.ClientWorld;
-import org.joml.Matrix4f;
 
 import java.util.List;
 
 public class Skybox extends AbstractSkybox {
     public static final Codec<Skybox> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codec.INT.fieldOf("dimension").forGetter(Skybox::dimension),
+            Id.CODEC.fieldOf("dimension").forGetter(Skybox::dimension),
             SkyLayer.CODEC.listOf().fieldOf("layers").forGetter(Skybox::layers)
     ).apply(instance, Skybox::new));
 
     private String packName = null;
     private final List<SkyLayer> layers;
-    private final int dimension;
+    private final Id dimension;
     private boolean active = true;
 
-    public Skybox(final int dimension, final List<SkyLayer> layers) {
+    public Skybox(final Id dimension, final List<SkyLayer> layers) {
         this.dimension = dimension;
         this.layers = layers;
     }
@@ -61,7 +62,7 @@ public class Skybox extends AbstractSkybox {
         return this.layers;
     }
 
-    public int dimension() {
+    public Id dimension() {
         return this.dimension;
     }
 
@@ -70,7 +71,7 @@ public class Skybox extends AbstractSkybox {
     }
 
     @Override
-    public void extractRenderState(final SkyFeatureRenderer skyFeatureRenderer, final ClientWorld level, final Matrix4f modelViewMatrix, final float tickDelta) {
+    public void extractRenderState(final SkyFeatureRenderer skyFeatureRenderer, final ClientWorld level, final float tickDelta) {
         final long dayTime = level.getTime();
         final int clampedTimeOfDay = (int) (dayTime % 24000L);
         final float skyAngle = level.getTimeOfDay(tickDelta);
@@ -83,7 +84,7 @@ public class Skybox extends AbstractSkybox {
 
         for (final SkyLayer layer : this.layers) {
             if (layer.isActive(dayTime, clampedTimeOfDay)) {
-                layer.extractRenderState(skyFeatureRenderer, level, new Matrix4f(modelViewMatrix), clampedTimeOfDay, skyAngle, rainLevel, thunderLevel);
+                layer.extractRenderState(skyFeatureRenderer, level, clampedTimeOfDay, skyAngle, rainLevel, thunderLevel);
             }
         }
     }
@@ -91,10 +92,10 @@ public class Skybox extends AbstractSkybox {
     @Override
     public void tick(final ClientWorld level) {
         final boolean allowOtherDimensions = SkyboxifyImpl.config().showOverworldForUnknownDimension.isEnabled() &&
-                this.dimension == 0 &&
-                level.dimension.getId() != -1 &&
-                level.dimension.getId() != 1;
-        this.active = this.dimension == level.dimension.getId() || allowOtherDimensions;
+                this.dimension.equals(CommonUtils.OVERWORLD_ID) &&
+                !CommonUtils.dimensionIdentifier(level.dimension.getId()).equals(CommonUtils.NETHER_ID) &&
+                !CommonUtils.dimensionIdentifier(level.dimension.getId()).equals(CommonUtils.END_ID);
+        this.active = this.dimension.equals(CommonUtils.dimensionIdentifier(level.dimension.getId())) || allowOtherDimensions;
         this.layers.forEach(layer -> layer.tick(this, level));
     }
 }

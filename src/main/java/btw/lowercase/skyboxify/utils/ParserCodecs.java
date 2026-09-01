@@ -27,7 +27,6 @@ import btw.lowercase.skyboxify.skybox.impl.components.Range;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JavaOps;
-import net.minecraft.resource.Identifier;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.slf4j.Logger;
@@ -110,19 +109,19 @@ public final class ParserCodecs {
         }, output -> Arrays.toString(output.stream().map(Range::toString).toArray()));
     }
 
-    public static Codec<Identifier> getSourceTextureCodec(final Identifier propertiesLocation) {
+    public static Codec<Id> getSourceTextureCodec(final Id propertiesLocation) {
         return Codec.STRING.comapFlatMap(input -> {
             if (input == null) {
-                return DataResult.success(IdentifierUtil.withPath(propertiesLocation, propertiesLocation.getPath().replace(".properties", ".png")));
+                return DataResult.success(propertiesLocation.withPath(propertiesLocation.getPath().replace(".properties", ".png")));
             } else if (input.startsWith("./")) {
                 final String fileName = propertiesLocation.getPath().split("/")[propertiesLocation.getPath().split("/").length - 1];
-                return DataResult.success(IdentifierUtil.withPath(propertiesLocation, propertiesLocation.getPath().replace(fileName, input.substring(2))));
+                return DataResult.success(propertiesLocation.withPath(propertiesLocation.getPath().replace(fileName, input.substring(2))));
             } else {
                 final String[] parts = input.split("/", 3);
                 if (parts.length == 3 && parts[0].equals("assets")) {
-                    return DataResult.success(new Identifier(parts[1], parts[2]));
+                    return DataResult.success(Id.fromNamespaceAndPath(parts[1], parts[2]));
                 } else {
-                    final Identifier result = IdentifierUtil.tryParse(input);
+                    final Id result = Id.tryParse(input);
                     if (result != null) {
                         return DataResult.success(result);
                     } else {
@@ -130,7 +129,7 @@ public final class ParserCodecs {
                     }
                 }
             }
-        }, Identifier::toString);
+        }, Id::toString);
     }
 
     public static final Codec<Float> SAFE_FLOAT = TRIMMED_STRING.comapFlatMap(input -> {

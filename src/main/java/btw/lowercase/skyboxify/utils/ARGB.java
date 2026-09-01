@@ -27,14 +27,6 @@ public final class ARGB {
     private ARGB() {
     }
 
-    public static int color(final int alpha, final int rgb) {
-        return alpha << 24 | rgb & 16777215;
-    }
-
-    public static int white(final float alpha) {
-        return as8BitChannel(alpha) << 24 | 16777215;
-    }
-
     public static int red(final int color) {
         return (color >> 16) & 0xFF;
     }

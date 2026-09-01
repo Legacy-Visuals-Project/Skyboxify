@@ -24,17 +24,17 @@
 package btw.lowercase.skyboxify.skybox.impl.components;
 
 import btw.lowercase.skyboxify.utils.CommonUtils;
+import btw.lowercase.skyboxify.utils.Id;
 import btw.lowercase.skyboxify.utils.ParserCodecs;
 import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JavaOps;
 import net.minecraft.world.biome.Biome;
-import net.ornithemc.osl.resource.loader.api.resource.ResourceLocation;
 
 import java.util.List;
 import java.util.Objects;
 
-public record Biomes(ImmutableList<ResourceLocation> locations, boolean exclusion) {
+public record Biomes(ImmutableList<Id> locations, boolean exclusion) {
     public static Biomes DEFAULT = new Biomes(ImmutableList.of(), false);
 
     public static Codec<Biomes> CODEC = ParserCodecs.TRIMMED_STRING.xmap(input -> {
@@ -45,8 +45,8 @@ public record Biomes(ImmutableList<ResourceLocation> locations, boolean exclusio
 
         final List<String> entries = ParserCodecs.SPLIT_SPACE_TRIMMED.parse(JavaOps.INSTANCE, input).getOrThrow();
         if (!entries.isEmpty()) {
-            final ImmutableList.Builder<ResourceLocation> builder = new ImmutableList.Builder<>();
-            entries.stream().map(ResourceLocation::tryParse).filter(Objects::nonNull).forEach(builder::add);
+            final ImmutableList.Builder<Id> builder = new ImmutableList.Builder<>();
+            entries.stream().map(Id::tryParse).filter(Objects::nonNull).forEach(builder::add);
             return new Biomes(builder.build(), exclusion);
         } else {
             return Biomes.DEFAULT;
@@ -57,7 +57,7 @@ public record Biomes(ImmutableList<ResourceLocation> locations, boolean exclusio
             builder.append("!");
         }
 
-        for (final ResourceLocation location : biomes.locations) {
+        for (final Id location : biomes.locations) {
             builder.append(location).append(" ");
         }
 
@@ -65,7 +65,7 @@ public record Biomes(ImmutableList<ResourceLocation> locations, boolean exclusio
     });
 
     public boolean contains(final Biome currentBiome) {
-        final boolean hasBiome = this.locations().contains(CommonUtils.getBiomeLocation(currentBiome.id));
+        final boolean hasBiome = this.locations().contains(CommonUtils.getBiomeId(currentBiome));
         return (!this.exclusion() || !hasBiome) && (this.exclusion() || hasBiome);
     }
 }

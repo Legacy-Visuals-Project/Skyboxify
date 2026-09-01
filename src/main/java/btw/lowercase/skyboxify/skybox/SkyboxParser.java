@@ -25,13 +25,16 @@ package btw.lowercase.skyboxify.skybox;
 
 import btw.lowercase.skyboxify.api.SkyboxifyImpl;
 import btw.lowercase.skyboxify.skybox.impl.components.Range;
+import btw.lowercase.skyboxify.utils.Id;
 import btw.lowercase.skyboxify.utils.ParserCodecs;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JavaOps;
 import com.mojang.serialization.JsonOps;
-import net.minecraft.resource.Identifier;
+import net.ornithemc.osl.core.api.util.function.IOSupplier;
+import net.ornithemc.osl.resource.loader.api.resource.ResourceType;
+import net.ornithemc.osl.resource.loader.api.resource.pack.ResourcePack;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,51 +44,51 @@ import java.util.List;
 import java.util.Properties;
 
 public final class SkyboxParser {
-	private static final Logger LOGGER = LoggerFactory.getLogger(SkyboxParser.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SkyboxParser.class);
 
-	private SkyboxParser() {
-	}
+    private SkyboxParser() {
+    }
 
-	public static @Nullable JsonObject parseSkyProperties(final Properties properties, final Identifier propertiesResourceLocation, final PackResources packResources) {
-		final JsonObject output = new JsonObject();
+    public static @Nullable JsonObject parseSkyProperties(final Properties properties, final Id propertiesResourceLocation, final ResourcePack packResources) {
+        final JsonObject output = new JsonObject();
 
-		final String sourceTexturePath = parseSourceTexture(properties, propertiesResourceLocation, packResources);
-		if (sourceTexturePath == null) {
-			return null;
-		}
+        final String sourceTexturePath = parseSourceTexture(properties, propertiesResourceLocation, packResources);
+        if (sourceTexturePath == null) {
+            return null;
+        }
 
-		output.addProperty("properties", propertiesResourceLocation.toString());
-		output.addProperty("texture", sourceTexturePath);
+        output.addProperty("properties", propertiesResourceLocation.toString());
+        output.addProperty("texture", sourceTexturePath);
 
-		// Convert fade
-		parseFade(properties, output);
+        // Convert fade
+        parseFade(properties, output);
 
-		// Speed
-		if (properties.containsKey("speed")) {
-			final float value = ParserCodecs.safeParseFloat(properties.getProperty("speed", null), 1.0F);
-			if (value != Float.MIN_VALUE) {
-				output.addProperty("speed", value);
-			} else {
-				LOGGER.warn("Invalid speed provided in skybox.");
-			}
-		}
+        // Speed
+        if (properties.containsKey("speed")) {
+            final float value = ParserCodecs.safeParseFloat(properties.getProperty("speed", null), 1.0F);
+            if (value != Float.MIN_VALUE) {
+                output.addProperty("speed", value);
+            } else {
+                LOGGER.warn("Invalid speed provided in skybox.");
+            }
+        }
 
-		// Heights
-		if (properties.containsKey("heights")) {
-			final List<Range> rangeEntries = ParserCodecs.getRangeEntriesCodec(true).orElse(List.of()).parse(JavaOps.INSTANCE, properties.getProperty("heights")).getOrThrow();
-			if (!rangeEntries.isEmpty()) {
-				final JsonArray heights = new JsonArray();
-				rangeEntries.stream()
-						.map(range -> Range.CODEC.encode(range, JsonOps.INSTANCE, null).getOrThrow())
-						.forEach(heights::add);
-				output.add("heights", heights);
-			}
-		}
+        // Heights
+        if (properties.containsKey("heights")) {
+            final List<Range> rangeEntries = ParserCodecs.getRangeEntriesCodec(true).orElse(List.of()).parse(JavaOps.INSTANCE, properties.getProperty("heights")).getOrThrow();
+            if (!rangeEntries.isEmpty()) {
+                final JsonArray heights = new JsonArray();
+                rangeEntries.stream()
+                        .map(range -> Range.CODEC.encode(range, JsonOps.INSTANCE, null).getOrThrow())
+                        .forEach(heights::add);
+                output.add("heights", heights);
+            }
+        }
 
-		// Days Loop -> Loop
-		if (properties.containsKey("days")) {
-			parseLoop(properties.getProperty("days"), properties.getProperty("daysLoop", null), output);
-		}
+        // Days Loop -> Loop
+        if (properties.containsKey("days")) {
+            parseLoop(properties.getProperty("days"), properties.getProperty("daysLoop", null), output);
+        }
 
         copyString("blend", properties, output);
         copyBoolean("rotate", properties, output);
@@ -94,8 +97,8 @@ public final class SkyboxParser {
         copyString("weather", properties, output);
         copyString("biomes", properties, output);
 
-		return output;
-	}
+        return output;
+    }
 
     private static void copyString(final String key, final Properties properties, final JsonObject output) {
         if (properties.containsKey(key)) {
@@ -115,99 +118,99 @@ public final class SkyboxParser {
         }
     }
 
-	private static String parseSourceTexture(final Properties properties, final Identifier propertiesResourceLocation, final PackResources packResources) {
-		final String source = properties.getProperty("source", null);
-		if (source == null) {
-			LOGGER.error("Failed to load texture texture \"{}\"", "No texture provided or was null");
-			return null;
-		}
+    private static String parseSourceTexture(final Properties properties, final Id propertiesResourceLocation, final ResourcePack packResources) {
+        final String source = properties.getProperty("source", null);
+        if (source == null) {
+            LOGGER.error("Failed to load texture texture \"{}\"", "No texture provided or was null");
+            return null;
+        }
 
-		final DataResult<Identifier> sourceResult = ParserCodecs.getSourceTextureCodec(propertiesResourceLocation).parse(JavaOps.INSTANCE, source);
-		if (sourceResult.isError()) {
-			LOGGER.error("{}", sourceResult.error().get());
-			return null;
-		}
+        final DataResult<Id> sourceResult = ParserCodecs.getSourceTextureCodec(propertiesResourceLocation).parse(JavaOps.INSTANCE, source);
+        if (sourceResult.isError()) {
+            LOGGER.error("{}", sourceResult.error().get());
+            return null;
+        }
 
-		final Identifier sourceTextureResourceLocation = sourceResult.getOrThrow();
-		try {
-			if (!SkyboxifyImpl.config().debug.isEnabled()) {
-				final IoSupplier<InputStream> sourceTextureStream = packResources.getResource(PackType.CLIENT_RESOURCES, sourceTextureResourceLocation);
-				if (sourceTextureStream == null) {
-					LOGGER.error("Failed to load texture '{}', missing or corrupt image?", sourceTextureResourceLocation);
-					return null;
-				}
+        final Id sourceTextureResourceLocation = sourceResult.getOrThrow();
+        try {
+            if (!SkyboxifyImpl.config().debug.isEnabled()) {
+                final IOSupplier<InputStream> sourceTextureStream = packResources.getResource(ResourceType.CLIENT_ASSETS, sourceTextureResourceLocation.vanilla());
+                if (sourceTextureStream == null) {
+                    LOGGER.error("Failed to load texture '{}', missing or corrupt image?", sourceTextureResourceLocation);
+                    return null;
+                }
 
-				sourceTextureStream.get().close();
-			}
-		} catch (final Exception exception) {
-			LOGGER.error("Failed to load texture '{}'", sourceTextureResourceLocation);
-			if (SkyboxifyImpl.config().debug.isEnabled()) {
-				exception.printStackTrace();
-			}
-		}
+                sourceTextureStream.get().close();
+            }
+        } catch (final Exception exception) {
+            LOGGER.error("Failed to load texture '{}'", sourceTextureResourceLocation);
+            if (SkyboxifyImpl.config().debug.isEnabled()) {
+                exception.printStackTrace();
+            }
+        }
 
-		return sourceTextureResourceLocation.toString();
-	}
+        return sourceTextureResourceLocation.toString();
+    }
 
-	private static int toTickTime(final String time) {
-		final String[] parts = time.trim().split(":");
-		if (parts.length == 2) {
-			final int m = ParserCodecs.safeParseInteger(parts[1], -1);
-			int h = ParserCodecs.safeParseInteger(parts[0], -1);
-			if (h >= 0 && h <= 23 && m >= 0 && m <= 59) {
-				h -= 6;
-				if (h < 0) {
-					h += 24;
-				}
+    private static int toTickTime(final String time) {
+        final String[] parts = time.trim().split(":");
+        if (parts.length == 2) {
+            final int m = ParserCodecs.safeParseInteger(parts[1], -1);
+            int h = ParserCodecs.safeParseInteger(parts[0], -1);
+            if (h >= 0 && h <= 23 && m >= 0 && m <= 59) {
+                h -= 6;
+                if (h < 0) {
+                    h += 24;
+                }
 
-				return h * 1000 + (int) (m / 60.0F * 1000.0F);
-			}
-		}
+                return h * 1000 + (int) (m / 60.0F * 1000.0F);
+            }
+        }
 
-		LOGGER.warn("Invalid time: \"{}\" in skybox.", time);
-		return -1;
-	}
+        LOGGER.warn("Invalid time: \"{}\" in skybox.", time);
+        return -1;
+    }
 
-	private static void parseFade(final Properties properties, final JsonObject output) {
-		final JsonObject fade = new JsonObject();
-		if (properties.containsKey("startFadeIn") && properties.containsKey("endFadeIn") && properties.containsKey("endFadeOut")) {
-			final int startFadeIn = toTickTime(properties.getProperty("startFadeIn"));
-			final int endFadeIn = toTickTime(properties.getProperty("endFadeIn"));
-			final int endFadeOut = toTickTime(properties.getProperty("endFadeOut"));
-			int startFadeOut;
-			if (properties.containsKey("startFadeOut")) {
-				startFadeOut = toTickTime(properties.getProperty("startFadeOut"));
-			} else {
-				startFadeOut = endFadeOut - (endFadeIn - startFadeIn);
-				if (startFadeIn <= startFadeOut && endFadeIn >= startFadeOut) {
-					startFadeOut = endFadeOut;
-				}
-			}
+    private static void parseFade(final Properties properties, final JsonObject output) {
+        final JsonObject fade = new JsonObject();
+        if (properties.containsKey("startFadeIn") && properties.containsKey("endFadeIn") && properties.containsKey("endFadeOut")) {
+            final int startFadeIn = toTickTime(properties.getProperty("startFadeIn"));
+            final int endFadeIn = toTickTime(properties.getProperty("endFadeIn"));
+            final int endFadeOut = toTickTime(properties.getProperty("endFadeOut"));
+            int startFadeOut;
+            if (properties.containsKey("startFadeOut")) {
+                startFadeOut = toTickTime(properties.getProperty("startFadeOut"));
+            } else {
+                startFadeOut = endFadeOut - (endFadeIn - startFadeIn);
+                if (startFadeIn <= startFadeOut && endFadeIn >= startFadeOut) {
+                    startFadeOut = endFadeOut;
+                }
+            }
 
-			fade.addProperty("startFadeIn", startFadeIn);
-			fade.addProperty("endFadeIn", endFadeIn);
-			fade.addProperty("startFadeOut", startFadeOut);
-			fade.addProperty("endFadeOut", endFadeOut);
-		} else {
-			fade.addProperty("alwaysOn", true);
-		}
+            fade.addProperty("startFadeIn", startFadeIn);
+            fade.addProperty("endFadeIn", endFadeIn);
+            fade.addProperty("startFadeOut", startFadeOut);
+            fade.addProperty("endFadeOut", endFadeOut);
+        } else {
+            fade.addProperty("alwaysOn", true);
+        }
 
-		output.add("fade", fade);
-	}
+        output.add("fade", fade);
+    }
 
-	private static void parseLoop(final String days, final String daysLoop, final JsonObject output) {
-		final JsonObject loop = new JsonObject();
-		if (daysLoop != null) {
-			loop.addProperty("days", ParserCodecs.safeParseInteger(daysLoop, 8));
-		}
+    private static void parseLoop(final String days, final String daysLoop, final JsonObject output) {
+        final JsonObject loop = new JsonObject();
+        if (daysLoop != null) {
+            loop.addProperty("days", ParserCodecs.safeParseInteger(daysLoop, 8));
+        }
 
-		final List<Range> rangeEntries = ParserCodecs.getRangeEntriesCodec(false).orElse(List.of()).parse(JavaOps.INSTANCE, days).getOrThrow();
-		if (!rangeEntries.isEmpty()) {
-			final JsonArray ranges = new JsonArray();
-			rangeEntries.stream().map(range -> Range.CODEC.encode(range, JsonOps.INSTANCE, null).getOrThrow()).forEach(ranges::add);
-			loop.add("ranges", ranges);
-		}
+        final List<Range> rangeEntries = ParserCodecs.getRangeEntriesCodec(false).orElse(List.of()).parse(JavaOps.INSTANCE, days).getOrThrow();
+        if (!rangeEntries.isEmpty()) {
+            final JsonArray ranges = new JsonArray();
+            rangeEntries.stream().map(range -> Range.CODEC.encode(range, JsonOps.INSTANCE, null).getOrThrow()).forEach(ranges::add);
+            loop.add("ranges", ranges);
+        }
 
-		output.add("loop", loop);
-	}
+        output.add("loop", loop);
+    }
 }

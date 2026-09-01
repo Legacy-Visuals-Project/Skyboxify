@@ -25,8 +25,8 @@ package btw.lowercase.skyboxify.api;
 
 import btw.lowercase.skyboxify.config.SkyboxifyConfig;
 import btw.lowercase.skyboxify.skybox.SkyboxManager;
+import btw.lowercase.skyboxify.utils.Id;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.resource.Identifier;
 
 public interface SkyboxifyApi {
     SkyboxifyConfig getConfig();
@@ -35,7 +35,7 @@ public interface SkyboxifyApi {
 
     SkyboxManager getSkyboxManager();
 
-    Identifier getModernDimension(final int legacyId);
+    Id getModernDimension(final int legacyId);
 
-    void registerDimensionMapping(final int legacyId, final Identifier modernId);
+    void registerDimensionMapping(final int legacyId, final Id modernId);
 }
