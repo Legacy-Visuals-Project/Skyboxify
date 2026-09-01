@@ -62,7 +62,7 @@ public class SkyboxResourceHelper implements ResourceReloadListener {
     }
 
     private static Comparator<Id> compareLocations(final Pattern pattern) {
-        return Comparator.comparing(Id::getPath, (first, second) -> {
+        return Comparator.comparing(Id::path, (first, second) -> {
             final Matcher matcherId1 = pattern.matcher(first);
             final Matcher matcherId2 = pattern.matcher(second);
             if (matcherId1.find() && matcherId2.find()) {
@@ -113,7 +113,7 @@ public class SkyboxResourceHelper implements ResourceReloadListener {
         final Map<String, JsonArray> layers = new HashMap<>();
         int count = 0;
         skies.forEach(id -> {
-            final Matcher matcher = skyPattern.matcher(id.getPath());
+            final Matcher matcher = skyPattern.matcher(id.path());
             if (!matcher.find()) {
                 return;
             }

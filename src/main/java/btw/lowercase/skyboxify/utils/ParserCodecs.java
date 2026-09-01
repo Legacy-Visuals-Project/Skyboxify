@@ -112,10 +112,10 @@ public final class ParserCodecs {
     public static Codec<Id> getSourceTextureCodec(final Id propertiesLocation) {
         return Codec.STRING.comapFlatMap(input -> {
             if (input == null) {
-                return DataResult.success(propertiesLocation.withPath(propertiesLocation.getPath().replace(".properties", ".png")));
+                return DataResult.success(propertiesLocation.withPath(propertiesLocation.path().replace(".properties", ".png")));
             } else if (input.startsWith("./")) {
-                final String fileName = propertiesLocation.getPath().split("/")[propertiesLocation.getPath().split("/").length - 1];
-                return DataResult.success(propertiesLocation.withPath(propertiesLocation.getPath().replace(fileName, input.substring(2))));
+                final String fileName = propertiesLocation.path().split("/")[propertiesLocation.path().split("/").length - 1];
+                return DataResult.success(propertiesLocation.withPath(propertiesLocation.path().replace(fileName, input.substring(2))));
             } else {
                 final String[] parts = input.split("/", 3);
                 if (parts.length == 3 && parts[0].equals("assets")) {

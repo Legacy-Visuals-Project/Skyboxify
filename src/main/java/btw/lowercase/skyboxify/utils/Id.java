@@ -81,40 +81,32 @@ public record Id(String namespace, String path) {
 
     @Nullable
     public static Id tryBySeparator(final String input, final char del) {
-        int index = input.indexOf(del);
+        final int index = input.indexOf(del);
         if (index >= 0) {
-            String string2 = input.substring(index + 1);
-            if (!isValidPath(string2)) {
+            final String path = input.substring(index + 1);
+            if (!isValidPath(path)) {
                 return null;
             } else if (index != 0) {
-                String string3 = input.substring(0, index);
-                return isValidNamespace(string3) ? new Id(string3, string2) : null;
+                final String namespace = input.substring(0, index);
+                return isValidNamespace(namespace) ? new Id(namespace, path) : null;
             } else {
-                return new Id(DEFAULT_NAMESPACE, string2);
+                return new Id(DEFAULT_NAMESPACE, path);
             }
         } else {
             return isValidPath(input) ? new Id(DEFAULT_NAMESPACE, input) : null;
         }
     }
 
-    public static DataResult<Id> read(String string) {
+    public static DataResult<Id> read(final String input) {
         try {
-            return DataResult.success(parse(string));
+            return DataResult.success(parse(input));
         } catch (Exception resourceLocationException) {
-            return DataResult.error(() -> "Not a valid resource location: " + string + " " + resourceLocationException.getMessage());
+            return DataResult.error(() -> "Not a valid resource location: " + input + " " + resourceLocationException.getMessage());
         }
     }
 
     public NamespacedIdentifier vanilla() {
         return new Identifier(this.namespace, this.path);
-    }
-
-    public String getNamespace() {
-        return this.namespace;
-    }
-
-    public String getPath() {
-        return this.path;
     }
 
     public Id withPath(final String path) {
