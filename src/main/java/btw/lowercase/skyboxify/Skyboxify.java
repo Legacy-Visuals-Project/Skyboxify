@@ -27,12 +27,12 @@ import btw.lowercase.skyboxify.api.SkyboxifyApi;
 import btw.lowercase.skyboxify.api.SkyboxifyImpl;
 import btw.lowercase.skyboxify.config.SkyboxifyConfig;
 import btw.lowercase.skyboxify.events.SkyRenderEvent;
-import btw.lowercase.skyboxify.events.WorldTickEvent;
 import btw.lowercase.skyboxify.skybox.impl.Skybox;
 import btw.lowercase.skyboxify.skybox.renderer.SkyFeatureRenderer;
 import btw.lowercase.skyboxify.utils.CommonUtils;
 import btw.lowercase.skyboxify.utils.ShaderUtil;
 import net.minecraft.client.world.ClientWorld;
+import net.ornithemc.osl.lifecycle.api.client.ClientWorldEvents;
 import org.joml.Matrix4f;
 import org.visuals.legacy.lightconfig.lib.v1.events.EventManager;
 
@@ -48,7 +48,7 @@ public final class Skyboxify {
         final SkyboxifyConfig config = impl.getConfig();
         config.load();
 
-        globalEventManager.listen(WorldTickEvent.End.class, event -> impl.getSkyboxManager().tick());
+        ClientWorldEvents.TICK_END.register(impl.getSkyboxManager()::tick);
 
         globalEventManager.listen(SkyRenderEvent.Disc.class, event -> {
             if (config.enabled.isEnabled() && !config.renderSky.isEnabled()) {
