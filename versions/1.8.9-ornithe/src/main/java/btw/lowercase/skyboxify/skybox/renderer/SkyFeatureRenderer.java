@@ -57,7 +57,7 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
     @Override
     public void endFrame() {
         if (!this.submits.isEmpty()) {
-            final Matrix4f backupModelView = ShaderUtil.extractModelView();
+            final Matrix4f backupModelView = ShaderUtil.captureModelView();
             for (final Submit submit : this.submits) {
                 if (submit.geometry.isClosed()) {
                     throw new RuntimeException("Cannot render closed geometry!");

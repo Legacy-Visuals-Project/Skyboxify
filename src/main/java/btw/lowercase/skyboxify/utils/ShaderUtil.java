@@ -63,7 +63,7 @@ public final class ShaderUtil {
 
     private static final FloatBuffer MATRIX_BUFFER = BufferUtils.createFloatBuffer(16);
 
-    public static Matrix4f extractModelView() {
+    public static Matrix4f captureModelView() {
         MATRIX_BUFFER.clear();
         GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX, MATRIX_BUFFER);
         MATRIX_BUFFER.flip();

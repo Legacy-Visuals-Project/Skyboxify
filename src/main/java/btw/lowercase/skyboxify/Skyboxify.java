@@ -31,8 +31,9 @@ import btw.lowercase.skyboxify.events.WorldTickEvent;
 import btw.lowercase.skyboxify.skybox.impl.Skybox;
 import btw.lowercase.skyboxify.skybox.renderer.SkyFeatureRenderer;
 import btw.lowercase.skyboxify.utils.CommonUtils;
-import net.minecraft.client.render.platform.GlStateManager;
+import btw.lowercase.skyboxify.utils.ShaderUtil;
 import net.minecraft.client.world.ClientWorld;
+import org.joml.Matrix4f;
 import org.visuals.legacy.lightconfig.lib.v1.events.EventManager;
 
 public final class Skyboxify {
@@ -90,12 +91,12 @@ public final class Skyboxify {
     }
 
     private static void renderSkyboxes(final SkyFeatureRenderer skyFeatureRenderer, final ClientWorld level, final float tickDelta) {
-        GlStateManager.pushMatrix();
-        GlStateManager.rotatef(-90.0F, 0.0F, 1.0F, 0.0F);
+        final Matrix4f modelViewMatrix = new Matrix4f(ShaderUtil.captureModelView());
+        modelViewMatrix.rotateY((float) Math.toDegrees(-90.0F));
         for (final Skybox skybox : SkyboxifyImpl.skyboxManager().getActiveSkies()) {
-            skybox.extractRenderState(skyFeatureRenderer, level, tickDelta);
+            skybox.extractRenderState(skyFeatureRenderer, level, modelViewMatrix, tickDelta);
         }
-        GlStateManager.popMatrix();
+
         skyFeatureRenderer.endFrame();
     }
 }

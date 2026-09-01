@@ -30,15 +30,15 @@ import btw.lowercase.skyboxify.skybox.renderer.SkyFeatureRenderer;
 import btw.lowercase.skyboxify.utils.CommonUtils;
 import btw.lowercase.skyboxify.utils.Id;
 import btw.lowercase.skyboxify.utils.ParserCodecs;
-import btw.lowercase.skyboxify.utils.ShaderUtil;
 import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.render.platform.GlStateManager;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3fc;
 
 import java.util.List;
@@ -106,7 +106,8 @@ public class SkyLayer {
 
     public void extractRenderState(
             final SkyFeatureRenderer skyFeatureRenderer,
-            final ClientWorld level,
+            final ClientWorld world,
+            final Matrix4f modelViewMatrix,
             final int clampedTimeOfDay,
             final float skyAngle,
             final float rainLevel,
@@ -116,15 +117,13 @@ public class SkyLayer {
         final float fadeAlpha = this.fade.getAlpha(clampedTimeOfDay);
         final float finalAlpha = Math.clamp(this.alpha * weatherAlpha * fadeAlpha, 0.0F, 1.0F);
         if (finalAlpha >= MIN_ALPHA_ALLOWED) {
-            GlStateManager.pushMatrix();
             if (this.rotate) {
-                GlStateManager.rotatef(this.getAngle(level, skyAngle), this.axis.x(), this.axis.y(), this.axis.z());
+                modelViewMatrix.rotate(new Quaternionf().rotateAxis((float) Math.toRadians(this.getAngle(world, skyAngle)), this.axis));
             }
 
             final SkyFeatureRenderer.Pipeline pipeline = new SkyFeatureRenderer.Pipeline(this.blend.getBlendFunction());
-            final RenderUniforms uniforms = new RenderUniforms(ShaderUtil.extractModelView(), this.blend.getShaderColor(finalAlpha));
+            final RenderUniforms uniforms = new RenderUniforms(modelViewMatrix, this.blend.getShaderColor(finalAlpha));
             skyFeatureRenderer.submit(pipeline, Geometry.DEFAULT, uniforms, this.texture);
-            GlStateManager.popMatrix();
         }
     }
 

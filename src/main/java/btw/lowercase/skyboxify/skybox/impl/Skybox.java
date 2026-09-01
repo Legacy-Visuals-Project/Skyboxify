@@ -31,6 +31,7 @@ import btw.lowercase.skyboxify.utils.Id;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.world.ClientWorld;
+import org.joml.Matrix4f;
 
 import java.util.List;
 
@@ -71,20 +72,20 @@ public class Skybox extends AbstractSkybox {
     }
 
     @Override
-    public void extractRenderState(final SkyFeatureRenderer skyFeatureRenderer, final ClientWorld level, final float tickDelta) {
-        final long dayTime = level.getTime();
+    public void extractRenderState(final SkyFeatureRenderer skyFeatureRenderer, final ClientWorld world, final Matrix4f modelViewMatrix, final float tickDelta) {
+        final long dayTime = world.getTime();
         final int clampedTimeOfDay = (int) (dayTime % 24000L);
-        final float skyAngle = level.getTimeOfDay(tickDelta);
+        final float skyAngle = world.getTimeOfDay(tickDelta);
 
-        float thunderLevel = level.getThunder(tickDelta);
-        final float rainLevel = level.getRain(tickDelta);
+        float thunderLevel = world.getThunder(tickDelta);
+        final float rainLevel = world.getRain(tickDelta);
         if (rainLevel > 0.0F) {
             thunderLevel /= rainLevel;
         }
 
         for (final SkyLayer layer : this.layers) {
             if (layer.isActive(dayTime, clampedTimeOfDay)) {
-                layer.extractRenderState(skyFeatureRenderer, level, clampedTimeOfDay, skyAngle, rainLevel, thunderLevel);
+                layer.extractRenderState(skyFeatureRenderer, world, new Matrix4f(modelViewMatrix), clampedTimeOfDay, skyAngle, rainLevel, thunderLevel);
             }
         }
     }
