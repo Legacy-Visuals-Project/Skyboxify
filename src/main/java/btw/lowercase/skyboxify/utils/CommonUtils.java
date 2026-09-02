@@ -23,7 +23,6 @@
 
 package btw.lowercase.skyboxify.utils;
 
-import net.minecraft.world.biome.Biome;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -86,9 +85,5 @@ public final class CommonUtils {
             case END -> END_ID;
             default -> Id.withDefaultNamespace("unknown");
         };
-    }
-
-    public static Id getBiomeId(final Biome biome) {
-        return Id.withDefaultNamespace(biome.name.toLowerCase().replace(" ", "_")); // TODO
     }
 }

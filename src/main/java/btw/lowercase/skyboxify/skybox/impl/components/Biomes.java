@@ -23,7 +23,7 @@
 
 package btw.lowercase.skyboxify.skybox.impl.components;
 
-import btw.lowercase.skyboxify.utils.CommonUtils;
+import btw.lowercase.skyboxify.utils.BiomeUtil;
 import btw.lowercase.skyboxify.utils.Id;
 import btw.lowercase.skyboxify.utils.ParserCodecs;
 import com.google.common.collect.ImmutableList;
@@ -65,7 +65,7 @@ public record Biomes(ImmutableList<Id> locations, boolean exclusion) {
     });
 
     public boolean contains(final Biome currentBiome) {
-        final boolean hasBiome = this.locations().contains(CommonUtils.getBiomeId(currentBiome));
+        final boolean hasBiome = this.locations().contains(BiomeUtil.legacyId(currentBiome));
         return (!this.exclusion() || !hasBiome) && (this.exclusion() || hasBiome);
     }
 }
