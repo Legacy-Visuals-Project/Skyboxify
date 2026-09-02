@@ -24,10 +24,18 @@
 
 package org.visuals.legacy.lightconfig.lib.v1.screen;
 
+import btw.lowercase.skyboxify.utils.Pressable;
+import net.minecraft.client.gui.GuiElement;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.LabelWidget;
+import net.minecraft.client.render.TextRenderer;
 import net.ornithemc.osl.text.api.TextComponent;
 import org.jetbrains.annotations.ApiStatus;
+import org.lwjgl.input.Keyboard;
 import org.visuals.legacy.lightconfig.lib.v1.Config;
+import org.visuals.legacy.lightconfig.lib.v1.Translations;
+import org.visuals.legacy.lightconfig.lib.v1.field.AbstractConfigField;
 
 @ApiStatus.Internal
 public class InternalConfigScreen extends Screen {
@@ -44,43 +52,65 @@ public class InternalConfigScreen extends Screen {
 
     @Override
     public void init() {
-//        final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this, 61, 33);
-//
-//        this.setupHeader(layout);
-//        this.setupConfigList(layout);
-//        this.setupFooter(layout);
-//
-//        layout.visitWidgets(this::addRenderableWidget);
-//        layout.arrangeElements();
+        this.buttons.clear();
+        this.labels.clear();
+
+        this.setupHeader();
+        this.setupConfigList();
+        this.setupFooter();
     }
 
-//    private void setupHeader(final HeaderAndFooterLayout layout) {
-//        // TODO: .spacing(8)
-//        final LinearLayout linearLayout = layout.addToHeader(new LinearLayout(0, 0, LinearLayout.Orientation.VERTICAL));
-//        linearLayout.addChild(new StringWidget(this.getTitle(), this.font), linearLayout.defaultChildLayoutSetting().alignHorizontallyCenter());
-//    }
-//
-//    // TODO: Custom Entry Setup
-//    private void setupConfigList(final HeaderAndFooterLayout layout) {
-//        final GridLayout gridLayout = layout.addToContents(new GridLayout());
-//        gridLayout.defaultCellSetting().paddingHorizontal(4).paddingBottom(4).alignHorizontallyCenter().alignVerticallyMiddle();
-//
-//        final GridLayout.RowHelper rowHelper = gridLayout.createRowHelper(2);
-//        for (final AbstractConfigField<?> child : this.config.getConfigFields()) {
-//            rowHelper.addChild(child.createWidget());
-//        }
-//    }
-//
-//    private void setupFooter(final HeaderAndFooterLayout layout) {
-//        final GridLayout footerGridLayout = layout.addToFooter(new GridLayout());
-//        footerGridLayout.defaultCellSetting().paddingHorizontal(4).paddingBottom(4).alignHorizontallyCenter();
-//
-//        final GridLayout.RowHelper footerRowHelper = footerGridLayout.createRowHelper(2);
-//        footerRowHelper.addChild(Button.builder(Translations.RESET, (button) -> this.config.reset()).width(125).build());
-//        footerRowHelper.addChild(Button.builder(CommonComponents.GUI_DONE, (button) -> this.onClose()).width(125).build());
-//    }
+    @Override
+    public void render(final int mouseX, final int mouseY, final float tickDelta) {
+        super.renderBackground();
+        super.render(mouseX, mouseY, tickDelta);
+    }
 
-    @SuppressWarnings("DataFlowIssue")
+    private void setupHeader() {
+        final TextRenderer font = this.minecraft.textRenderer;
+        final String title = this.title.buildFormattedString();
+        final LabelWidget titleLabel = new LabelWidget(font, 100, (this.width / 2) - (font.getWidth(title) / 2), 33, 0, 0, -1);
+        titleLabel.add(title);
+        this.labels.add(titleLabel);
+    }
+
+    // TODO: Custom Entry Setup
+    private void setupConfigList() {
+        for (final AbstractConfigField<?> child : this.config.getConfigFields()) {
+            final GuiElement element = child.createWidget();
+            if (element == null) continue;
+            // TODO
+        }
+    }
+
+    private void setupFooter() {
+        final int buttonWidth = 125;
+        final int buttonHeight = 20;
+        final int footerTop = this.height - (buttonHeight * 2);
+        final int footerButtonMiddle = (this.width / 2) - (buttonWidth / 2);
+
+        final ButtonWidget resetButton = new ButtonWidget(101, footerButtonMiddle - (buttonWidth / 2), footerTop + (buttonHeight / 2), buttonWidth, buttonHeight, Translations.RESET.buildFormattedString());
+        ((Pressable) resetButton).skyboxify$setup(this.config::reset);
+
+        final ButtonWidget doneButton = new ButtonWidget(102, footerButtonMiddle + (buttonWidth / 2), footerTop + (buttonHeight / 2), buttonWidth, buttonHeight, Translations.DONE.buildFormattedString());
+        ((Pressable) doneButton).skyboxify$setup(this::onClose);
+
+        this.buttons.add(resetButton);
+        this.buttons.add(doneButton);
+    }
+
+    @Override
+    protected void keyPressed(final char chr, final int key) {
+        if (key == Keyboard.KEY_ESCAPE) {
+            this.onClose();
+        }
+    }
+
+    @Override
+    protected void buttonClicked(final ButtonWidget button) {
+        ((Pressable) button).skyboxify$onPress();
+    }
+
     public void onClose() {
         this.config.save();
         this.minecraft.openScreen(this.parent);
