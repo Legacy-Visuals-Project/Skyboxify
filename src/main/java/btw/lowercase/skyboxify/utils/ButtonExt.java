@@ -23,8 +23,12 @@
 
 package btw.lowercase.skyboxify.utils;
 
-import net.minecraft.client.gui.GuiElement;
+import net.minecraft.client.gui.widget.ButtonWidget;
 
-public interface Pressable<T extends GuiElement> {
-    void press(final T element);
+public interface ButtonExt {
+    void skyboxify$setup(final Pressable<ButtonWidget> pressable);
+
+    void skyboxify$onPress();
+
+    int skyboxify$getHeight();
 }

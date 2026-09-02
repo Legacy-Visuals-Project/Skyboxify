@@ -43,7 +43,7 @@ public abstract class FeatureRenderer<T extends FeatureRenderer.Submit> {
 
     public void submit(final Pipeline pipeline, final Geometry geometry, final RenderUniforms uniforms, final Id location) {
         if (geometry != null && !geometry.isClosed()) {
-            this.submits.add(createSubmit(pipeline, geometry, uniforms, location));
+            this.submits.add(this.createSubmit(pipeline, geometry, uniforms, location));
         } else {
             throw new IllegalStateException("Cannot call submit with " + (geometry == null ? "null" : "closed") + " geometry!");
         }

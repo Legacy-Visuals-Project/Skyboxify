@@ -28,9 +28,11 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.ornithemc.osl.text.api.TextComponent;
 import net.ornithemc.osl.text.impl.TranslatableTextComponent;
 import org.visuals.legacy.lightconfig.lib.v1.Config;
+import org.visuals.legacy.lightconfig.lib.v1.Translations;
 import org.visuals.legacy.lightconfig.lib.v1.serialization.ConfigDeserializer;
 import org.visuals.legacy.lightconfig.lib.v1.serialization.ConfigSerializer;
 import org.visuals.legacy.lightconfig.lib.v1.type.Types;
+import org.visuals.legacy.lightconfig.lib.v1.util.ScreenUtil;
 
 import java.util.function.Function;
 
@@ -62,14 +64,13 @@ public class BooleanConfigField extends AbstractConfigField<Boolean> {
     public ButtonWidget createWidget(final Runnable onClick) {
         final String translationKey = this.getTranslationKey();
         final TextComponent translate = new TranslatableTextComponent(translationKey);
-//        return Button.builder(Translations.TEMPLATE.apply(translate, Translations.toggle(this.isEnabled())), (button) -> {
-//                    this.toggle();
-//                    onClick.run();
-//                    button.setMessage(Translations.TEMPLATE.apply(translate, Translations.toggle(this.isEnabled())));
-//                })
+        return ScreenUtil.button(Translations.TEMPLATE.apply(translate, Translations.toggle(this.isEnabled())), button -> {
+                    this.toggle();
+                    onClick.run();
+                    button.message = Translations.TEMPLATE.apply(translate, Translations.toggle(this.isEnabled())).buildFormattedString();
+                })
 //                .tooltip(Tooltip.create(Translations.tooltip(translationKey)))
-//                .build();
-        return null;
+                .build();
     }
 
     public void toggle() {

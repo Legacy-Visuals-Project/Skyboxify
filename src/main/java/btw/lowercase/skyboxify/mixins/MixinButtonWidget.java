@@ -23,25 +23,35 @@
 
 package btw.lowercase.skyboxify.mixins;
 
+import btw.lowercase.skyboxify.utils.ButtonExt;
 import btw.lowercase.skyboxify.utils.Pressable;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(ButtonWidget.class)
-public abstract class MixinButtonWidget implements Pressable {
+public abstract class MixinButtonWidget implements ButtonExt {
+    @Shadow
+    protected int height;
+
     @Unique
-    private Runnable runnable = null;
+    private Pressable<ButtonWidget> runnable = null;
 
     @Override
-    public void skyboxify$setup(final Runnable runnable) {
+    public void skyboxify$setup(final Pressable<ButtonWidget> runnable) {
         this.runnable = runnable;
     }
 
     @Override
     public void skyboxify$onPress() {
         if (this.runnable != null) {
-            this.runnable.run();
+            this.runnable.press((ButtonWidget) (Object) this);
         }
+    }
+
+    @Override
+    public int skyboxify$getHeight() {
+        return this.height;
     }
 }

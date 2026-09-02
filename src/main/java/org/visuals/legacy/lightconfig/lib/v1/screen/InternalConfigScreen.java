@@ -24,18 +24,17 @@
 
 package org.visuals.legacy.lightconfig.lib.v1.screen;
 
-import btw.lowercase.skyboxify.utils.Pressable;
+import btw.lowercase.skyboxify.utils.ButtonExt;
 import net.minecraft.client.gui.GuiElement;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.LabelWidget;
-import net.minecraft.client.render.TextRenderer;
 import net.ornithemc.osl.text.api.TextComponent;
 import org.jetbrains.annotations.ApiStatus;
 import org.lwjgl.input.Keyboard;
 import org.visuals.legacy.lightconfig.lib.v1.Config;
 import org.visuals.legacy.lightconfig.lib.v1.Translations;
 import org.visuals.legacy.lightconfig.lib.v1.field.AbstractConfigField;
+import org.visuals.legacy.lightconfig.lib.v1.util.ScreenUtil;
 
 @ApiStatus.Internal
 public class InternalConfigScreen extends Screen {
@@ -67,36 +66,42 @@ public class InternalConfigScreen extends Screen {
     }
 
     private void setupHeader() {
-        final TextRenderer font = this.minecraft.textRenderer;
-        final String title = this.title.buildFormattedString();
-        final LabelWidget titleLabel = new LabelWidget(font, 100, (this.width / 2) - (font.getWidth(title) / 2), 33, 0, 0, -1);
-        titleLabel.add(title);
-        this.labels.add(titleLabel);
+        this.labels.add(ScreenUtil.centeredLabel(this.title, this.width / 2, 33, -1));
     }
 
     // TODO: Custom Entry Setup
     private void setupConfigList() {
+        final int padding = 8;
+
+        final int rowSize = ScreenUtil.SMALL_BUTTON_WIDTH * 2 + padding;
+        final int x = (this.width / 2) - (rowSize / 2);
+        final int y = this.height / 4;
+
+        int index = 0;
         for (final AbstractConfigField<?> child : this.config.getConfigFields()) {
             final GuiElement element = child.createWidget();
-            if (element == null) continue;
-            // TODO
+            if (!(element instanceof ButtonWidget buttonWidget)) continue;
+
+            final int column = index % 2;
+            final int row = index / 2;
+            buttonWidget.x = x + column * (buttonWidget.getWidth() + padding);
+            buttonWidget.y = y + row * (((ButtonExt) buttonWidget).skyboxify$getHeight() + padding);
+
+            this.buttons.add(buttonWidget);
+            index++;
         }
     }
 
     private void setupFooter() {
-        final int buttonWidth = 125;
-        final int buttonHeight = 20;
-        final int footerTop = this.height - (buttonHeight * 2);
-        final int footerButtonMiddle = (this.width / 2) - (buttonWidth / 2);
-
-        final ButtonWidget resetButton = new ButtonWidget(101, footerButtonMiddle - (buttonWidth / 2), footerTop + (buttonHeight / 2), buttonWidth, buttonHeight, Translations.RESET.buildFormattedString());
-        ((Pressable) resetButton).skyboxify$setup(this.config::reset);
-
-        final ButtonWidget doneButton = new ButtonWidget(102, footerButtonMiddle + (buttonWidth / 2), footerTop + (buttonHeight / 2), buttonWidth, buttonHeight, Translations.DONE.buildFormattedString());
-        ((Pressable) doneButton).skyboxify$setup(this::onClose);
-
-        this.buttons.add(resetButton);
-        this.buttons.add(doneButton);
+        final int padding = 4;
+        final int footerTop = this.height - (ScreenUtil.BUTTON_HEIGHT * 2);
+        final int footerButtonMiddle = (this.width / 2) - (ScreenUtil.SMALL_BUTTON_WIDTH / 2);
+        this.buttons.add(ScreenUtil.button(Translations.RESET, button -> this.config.reset())
+                .pos(footerButtonMiddle - (ScreenUtil.SMALL_BUTTON_WIDTH / 2) - padding, footerTop + (ScreenUtil.BUTTON_HEIGHT / 2))
+                .build());
+        this.buttons.add(ScreenUtil.button(Translations.DONE, button -> this.onClose())
+                .pos(footerButtonMiddle + (ScreenUtil.SMALL_BUTTON_WIDTH / 2) + padding, footerTop + (ScreenUtil.BUTTON_HEIGHT / 2))
+                .build());
     }
 
     @Override
@@ -108,7 +113,7 @@ public class InternalConfigScreen extends Screen {
 
     @Override
     protected void buttonClicked(final ButtonWidget button) {
-        ((Pressable) button).skyboxify$onPress();
+        ((ButtonExt) button).skyboxify$onPress();
     }
 
     public void onClose() {

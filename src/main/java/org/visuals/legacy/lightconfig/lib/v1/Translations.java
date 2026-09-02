@@ -32,7 +32,7 @@ import java.util.function.BiFunction;
 public final class Translations {
     public static final TextComponent RESET = new TranslatableTextComponent("options.reset");
     public static final TextComponent DONE = new TranslatableTextComponent("gui.done");
-    public static final BiFunction<TextComponent, TextComponent, TextComponent> TEMPLATE = (a, b) -> new TranslatableTextComponent("options.template", a, b);
+    public static final BiFunction<TextComponent, TextComponent, TextComponent> TEMPLATE = (a, b) -> new TranslatableTextComponent("options.template", a.buildFormattedString(), b.buildFormattedString());
     public static final TextComponent ON = new TranslatableTextComponent("options.on");
     public static final TextComponent OFF = new TranslatableTextComponent("options.off");
 

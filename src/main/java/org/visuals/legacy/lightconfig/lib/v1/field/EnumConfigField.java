@@ -33,6 +33,7 @@ import org.visuals.legacy.lightconfig.lib.v1.serialization.ConfigDeserializer;
 import org.visuals.legacy.lightconfig.lib.v1.serialization.ConfigSerializer;
 import org.visuals.legacy.lightconfig.lib.v1.type.Type;
 import org.visuals.legacy.lightconfig.lib.v1.type.Types;
+import org.visuals.legacy.lightconfig.lib.v1.util.ScreenUtil;
 
 public class EnumConfigField<T extends Enum<T>> extends AbstractConfigField<T> {
     private final Class<T> enumClass;
@@ -65,15 +66,14 @@ public class EnumConfigField<T extends Enum<T>> extends AbstractConfigField<T> {
     public ButtonWidget createWidget() {
         final String translationKey = this.getTranslationKey();
         final TextComponent translate = new TranslatableTextComponent(translationKey);
-//        return Button.builder(getDisplayText(translate, translationKey), (button) -> {
-//                    T[] constants = this.enumClass.getEnumConstants();
-//                    T next = constants[(this.value.ordinal() + 1) % constants.length];
-//                    this.setValue(next);
-//                    button.setMessage(getDisplayText(translate, translationKey));
-//                })
+        return ScreenUtil.button(getDisplayText(translate, translationKey), button -> {
+                    T[] constants = this.enumClass.getEnumConstants();
+                    T next = constants[(this.value.ordinal() + 1) % constants.length];
+                    this.setValue(next);
+                    button.message = getDisplayText(translate, translationKey).buildFormattedString();
+                })
 //                .tooltip(Tooltip.create(Translations.tooltip(translationKey)))
-//                .build();
-        return null;
+                .build();
     }
 
     private TextComponent getDisplayText(final TextComponent translate, final String translationKey) {

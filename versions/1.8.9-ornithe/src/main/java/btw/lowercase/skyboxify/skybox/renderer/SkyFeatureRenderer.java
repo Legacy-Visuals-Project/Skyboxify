@@ -57,15 +57,16 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
     @Override
     public void endFrame() {
         if (!this.submits.isEmpty()) {
+            final TextureManager textureManager = Minecraft.getInstance().getTextureManager();
             final Matrix4f backupModelView = ShaderUtil.captureModelView();
             for (final Submit submit : this.submits) {
                 if (submit.geometry.isClosed()) {
                     throw new RuntimeException("Cannot render closed geometry!");
                 }
 
-                this.setupGlState(submit);
+                this.setupGlState(textureManager, submit);
                 submit.geometry.draw();
-                this.resetGlState(submit);
+                this.resetGlState(textureManager, submit);
             }
 
             GlStateManager.enableBlend();
@@ -76,11 +77,9 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
         }
     }
 
-    private void setupGlState(final Submit submit) {
-        final TextureManager textureManager = Minecraft.getInstance().getTextureManager();
+    private void setupGlState(final TextureManager textureManager, final Submit submit) {
         final Texture texture = textureManager.get(submit.location);
         texture.pushFilter(submit.blur, false);
-
         ShaderUtil.applyColor(submit.uniforms.shaderColor());
         GlStateManager.bindTexture(texture.getGlId());
         GlStateManager.depthMask(false);
@@ -97,7 +96,7 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
         ShaderUtil.applyModelView(submit.uniforms.modelViewMatrix());
     }
 
-    private void resetGlState(final Submit submit) {
+    private void resetGlState(final TextureManager textureManager, final Submit submit) {
         Minecraft.getInstance().getRenderTarget().bindWrite(false);
 
         final BlendFunction blendFunction = submit.blend;
@@ -109,8 +108,6 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
         GlStateManager.depthMask(true);
         GlStateManager.bindTexture(0);
         ShaderUtil.applyWhite();
-
-        final TextureManager textureManager = Minecraft.getInstance().getTextureManager();
         textureManager.get(submit.location).popFilter();
     }
 
