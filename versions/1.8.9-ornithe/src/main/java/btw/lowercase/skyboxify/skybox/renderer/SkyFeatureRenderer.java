@@ -68,9 +68,9 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
                 this.resetGlState(submit);
             }
 
-            ShaderUtil.applyWhite();
             GlStateManager.enableBlend();
             GlStateManager.depthMask(false);
+            ShaderUtil.applyWhite();
             ShaderUtil.applyModelView(backupModelView);
             super.endFrame();
         }
@@ -89,6 +89,8 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
         if (blendFunction != null) {
             GlStateManager.enableBlend();
             GlStateManager.blendFunc(blendFunction.srcFactor().vanilla(), blendFunction.dstFactor().vanilla());
+        } else {
+            GlStateManager.disableBlend();
         }
 
         this.renderTarget.bindWrite(false);

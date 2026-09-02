@@ -172,7 +172,7 @@ public class SkyLayer {
     private float getAngle(final ClientWorld world, final float skyAngle) {
         float angleDayStart = 0.0F;
         if (this.speed != (float) Math.round(this.speed)) {
-            final long currentWorldDay = (world.getTime() + 18000L) / 24000L;
+            final long currentWorldDay = (world.getTimeOfDay() + 18000L) / 24000L;
             final float currentAngle = (float) currentWorldDay * (this.speed % 1.0F);
             angleDayStart = currentAngle % 1.0F;
         }

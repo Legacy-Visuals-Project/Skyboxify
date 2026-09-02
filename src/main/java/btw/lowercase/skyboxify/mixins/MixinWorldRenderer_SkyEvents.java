@@ -44,19 +44,19 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(value = WorldRenderer.class, priority = 900)
+@Mixin(WorldRenderer.class)
 public abstract class MixinWorldRenderer_SkyEvents {
     @Shadow
     private ClientWorld world;
 
     @Unique
-    private static SkyFeatureRenderer skyboxify$skyFeatureRenderer = null;
+    private SkyFeatureRenderer skyboxify$skyFeatureRenderer = null;
 
     // Setup Renderer
     @Inject(method = "renderSky", at = @At("HEAD"))
     private void skyboxify$setup(final float tickDelta, final int anaglyphRenderPass, final CallbackInfo ci) {
-        if (skyboxify$skyFeatureRenderer == null) {
-            skyboxify$skyFeatureRenderer = new SkyFeatureRenderer(Minecraft.getInstance().getRenderTarget());
+        if (this.skyboxify$skyFeatureRenderer == null) {
+            this.skyboxify$skyFeatureRenderer = new SkyFeatureRenderer(Minecraft.getInstance().getRenderTarget());
         }
     }
 
@@ -74,7 +74,7 @@ public abstract class MixinWorldRenderer_SkyEvents {
     // Render Skyboxes & Modify Sun/Moon/Stars
     @Inject(method = "renderSky", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/world/WorldRenderer;renderEndSky()V", shift = At.Shift.AFTER))
     private void skyboxify$renderEndSkybox(final float tickDelta, final int anaglyphRenderPass, final CallbackInfo ci) {
-        Skyboxify.eventManager().dispatch(new SkyRenderEvent.EndSky.After(skyboxify$skyFeatureRenderer, this.world));
+        Skyboxify.eventManager().dispatch(new SkyRenderEvent.EndSky.After(this.skyboxify$skyFeatureRenderer, this.world));
     }
 
     @Unique
@@ -82,27 +82,27 @@ public abstract class MixinWorldRenderer_SkyEvents {
 
     @Inject(method = "renderSky", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/platform/GlStateManager;blendFuncSeparate(IIII)V", ordinal = 1))
     private void skyboxify$renderSkyboxes(final float tickDelta, final int anaglyphRenderPass, final CallbackInfo ci) {
-        skyboxify$renderSunMoonStars = !Skyboxify.eventManager().dispatch(new SkyRenderEvent.SunMoonStars(skyboxify$skyFeatureRenderer, this.world, tickDelta)).isCancelled();
+        this.skyboxify$renderSunMoonStars = !Skyboxify.eventManager().dispatch(new SkyRenderEvent.SunMoonStars(this.skyboxify$skyFeatureRenderer, this.world, tickDelta)).isCancelled();
     }
 
     @WrapWithCondition(method = "renderSky", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/vertex/Tesselator;end()V", ordinal = 1))
     private boolean skyboxify$toggleSun(final Tesselator instance) {
-        return !Skyboxify.eventManager().dispatch(SkyRenderEvent.sun()).isCancelled() && skyboxify$renderSunMoonStars;
+        return !Skyboxify.eventManager().dispatch(SkyRenderEvent.sun()).isCancelled() && this.skyboxify$renderSunMoonStars;
     }
 
     @WrapWithCondition(method = "renderSky", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/vertex/Tesselator;end()V", ordinal = 2))
     private boolean skyboxify$toggleMoon(final Tesselator instance) {
-        return !Skyboxify.eventManager().dispatch(SkyRenderEvent.moon()).isCancelled() && skyboxify$renderSunMoonStars;
+        return !Skyboxify.eventManager().dispatch(SkyRenderEvent.moon()).isCancelled() && this.skyboxify$renderSunMoonStars;
     }
 
     @WrapWithCondition(method = "renderSky", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/vertex/VertexBuffer;draw(I)V", ordinal = 1))
     private boolean skyboxify$toggleStars$vbo(final VertexBuffer instance, final int mode) {
-        return !Skyboxify.eventManager().dispatch(SkyRenderEvent.stars()).isCancelled() && skyboxify$renderSunMoonStars;
+        return !Skyboxify.eventManager().dispatch(SkyRenderEvent.stars()).isCancelled() && this.skyboxify$renderSunMoonStars;
     }
 
     @WrapWithCondition(method = "renderSky", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/platform/GlStateManager;callList(I)V", ordinal = 1))
     private boolean skyboxify$toggleStars(final int list) {
-        return !Skyboxify.eventManager().dispatch(SkyRenderEvent.stars()).isCancelled() && skyboxify$renderSunMoonStars;
+        return !Skyboxify.eventManager().dispatch(SkyRenderEvent.stars()).isCancelled() && this.skyboxify$renderSunMoonStars;
     }
 
     // Void Disc
@@ -111,8 +111,7 @@ public abstract class MixinWorldRenderer_SkyEvents {
         return !Skyboxify.eventManager().dispatch(SkyRenderEvent.bottomDisc()).isCancelled();
     }
 
-    @WrapWithCondition(method = "renderSky", at =
-    @At(value = "INVOKE", target = "Lnet/minecraft/client/render/platform/GlStateManager;callList(I)V", ordinal = 2))
+    @WrapWithCondition(method = "renderSky", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/platform/GlStateManager;callList(I)V", ordinal = 2))
     private boolean skyboxify$skyDiscEvent$void(final int list) {
         return !Skyboxify.eventManager().dispatch(SkyRenderEvent.bottomDisc()).isCancelled();
     }

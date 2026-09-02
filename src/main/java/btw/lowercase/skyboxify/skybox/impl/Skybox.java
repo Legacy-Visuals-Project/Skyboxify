@@ -73,7 +73,7 @@ public class Skybox extends AbstractSkybox {
 
     @Override
     public void extractRenderState(final SkyFeatureRenderer skyFeatureRenderer, final ClientWorld world, final Matrix4f modelViewMatrix, final float tickDelta) {
-        final long dayTime = world.getTime();
+        final long dayTime = world.getTimeOfDay();
         final int clampedTimeOfDay = (int) (dayTime % 24000L);
         final float skyAngle = world.getTimeOfDay(tickDelta);
 
