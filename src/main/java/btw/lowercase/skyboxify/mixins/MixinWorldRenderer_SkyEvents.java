@@ -87,12 +87,22 @@ public abstract class MixinWorldRenderer_SkyEvents {
 
     @WrapWithCondition(method = "renderSky", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/vertex/Tesselator;end()V", ordinal = 1))
     private boolean skyboxify$toggleSun(final Tesselator instance) {
-        return !Skyboxify.eventManager().dispatch(SkyRenderEvent.sun()).isCancelled() && this.skyboxify$renderSunMoonStars;
+        final boolean shouldRender = !Skyboxify.eventManager().dispatch(SkyRenderEvent.sun()).isCancelled() && this.skyboxify$renderSunMoonStars;
+        if (!shouldRender) {
+            instance.getBuffer().end();
+        }
+
+        return shouldRender;
     }
 
     @WrapWithCondition(method = "renderSky", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/vertex/Tesselator;end()V", ordinal = 2))
     private boolean skyboxify$toggleMoon(final Tesselator instance) {
-        return !Skyboxify.eventManager().dispatch(SkyRenderEvent.moon()).isCancelled() && this.skyboxify$renderSunMoonStars;
+        final boolean shouldRender = !Skyboxify.eventManager().dispatch(SkyRenderEvent.moon()).isCancelled() && this.skyboxify$renderSunMoonStars;
+        if (!shouldRender) {
+            instance.getBuffer().end();
+        }
+
+        return shouldRender;
     }
 
     @WrapWithCondition(method = "renderSky", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/vertex/VertexBuffer;draw(I)V", ordinal = 1))

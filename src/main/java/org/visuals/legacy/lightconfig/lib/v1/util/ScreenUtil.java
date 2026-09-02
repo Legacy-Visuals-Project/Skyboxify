@@ -36,7 +36,7 @@ public final class ScreenUtil {
     private ScreenUtil() {
     }
 
-    public static final int SMALL_BUTTON_WIDTH = 125;
+    public static final int SMALL_BUTTON_WIDTH = 150;
     public static final int BUTTON_HEIGHT = 20;
     private static final TextRenderer font = Minecraft.getInstance().textRenderer;
 
