@@ -38,8 +38,8 @@ import java.util.regex.Pattern;
 public record Id(String namespace, String path) implements NamespacedIdentifier, Comparable<Id> {
     public static final Codec<Id> CODEC = Codec.STRING.comapFlatMap(Id::read, Id::toString).stable();
     public static final String DEFAULT_NAMESPACE = "minecraft";
-    public static final Pattern VALID_NAMESPACE_REGEX = Pattern.compile("[_a-z0-9.-]*");
-    public static final Pattern VALID_PATH_REGEX = Pattern.compile("[_a-z0-9./-]*");
+    public static final Pattern VALID_NAMESPACE_REGEX = Pattern.compile("[a-z0-9_.-]*");
+    public static final Pattern VALID_PATH_REGEX = Pattern.compile("[a-z0-9/._-]*");
 
     public Id {
         assert isValidNamespace(namespace);
@@ -120,7 +120,7 @@ public record Id(String namespace, String path) implements NamespacedIdentifier,
 
     private static String assertValidNamespace(final String namespace, final String path) {
         if (!isValidNamespace(namespace)) {
-            throw new IdException("Non [a-z0-9_.-] character in namespace of location: " + namespace + ":" + path);
+            throw new IdException("Invalid character (" + VALID_NAMESPACE_REGEX.pattern() + ") in namespace of id: " + namespace + ":" + path);
         } else {
             return namespace;
         }
@@ -128,7 +128,7 @@ public record Id(String namespace, String path) implements NamespacedIdentifier,
 
     private static String assertValidPath(final String namespace, final String path) {
         if (!isValidPath(path)) {
-            throw new IdException("Non [a-z0-9/._-] character in path of location: " + namespace + ":" + path);
+            throw new IdException("Invalid character (" + VALID_PATH_REGEX.pattern() + ") in path of id: " + namespace + ":" + path);
         } else {
             return path;
         }
