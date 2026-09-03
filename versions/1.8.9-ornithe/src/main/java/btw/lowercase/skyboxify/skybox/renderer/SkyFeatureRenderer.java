@@ -36,7 +36,6 @@ import net.minecraft.client.render.texture.TextureManager;
 import net.minecraft.resource.Identifier;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
-import org.lwjgl.opengl.GL11;
 
 public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submit> {
     public SkyFeatureRenderer(final RenderTarget renderTarget) {
@@ -77,9 +76,10 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
 
     private void setupGlState(final TextureManager textureManager, final Submit submit) {
         final Texture texture = textureManager.get(submit.location);
-        texture.pushFilter(submit.blur, false);
-        ShaderUtil.applyColor(submit.uniforms.shaderColor());
         GlStateManager.bindTexture(texture.getGlId());
+        texture.pushFilter(submit.blur, false);
+
+        ShaderUtil.applyColor(submit.uniforms.shaderColor());
         GlStateManager.depthMask(false);
 
         final BlendFunction blendFunction = submit.blend;
@@ -95,18 +95,10 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
     }
 
     private void resetGlState(final TextureManager textureManager, final Submit submit) {
-        Minecraft.getInstance().getRenderTarget().bindWrite(false);
-
-        final BlendFunction blendFunction = submit.blend;
-        if (blendFunction != null) {
-            GlStateManager.disableBlend();
-            GlStateManager.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
-        }
-
-        GlStateManager.depthMask(true);
-        GlStateManager.bindTexture(0);
-        ShaderUtil.applyWhite();
-        textureManager.get(submit.location).popFilter();
+        Minecraft.getInstance().getRenderTarget().bindWrite(false); // Restore Main Render Target
+        ShaderUtil.applyWhite(); // Set Color Modulator to White
+        textureManager.get(submit.location).popFilter(); // Pop Filter (blur)
+        GlStateManager.bindTexture(0); // Clear Active Texture
     }
 
     protected record Submit(
