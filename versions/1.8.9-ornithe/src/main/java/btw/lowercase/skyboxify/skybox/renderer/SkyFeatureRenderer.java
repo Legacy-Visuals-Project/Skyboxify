@@ -69,8 +69,6 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
                 this.resetGlState(textureManager, submit);
             }
 
-            GlStateManager.enableBlend();
-            GlStateManager.depthMask(false);
             ShaderUtil.applyWhite();
             ShaderUtil.applyModelView(backupModelView);
             super.endFrame();

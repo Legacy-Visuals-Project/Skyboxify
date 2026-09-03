@@ -31,6 +31,7 @@ import btw.lowercase.skyboxify.skybox.impl.Skybox;
 import btw.lowercase.skyboxify.skybox.renderer.SkyFeatureRenderer;
 import btw.lowercase.skyboxify.utils.CommonUtils;
 import btw.lowercase.skyboxify.utils.ShaderUtil;
+import net.minecraft.client.render.platform.GlStateManager;
 import net.minecraft.client.world.ClientWorld;
 import net.ornithemc.osl.lifecycle.api.client.ClientWorldEvents;
 import org.joml.Matrix4f;
@@ -76,6 +77,9 @@ public final class Skyboxify {
         globalEventManager.listen(SkyRenderEvent.EndSky.After.class, event -> {
             if (SkyboxifyImpl.skyboxManager().isEnabled()) {
                 renderSkyboxes(event.skyFeatureRenderer(), event.level(), 0.0F);
+
+                // Restore
+                GlStateManager.depthMask(true);
             }
         });
 
@@ -86,6 +90,10 @@ public final class Skyboxify {
                 if (level.dimension.getId() == CommonUtils.NETHER) {
                     event.setCancelled(true);
                 }
+
+                // Restore
+                GlStateManager.enableBlend();
+                GlStateManager.depthMask(false);
             }
         });
     }
