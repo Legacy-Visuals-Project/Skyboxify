@@ -57,7 +57,10 @@ public abstract class FeatureRenderer<T extends FeatureRenderer.Submit> {
     }
 
     // Override and implement your rendering
-    public void endFrame() {
+    public void endFrame(
+            //? >=26.3
+            final com.mojang.renderpearl.api.commands.RenderPass pass
+    ) {
         this.clear();
     }
 

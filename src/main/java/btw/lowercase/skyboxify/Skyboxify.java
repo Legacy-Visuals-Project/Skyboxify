@@ -35,11 +35,14 @@ import com.mojang.math.Axis;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 import org.joml.Matrix4f;
+
+//? >=26.3 {
+import com.mojang.renderpearl.api.commands.RenderPass;
+//? }
 
 @UtilityClass
 public final class Skyboxify {
@@ -90,14 +93,24 @@ public final class Skyboxify {
 
         globalEventManager.listen(SkyRenderEvent.EndSky.After.class, event -> {
             if (SkyboxifyImpl.skyboxManager().isEnabled()) {
-                renderSkyboxes(event.getSkyFeatureRenderer(), event.getLevel(), 0.0F);
+                renderSkyboxes(
+                        event.getSkyFeatureRenderer(),
+                        event.getLevel(), 0.0F
+                        //? >=26.3
+                        , event.getPass()
+                );
             }
         });
 
         globalEventManager.listen(SkyRenderEvent.SunMoonStars.class, event -> {
             final ClientLevel level = event.getLevel();
             if (SkyboxifyImpl.skyboxManager().isEnabled()) {
-                renderSkyboxes(event.getSkyFeatureRenderer(), level, event.getTickDelta());
+                renderSkyboxes(
+                        event.getSkyFeatureRenderer(),
+                        level, event.getTickDelta()
+                        //? >=26.3
+                        , event.getPass()
+                );
                 if (level.dimension().equals(Level.NETHER)) {
                     event.setCancelled(true);
                 }
@@ -105,13 +118,22 @@ public final class Skyboxify {
         });
     }
 
-    private void renderSkyboxes(final SkyFeatureRenderer skyFeatureRenderer, final ClientLevel level, final float tickDelta) {
+    private void renderSkyboxes(
+            final SkyFeatureRenderer skyFeatureRenderer,
+            final ClientLevel level,
+            final float tickDelta
+            //? >=26.3
+            , final RenderPass pass
+    ) {
         final Matrix4f modelViewMatrix = new Matrix4f(RenderSystem.getModelViewStack());
         modelViewMatrix.rotate(Axis.YP.rotationDegrees(-90.0F));
         for (final Skybox skybox : SkyboxifyImpl.skyboxManager().getActiveSkies()) {
             skybox.extractRenderState(skyFeatureRenderer, level, modelViewMatrix, tickDelta);
         }
 
-        skyFeatureRenderer.endFrame();
+        skyFeatureRenderer.endFrame(
+                //? >=26.3
+                pass
+        );
     }
 }

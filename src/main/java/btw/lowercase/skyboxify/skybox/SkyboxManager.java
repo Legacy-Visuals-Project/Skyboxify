@@ -24,10 +24,14 @@
 package btw.lowercase.skyboxify.skybox;
 
 import btw.lowercase.skyboxify.api.SkyboxifyApi;
+import btw.lowercase.skyboxify.skybox.impl.SkyLayer;
 import btw.lowercase.skyboxify.skybox.impl.Skybox;
 import com.google.common.base.Preconditions;
+import lombok.Getter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.texture.SimpleTexture;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 
@@ -36,7 +40,9 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public final class SkyboxManager {
+    @Getter
     private final List<Skybox> loadedSkies = new ArrayList<>();
+    @Getter
     private final List<Skybox> activeSkies = new CopyOnWriteArrayList<>();
     private final SkyboxifyApi api;
 
@@ -46,9 +52,27 @@ public final class SkyboxManager {
 
     public void addSkybox(final Skybox skybox) {
         this.loadedSkies.add(Preconditions.checkNotNull(skybox, "Skybox was null"));
+
+        final Minecraft minecraft = Minecraft.getInstance();
+        minecraft.execute(() -> {
+            for (final SkyLayer layer : skybox.layers()) {
+                final Identifier id = layer.texture();
+                minecraft.getTextureManager().registerAndLoad(id, new SimpleTexture(id));
+            }
+        });
     }
 
     public void clearSkyboxes() {
+        final Minecraft minecraft = Minecraft.getInstance();
+        minecraft.execute(() -> {
+            for (final Skybox skybox : this.loadedSkies) {
+                for (final SkyLayer layer : skybox.layers()) {
+                    final Identifier id = layer.texture();
+                    minecraft.getTextureManager().getTexture(id).close();
+                }
+            }
+        });
+
         this.loadedSkies.clear();
         this.activeSkies.clear();
     }
@@ -79,13 +103,5 @@ public final class SkyboxManager {
 
     public boolean containsEnabled(final ResourceKey<Level> resourceKey) {
         return !getSkiesFor(resourceKey).isEmpty();
-    }
-
-    public List<Skybox> getActiveSkies() {
-        return this.activeSkies;
-    }
-
-    public List<Skybox> getLoadedSkies() {
-        return this.loadedSkies;
     }
 }

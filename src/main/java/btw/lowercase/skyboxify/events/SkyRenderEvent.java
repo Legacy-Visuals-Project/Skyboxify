@@ -28,6 +28,10 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.client.multiplayer.ClientLevel;
 
+//? >=26.3 {
+import com.mojang.renderpearl.api.commands.RenderPass;
+//? }
+
 public class SkyRenderEvent {
     public static final class EndSky {
         @RequiredArgsConstructor
@@ -37,6 +41,11 @@ public class SkyRenderEvent {
 
             @Getter
             private final ClientLevel level;
+
+            //? >=26.3 {
+            @Getter
+            private final RenderPass pass;
+            //? }
         }
     }
 
@@ -61,6 +70,11 @@ public class SkyRenderEvent {
 
         @Getter
         private final float tickDelta;
+
+        //? >=26.3 {
+        @Getter
+        private final RenderPass pass;
+        //? }
     }
 
     @RequiredArgsConstructor

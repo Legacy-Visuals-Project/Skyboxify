@@ -29,7 +29,6 @@ import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.renderpearl.api.buffers.GpuBufferSlice;
 import com.mojang.renderpearl.api.commands.RenderPass;
-import com.mojang.renderpearl.api.commands.RenderPassDescriptor;
 import com.mojang.renderpearl.api.pipeline.CompiledRenderPipeline;
 import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
 import com.mojang.renderpearl.api.textures.FilterMode;
@@ -38,7 +37,6 @@ import com.mojang.renderpearl.api.textures.GpuTextureView;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.Identifier;
 import org.joml.Vector4f;
-import org.jspecify.annotations.NonNull;
 
 public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submit> {
     public SkyFeatureRenderer(final RenderTarget renderTarget) {
@@ -53,53 +51,36 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
     }
 
     @Override
-    public void endFrame() {
+    public void endFrame(final RenderPass pass) {
         if (!this.submits.isEmpty()) {
             final RenderSystem.AutoStorageIndexBuffer indexBuffer = RenderSystem.getSequentialBuffer(PrimitiveTopology.QUADS);
 
             final FilteringMode filteringMode = SkyboxifyImpl.config().filteringMode;
             final GpuSampler sampler = RenderSystem.getSamplerCache().getClampToEdge(filteringMode == FilteringMode.LINEAR ? FilterMode.LINEAR : FilterMode.NEAREST);
 
-            try (final RenderPass pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(this.createPassDescriptor())) {
-                RenderSystem.bindDefaultUniforms(pass);
-                for (final Submit submit : this.submits) {
-                    if (submit.geometry.isClosed()) {
-                        throw new RuntimeException("Cannot render closed geometry!");
-                    }
+            pass.pushDebugGroup(() -> "Sky Feature End Frame");
+            RenderSystem.bindDefaultUniforms(pass);
+            for (final Submit submit : this.submits) {
+                if (submit.geometry.isClosed()) {
+                    throw new RuntimeException("Cannot render closed geometry!");
+                }
 
-                    pass.setPipeline(submit.pipeline);
-                    if (submit.geometry instanceof StaticGeometry staticGeometry) {
-                        pass.setVertexBuffer(0, staticGeometry.vertexBuffer().slice());
-                        pass.setIndexBuffer(indexBuffer.getBuffer(staticGeometry.indexCount()), indexBuffer.type());
-                    }
+                pass.setPipeline(submit.pipeline);
+                if (submit.geometry instanceof StaticGeometry staticGeometry) {
+                    pass.setVertexBuffer(0, staticGeometry.vertexBuffer().slice());
+                    pass.setIndexBuffer(indexBuffer.getBuffer(staticGeometry.indexCount()), indexBuffer.type());
+                }
 
-                    pass.setUniform("DynamicTransforms", submit.dynamicTransforms);
-                    pass.setUniform("Sampler0", submit.textureView, sampler);
-                    if (submit.geometry instanceof StaticGeometry staticGeometry) {
-                        pass.drawIndexed(staticGeometry.indexCount(), 1, 0, 0, 0);
-                    }
+                pass.setUniform("DynamicTransforms", submit.dynamicTransforms);
+                pass.setUniform("Sampler0", submit.textureView, sampler);
+                if (submit.geometry instanceof StaticGeometry staticGeometry) {
+                    pass.drawIndexed(staticGeometry.indexCount(), 1, 0, 0, 0);
                 }
             }
 
-            super.endFrame();
+            pass.popDebugGroup();
+            super.endFrame(pass);
         }
-    }
-
-    private @NonNull RenderPassDescriptor createPassDescriptor() {
-        final RenderPassDescriptor.Builder descriptor = RenderPassDescriptor.builder((() -> "Sky Feature End Frame"));
-
-        final GpuTextureView colorTextureView = this.renderTarget.getColorTextureView();
-        if (colorTextureView != null) {
-            descriptor.withColorAttachment(colorTextureView);
-        }
-
-        final GpuTextureView depthTextureView = this.renderTarget.getDepthTextureView();
-        if (this.renderTarget.hasDepth() && depthTextureView != null) {
-            descriptor.withDepthAttachment(depthTextureView);
-        }
-
-        descriptor.withRenderArea(new RenderPass.RenderArea(0, 0, this.renderTarget.width, this.renderTarget.height));
-        return descriptor.build();
     }
 
     protected record Submit(CompiledRenderPipeline pipeline, Geometry geometry,
