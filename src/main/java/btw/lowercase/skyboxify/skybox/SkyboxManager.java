@@ -53,6 +53,7 @@ public final class SkyboxManager {
     public void addSkybox(final Skybox skybox) {
         this.loadedSkies.add(Preconditions.checkNotNull(skybox, "Skybox was null"));
 
+        //? >=26.3 {
         // TODO/NOTE: Figure out better way to do this as it freezes the game entirely till it finishes
         final Minecraft minecraft = Minecraft.getInstance();
         minecraft.execute(() -> {
@@ -61,9 +62,11 @@ public final class SkyboxManager {
                 minecraft.getTextureManager().registerAndLoad(id, new SimpleTexture(id));
             }
         });
+        //? }
     }
 
     public void clearSkyboxes() {
+        //? >=26.3 {
         final Minecraft minecraft = Minecraft.getInstance();
         minecraft.execute(() -> {
             for (final Skybox skybox : this.loadedSkies) {
@@ -73,6 +76,7 @@ public final class SkyboxManager {
                 }
             }
         });
+        //? }
 
         this.loadedSkies.clear();
         this.activeSkies.clear();

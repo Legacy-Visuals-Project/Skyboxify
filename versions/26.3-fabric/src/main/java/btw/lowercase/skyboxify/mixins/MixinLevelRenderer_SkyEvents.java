@@ -58,13 +58,13 @@ public abstract class MixinLevelRenderer_SkyEvents {
     private RenderTarget renderTarget;
 
     @Unique
-    private static float skyboxify$tickDelta = 0.0F;
+    private float skyboxify$tickDelta = 0.0F;
 
     @Unique
-    private static ClientLevel skyboxify$level;
+    private ClientLevel skyboxify$level;
 
     @Unique
-    private static SkyFeatureRenderer skyboxify$skyFeatureRenderer = null;
+    private SkyFeatureRenderer skyboxify$skyFeatureRenderer = null;
 
     @Inject(method = "extractRenderState", at = @At("HEAD"))
     private void skyboxify$getLocals(final ClientLevel level, final float tickDelta, final Camera camera, final SkyRenderState state, final CallbackInfo ci) {
@@ -77,29 +77,29 @@ public abstract class MixinLevelRenderer_SkyEvents {
     }
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SkyRenderer;renderEndSky(Lcom/mojang/renderpearl/api/commands/RenderPass;)V", shift = At.Shift.AFTER))
-    private static void skyboxify$renderEndSkybox(final CallbackInfo ci, @Local(name = "renderPass") final RenderPass pass) {
+    private void skyboxify$renderEndSkybox(final CallbackInfo ci, @Local(name = "renderPass") final RenderPass pass) {
         Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.EndSky.After(skyboxify$skyFeatureRenderer, skyboxify$level, pass));
     }
 
     @WrapWithCondition(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSkyDisc(Lcom/mojang/renderpearl/api/commands/RenderPass;Lorg/joml/Vector3fc;)V"))
-    private static boolean skyboxify$skyDiscEvent$top(final SkyRenderer instance, final RenderPass renderPass, final Vector3fc vector3fc) {
+    private boolean skyboxify$skyDiscEvent$top(final SkyRenderer instance, final RenderPass renderPass, final Vector3fc color) {
         return !Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.Disc(SkyRenderEvent.Disc.Type.TOP)).isCancelled();
     }
 
     @WrapWithCondition(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunMoonAndStars(Lcom/mojang/renderpearl/api/commands/RenderPass;Lcom/mojang/blaze3d/vertex/PoseStack;FFFLnet/minecraft/world/level/MoonPhase;FF)V"))
-    private static boolean skyboxify$renderSkyboxes(final SkyRenderer instance, final RenderPass pass, final PoseStack poseStack, final float sunAngle, final float moonAngle, final float starAngle, final MoonPhase moonPhase, final float rainBrightness, final float starBrightness) {
+    private boolean skyboxify$renderSkyboxes(final SkyRenderer instance, final RenderPass pass, final PoseStack poseStack, final float sunAngle, final float moonAngle, final float starAngle, final MoonPhase moonPhase, final float rainBrightness, final float starBrightness) {
         return !Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.SunMoonStars(skyboxify$skyFeatureRenderer, skyboxify$level, skyboxify$tickDelta, pass)).isCancelled();
     }
 
     @WrapWithCondition(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SkyRenderer;renderDarkDisc(Lcom/mojang/renderpearl/api/commands/RenderPass;)V"))
-    private static boolean skyboxify$skyDiscEvent$bottom(final SkyRenderer instance, final RenderPass pass) {
+    private boolean skyboxify$skyDiscEvent$bottom(final SkyRenderer instance, final RenderPass pass) {
         return !Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.Disc(SkyRenderEvent.Disc.Type.BOTTOM)).isCancelled();
     }
 
     @WrapOperation(method = "extractRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/dimension/DimensionType;skybox()Lnet/minecraft/world/level/dimension/DimensionType$Skybox;", opcode = Opcodes.GETFIELD))
-    private static DimensionType.Skybox skyboxify$allowNetherSky(final DimensionType instance, final Operation<DimensionType.Skybox> original) {
+    private DimensionType.Skybox skyboxify$allowNetherSky(final DimensionType instance, final Operation<DimensionType.Skybox> original, @Local(argsOnly = true, name = "level") final ClientLevel level) {
         //noinspection DataFlowIssue
-        if (SkyboxifyImpl.skyboxManager().isEnabled() && SkyboxifyImpl.skyboxManager().containsEnabled(Level.NETHER) && skyboxify$level.dimension().equals(Level.NETHER)) {
+        if (SkyboxifyImpl.skyboxManager().isEnabled() && SkyboxifyImpl.skyboxManager().containsEnabled(Level.NETHER) && level.dimension().equals(Level.NETHER)) {
             return DimensionType.Skybox.OVERWORLD;
         } else {
             return original.call(instance);

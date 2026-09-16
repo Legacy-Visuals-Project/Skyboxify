@@ -38,11 +38,9 @@ import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
 public interface Geometry extends AutoCloseable {
     StaticGeometry DEFAULT = StaticGeometry.create(
             DefaultVertexFormat.POSITION_TEX,
-            //? >=26.2 {
+            //~ if >=26.2 'VertexFormat.Mode' -> 'PrimitiveTopology' {
             PrimitiveTopology.QUADS,
-            //? } else {
-            /*VertexFormat.Mode.QUADS,
-             *///? }
+            //~ }
             SkyPart.COUNT * 4,
             vertexConsumer -> {
                 for (final SkyPart part : SkyPart.VALUES) {
@@ -57,5 +55,6 @@ public interface Geometry extends AutoCloseable {
 
     boolean isClosed();
 
+    @Override
     void close();
 }
