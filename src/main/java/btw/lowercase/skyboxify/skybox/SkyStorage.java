@@ -65,12 +65,12 @@ public final class SkyStorage {
                     //? >=26.2 {
                     //~ if >=26.3 'com.mojang.blaze3d.GpuFormat' -> 'com.mojang.renderpearl.api.GpuFormat' {
                     com.mojang.renderpearl.api.GpuFormat.RGBA8_UNORM, writeColor
-                    //? }
+                    //~ }
                     //? } else {
                     /*writeColor
                     *///? }
             ));
-            //? }
+            //~ }
             //? } else {
             /*builder.withDepthWrite(false);
             builder.withColorWrite(true, false);
@@ -95,7 +95,7 @@ public final class SkyStorage {
             builder.withVertexBinding(0, DefaultVertexFormat.POSITION_TEX);
             //~ if >=26.3 'com.mojang.blaze3d.PrimitiveTopology' -> 'com.mojang.renderpearl.api.pipeline.PrimitiveTopology' {
             builder.withPrimitiveTopology(com.mojang.renderpearl.api.pipeline.PrimitiveTopology.QUADS);
-            //? }
+            //~ }
             //? } else {
             /*builder.withVertexFormat(DefaultVertexFormat.POSITION_TEX, VertexFormat.Mode.QUADS);
             *///? }

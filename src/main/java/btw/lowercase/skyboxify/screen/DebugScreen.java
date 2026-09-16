@@ -117,7 +117,7 @@ public class DebugScreen extends Screen {
 	public boolean keyPressed(final net.minecraft.client.input.KeyEvent event) {
         //~ if >=26.3 'scancode' -> 'keycode' {
         return this.keyPressedInternal(event.key(), event.keycode(), event.modifiers());
-        //? }
+        //~ }
 	}
 	//?} else {
     /*@Override
@@ -141,7 +141,7 @@ public class DebugScreen extends Screen {
 	public boolean keyReleased(final net.minecraft.client.input.KeyEvent event) {
         //~ if >=26.3 'scancode' -> 'keycode' {
 		return this.keyReleasedInternal(event.key(), event.keycode(), event.modifiers());
-        //? }
+        //~ }
 	}
 	//?} else {
     /*@Override

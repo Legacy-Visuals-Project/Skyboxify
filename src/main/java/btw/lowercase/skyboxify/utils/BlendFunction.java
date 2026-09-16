@@ -81,6 +81,6 @@ public record BlendFunction(SrcFactor srcFactor, DstFactor dstFactor) {
     public com.mojang.renderpearl.api.pipeline.BlendFunction vanilla() {
         return new com.mojang.renderpearl.api.pipeline.BlendFunction(this.srcFactor.vanilla(), this.dstFactor.vanilla());
     }
-    //? }
+    //~ }
     //?}
 }
