@@ -84,7 +84,7 @@ public final class Skyboxify {
         });
 
         //? >=1.21.4 <1.21.9 {
-		/*globalEventManager.listen(SkyRenderEvent.SunriseSunset.After.class, event -> {
+		/*globalEventManager.listen(SkyRenderEvent.SunriseSunsetAfter.class, event -> {
 			if (SkyboxifyImpl.skyboxManager().isEnabled()) {
 				event.getBufferSource().endBatch(); // Fix horizon rendering over the skybox
 			}

@@ -42,7 +42,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.MoonPhase;
 import net.minecraft.world.level.dimension.DimensionType;
 import org.joml.Vector3fc;
-import org.joml.Vector4fc;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -80,14 +79,6 @@ public abstract class MixinLevelRenderer_SkyEvents {
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SkyRenderer;renderEndSky(Lcom/mojang/renderpearl/api/commands/RenderPass;)V", shift = At.Shift.AFTER))
     private static void skyboxify$renderEndSkybox(final CallbackInfo ci, @Local(name = "renderPass") final RenderPass pass) {
         Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.EndSky.After(skyboxify$skyFeatureRenderer, skyboxify$level, pass));
-    }
-
-    @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunriseAndSunset(Lcom/mojang/renderpearl/api/commands/RenderPass;Lcom/mojang/blaze3d/vertex/PoseStack;FLorg/joml/Vector4fc;)V"))
-    private static void skyboxify$endBatchSunrise(final SkyRenderer instance, final RenderPass renderPass, final PoseStack poseStack, final float sunAngle, final Vector4fc sunriseAndSunsetColor, final Operation<Void> original) {
-        if (!Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.SunriseSunset()).isCancelled()) {
-            original.call(instance, renderPass, poseStack, sunAngle, sunriseAndSunsetColor);
-            Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.SunriseSunset.After());
-        }
     }
 
     @WrapWithCondition(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSkyDisc(Lcom/mojang/renderpearl/api/commands/RenderPass;Lorg/joml/Vector3fc;)V"))

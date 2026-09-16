@@ -49,16 +49,13 @@ public class SkyRenderEvent {
         }
     }
 
-    @RequiredArgsConstructor
-    public static final class SunriseSunset extends CancellableEvent {
-        @RequiredArgsConstructor
-        public static class After implements Event {
-            //? >=1.21.4 <1.21.9 {
-			/*@Getter
-			private final net.minecraft.client.renderer.MultiBufferSource.BufferSource bufferSource;
-			*///?}
-        }
+    //? >=1.21.4 <1.21.9 {
+    /*@RequiredArgsConstructor
+    public static final class SunriseSunsetAfter implements Event {
+        @Getter
+        private final net.minecraft.client.renderer.MultiBufferSource.BufferSource bufferSource;
     }
+    *///?}
 
     @RequiredArgsConstructor
     public static final class SunMoonStars extends CancellableEvent {

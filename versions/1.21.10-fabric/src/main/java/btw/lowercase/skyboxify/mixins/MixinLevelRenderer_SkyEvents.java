@@ -81,14 +81,6 @@ public abstract class MixinLevelRenderer_SkyEvents {
         Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.EndSky.After(skyboxify$skyFeatureRenderer, this.level));
     }
 
-    @WrapOperation(method = "method_62215", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunriseAndSunset(Lcom/mojang/blaze3d/vertex/PoseStack;FI)V"))
-    private void skyboxify$endBatchSunrise(final SkyRenderer instance, final PoseStack poseStack, final float sunAngle, final int sunriseAndSunsetColor, final Operation<Void> original) {
-        if (!Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.SunriseSunset()).isCancelled()) {
-            original.call(instance, poseStack, sunAngle, sunriseAndSunsetColor);
-            Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.SunriseSunset.After());
-        }
-    }
-
     @WrapWithCondition(method = "method_62215", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSkyDisc(FFF)V"))
     private boolean skyboxify$skyDiscEvent$top(final SkyRenderer instance, final float red, final float green, final float blue) {
         return !Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.Disc(SkyRenderEvent.Disc.Type.TOP)).isCancelled();
