@@ -53,6 +53,7 @@ public final class SkyboxManager {
     public void addSkybox(final Skybox skybox) {
         this.loadedSkies.add(Preconditions.checkNotNull(skybox, "Skybox was null"));
 
+        // TODO/NOTE: Figure out better way to do this as it freezes the game entirely till it finishes
         final Minecraft minecraft = Minecraft.getInstance();
         minecraft.execute(() -> {
             for (final SkyLayer layer : skybox.layers()) {
