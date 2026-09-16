@@ -38,6 +38,8 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.joml.Matrix4f;
 
 //? >=26.3 {
@@ -46,6 +48,8 @@ import com.mojang.renderpearl.api.commands.RenderPass;
 
 @UtilityClass
 public final class Skyboxify {
+    private final Logger LOGGER = LogManager.getLogger();
+
     @Getter
     private final EventManager globalEventManager = new EventManager();
 
@@ -125,6 +129,11 @@ public final class Skyboxify {
             //? >=26.3
             , final RenderPass pass
     ) {
+        if (level == null) {
+            LOGGER.warn("Failed to render skyboxify skybox frame! Level was null.");
+            return;
+        }
+
         final Matrix4f modelViewMatrix = new Matrix4f(RenderSystem.getModelViewStack());
         modelViewMatrix.rotate(Axis.YP.rotationDegrees(-90.0F));
         for (final Skybox skybox : SkyboxifyImpl.skyboxManager().getActiveSkies()) {
