@@ -24,22 +24,27 @@
 package btw.lowercase.skyboxify.skybox;
 
 import btw.lowercase.skyboxify.api.SkyboxifyApi;
-import btw.lowercase.skyboxify.skybox.impl.SkyLayer;
+import btw.lowercase.skyboxify.api.SkyboxifyImpl;
 import btw.lowercase.skyboxify.skybox.impl.Skybox;
+import btw.lowercase.skyboxify.skybox.renderer.SkyFeatureRenderer;
 import com.google.common.base.Preconditions;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.math.Axis;
 import lombok.Getter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.texture.SimpleTexture;
-import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.joml.Matrix4f;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public final class SkyboxManager {
+    private final Logger LOGGER = LogManager.getLogger();
     @Getter
     private final List<Skybox> loadedSkies = new ArrayList<>();
     @Getter
@@ -52,34 +57,24 @@ public final class SkyboxManager {
 
     public void addSkybox(final Skybox skybox) {
         this.loadedSkies.add(Preconditions.checkNotNull(skybox, "Skybox was null"));
-
-        //? >=26.3 {
-        // TODO/NOTE: Figure out better way to do this as it freezes the game entirely till it finishes
-        final Minecraft minecraft = Minecraft.getInstance();
-        minecraft.execute(() -> {
-            for (final SkyLayer layer : skybox.layers()) {
-                final Identifier id = layer.texture();
-                minecraft.getTextureManager().registerAndLoad(id, new SimpleTexture(id));
-            }
-        });
-        //? }
     }
 
     public void clearSkyboxes() {
-        //? >=26.3 {
-        final Minecraft minecraft = Minecraft.getInstance();
-        minecraft.execute(() -> {
-            for (final Skybox skybox : this.loadedSkies) {
-                for (final SkyLayer layer : skybox.layers()) {
-                    final Identifier id = layer.texture();
-                    minecraft.getTextureManager().getTexture(id).close();
-                }
-            }
-        });
-        //? }
-
         this.loadedSkies.clear();
         this.activeSkies.clear();
+    }
+
+    public void extractSkyboxes(final SkyFeatureRenderer skyFeatureRenderer, final ClientLevel level, final float tickDelta) {
+        if (level == null) {
+            LOGGER.warn("Failed to extract skyboxify skybox frame! Level was null.");
+            return;
+        }
+
+        final Matrix4f modelViewMatrix = new Matrix4f(RenderSystem.getModelViewStack());
+        modelViewMatrix.rotate(Axis.YP.rotationDegrees(-90.0F));
+        for (final Skybox skybox : SkyboxifyImpl.skyboxManager().getActiveSkies()) {
+            skybox.extractRenderState(skyFeatureRenderer, level, modelViewMatrix, tickDelta);
+        }
     }
 
     public void tick() {

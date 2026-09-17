@@ -24,7 +24,7 @@
 package btw.lowercase.skyboxify.mixins;
 
 import btw.lowercase.skyboxify.Skyboxify;
-import btw.lowercase.skyboxify.events.SkyRenderEvent;
+import btw.lowercase.skyboxify.events.SkyEvents;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.SkyRenderer;
@@ -36,16 +36,16 @@ import org.spongepowered.asm.mixin.injection.At;
 public abstract class MixinSkyRenderer_CelestialEvents {
     @WrapWithCondition(method = "renderSunMoonAndStars", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSun(FLcom/mojang/blaze3d/vertex/PoseStack;)V"))
     private boolean skyboxify$toggleSun(final SkyRenderer instance, final float rainBrightness, final PoseStack poseStack) {
-        return !Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.Celestial(SkyRenderEvent.Celestial.Type.SUN)).isCancelled();
+        return !Skyboxify.getGlobalEventManager().dispatch(new SkyEvents.Celestial(SkyEvents.Celestial.Type.SUN)).isCancelled();
     }
 
     @WrapWithCondition(method = "renderSunMoonAndStars", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SkyRenderer;renderMoon(Lnet/minecraft/world/level/MoonPhase;FLcom/mojang/blaze3d/vertex/PoseStack;)V"))
     private boolean skyboxify$toggleMoon(final SkyRenderer instance, final MoonPhase moonPhase, final float rainBrightness, final PoseStack poseStack) {
-        return !Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.Celestial(SkyRenderEvent.Celestial.Type.MOON)).isCancelled();
+        return !Skyboxify.getGlobalEventManager().dispatch(new SkyEvents.Celestial(SkyEvents.Celestial.Type.MOON)).isCancelled();
     }
 
     @WrapWithCondition(method = "renderSunMoonAndStars", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SkyRenderer;renderStars(FLcom/mojang/blaze3d/vertex/PoseStack;)V"))
     private boolean skyboxify$toggleStars(final SkyRenderer instance, final float starBrightness, final PoseStack poseStack) {
-        return !Skyboxify.getGlobalEventManager().dispatch(new SkyRenderEvent.Celestial(SkyRenderEvent.Celestial.Type.STARS)).isCancelled();
+        return !Skyboxify.getGlobalEventManager().dispatch(new SkyEvents.Celestial(SkyEvents.Celestial.Type.STARS)).isCancelled();
     }
 }

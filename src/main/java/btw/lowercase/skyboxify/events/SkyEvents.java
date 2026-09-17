@@ -32,15 +32,16 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import com.mojang.renderpearl.api.commands.RenderPass;
 //? }
 
-public class SkyRenderEvent {
+public class SkyEvents {
+    public record Extraction(SkyFeatureRenderer skyFeatureRenderer, ClientLevel level,
+                             float tickDelta) implements Event {
+    }
+
     public static final class EndSky {
         @RequiredArgsConstructor
         public static final class After implements Event {
             @Getter
             private final SkyFeatureRenderer skyFeatureRenderer;
-
-            @Getter
-            private final ClientLevel level;
 
             //? >=26.3 {
             @Getter
@@ -63,10 +64,7 @@ public class SkyRenderEvent {
         private final SkyFeatureRenderer skyFeatureRenderer;
 
         @Getter
-        private final ClientLevel level;
-
-        @Getter
-        private final float tickDelta;
+        private final boolean isInNether;
 
         //? >=26.3 {
         @Getter
