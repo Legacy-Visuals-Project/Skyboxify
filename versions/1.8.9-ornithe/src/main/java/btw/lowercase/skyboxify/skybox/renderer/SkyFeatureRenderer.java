@@ -35,7 +35,6 @@ import net.minecraft.client.render.texture.Texture;
 import net.minecraft.client.render.texture.TextureManager;
 import net.minecraft.resource.Identifier;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix4f;
 
 public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submit> {
     public SkyFeatureRenderer(final RenderTarget renderTarget) {
@@ -57,7 +56,6 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
     public void endFrame() {
         if (!this.submits.isEmpty()) {
             final TextureManager textureManager = Minecraft.getInstance().getTextureManager();
-            final Matrix4f backupModelView = ShaderUtil.captureModelView();
             for (final Submit submit : this.submits) {
                 if (submit.geometry.isClosed()) {
                     throw new RuntimeException("Cannot render closed geometry!");
@@ -69,7 +67,6 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
             }
 
             ShaderUtil.applyWhite();
-            ShaderUtil.applyModelView(backupModelView);
             super.endFrame();
         }
     }
@@ -91,10 +88,12 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
         }
 
         this.renderTarget.bindWrite(false);
-        ShaderUtil.applyModelView(submit.uniforms.modelViewMatrix());
+        GlStateManager.pushMatrix();
+        GlStateManager.multMatrix(ShaderUtil.getMatrixBuffer(submit.uniforms.rotationMatrix()));
     }
 
     private void resetGlState(final TextureManager textureManager, final Submit submit) {
+        GlStateManager.popMatrix();
         Minecraft.getInstance().getRenderTarget().bindWrite(false); // Restore Main Render Target
         ShaderUtil.applyWhite(); // Set Color Modulator to White
         textureManager.get(submit.location).popFilter(); // Pop Filter (blur)

@@ -26,15 +26,11 @@ package btw.lowercase.skyboxify;
 import btw.lowercase.skyboxify.api.SkyboxifyApi;
 import btw.lowercase.skyboxify.api.SkyboxifyImpl;
 import btw.lowercase.skyboxify.config.SkyboxifyConfig;
-import btw.lowercase.skyboxify.events.SkyRenderEvent;
-import btw.lowercase.skyboxify.skybox.impl.Skybox;
-import btw.lowercase.skyboxify.skybox.renderer.SkyFeatureRenderer;
+import btw.lowercase.skyboxify.events.SkyEvents;
 import btw.lowercase.skyboxify.utils.CommonUtils;
-import btw.lowercase.skyboxify.utils.ShaderUtil;
 import net.minecraft.client.render.platform.GlStateManager;
 import net.minecraft.client.world.ClientWorld;
 import net.ornithemc.osl.lifecycle.api.client.ClientWorldEvents;
-import org.joml.Matrix4f;
 import org.visuals.legacy.lightconfig.lib.v1.events.EventManager;
 
 public final class Skyboxify {
@@ -51,20 +47,20 @@ public final class Skyboxify {
 
         ClientWorldEvents.TICK_END.register(impl.getSkyboxManager()::tick);
 
-        globalEventManager.listen(SkyRenderEvent.Disc.class, event -> {
+        globalEventManager.listen(SkyEvents.Disc.class, event -> {
             if (config.enabled.isEnabled() && !config.renderSky.isEnabled()) {
                 event.setCancelled(true);
             }
         });
 
-        globalEventManager.listen(SkyRenderEvent.Celestial.class, event -> {
+        globalEventManager.listen(SkyEvents.Celestial.class, event -> {
             if (config.enabled.isEnabled()) {
-                final SkyRenderEvent.Celestial.Type type = event.getType();
-                if (!config.renderSunMoon.isEnabled() && (type == SkyRenderEvent.Celestial.Type.SUN || type == SkyRenderEvent.Celestial.Type.MOON)) {
+                final SkyEvents.Celestial.Type type = event.getType();
+                if (!config.renderSunMoon.isEnabled() && (type == SkyEvents.Celestial.Type.SUN || type == SkyEvents.Celestial.Type.MOON)) {
                     event.setCancelled(true);
                 }
 
-                if (SkyboxifyImpl.skyboxManager().isEnabled() && type == SkyRenderEvent.Celestial.Type.STARS) {
+                if (impl.getSkyboxManager().isEnabled() && type == SkyEvents.Celestial.Type.STARS) {
                     if (config.renderStars.isEnabled()) {
                         return;
                     }
@@ -74,20 +70,26 @@ public final class Skyboxify {
             }
         });
 
-        globalEventManager.listen(SkyRenderEvent.EndSky.After.class, event -> {
-            if (SkyboxifyImpl.skyboxManager().isEnabled()) {
-                renderSkyboxes(event.skyFeatureRenderer(), event.level(), 0.0F);
+        globalEventManager.listen(SkyEvents.Extraction.class, event -> {
+            if (impl.getSkyboxManager().isEnabled()) {
+                impl.getSkyboxManager().extractSkyboxes(event.skyFeatureRenderer(), event.world(), event.tickDelta());
+            }
+        });
+
+        globalEventManager.listen(SkyEvents.EndSky.After.class, event -> {
+            if (impl.getSkyboxManager().isEnabled()) {
+                event.skyFeatureRenderer().endFrame();
 
                 // Restore
                 GlStateManager.depthMask(true);
             }
         });
 
-        globalEventManager.listen(SkyRenderEvent.SunMoonStars.class, event -> {
-            final ClientWorld level = event.level();
-            if (SkyboxifyImpl.skyboxManager().isEnabled()) {
-                renderSkyboxes(event.skyFeatureRenderer(), level, event.tickDelta());
-                if (level.dimension.getId() == CommonUtils.NETHER) {
+        globalEventManager.listen(SkyEvents.SunMoonStars.class, event -> {
+            final ClientWorld world = event.world();
+            if (impl.getSkyboxManager().isEnabled()) {
+                event.skyFeatureRenderer().endFrame();
+                if (world.dimension.getId() == CommonUtils.NETHER) {
                     event.setCancelled(true);
                 }
 
@@ -96,15 +98,5 @@ public final class Skyboxify {
                 GlStateManager.depthMask(false);
             }
         });
-    }
-
-    private static void renderSkyboxes(final SkyFeatureRenderer skyFeatureRenderer, final ClientWorld level, final float tickDelta) {
-        final Matrix4f modelViewMatrix = new Matrix4f(ShaderUtil.captureModelView());
-        CommonUtils.rotate(modelViewMatrix, CommonUtils.Y_AXIS, -90.0F);
-        for (final Skybox skybox : SkyboxifyImpl.skyboxManager().getActiveSkies()) {
-            skybox.extractRenderState(skyFeatureRenderer, level, modelViewMatrix, tickDelta);
-        }
-
-        skyFeatureRenderer.endFrame();
     }
 }

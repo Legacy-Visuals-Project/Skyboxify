@@ -28,33 +28,31 @@ import net.minecraft.client.world.ClientWorld;
 import org.visuals.legacy.lightconfig.lib.v1.events.CancellableEvent;
 import org.visuals.legacy.lightconfig.lib.v1.events.Event;
 
-public class SkyRenderEvent {
+public class SkyEvents {
+    public record Extraction(SkyFeatureRenderer skyFeatureRenderer, ClientWorld world,
+                             float tickDelta) implements Event {
+    }
+
     public static final class EndSky {
-        public record After(SkyFeatureRenderer skyFeatureRenderer, ClientWorld level) implements Event {
+        public record After(SkyFeatureRenderer skyFeatureRenderer, ClientWorld world) implements Event {
         }
     }
 
     public static final class SunMoonStars extends CancellableEvent {
         private final SkyFeatureRenderer skyFeatureRenderer;
-        private final ClientWorld level;
-        private final float tickDelta;
+        private final ClientWorld world;
 
-        public SunMoonStars(final SkyFeatureRenderer skyFeatureRenderer, final ClientWorld level, final float tickDelta) {
+        public SunMoonStars(final SkyFeatureRenderer skyFeatureRenderer, final ClientWorld world) {
             this.skyFeatureRenderer = skyFeatureRenderer;
-            this.level = level;
-            this.tickDelta = tickDelta;
+            this.world = world;
         }
 
         public SkyFeatureRenderer skyFeatureRenderer() {
             return this.skyFeatureRenderer;
         }
 
-        public ClientWorld level() {
-            return this.level;
-        }
-
-        public float tickDelta() {
-            return this.tickDelta;
+        public ClientWorld world() {
+            return this.world;
         }
     }
 

@@ -24,20 +24,27 @@
 package btw.lowercase.skyboxify.skybox;
 
 import btw.lowercase.skyboxify.api.SkyboxifyApi;
+import btw.lowercase.skyboxify.api.SkyboxifyImpl;
 import btw.lowercase.skyboxify.skybox.impl.SkyLayer;
 import btw.lowercase.skyboxify.skybox.impl.Skybox;
+import btw.lowercase.skyboxify.skybox.renderer.SkyFeatureRenderer;
+import btw.lowercase.skyboxify.utils.CommonUtils;
 import btw.lowercase.skyboxify.utils.Id;
 import com.google.common.base.Preconditions;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.render.texture.SimpleTexture;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.resource.Identifier;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.joml.Matrix4f;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public final class SkyboxManager {
+    private final Logger LOGGER = LogManager.getLogger();
     private final List<Skybox> loadedSkies = new ArrayList<>();
     private final List<Skybox> activeSkies = new CopyOnWriteArrayList<>();
     private final SkyboxifyApi api;
@@ -64,6 +71,19 @@ public final class SkyboxManager {
 
         this.loadedSkies.clear();
         this.activeSkies.clear();
+    }
+
+    public void extractSkyboxes(final SkyFeatureRenderer skyFeatureRenderer, final ClientWorld world, final float tickDelta) {
+        if (world == null) {
+            LOGGER.warn("Failed to extract skyboxify skybox frame! Level was null.");
+            return;
+        }
+
+        final Matrix4f modelViewMatrix = new Matrix4f();
+        CommonUtils.rotate(modelViewMatrix, CommonUtils.Y_AXIS, -90.0F);
+        for (final Skybox skybox : SkyboxifyImpl.skyboxManager().getActiveSkies()) {
+            skybox.extractRenderState(skyFeatureRenderer, world, modelViewMatrix, tickDelta);
+        }
     }
 
     public void tick() {

@@ -29,7 +29,6 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4fc;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
 
 import java.nio.FloatBuffer;
 
@@ -52,20 +51,10 @@ public final class ShaderUtil {
 
     private static final FloatBuffer MATRIX_BUFFER = BufferUtils.createFloatBuffer(16);
 
-    public static Matrix4f captureModelView() {
-        MATRIX_BUFFER.clear();
-        GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX, MATRIX_BUFFER);
-        MATRIX_BUFFER.flip();
-
-        return new Matrix4f(MATRIX_BUFFER);
-    }
-
-    public static void applyModelView(final Matrix4f matrix4f) {
+    public static FloatBuffer getMatrixBuffer(final Matrix4f matrix4f) {
         MATRIX_BUFFER.clear();
         matrix4f.get(MATRIX_BUFFER);
         MATRIX_BUFFER.rewind();
-
-        GlStateManager.matrixMode(GL11.GL_MODELVIEW);
-        GL11.glLoadMatrix(MATRIX_BUFFER);
+        return MATRIX_BUFFER;
     }
 }
