@@ -50,7 +50,7 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
     protected Submit createSubmit(final Pipeline pipeline, final Geometry geometry, final RenderUniforms uniforms, final ResourceLocation location) {
         final AbstractTexture texture = Minecraft.getInstance().getTextureManager().getTexture(location);
         texture.setFilter(SkyboxifyImpl.config().filteringMode == FilteringMode.LINEAR, false);
-        final GpuBufferSlice dynamicTransforms = RenderSystem.getDynamicUniforms().writeTransform(uniforms.modelViewMatrix(), uniforms.shaderColor(), new Vector3f(), new Matrix4f(), 1.0F);
+        final GpuBufferSlice dynamicTransforms = RenderSystem.getDynamicUniforms().writeTransform(new Matrix4f(RenderSystem.getModelViewMatrix()).mul(uniforms.rotationMatrix()), uniforms.shaderColor(), new Vector3f(), new Matrix4f(), 1.0F);
         return new Submit(pipeline.pipeline(), geometry, uniforms, texture.getTextureView(), dynamicTransforms);
     }
 

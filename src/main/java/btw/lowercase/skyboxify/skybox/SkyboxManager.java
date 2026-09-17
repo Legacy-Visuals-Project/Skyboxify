@@ -70,7 +70,7 @@ public final class SkyboxManager {
             return;
         }
 
-        final Matrix4f modelViewMatrix = new Matrix4f(RenderSystem.getModelViewStack());
+        final Matrix4f modelViewMatrix = new Matrix4f();
         modelViewMatrix.rotate(Axis.YP.rotationDegrees(-90.0F));
         for (final Skybox skybox : SkyboxifyImpl.skyboxManager().getActiveSkies()) {
             skybox.extractRenderState(skyFeatureRenderer, level, modelViewMatrix, tickDelta);

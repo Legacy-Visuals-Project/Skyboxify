@@ -39,6 +39,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.TriState;
+import org.joml.Matrix4f;
 import org.joml.Vector4fc;
 
 import java.util.Objects;
@@ -97,7 +98,7 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
 
                 submit.renderType.setupRenderState();
                 vertexBuffer.bind();
-                vertexBuffer.drawWithShader(submit.uniforms.modelViewMatrix(), RenderSystem.getProjectionMatrix(), RenderSystem.getShader());
+                vertexBuffer.drawWithShader(new Matrix4f(RenderSystem.getModelViewMatrix()).mul(submit.uniforms.rotationMatrix()), RenderSystem.getProjectionMatrix(), RenderSystem.getShader());
                 VertexBuffer.unbind();
                 submit.renderType.clearRenderState();
             }

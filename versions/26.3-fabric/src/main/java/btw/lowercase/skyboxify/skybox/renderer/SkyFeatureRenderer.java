@@ -46,8 +46,7 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
     @Override
     protected Submit createSubmit(final Pipeline pipeline, final Geometry geometry, final RenderUniforms uniforms, final Identifier location) {
         final GpuTextureView textureView = Minecraft.getInstance().getTextureManager().getTexture(location).getTextureView();
-        final GpuBufferSlice dynamicTransforms = RenderSystem.getDynamicUniforms().writeTransform(uniforms.modelViewMatrix(), (Vector4f) uniforms.shaderColor());
-        return new Submit(RenderSystem.getCompiledPipeline(pipeline.pipeline()), geometry, uniforms, textureView, dynamicTransforms);
+        return new Submit(RenderSystem.getCompiledPipeline(pipeline.pipeline()), geometry, uniforms, textureView);
     }
 
     @Override
@@ -71,7 +70,8 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
                     pass.setIndexBuffer(indexBuffer.getBuffer(staticGeometry.indexCount()), indexBuffer.type());
                 }
 
-                pass.setUniform("DynamicTransforms", submit.dynamicTransforms);
+                final GpuBufferSlice dynamicTransforms = RenderSystem.getDynamicUniforms().writeTransform(RenderSystem.getModelViewMatrixCopy().mul(submit.uniforms.rotationMatrix()), (Vector4f) submit.uniforms.shaderColor());
+                pass.setUniform("DynamicTransforms", dynamicTransforms);
                 pass.setUniform("Sampler0", submit.textureView, sampler);
                 if (submit.geometry instanceof StaticGeometry staticGeometry) {
                     pass.drawIndexed(staticGeometry.indexCount(), 1, 0, 0, 0);
@@ -84,7 +84,6 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
     }
 
     protected record Submit(CompiledRenderPipeline pipeline, Geometry geometry,
-                            RenderUniforms uniforms, GpuTextureView textureView,
-                            GpuBufferSlice dynamicTransforms) implements FeatureRenderer.Submit {
+                            RenderUniforms uniforms, GpuTextureView textureView) implements FeatureRenderer.Submit {
     }
 }
