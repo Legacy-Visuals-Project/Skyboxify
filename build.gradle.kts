@@ -86,7 +86,7 @@ dependencies {
     minecraft("com.mojang:minecraft:${mod.minecraftVersion}")
 
     @Suppress("UnstableApiUsage")
-    mappings(loom.layered {
+    mappings(ploceus.layeredMappings {
         mappings(ploceus.featherMappings(deps.featherVersion))
         mappings(rootProject.file("gradle/feather-overrides.tiny"))
     })
