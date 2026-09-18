@@ -88,7 +88,8 @@ public final class Skyboxify {
 
         globalEventManager.listen(SkyEvents.Extraction.class, event -> {
             if (impl.getSkyboxManager().isEnabled()) {
-                impl.getSkyboxManager().extractSkyboxes(event.skyFeatureRenderer(), event.level(), event.tickDelta());
+                final float delta = event.level().dimension().equals(Level.END) ? 0.0F : event.tickDelta();
+                impl.getSkyboxManager().extractSkyboxes(event.skyFeatureRenderer(), event.level(), delta);
             }
         });
 
