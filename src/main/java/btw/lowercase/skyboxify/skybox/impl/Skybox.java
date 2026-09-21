@@ -41,7 +41,7 @@ public class Skybox extends AbstractSkybox {
             SkyLayer.CODEC.listOf().fieldOf("layers").forGetter(Skybox::layers)
     ).apply(instance, Skybox::new));
 
-    private String packName = null;
+    private String packName = "<unknown>";
     private final List<SkyLayer> layers;
     private final Id dimension;
     private boolean active = true;
