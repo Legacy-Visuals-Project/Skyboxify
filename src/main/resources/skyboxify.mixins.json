@@ -7,8 +7,7 @@
 		"MixinGameRenderer_NetherSkies",
 		"MixinLevelRenderer_SkyEvents",
 		"MixinMinecraft_CloseBuffers",
-		"MixinSkyRenderer_CelestialEvents",
-		"RenderPipelinesAccessor"
+		"MixinSkyRenderer_CelestialEvents"
 	],
 	"injectors": {
 		"defaultRequire": 1

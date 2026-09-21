@@ -28,16 +28,15 @@ import btw.lowercase.skyboxify.utils.*;
 import com.mojang.blaze3d.vertex.*;
 
 //? >=1.21.6 {
-//? <=26.1
-//import btw.lowercase.skyboxify.mixins.RenderPipelinesAccessor;
-//? >=26.3 {
-import com.mojang.renderpearl.api.pipeline.RenderPipeline;
-//? } else {
-/*import com.mojang.blaze3d.pipeline.RenderPipeline;
-*///? }
+import java.util.Map;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
-import java.util.Map;
+//? <=26.1
+/*import net.minecraft.client.renderer.RenderPipelines;*/
+
+//~ if >=26.3 'com.mojang.blaze3d' -> 'com.mojang.renderpearl.api' {
+import com.mojang.renderpearl.api.pipeline.RenderPipeline;
+//~ }
 //?}
 
 public final class SkyStorage {
@@ -49,8 +48,13 @@ public final class SkyStorage {
             return renderPipelineCache.get(blendFunction);
         } else {
             final RenderPipeline.Builder builder = RenderPipeline.builder(
-                    //? <=26.1
-                    //RenderPipelinesAccessor.skyboxify$getMatricesProjectionSnippet()
+                    //? <=26.1 {
+                    /*//? >=1.21.6 {
+                    RenderPipelines.MATRICES_PROJECTION_SNIPPET
+                    //?} else {
+                    *//*RenderPipelines.MATRICES_COLOR_FOG_SNIPPET
+                    *//*//?}
+                     *///? }
             );
             builder.withLocation(Skyboxify.locationOrNull("pipeline/custom_skybox"));
             builder.withVertexShader(SkyboxResourceHelper.CUSTOM_SKYBOX_LOCATION);

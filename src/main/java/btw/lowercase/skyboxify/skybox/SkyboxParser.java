@@ -52,13 +52,13 @@ public final class SkyboxParser {
 	public static @Nullable JsonObject parseSkyProperties(final Properties properties, final Identifier propertiesIdentifier, final PackResources packResources) {
 		final JsonObject output = new JsonObject();
 
-		final String sourceTexturePath = parseSourceTexture(properties, propertiesIdentifier, packResources);
+		final Identifier sourceTexturePath = parseSourceTexture(properties, propertiesIdentifier, packResources);
 		if (sourceTexturePath == null) {
 			return null;
 		}
 
 		output.addProperty("properties", propertiesIdentifier.toString());
-		output.addProperty("texture", sourceTexturePath);
+		output.addProperty("texture", sourceTexturePath.toString());
 
 		// Convert fade
 		parseFade(properties, output);
@@ -118,7 +118,7 @@ public final class SkyboxParser {
         }
     }
 
-	private static String parseSourceTexture(final Properties properties, final Identifier propertiesIdentifier, final PackResources packResources) {
+	private static Identifier parseSourceTexture(final Properties properties, final Identifier propertiesIdentifier, final PackResources packResources) {
 		final String source = properties.getProperty("source", null);
 		if (source == null) {
 			LOGGER.error("Failed to load texture texture \"{}\"", "No texture provided or was null");
@@ -149,7 +149,7 @@ public final class SkyboxParser {
 			}
 		}
 
-		return sourceTextureIdentifier.toString();
+		return sourceTextureIdentifier;
 	}
 
 	private static int toTickTime(final String time) {
