@@ -28,32 +28,29 @@ import btw.lowercase.skyboxify.api.SkyboxifyImpl;
 import btw.lowercase.skyboxify.config.SkyboxifyConfig;
 import btw.lowercase.skyboxify.events.EventManager;
 import btw.lowercase.skyboxify.events.SkyEvents;
-import lombok.Getter;
-import lombok.experimental.UtilityClass;
+import btw.lowercase.skyboxify.skybox.SkyboxManager;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 
-//? >=26.3 {
-
-//? }
-
-@UtilityClass
 public final class Skyboxify {
-    @Getter
-    private final EventManager globalEventManager = new EventManager();
+    private static final EventManager globalEventManager = new EventManager();
 
-    public Identifier locationOrNull(final String path) {
+    public static EventManager eventManager() {
+        return globalEventManager;
+    }
+
+    public static Identifier locationOrNull(final String path) {
         return Identifier.fromNamespaceAndPath(SkyboxifyInfo.MOD_ID, path);
     }
 
-    public void initialize() {
+    public static void initialize() {
         final SkyboxifyApi impl = SkyboxifyImpl.getInstance();
         impl.getConfigHandler().load();
 
+        final SkyboxManager skyboxManager = impl.getSkyboxManager();
         final SkyboxifyConfig config = impl.getConfig();
-        ClientTickEvents.END_LEVEL_TICK.register(SkyboxifyImpl.skyboxManager()::tick);
+        ClientTickEvents.END_LEVEL_TICK.register(skyboxManager::tick);
 
         globalEventManager.listen(SkyEvents.Disc.class, event -> {
             if (config.enabled && !config.renderSky) {
@@ -68,7 +65,7 @@ public final class Skyboxify {
                     event.setCancelled(true);
                 }
 
-                if (impl.getSkyboxManager().isEnabled() && type == SkyEvents.Celestial.Type.STARS) {
+                if (skyboxManager.isEnabled() && type == SkyEvents.Celestial.Type.STARS) {
                     if (config.renderStars) {
                         return;
                     }
@@ -80,33 +77,33 @@ public final class Skyboxify {
 
         //? >=1.21.4 <1.21.9 {
 		/*globalEventManager.listen(SkyEvents.SunriseSunsetAfter.class, event -> {
-			if (impl.getSkyboxManager().isEnabled()) {
-				event.getBufferSource().endBatch(); // Fix horizon rendering over the skybox
+			if (skyboxManager.isEnabled()) {
+				event.bufferSource().endBatch(); // Fix horizon rendering over the skybox
 			}
 		});
 		*///?}
 
         globalEventManager.listen(SkyEvents.Extraction.class, event -> {
-            if (impl.getSkyboxManager().isEnabled()) {
+            if (skyboxManager.isEnabled()) {
                 final float delta = event.level().dimension().equals(Level.END) ? 0.0F : event.tickDelta();
-                impl.getSkyboxManager().extractSkyboxes(event.skyFeatureRenderer(), event.level(), delta);
+                skyboxManager.extractSkyboxes(event.skyFeatureRenderer(), event.level(), delta);
             }
         });
 
         globalEventManager.listen(SkyEvents.EndSky.After.class, event -> {
-            if (impl.getSkyboxManager().isEnabled()) {
-                event.getSkyFeatureRenderer().endFrame(
+            if (skyboxManager.isEnabled()) {
+                event.skyFeatureRenderer().endFrame(
                         //? >=26.3
-                        event.getPass()
+                        event.pass()
                 );
             }
         });
 
         globalEventManager.listen(SkyEvents.SunMoonStars.class, event -> {
-            if (impl.getSkyboxManager().isEnabled()) {
-                event.getSkyFeatureRenderer().endFrame(
+            if (skyboxManager.isEnabled()) {
+                event.skyFeatureRenderer().endFrame(
                         //? >=26.3
-                        event.getPass()
+                        event.pass()
                 );
                 if (event.isInNether()) {
                     event.setCancelled(true);

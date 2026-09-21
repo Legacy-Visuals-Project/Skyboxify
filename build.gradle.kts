@@ -40,7 +40,6 @@ class Dependencies {
     val devAuthVersion = property("deps.devauth_version") as String?
     val mixinconstraintsVersion = property("deps.mixinconstraints_version") as String?
     val mixinsquaredVersion = property("deps.mixinsquared_version") as String?
-    val lombokVersion = property("deps.lombok_version") as String?
 }
 
 val mod = ModData()
@@ -220,8 +219,6 @@ dependencies {
         })
     }
 
-    compileOnly("org.projectlombok:lombok:${deps.lombokVersion}")
-    annotationProcessor("org.projectlombok:lombok:${deps.lombokVersion}")
     modRuntimeOnly("me.djtheredstoner:DevAuth-${loader.name}:${deps.devAuthVersion}")
 
     include(implementation("com.moulberry:mixinconstraints:${deps.mixinconstraintsVersion}")!!)!!

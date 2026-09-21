@@ -25,7 +25,6 @@ package btw.lowercase.skyboxify.screen.widget.components;
 
 import btw.lowercase.skyboxify.Skyboxify;
 import btw.lowercase.skyboxify.screen.widget.Gidget;
-import lombok.Getter;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
@@ -35,7 +34,6 @@ public class Scrollbar extends Gidget {
 
 	public static final int DEFAULT_WIDTH = 10;
 	private final Knob knob;
-	@Getter
 	private double scrollY;
 
 	public Scrollbar(int x, int y, int height) {
@@ -43,6 +41,8 @@ public class Scrollbar extends Gidget {
 		this.knob = new Knob(x, y, Knob.DEFAULT_HEIGHT);
 		this.scrollY = 0.0;
 	}
+
+    public double getScrollY() { return this.scrollY; }
 
 	@Override
 	public void extractRenderState(final GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY) {

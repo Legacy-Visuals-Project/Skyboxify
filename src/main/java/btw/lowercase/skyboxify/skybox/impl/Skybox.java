@@ -109,12 +109,10 @@ public class Skybox extends AbstractSkybox {
     }
 
     private float getSkyAngle(final float tickDelta) {
-        final Camera camera =
-                //? >=26.2 {
-                Minecraft.getInstance().gameRenderer.mainCamera();
-                //? } else {
-                /*Minecraft.getInstance().gameRenderer.getMainCamera();
-                 *///? }
+        //~ if >=26.2 'getMainCamera' -> 'mainCamera' {
+        final Camera camera = Minecraft.getInstance().gameRenderer.mainCamera();
+        //~ }
+
         //? >=1.21.11 {
         return camera.attributeProbe().getValue(EnvironmentAttributes.SUN_ANGLE, tickDelta) / 360.0F;
         //?} else {

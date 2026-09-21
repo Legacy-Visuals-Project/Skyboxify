@@ -68,27 +68,27 @@ public abstract class MixinLevelRenderer_SkyEvents {
     @Inject(method = "extractRenderState", at = @At("HEAD"))
     private void skyboxify$getLocals(final ClientLevel level, final float tickDelta, final Camera camera, final SkyRenderState state, final CallbackInfo ci) {
         state.setData(skyboxify$IS_IN_NETHER, level.dimension().equals(Level.NETHER));
-        Skyboxify.getGlobalEventManager().dispatch(new SkyEvents.Extraction(this.skyboxify$skyFeatureRenderer, level, tickDelta));
+        Skyboxify.eventManager().dispatch(new SkyEvents.Extraction(this.skyboxify$skyFeatureRenderer, level, tickDelta));
     }
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SkyRenderer;renderEndSky(Lcom/mojang/renderpearl/api/commands/RenderPass;)V", shift = At.Shift.AFTER))
     private void skyboxify$renderEndSkybox(final CallbackInfo ci, @Local(name = "renderPass") final RenderPass pass) {
-        Skyboxify.getGlobalEventManager().dispatch(new SkyEvents.EndSky.After(this.skyboxify$skyFeatureRenderer, pass));
+        Skyboxify.eventManager().dispatch(new SkyEvents.EndSky.After(this.skyboxify$skyFeatureRenderer, pass));
     }
 
     @WrapWithCondition(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSkyDisc(Lcom/mojang/renderpearl/api/commands/RenderPass;Lorg/joml/Vector3fc;)V"))
     private boolean skyboxify$skyDiscEvent$top(final SkyRenderer instance, final RenderPass renderPass, final Vector3fc color) {
-        return !Skyboxify.getGlobalEventManager().dispatch(new SkyEvents.Disc(SkyEvents.Disc.Type.TOP)).isCancelled();
+        return !Skyboxify.eventManager().dispatch(new SkyEvents.Disc(SkyEvents.Disc.Type.TOP)).isCancelled();
     }
 
     @WrapWithCondition(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSunMoonAndStars(Lcom/mojang/renderpearl/api/commands/RenderPass;Lcom/mojang/blaze3d/vertex/PoseStack;FFFLnet/minecraft/world/level/MoonPhase;FF)V"))
     private boolean skyboxify$renderSkyboxes(final SkyRenderer instance, final RenderPass pass, final PoseStack poseStack, final float sunAngle, final float moonAngle, final float starAngle, final MoonPhase moonPhase, final float rainBrightness, final float starBrightness, @Local(argsOnly = true, name = "state") final SkyRenderState skyRenderState) {
-        return !Skyboxify.getGlobalEventManager().dispatch(new SkyEvents.SunMoonStars(this.skyboxify$skyFeatureRenderer, skyRenderState.getDataOrDefault(skyboxify$IS_IN_NETHER, false), pass)).isCancelled();
+        return !Skyboxify.eventManager().dispatch(new SkyEvents.SunMoonStars(this.skyboxify$skyFeatureRenderer, skyRenderState.getDataOrDefault(skyboxify$IS_IN_NETHER, false), pass)).isCancelled();
     }
 
     @WrapWithCondition(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SkyRenderer;renderDarkDisc(Lcom/mojang/renderpearl/api/commands/RenderPass;)V"))
     private boolean skyboxify$skyDiscEvent$bottom(final SkyRenderer instance, final RenderPass pass) {
-        return !Skyboxify.getGlobalEventManager().dispatch(new SkyEvents.Disc(SkyEvents.Disc.Type.BOTTOM)).isCancelled();
+        return !Skyboxify.eventManager().dispatch(new SkyEvents.Disc(SkyEvents.Disc.Type.BOTTOM)).isCancelled();
     }
 
     @WrapOperation(method = "extractRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/dimension/DimensionType;skybox()Lnet/minecraft/world/level/dimension/DimensionType$Skybox;", opcode = Opcodes.GETFIELD))

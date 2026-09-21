@@ -24,140 +24,148 @@
 package btw.lowercase.skyboxify.screen.widget;
 
 import btw.lowercase.skyboxify.screen.widget.components.Box;
-import lombok.Getter;
-import lombok.Setter;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.ARGB;
 
 public class Text extends Gidget {
-	private final Font font;
-	@Getter
-	private Component text;
-	@Getter
-	@Setter
-	private Alignment alignment;
-	@Setter
-	private boolean shadow;
-	@Getter
-	@Setter
-	private int color;
+    private final Font font;
+    private Component text;
+    private Alignment alignment;
+    private boolean shadow;
+    private int color;
 
-	public Text(
-			final Font font,
-			final Component text,
-			final int x,
-			final int y,
-			final Alignment alignment,
-			final boolean shadow,
-			final int color
-	) {
-		super(new Box(x, y, font.width(text.getString()), font.lineHeight));
-		this.font = font;
-		this.text = text;
-		this.alignment = alignment;
-		this.shadow = shadow;
-		this.color = color;
-	}
+    public Text(final Font font, final Component text, final int x, final int y, final Alignment alignment, final boolean shadow, final int color) {
+        super(new Box(x, y, font.width(text.getString()), font.lineHeight));
+        this.font = font;
+        this.text = text;
+        this.alignment = alignment;
+        this.shadow = shadow;
+        this.color = color;
+    }
 
-	public static Builder builder(final Component component) {
-		return new Builder(component);
-	}
+    public static Builder builder(final Component component) {
+        return new Builder(component);
+    }
 
-	public static Builder builder(final String text) {
-		return new Builder(text);
-	}
+    public static Builder builder(final String text) {
+        return new Builder(text);
+    }
 
-	@Override
-	public void extractRenderState(final GuiGraphicsExtractor guiGraphics, final int mouseX, final int mouseY) {
-		int finalX = this.box().left();
-		if (this.alignment == Alignment.BOTH || this.alignment == Alignment.CENTER_HORIZONTAL) {
-			finalX -= this.box().width() / 2;
-		}
+    public Component getText() {
+        return this.text;
+    }
 
-		int finalY = this.box().top();
-		if (this.alignment == Alignment.BOTH || this.alignment == Alignment.CENTER_VERTICAL) {
-			finalY -= this.box().height() / 2;
-		}
+    public void setText(final Component text) {
+        this.text = text;
+        this.resize(this.font.width(text.getString()), this.box().height());
+    }
 
-		guiGraphics.text(this.font, this.text, finalX, finalY, this.color, this.shadow);
-		//? >=1.21.9 {
-		if (new Box(finalX, finalY, this.box.width(), this.box.height()).contains(mouseX, mouseY)) {
-			guiGraphics.requestCursor(com.mojang.blaze3d.platform.cursor.CursorTypes.IBEAM);
-		}
-		//?}
-	}
+    public Alignment getAlignment() {
+        return this.alignment;
+    }
 
-	public Builder builder() {
-		return new Builder(this.text)
-				.position(this.box().left(), this.box().top())
-				.aligned(this.alignment)
-				.withColor(this.color)
-				.withShadow(this.shadow);
-	}
+    public void setAlignment(final Alignment alignment) {
+        this.alignment = alignment;
+    }
 
-	public boolean hasShadow() {
-		return this.shadow;
-	}
+    public boolean hasShadow() {
+        return this.shadow;
+    }
 
-	public void setText(final Component text) {
-		this.text = text;
-		this.resize(this.font.width(text.getString()), this.box().height());
-	}
+    public void setShadow(final boolean shadow) {
+        this.shadow = shadow;
+    }
 
-	public enum Alignment {
-		CENTER_VERTICAL,
-		CENTER_HORIZONTAL,
-		BOTH,
-		NONE
-	}
+    public int getColor() {
+        return this.color;
+    }
 
-	public static class Builder {
-		private final Component text;
+    public void setColor(final int color) {
+        this.color = color;
+    }
 
-		private int color = ARGB.white(1.0F);
-		private Alignment alignment = Alignment.NONE;
-		private boolean shadow = true;
-		private int x = 0;
-		private int y = 0;
+    @Override
+    public void extractRenderState(final GuiGraphicsExtractor guiGraphics, final int mouseX, final int mouseY) {
+        int finalX = this.box().left();
+        if (this.alignment == Alignment.BOTH || this.alignment == Alignment.CENTER_HORIZONTAL) {
+            finalX -= this.box().width() / 2;
+        }
 
-		public Builder(final Component text) {
-			this.text = text;
-		}
+        int finalY = this.box().top();
+        if (this.alignment == Alignment.BOTH || this.alignment == Alignment.CENTER_VERTICAL) {
+            finalY -= this.box().height() / 2;
+        }
 
-		public Builder(final String text) {
-			this(Component.literal(text));
-		}
+        guiGraphics.text(this.font, this.text, finalX, finalY, this.color, this.shadow);
+        //? >=1.21.9 {
+        if (new Box(finalX, finalY, this.box.width(), this.box.height()).contains(mouseX, mouseY)) {
+            guiGraphics.requestCursor(com.mojang.blaze3d.platform.cursor.CursorTypes.IBEAM);
+        }
+        //?}
+    }
 
-		public Builder position(final int x, final int y) {
-			this.x = x;
-			this.y = y;
-			return this;
-		}
+    public Builder builder() {
+        return new Builder(this.text)
+                .position(this.box().left(), this.box().top())
+                .aligned(this.alignment)
+                .withColor(this.color)
+                .withShadow(this.shadow);
+    }
 
-		public Builder withColor(final int color) {
-			this.color = color;
-			return this;
-		}
+    public enum Alignment {
+        CENTER_VERTICAL,
+        CENTER_HORIZONTAL,
+        BOTH,
+        NONE
+    }
 
-		public Builder withShadow(final boolean shadow) {
-			this.shadow = shadow;
-			return this;
-		}
+    public static class Builder {
+        private final Component text;
 
-		public Builder aligned(final Alignment alignment) {
-			this.alignment = alignment;
-			return this;
-		}
+        private int color = ARGB.white(1.0F);
+        private Alignment alignment = Alignment.NONE;
+        private boolean shadow = true;
+        private int x = 0;
+        private int y = 0;
 
-		public Builder centered() {
-			this.alignment = Alignment.CENTER_HORIZONTAL;
-			return this;
-		}
+        public Builder(final Component text) {
+            this.text = text;
+        }
 
-		public Text build(final Font font) {
-			return new Text(font, this.text, this.x, this.y, this.alignment, this.shadow, this.color);
-		}
-	}
+        public Builder(final String text) {
+            this(Component.literal(text));
+        }
+
+        public Builder position(final int x, final int y) {
+            this.x = x;
+            this.y = y;
+            return this;
+        }
+
+        public Builder withColor(final int color) {
+            this.color = color;
+            return this;
+        }
+
+        public Builder withShadow(final boolean shadow) {
+            this.shadow = shadow;
+            return this;
+        }
+
+        public Builder aligned(final Alignment alignment) {
+            this.alignment = alignment;
+            return this;
+        }
+
+        public Builder centered() {
+            this.alignment = Alignment.CENTER_HORIZONTAL;
+            return this;
+        }
+
+        public Text build(final Font font) {
+            return new Text(font, this.text, this.x, this.y, this.alignment, this.shadow, this.color);
+        }
+    }
 }

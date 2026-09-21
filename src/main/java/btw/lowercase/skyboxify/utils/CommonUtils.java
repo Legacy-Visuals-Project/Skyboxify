@@ -24,13 +24,16 @@
 package btw.lowercase.skyboxify.utils;
 
 import net.minecraft.util.Mth;
-import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
 import java.text.DecimalFormat;
 
 public final class CommonUtils {
+    public static final Vector3f X_AXIS = new Vector3f(1.0F, 0.0F, 0.0F);
+    public static final Vector3f Y_AXIS = new Vector3f(0.0F, 1.0F, 0.0F);
+    public static final float EPSILON = 1.0E-5F;
+
     public static int normalizeTickTime(final int tickTime) {
         int result = tickTime % 24000;
         if (result < 0) {

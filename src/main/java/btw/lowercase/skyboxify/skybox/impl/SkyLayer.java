@@ -42,7 +42,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-import org.joml.Vector3fc;
 
 import java.util.List;
 
@@ -57,7 +56,7 @@ public class SkyLayer {
             Range.CODEC.listOf().optionalFieldOf("heights", ImmutableList.of()).forGetter(SkyLayer::heights),
             Blend.CODEC.optionalFieldOf("blend", Blend.ADD).forGetter(SkyLayer::blend),
             Fade.CODEC.optionalFieldOf("fade", Fade.DEFAULT).forGetter(SkyLayer::fade),
-            ParserCodecs.AXIS.optionalFieldOf("axis", Mth.X_AXIS).forGetter(SkyLayer::axis),
+            ParserCodecs.AXIS.optionalFieldOf("axis", CommonUtils.X_AXIS).forGetter(SkyLayer::axis),
             Loop.CODEC.optionalFieldOf("loop", Loop.DEFAULT).forGetter(SkyLayer::loop),
             Codec.BOOL.optionalFieldOf("rotate", true).forGetter(SkyLayer::rotate),
             Codec.FLOAT.optionalFieldOf("speed", 1.0F).forGetter(SkyLayer::speed),
@@ -71,7 +70,7 @@ public class SkyLayer {
     private final List<Range> heights;
     private final Blend blend;
     private final Fade fade;
-    private final Vector3fc axis;
+    private final Vector3f axis;
     private final Loop loop;
     private final boolean rotate;
     private final float speed;
@@ -87,7 +86,7 @@ public class SkyLayer {
             final List<Range> heights,
             final Blend blend,
             final Fade fade,
-            final Vector3fc axis,
+            final Vector3f axis,
             final Loop loop,
             final boolean rotate,
             final float speed,
@@ -121,7 +120,7 @@ public class SkyLayer {
         final float finalAlpha = Mth.clamp(this.alpha * weatherAlpha * fadeAlpha, 0.0F, 1.0F);
         if (finalAlpha >= MIN_ALPHA_ALLOWED) {
             if (this.rotate) {
-                modelViewMatrix.rotate(Axis.of((Vector3f) this.axis).rotationDegrees(this.getAngle(level, skyAngle)));
+                modelViewMatrix.rotate(Axis.of(this.axis).rotationDegrees(this.getAngle(level, skyAngle)));
             }
 
             final SkyFeatureRenderer.Pipeline pipeline = new SkyFeatureRenderer.Pipeline(
@@ -217,7 +216,7 @@ public class SkyLayer {
         return this.fade;
     }
 
-    public Vector3fc axis() {
+    public Vector3f axis() {
         return this.axis;
     }
 

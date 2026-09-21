@@ -24,8 +24,6 @@
 package btw.lowercase.skyboxify.events;
 
 import btw.lowercase.skyboxify.skybox.renderer.SkyFeatureRenderer;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import net.minecraft.client.multiplayer.ClientLevel;
 
 //? >=26.3 {
@@ -38,44 +36,57 @@ public class SkyEvents {
     }
 
     public static final class EndSky {
-        @RequiredArgsConstructor
-        public static final class After implements Event {
-            @Getter
-            private final SkyFeatureRenderer skyFeatureRenderer;
-
-            //? >=26.3 {
-            @Getter
-            private final RenderPass pass;
-            //? }
+        public record After(
+                SkyFeatureRenderer skyFeatureRenderer
+                //? >=26.3 {
+                , RenderPass pass
+                //? }
+        ) implements Event {
         }
     }
 
     //? >=1.21.4 <1.21.9 {
-    /*@RequiredArgsConstructor
-    public static final class SunriseSunsetAfter implements Event {
-        @Getter
-        private final net.minecraft.client.renderer.MultiBufferSource.BufferSource bufferSource;
-    }
-    *///?}
+    /*public static record SunriseSunsetAfter(net.minecraft.client.renderer.MultiBufferSource.BufferSource bufferSource) implements Event {
+    }*///?}
 
-    @RequiredArgsConstructor
     public static final class SunMoonStars extends CancellableEvent {
-        @Getter
         private final SkyFeatureRenderer skyFeatureRenderer;
-
-        @Getter
         private final boolean isInNether;
+        //? >=26.3 {
+        private final RenderPass pass;
+        //? }
+
+        public SunMoonStars(
+                final SkyFeatureRenderer skyFeatureRenderer,
+                final boolean isInNether
+                //? >=26.3 {
+                , final RenderPass pass
+                //? }
+        ) {
+            this.skyFeatureRenderer = skyFeatureRenderer;
+            this.isInNether = isInNether;
+            //? >=26.3 {
+            this.pass = pass;
+            //? }
+        }
+
+        public SkyFeatureRenderer skyFeatureRenderer() { return this.skyFeatureRenderer; }
+
+        public boolean isInNether() { return this.isInNether; }
 
         //? >=26.3 {
-        @Getter
-        private final RenderPass pass;
+        public RenderPass pass() { return this.pass; }
         //? }
     }
 
-    @RequiredArgsConstructor
     public static final class Celestial extends CancellableEvent {
-        @Getter
         private final Type type;
+
+        public Celestial(final Type type) {
+            this.type = type;
+        }
+
+        public Type getType() { return this.type; }
 
         public enum Type {
             SUN,
@@ -84,14 +95,43 @@ public class SkyEvents {
         }
     }
 
-    @RequiredArgsConstructor
+    public static Celestial sun() {
+        return new Celestial(Celestial.Type.SUN);
+    }
+
+    public static Celestial moon() {
+        return new Celestial(Celestial.Type.MOON);
+    }
+
+    public static Celestial stars() {
+        return new Celestial(Celestial.Type.STARS);
+    }
+
     public static final class Disc extends CancellableEvent {
-        @Getter
         private final Type type;
+
+        public Disc(final Type type) {
+            this.type = type;
+        }
+
+        public Type getType() { return this.type; }
 
         public enum Type {
             TOP,
+            VOID,
             BOTTOM
         }
+    }
+
+    public static Disc topDisc() {
+        return new Disc(Disc.Type.TOP);
+    }
+
+    public static Disc voidDisc() {
+        return new Disc(Disc.Type.VOID);
+    }
+
+    public static Disc bottomDisc() {
+        return new Disc(Disc.Type.BOTTOM);
     }
 }

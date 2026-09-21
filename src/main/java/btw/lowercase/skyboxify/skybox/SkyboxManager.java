@@ -24,13 +24,10 @@
 package btw.lowercase.skyboxify.skybox;
 
 import btw.lowercase.skyboxify.api.SkyboxifyApi;
-import btw.lowercase.skyboxify.api.SkyboxifyImpl;
 import btw.lowercase.skyboxify.skybox.impl.Skybox;
 import btw.lowercase.skyboxify.skybox.renderer.SkyFeatureRenderer;
 import com.google.common.base.Preconditions;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.math.Axis;
-import lombok.Getter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.ResourceKey;
@@ -45,9 +42,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public final class SkyboxManager {
     private final Logger LOGGER = LogManager.getLogger();
-    @Getter
     private final List<Skybox> loadedSkies = new ArrayList<>();
-    @Getter
     private final List<Skybox> activeSkies = new CopyOnWriteArrayList<>();
     private final SkyboxifyApi api;
 
@@ -72,7 +67,7 @@ public final class SkyboxManager {
 
         final Matrix4f modelViewMatrix = new Matrix4f();
         modelViewMatrix.rotate(Axis.YP.rotationDegrees(-90.0F));
-        for (final Skybox skybox : SkyboxifyImpl.skyboxManager().getActiveSkies()) {
+        for (final Skybox skybox : this.activeSkies) {
             skybox.extractRenderState(skyFeatureRenderer, level, modelViewMatrix, tickDelta);
         }
     }
@@ -98,10 +93,14 @@ public final class SkyboxManager {
     }
 
     public List<Skybox> getSkiesFor(final ResourceKey<Level> resourceKey) {
-        return getActiveSkies().stream().filter(skybox -> resourceKey.equals(skybox.dimension())).toList();
+        return this.activeSkies.stream().filter(skybox -> resourceKey.equals(skybox.dimension())).toList();
     }
 
     public boolean containsEnabled(final ResourceKey<Level> resourceKey) {
         return !getSkiesFor(resourceKey).isEmpty();
+    }
+
+    public List<Skybox> getLoadedSkies() {
+        return this.loadedSkies;
     }
 }

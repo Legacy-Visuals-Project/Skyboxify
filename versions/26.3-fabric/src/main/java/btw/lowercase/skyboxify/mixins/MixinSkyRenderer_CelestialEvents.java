@@ -37,16 +37,16 @@ import org.spongepowered.asm.mixin.injection.At;
 public abstract class MixinSkyRenderer_CelestialEvents {
     @WrapWithCondition(method = "renderSunMoonAndStars", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSun(Lcom/mojang/renderpearl/api/commands/RenderPass;FLcom/mojang/blaze3d/vertex/PoseStack;)V"))
     private boolean skyboxify$toggleSun(final SkyRenderer instance, final RenderPass pass, final float rainBrightness, final PoseStack poseStack) {
-        return !Skyboxify.getGlobalEventManager().dispatch(new SkyEvents.Celestial(SkyEvents.Celestial.Type.SUN)).isCancelled();
+        return !Skyboxify.eventManager().dispatch(new SkyEvents.Celestial(SkyEvents.Celestial.Type.SUN)).isCancelled();
     }
 
     @WrapWithCondition(method = "renderSunMoonAndStars", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SkyRenderer;renderMoon(Lcom/mojang/renderpearl/api/commands/RenderPass;Lnet/minecraft/world/level/MoonPhase;FLcom/mojang/blaze3d/vertex/PoseStack;)V"))
     private boolean skyboxify$toggleMoon(final SkyRenderer instance, final RenderPass pass, final MoonPhase moonPhase, final float rainBrightness, final PoseStack poseStack) {
-        return !Skyboxify.getGlobalEventManager().dispatch(new SkyEvents.Celestial(SkyEvents.Celestial.Type.MOON)).isCancelled();
+        return !Skyboxify.eventManager().dispatch(new SkyEvents.Celestial(SkyEvents.Celestial.Type.MOON)).isCancelled();
     }
 
     @WrapWithCondition(method = "renderSunMoonAndStars", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SkyRenderer;renderStars(Lcom/mojang/renderpearl/api/commands/RenderPass;FLcom/mojang/blaze3d/vertex/PoseStack;)V"))
     private boolean skyboxify$toggleStars(final SkyRenderer instance, final RenderPass pass, final float starBrightness, final PoseStack poseStack) {
-        return !Skyboxify.getGlobalEventManager().dispatch(new SkyEvents.Celestial(SkyEvents.Celestial.Type.STARS)).isCancelled();
+        return !Skyboxify.eventManager().dispatch(new SkyEvents.Celestial(SkyEvents.Celestial.Type.STARS)).isCancelled();
     }
 }
