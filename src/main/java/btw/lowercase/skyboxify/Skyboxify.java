@@ -26,6 +26,7 @@ package btw.lowercase.skyboxify;
 import btw.lowercase.skyboxify.api.SkyboxifyApi;
 import btw.lowercase.skyboxify.api.SkyboxifyImpl;
 import btw.lowercase.skyboxify.config.SkyboxifyConfig;
+import btw.lowercase.skyboxify.events.EventManager;
 import btw.lowercase.skyboxify.events.SkyEvents;
 import btw.lowercase.skyboxify.utils.CommonUtils;
 import net.minecraft.client.render.platform.GlStateManager;
@@ -40,15 +41,20 @@ public final class Skyboxify {
         return globalEventManager;
     }
 
+    public static Identifier locationOrNull(final String path) {
+        return Identifier.fromNamespaceAndPath(SkyboxifyInfo.MOD_ID, path);
+    }
+
     public static void initialize() {
         final SkyboxifyApi impl = SkyboxifyImpl.getInstance();
-        final SkyboxifyConfig config = impl.getConfig();
-        config.load();
+        impl.getConfigHandler().load();
 
-        ClientWorldEvents.TICK_END.register(impl.getSkyboxManager()::tick);
+        final SkyboxManager skyboxManager = impl.getSkyboxManager();
+        final SkyboxifyConfig config = impl.getConfig();
+        ClientTickEvents.END_LEVEL_TICK.register(skyboxManager::tick);
 
         globalEventManager.listen(SkyEvents.Disc.class, event -> {
-            if (config.enabled.isEnabled() && !config.renderSky.isEnabled()) {
+            if (config.enabled && !config.renderSky) {
                 event.setCancelled(true);
             }
         });
@@ -60,7 +66,7 @@ public final class Skyboxify {
                     event.setCancelled(true);
                 }
 
-                if (impl.getSkyboxManager().isEnabled() && type == SkyEvents.Celestial.Type.STARS) {
+                if (skyboxManager.isEnabled() && type == SkyEvents.Celestial.Type.STARS) {
                     if (config.renderStars.isEnabled()) {
                         return;
                     }
@@ -71,13 +77,14 @@ public final class Skyboxify {
         });
 
         globalEventManager.listen(SkyEvents.Extraction.class, event -> {
-            if (impl.getSkyboxManager().isEnabled()) {
-                impl.getSkyboxManager().extractSkyboxes(event.skyFeatureRenderer(), event.world(), event.tickDelta());
+            if (skyboxManager.isEnabled()) {
+                final float delta = event.level().dimension().equals(Level.END) ? 0.0F : event.tickDelta();
+                skyboxManager.extractSkyboxes(event.skyFeatureRenderer(), event.level(), delta);
             }
         });
 
         globalEventManager.listen(SkyEvents.EndSky.After.class, event -> {
-            if (impl.getSkyboxManager().isEnabled()) {
+            if (skyboxManager.isEnabled()) {
                 event.skyFeatureRenderer().endFrame();
 
                 // Restore

@@ -49,5 +49,6 @@ public interface Geometry extends AutoCloseable {
 
     boolean isClosed();
 
+    @Override
     void close();
 }

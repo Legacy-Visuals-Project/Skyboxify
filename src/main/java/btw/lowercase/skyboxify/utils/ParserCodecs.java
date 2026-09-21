@@ -27,6 +27,8 @@ import btw.lowercase.skyboxify.skybox.impl.components.Range;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JavaOps;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.Mth;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.slf4j.Logger;
@@ -57,22 +59,22 @@ public final class ParserCodecs {
         return builder.toString().trim();
     });
 
-    public static final Codec<Vector3fc> AXIS = TRIMMED_STRING.xmap(input -> {
-        final List<String> parts = SPLIT_SPACE_TRIMMED.parse(JavaOps.INSTANCE, input.replaceAll(" +", " ")).getOrThrow();
-        if (parts.size() == 3) {
-            final Vector3f vector3f = new Vector3f(
-                    safeParseFloat(parts.get(0), Float.MIN_VALUE),
-                    safeParseFloat(parts.get(1), Float.MIN_VALUE),
-                    safeParseFloat(parts.get(2), Float.MIN_VALUE)
-            );
-            if (vector3f.lengthSquared() > CommonUtils.EPSILON) {
-                return new Vector3f(vector3f.z, vector3f.y, -vector3f.x);
-            }
-        }
+	public static final Codec<Vector3f> AXIS = TRIMMED_STRING.xmap(input -> {
+		final List<String> parts = SPLIT_SPACE_TRIMMED.parse(JavaOps.INSTANCE, input.replaceAll(" +", " ")).getOrThrow();
+		if (parts.size() == 3) {
+			final Vector3f vector3f = new Vector3f(
+					safeParseFloat(parts.get(0), Float.MIN_VALUE),
+					safeParseFloat(parts.get(1), Float.MIN_VALUE),
+					safeParseFloat(parts.get(2), Float.MIN_VALUE)
+			);
+			if (vector3f.lengthSquared() > CommonUtils.EPSILON) {
+				return new Vector3f(vector3f.z, vector3f.y, -vector3f.x);
+			}
+		}
 
         LOGGER.warn("Invalid axis provided in skybox, returning default axis (Mth.X_AXIS).");
-        return CommonUtils.X_AXIS;
-    }, output -> String.format("%s %s %s", -output.z(), output.y(), output.x()));
+		return CommonUtils.X_AXIS;
+	}, output -> String.format("%s %s %s", -output.z(), output.y(), output.x()));
 
     private static Codec<Range> getRangeEntryCodec(final boolean allowNegative) {
         final int minValue = allowNegative ? Integer.MIN_VALUE : -1;

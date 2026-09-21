@@ -38,7 +38,7 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import org.joml.Matrix4f;
-import org.joml.Vector3fc;
+import org.joml.Vector3f;
 
 import java.util.List;
 
@@ -67,7 +67,7 @@ public class SkyLayer {
     private final List<Range> heights;
     private final Blend blend;
     private final Fade fade;
-    private final Vector3fc axis;
+    private final Vector3f axis;
     private final Loop loop;
     private final boolean rotate;
     private final float speed;
@@ -83,7 +83,7 @@ public class SkyLayer {
             final List<Range> heights,
             final Blend blend,
             final Fade fade,
-            final Vector3fc axis,
+            final Vector3f axis,
             final Loop loop,
             final boolean rotate,
             final float speed,
@@ -208,7 +208,7 @@ public class SkyLayer {
         return this.fade;
     }
 
-    public Vector3fc axis() {
+    public Vector3f axis() {
         return this.axis;
     }
 

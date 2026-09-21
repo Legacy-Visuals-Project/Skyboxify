@@ -55,20 +55,9 @@ public final class SkyboxManager {
 
     public void addSkybox(final Skybox skybox) {
         this.loadedSkies.add(Preconditions.checkNotNull(skybox, "Skybox was null"));
-        for (final SkyLayer layer : skybox.layers()) {
-            final Identifier id = layer.texture().vanilla();
-            Minecraft.getInstance().getTextureManager().register(id, new SimpleTexture(id));
-        }
     }
 
     public void clearSkyboxes() {
-        for (final Skybox skybox : this.loadedSkies) {
-            for (final SkyLayer layer : skybox.layers()) {
-                final Identifier id = layer.texture().vanilla();
-                Minecraft.getInstance().getTextureManager().close(id);
-            }
-        }
-
         this.loadedSkies.clear();
         this.activeSkies.clear();
     }
