@@ -1,7 +1,3 @@
-@file:OptIn(StonecutterExperimentalAPI::class)
-
-import dev.kikugie.stonecutter.StonecutterExperimentalAPI
-
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.loom.remap)
@@ -28,7 +24,6 @@ class ModData {
 
 class Dependencies {
     val fabricLoaderVersion = property("deps.fabric_loader_version") as String?
-    val ornitheApiVersion = property("deps.ornithe_api_version") as String?
     val featherVersion = property("deps.feather_version") as String?
     val oslVersion = property("deps.osl_version") as String?
     val devAuthVersion = property("deps.devauth_version") as String?
