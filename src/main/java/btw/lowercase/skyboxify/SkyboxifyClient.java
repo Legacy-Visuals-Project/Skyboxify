@@ -24,7 +24,7 @@
 package btw.lowercase.skyboxify;
 
 import btw.lowercase.skyboxify.command.SkyboxifyCommand;
-import btw.lowercase.skyboxify.skybox.SkyboxResourceHelper;
+import btw.lowercase.skyboxify.skybox.SkyboxResourceListener;
 import dev.kikugie.fletching_table.annotation.fabric.Entrypoint;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
@@ -43,9 +43,9 @@ public final class SkyboxifyClient implements ClientModInitializer {
                 //? } else {
                 /*.registerReloader
                 *///? }
-                (Skyboxify.locationOrNull("skybox_reader"), new SkyboxResourceHelper());
+                (SkyboxResourceListener.SKYBOX_RELOAD_ID, new SkyboxResourceListener());
 		//?} else {
-		/*net.fabricmc.fabric.api.resource.ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new SkyboxResourceHelper());
+		/*net.fabricmc.fabric.api.resource.ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new SkyboxResourceListener());
 		 *///?}
 	}
 }

@@ -26,7 +26,7 @@ package btw.lowercase.skyboxify.skybox.renderer;
 import btw.lowercase.skyboxify.SkyboxifyInfo;
 import btw.lowercase.skyboxify.api.SkyboxifyImpl;
 import btw.lowercase.skyboxify.skybox.SkyPart;
-import btw.lowercase.skyboxify.skybox.SkyboxResourceHelper;
+import btw.lowercase.skyboxify.skybox.SkyboxResourceListener;
 import btw.lowercase.skyboxify.utils.BlendFunction;
 import btw.lowercase.skyboxify.utils.FilteringMode;
 import com.mojang.blaze3d.pipeline.RenderTarget;
@@ -46,7 +46,7 @@ import java.util.Objects;
 import java.util.function.Function;
 
 public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submit> {
-    private static final ShaderProgram CUSTOM_SKYBOX_SHADER_PROGRAM = new ShaderProgram(SkyboxResourceHelper.CUSTOM_SKYBOX_LOCATION, DefaultVertexFormat.POSITION_TEX, ShaderDefines.EMPTY);
+    private static final ShaderProgram CUSTOM_SKYBOX_SHADER_PROGRAM = new ShaderProgram(SkyboxResourceListener.CUSTOM_SKYBOX_LOCATION, DefaultVertexFormat.POSITION_TEX, ShaderDefines.EMPTY);
     private static final RenderStateShard.ShaderStateShard SKYBOX_SHADER = new RenderStateShard.ShaderStateShard(CUSTOM_SKYBOX_SHADER_PROGRAM);
 
     private final Function<RenderData, RenderType> RENDER_TYPE = Util.memoize(renderData -> {

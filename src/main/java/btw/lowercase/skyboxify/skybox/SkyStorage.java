@@ -57,8 +57,8 @@ public final class SkyStorage {
                      *///? }
             );
             builder.withLocation(Skyboxify.locationOrNull("pipeline/custom_skybox"));
-            builder.withVertexShader(SkyboxResourceHelper.CUSTOM_SKYBOX_LOCATION);
-            builder.withFragmentShader(SkyboxResourceHelper.CUSTOM_SKYBOX_LOCATION);
+            builder.withVertexShader(SkyboxResourceListener.CUSTOM_SKYBOX_LOCATION);
+            builder.withFragmentShader(SkyboxResourceListener.CUSTOM_SKYBOX_LOCATION);
 
             //? >=26.1 {
             //~ if >=26.3 'com.mojang.blaze3d.pipeline' -> 'com.mojang.renderpearl.api.pipeline' {
