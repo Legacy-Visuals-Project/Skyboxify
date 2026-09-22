@@ -216,10 +216,7 @@ public class SkyboxResourceListener implements
     private void applySkyboxes(final List<Skybox> skyboxes) {
         final SkyboxManager skyboxManager = SkyboxifyImpl.skyboxManager();
         skyboxManager.clearSkyboxes();
-        for (final Skybox skybox : skyboxes) {
-            skyboxManager.addSkybox(skybox);
-        }
-
+        skyboxes.forEach(skyboxManager::addSkybox);
         // Tick at-least once as a trick for the sky to show up immediately while in the menu
         skyboxManager.tick();
     }

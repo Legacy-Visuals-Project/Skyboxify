@@ -24,12 +24,15 @@
 package btw.lowercase.skyboxify.skybox;
 
 import btw.lowercase.skyboxify.api.SkyboxifyApi;
+import btw.lowercase.skyboxify.skybox.impl.SkyLayer;
 import btw.lowercase.skyboxify.skybox.impl.Skybox;
 import btw.lowercase.skyboxify.skybox.renderer.SkyFeatureRenderer;
 import com.google.common.base.Preconditions;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.texture.SimpleTexture;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import org.apache.logging.log4j.LogManager;
@@ -52,11 +55,28 @@ public final class SkyboxManager {
 
     public void addSkybox(final Skybox skybox) {
         this.loadedSkies.add(Preconditions.checkNotNull(skybox, "Skybox was null"));
+        this.registerTextures(skybox);
+    }
+
+    private void registerTextures(final Skybox skybox) {
+        final TextureManager textureManager = Minecraft.getInstance().getTextureManager();
+        for (final SkyLayer skyLayer : skybox.layers()) {
+            //~ if >=1.21.4 'register' -> 'registerAndLoad'
+            textureManager.registerAndLoad(skyLayer.texture(), new SimpleTexture(skyLayer.texture()));
+        }
     }
 
     public void clearSkyboxes() {
+        this.loadedSkies.forEach(this::releaseTextures);
         this.loadedSkies.clear();
         this.activeSkies.clear();
+    }
+
+    private void releaseTextures(final Skybox skybox)  {
+        final TextureManager textureManager = Minecraft.getInstance().getTextureManager();
+        for (final SkyLayer layer : skybox.layers()) {
+            textureManager.release(layer.texture());
+        }
     }
 
     public void extractSkyboxes(final SkyFeatureRenderer skyFeatureRenderer, final ClientLevel level, final float tickDelta) {
