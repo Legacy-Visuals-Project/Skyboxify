@@ -59,10 +59,11 @@ public final class SkyboxManager {
     }
 
     private void registerTextures(final Skybox skybox) {
-        final TextureManager textureManager = Minecraft.getInstance().getTextureManager();
-        for (final SkyLayer skyLayer : skybox.layers()) {
-            //~ if >=1.21.4 'register' -> 'registerAndLoad'
-            textureManager.register(skyLayer.texture().vanilla(), new SimpleTexture(skyLayer.texture().vanilla()));
+        if (this.api.getConfig().preloadTextures.isEnabled()) {
+            final TextureManager textureManager = Minecraft.getInstance().getTextureManager();
+            for (final SkyLayer skyLayer : skybox.layers()) {
+                textureManager.register(skyLayer.texture().vanilla(), new SimpleTexture(skyLayer.texture().vanilla()));
+            }
         }
     }
 
@@ -87,7 +88,7 @@ public final class SkyboxManager {
 
         final Matrix4f modelViewMatrix = new Matrix4f();
         CommonUtils.rotate(modelViewMatrix, CommonUtils.Y_AXIS, -90.0F);
-        for (final Skybox skybox : SkyboxifyImpl.skyboxManager().getActiveSkies()) {
+        for (final Skybox skybox : this.activeSkies) {
             skybox.extractRenderState(skyFeatureRenderer, world, modelViewMatrix, tickDelta);
         }
     }
@@ -112,12 +113,8 @@ public final class SkyboxManager {
         return this.api.getConfig().enabled.isEnabled() && !this.activeSkies.isEmpty();
     }
 
-    public List<Skybox> getSkiesFor(final Id dimensionId) {
-        return this.activeSkies.stream().filter(skybox -> dimensionId.equals(skybox.dimension())).toList();
-    }
-
     public boolean containsEnabled(final Id dimensionId) {
-        return !getSkiesFor(dimensionId).isEmpty();
+        return this.activeSkies.stream().anyMatch(skybox -> dimensionId.equals(skybox.dimension()));
     }
 
     public List<Skybox> getLoadedSkies() {
