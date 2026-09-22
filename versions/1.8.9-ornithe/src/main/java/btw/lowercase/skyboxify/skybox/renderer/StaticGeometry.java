@@ -23,18 +23,25 @@
 
 package btw.lowercase.skyboxify.skybox.renderer;
 
+import net.minecraft.client.render.platform.GLX;
+import net.minecraft.client.render.platform.GlStateManager;
 import net.minecraft.client.render.vertex.BufferBuilder;
 import net.minecraft.client.render.vertex.VertexBuffer;
 import net.minecraft.client.render.vertex.VertexFormat;
+import net.minecraft.client.render.vertex.VertexFormatElement;
+import org.lwjgl.opengl.GL11;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 public class StaticGeometry implements Geometry {
+    private final VertexFormat vertexFormat;
     private final int vertexMode;
     private final VertexBuffer vertexBuffer;
     private boolean closed;
 
-    StaticGeometry(final int vertexMode, final VertexBuffer vertexBuffer) {
+    StaticGeometry(final VertexFormat vertexFormat, final int vertexMode, final VertexBuffer vertexBuffer) {
+        this.vertexFormat = vertexFormat;
         this.vertexMode = vertexMode;
         this.vertexBuffer = vertexBuffer;
     }
@@ -47,15 +54,16 @@ public class StaticGeometry implements Geometry {
 
         final VertexBuffer vertexBuffer = new VertexBuffer(vertexFormat);
         vertexBuffer.upload(builder.getBuffer());
-        return new StaticGeometry(vertexMode, vertexBuffer);
+        return new StaticGeometry(vertexFormat, vertexMode, vertexBuffer);
     }
 
     @Override
     public void draw() {
-        // TODO: Client states
         this.vertexBuffer.bind();
+        this.setupBufferState();
         this.vertexBuffer.draw(this.vertexMode);
         this.vertexBuffer.unbind();
+        this.clearBufferState();
     }
 
     @Override
@@ -68,6 +76,64 @@ public class StaticGeometry implements Geometry {
         if (!this.closed) {
             this.closed = true;
             this.vertexBuffer.delete();
+        }
+    }
+
+    private void setupBufferState() {
+        final int vertexSize = this.vertexFormat.getVertexSize();
+
+        int index = 0;
+        for (final VertexFormatElement element : this.vertexFormat.getElements()) {
+            final VertexFormatElement.Usage usage = element.getUsage();
+            final int glCode = element.getType().getGlCode();
+            final int elementIndex = element.getIndex();
+            final int offset = this.vertexFormat.getOffset(index++);
+            switch (usage) {
+                case POSITION:
+                    GL11.glVertexPointer(element.getCount(), glCode, vertexSize, offset);
+                    GL11.glEnableClientState(GL11.GL_VERTEX_ARRAY);
+                    break;
+                case UV:
+                    GLX.clientActiveTexture(GLX.GL_TEXTURE0 + elementIndex);
+                    GL11.glTexCoordPointer(element.getCount(), glCode, vertexSize, offset);
+                    GL11.glEnableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+                    GLX.clientActiveTexture(GLX.GL_TEXTURE0);
+                    break;
+                case COLOR:
+                    GL11.glColorPointer(element.getCount(), glCode, vertexSize, offset);
+                    GL11.glEnableClientState(GL11.GL_COLOR_ARRAY);
+                    break;
+                case NORMAL:
+                    GL11.glNormalPointer(glCode, vertexSize, offset);
+                    GL11.glEnableClientState(GL11.GL_NORMAL_ARRAY);
+            }
+        }
+    }
+
+    private void clearBufferState() {
+        final List<VertexFormatElement> elements = this.vertexFormat.getElements();
+
+        int index = 0;
+        for (int i = elements.size(); index < i; ++index) {
+            final VertexFormatElement element = elements.get(index);
+            final VertexFormatElement.Usage usage = element.getUsage();
+            final int elementIndex = element.getIndex();
+            switch (usage) {
+                case POSITION:
+                    GL11.glDisableClientState(GL11.GL_VERTEX_ARRAY);
+                    break;
+                case UV:
+                    GLX.clientActiveTexture(GLX.GL_TEXTURE0 + elementIndex);
+                    GL11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+                    GLX.clientActiveTexture(GLX.GL_TEXTURE0);
+                    break;
+                case COLOR:
+                    GL11.glDisableClientState(GL11.GL_COLOR_ARRAY);
+                    GlStateManager.clearColor();
+                    break;
+                case NORMAL:
+                    GL11.glDisableClientState(GL11.GL_NORMAL_ARRAY);
+            }
         }
     }
 }

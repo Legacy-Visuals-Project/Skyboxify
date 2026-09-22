@@ -48,7 +48,7 @@ public class SkyboxifyConfig extends Config {
     }
 
     @Override
-    public Screen getConfigScreen(@Nullable final Screen parent) {
+    public Screen getConfigScreen(final @Nullable Screen parent) {
         final ConfigScreenBuilder builder = ConfigScreenBuilder.builder(this);
         builder.setTitle(new TranslatableTextComponent("options.skyboxify.title"));
         return builder.build(parent);
