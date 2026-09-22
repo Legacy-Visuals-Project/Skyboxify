@@ -35,13 +35,17 @@ import net.ornithemc.osl.resource.loader.api.resource.ResourceType;
 import net.ornithemc.osl.resource.loader.api.resource.manager.ResourceManager;
 import net.ornithemc.osl.resource.loader.api.resource.pack.ResourceConsumer;
 import net.ornithemc.osl.resource.loader.api.resource.pack.ResourcePack;
+import net.ornithemc.osl.resource.loader.api.resource.reload.ReloadStep;
 import net.ornithemc.osl.resource.loader.api.resource.reload.ResourceReloadListener;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -84,6 +88,18 @@ public class SkyboxResourceListener implements ResourceReloadListener {
     }
 
     @Override
+    public @NotNull CompletableFuture<Void> reloadResources(final SharedState state, final ReloadStep previousStep, final Executor preparationExecutor, final Executor reloadExecutor) {
+        final ResourceManager manager = state.resourceManager();
+        return CompletableFuture.supplyAsync(() -> {
+            final List<Skybox> skyboxes = new ArrayList<>();
+            manager.getResourcePacks().forEach(pack -> this.parseSkyboxesInPack(pack, skyboxes));
+            return skyboxes;
+        }, preparationExecutor)
+            .thenCompose(previousStep::await)
+            .thenAcceptAsync(this::applySkyboxes, reloadExecutor);
+    }
+
+    @Override
     public void resourcesReloaded(final ResourceManager manager) {
         final List<Skybox> skyboxes = new ArrayList<>();
         manager.getResourcePacks().forEach(pack -> this.parseSkyboxesInPack(pack, skyboxes));
@@ -91,20 +107,19 @@ public class SkyboxResourceListener implements ResourceReloadListener {
     }
 
     private void parseSkyboxesInPack(final ResourcePack pack, final List<Skybox> outputSkyboxes) {
-        final List<Id> optiFineSkies = new ArrayList<>();
-        pack.findResources(ResourceType.CLIENT_ASSETS, "minecraft", OPTIFINE_SKY_PARENT, filterResource(optiFineSkies));
-        optiFineSkies.sort(compareLocations(OPTIFINE_SKY_PATTERN));
-        if (!optiFineSkies.isEmpty()) {
-            this.parseSkyboxes(pack, OPTIFINE_SKY_PATTERN, optiFineSkies, outputSkyboxes);
+        final List<Id> skies = new ArrayList<>();
+        pack.findResources(ResourceType.CLIENT_ASSETS, "minecraft", OPTIFINE_SKY_PARENT, filterResource(skies));
+        skies.sort(compareLocations(OPTIFINE_SKY_PATTERN));
+        if (!skies.isEmpty()) {
+            this.parseSkyboxes(pack, OPTIFINE_SKY_PATTERN, skies, outputSkyboxes);
         } else {
             if (SkyboxifyImpl.config().debug.isEnabled()) {
                 LOGGER.info("Couldn't find any skies inside \"{}\" under \"optifine\", searching for skies under \"mcpatcher\" instead...", pack.getName());
             }
 
-            final List<Id> mcPatcherSkies = new ArrayList<>();
-            pack.findResources(ResourceType.CLIENT_ASSETS, "minecraft", MCPATCHER_SKY_PARENT, filterResource(mcPatcherSkies));
-            mcPatcherSkies.sort(compareLocations(MCPATCHER_SKY_PATTERN));
-            this.parseSkyboxes(pack, MCPATCHER_SKY_PATTERN, mcPatcherSkies, outputSkyboxes);
+            pack.findResources(ResourceType.CLIENT_ASSETS, "minecraft", MCPATCHER_SKY_PARENT, filterResource(skies));
+            skies.sort(compareLocations(MCPATCHER_SKY_PATTERN));
+            this.parseSkyboxes(pack, MCPATCHER_SKY_PATTERN, skies, outputSkyboxes);
         }
     }
 
@@ -123,8 +138,8 @@ public class SkyboxResourceListener implements ResourceReloadListener {
                 return;
             }
 
+            // TODO/NOTE: Support moon/sun? (apparently doesn't even work in OptiFine)
             if (name.equals("moon_phases") || name.equals("sun")) {
-                // TODO/NOTE: Support moon/sun? (apparently doesn't even work in OptiFine)
                 if (SkyboxifyImpl.config().debug.isEnabled()) {
                     LOGGER.warn("Skipping {}, moon_phases/sun aren't currently supported!", id);
                 }
