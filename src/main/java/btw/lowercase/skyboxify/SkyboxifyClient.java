@@ -30,26 +30,60 @@ import btw.lowercase.skyboxify.skybox.SkyboxResourceListener;
 import dev.kikugie.fletching_table.annotation.fabric.Entrypoint;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
+//? <1.21.9
+//import net.minecraft.server.packs.resources.ResourceManager;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 
 @Entrypoint
 public final class SkyboxifyClient implements ClientModInitializer {
-	@Override
-	public void onInitializeClient() {
-		Skyboxify.initialize();
+    @Override
+    public void onInitializeClient() {
+        Skyboxify.initialize();
 
         final SkyboxManager skyboxManager = SkyboxifyImpl.skyboxManager();
-		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(new SkyboxifyCommand()));
-		//? >=1.21.10 {
-		net.fabricmc.fabric.api.resource.v1.ResourceLoader.get(PackType.CLIENT_RESOURCES)
-                //? >=26.1 {
-                .registerReloadListener
-                //? } else {
-                /*.registerReloader
-                *///? }
-                (SkyboxResourceListener.SKYBOX_RELOAD_ID, new SkyboxResourceListener(skyboxManager));
-		//?} else {
-		/*net.fabricmc.fabric.api.resource.ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new SkyboxResourceListener(skyboxManager));
-		 *///?}
-	}
+        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(new SkyboxifyCommand()));
+
+        ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new IdentifiableResourceReloadListener() {
+            private final SkyboxResourceListener listener = new SkyboxResourceListener(skyboxManager);
+
+            @Override
+            public @NotNull Identifier getFabricId() {
+                return SkyboxResourceListener.SKYBOX_RELOAD_ID;
+            }
+
+            @Override
+            public @NotNull CompletableFuture<Void> reload(
+                    //? >=1.21.9
+                    final @NotNull SharedState state,
+                    //? <1.21.9 {
+                    /*final @NotNull PreparationBarrier preparationBarrier,
+                    final @NotNull ResourceManager resourceManager,
+                    *///? }
+                    final @NotNull Executor preparationExecutor,
+                    //? >=1.21.9
+                    final @NotNull PreparationBarrier preparationBarrier,
+                    final @NotNull Executor reloadExecutor
+            ) {
+                return this.listener.reload(
+                        //? >=1.21.9
+                        state,
+                        //? <1.21.9 {
+                        /*preparationBarrier,
+                        resourceManager,
+                        *///? }
+                        preparationExecutor,
+                        //? >=1.21.9
+                        preparationBarrier,
+                        reloadExecutor
+                );
+            }
+        });
+    }
 }

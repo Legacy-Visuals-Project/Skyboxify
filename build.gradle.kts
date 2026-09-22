@@ -1,7 +1,4 @@
-@file:OptIn(StonecutterExperimentalAPI::class)
-
 import com.google.devtools.ksp.processing.parseBoolean
-import dev.kikugie.stonecutter.StonecutterExperimentalAPI
 import net.fabricmc.loom.api.LoomGradleExtensionAPI
 import net.fabricmc.loom.api.fabricapi.FabricApiExtension
 
