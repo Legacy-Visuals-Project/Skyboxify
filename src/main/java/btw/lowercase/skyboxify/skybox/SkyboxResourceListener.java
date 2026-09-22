@@ -45,13 +45,19 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class SkyboxResourceHelper implements ResourceReloadListener {
+public class SkyboxResourceListener implements ResourceReloadListener {
     private static final String OPTIFINE_SKY_PARENT = "optifine/sky";
     private static final String SKY_PATTERN_ENDING = "(?<dimension>[\\w-]+)/(?<name>\\w+).properties$";
     private static final Pattern OPTIFINE_SKY_PATTERN = Pattern.compile(OPTIFINE_SKY_PARENT + "/" + SKY_PATTERN_ENDING);
     private static final String MCPATCHER_SKY_PARENT = "mcpatcher/sky";
     private static final Pattern MCPATCHER_SKY_PATTERN = Pattern.compile(MCPATCHER_SKY_PARENT + "/" + SKY_PATTERN_ENDING);
-    private static final Logger LOGGER = LoggerFactory.getLogger(SkyboxResourceHelper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SkyboxResourceListener.class);
+
+    private final SkyboxManager skyboxManager;
+
+    public SkyboxResourceListener(final SkyboxManager skyboxManager) {
+        this.skyboxManager = skyboxManager;
+    }
 
     private static ResourceConsumer filterResource(final List<Id> list) {
         return (identifier, ioSupplier) -> {
@@ -78,40 +84,33 @@ public class SkyboxResourceHelper implements ResourceReloadListener {
     }
 
     @Override
-    public void resourcesReloaded(final ResourceManager resourceManager) {
-        final SkyboxManager skyboxManager = SkyboxifyImpl.skyboxManager();
-        skyboxManager.clearSkyboxes();
-        resourceManager.getResourcePacks().forEach(pack -> {
-            final List<Id> optiFineSkies = new ArrayList<>();
-            pack.findResources(ResourceType.CLIENT_ASSETS, "minecraft", OPTIFINE_SKY_PARENT, filterResource(optiFineSkies));
-            optiFineSkies.sort(compareLocations(OPTIFINE_SKY_PATTERN));
+    public void resourcesReloaded(final ResourceManager manager) {
+        final List<Skybox> skyboxes = new ArrayList<>();
+        manager.getResourcePacks().forEach(pack -> this.parseSkyboxesInPack(pack, skyboxes));
+        this.applySkyboxes(skyboxes);
+    }
+
+    private void parseSkyboxesInPack(final ResourcePack pack, final List<Skybox> outputSkyboxes) {
+        final List<Id> optiFineSkies = new ArrayList<>();
+        pack.findResources(ResourceType.CLIENT_ASSETS, "minecraft", OPTIFINE_SKY_PARENT, filterResource(optiFineSkies));
+        optiFineSkies.sort(compareLocations(OPTIFINE_SKY_PATTERN));
+        if (!optiFineSkies.isEmpty()) {
+            this.parseSkyboxes(pack, OPTIFINE_SKY_PATTERN, optiFineSkies, outputSkyboxes);
+        } else {
+            if (SkyboxifyImpl.config().debug.isEnabled()) {
+                LOGGER.info("Couldn't find any skies inside \"{}\" under \"optifine\", searching for skies under \"mcpatcher\" instead...", pack.getName());
+            }
 
             final List<Id> mcPatcherSkies = new ArrayList<>();
             pack.findResources(ResourceType.CLIENT_ASSETS, "minecraft", MCPATCHER_SKY_PARENT, filterResource(mcPatcherSkies));
             mcPatcherSkies.sort(compareLocations(MCPATCHER_SKY_PATTERN));
-
-            Pattern skyPattern = OPTIFINE_SKY_PATTERN;
-            if (optiFineSkies.isEmpty()) {
-                if (SkyboxifyImpl.config().debug.isEnabled()) {
-                    LOGGER.info("Couldn't find any skies inside \"{}\" under \"optifine\", searching for skies under \"mcpatcher\" instead...", pack.getName());
-                }
-
-                skyPattern = MCPATCHER_SKY_PATTERN;
-            }
-
-            final List<Id> skies = (skyPattern == OPTIFINE_SKY_PATTERN ? optiFineSkies : mcPatcherSkies);
-            if (!skies.isEmpty()) {
-                final int count = this.parseSkyboxesInPack(skyboxManager, pack, skies, skyPattern);
-                if (count > 0 && SkyboxifyImpl.config().debug.isEnabled()) {
-                    LOGGER.info("Loaded {} {} from \"{}\"!", count, (count == 1 ? "skies" : "sky"), pack.getName());
-                }
-            }
-        });
+            this.parseSkyboxes(pack, MCPATCHER_SKY_PATTERN, mcPatcherSkies, outputSkyboxes);
+        }
     }
 
-    private int parseSkyboxesInPack(final SkyboxManager skyboxManager, final ResourcePack packResources, final List<Id> skies, final Pattern skyPattern) {
+    private void parseSkyboxes(final ResourcePack pack, final Pattern skyPattern, final List<Id> skies, final List<Skybox> outputSkyboxes) {
         final Map<String, JsonArray> layers = new HashMap<>();
-        int count = 0;
+        int loadedCount = 0;
         skies.forEach(id -> {
             final Matcher matcher = skyPattern.matcher(id.path());
             if (!matcher.find()) {
@@ -133,7 +132,7 @@ public class SkyboxResourceHelper implements ResourceReloadListener {
                 return;
             }
 
-            final IOSupplier<InputStream> resource = packResources.getResource(ResourceType.CLIENT_ASSETS, id);
+            final IOSupplier<InputStream> resource = pack.getResource(ResourceType.CLIENT_ASSETS, id);
             if (resource == null) {
                 LOGGER.error("Error trying to read namespaced identifier: {}", id);
                 return;
@@ -149,7 +148,7 @@ public class SkyboxResourceHelper implements ResourceReloadListener {
                 return;
             }
 
-            final JsonObject json = SkyboxParser.parseSkyProperties(properties, id, packResources);
+            final JsonObject json = SkyboxParser.parseSkyProperties(properties, id, pack);
             // NOTE: Don't add broken skies (returns null if broken)
             if (json != null) {
                 layers.computeIfAbsent(dimension, key -> new JsonArray()).add(json);
@@ -175,14 +174,21 @@ public class SkyboxResourceHelper implements ResourceReloadListener {
                 skyboxJson.add("layers", skyLayers);
 
                 final Skybox skybox = Skybox.CODEC.decode(JsonOps.INSTANCE, skyboxJson).getOrThrow().getFirst();
-                skybox.setPackName(packResources.getName());
-                skyboxManager.addSkybox(skybox);
-                // Tick at-least once as a trick for the sky to show up immediately while in the menu
-                skyboxManager.tick();
-                count++;
+                skybox.setPackName(pack.getName());
+                outputSkyboxes.add(skybox);
+                loadedCount++;
             }
         }
 
-        return count;
+        if (loadedCount > 0 && SkyboxifyImpl.config().debug.isEnabled()) {
+            LOGGER.info("Loaded {} {} from \"{}\"!", loadedCount, (loadedCount == 1 ? "skies" : "sky"), pack.getName());
+        }
+    }
+
+    private void applySkyboxes(final List<Skybox> skyboxes) {
+        this.skyboxManager.clearSkyboxes();
+        skyboxes.forEach(this.skyboxManager::addSkybox);
+        // Tick at-least once as a trick for the sky to show up immediately while in the menu
+        this.skyboxManager.tick();
     }
 }

@@ -76,7 +76,7 @@ public abstract class MixinWorldRenderer_SkyEvents {
     // Render Skyboxes & Modify Sun/Moon/Stars
     @Inject(method = "renderSky", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/world/WorldRenderer;renderEndSky()V", shift = At.Shift.AFTER))
     private void skyboxify$renderEndSkybox(final float tickDelta, final int anaglyphRenderPass, final CallbackInfo ci) {
-        Skyboxify.eventManager().dispatch(new SkyEvents.EndSky.After(this.skyboxify$skyFeatureRenderer, this.world));
+        Skyboxify.eventManager().dispatch(new SkyEvents.EndSky.After(this.skyboxify$skyFeatureRenderer));
     }
 
     @Unique
@@ -84,7 +84,7 @@ public abstract class MixinWorldRenderer_SkyEvents {
 
     @Inject(method = "renderSky", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/platform/GlStateManager;blendFuncSeparate(IIII)V", ordinal = 1))
     private void skyboxify$renderSkyboxes(final float tickDelta, final int anaglyphRenderPass, final CallbackInfo ci) {
-        this.skyboxify$renderSunMoonStars = !Skyboxify.eventManager().dispatch(new SkyEvents.SunMoonStars(this.skyboxify$skyFeatureRenderer, this.world)).isCancelled();
+        this.skyboxify$renderSunMoonStars = !Skyboxify.eventManager().dispatch(new SkyEvents.SunMoonStars(this.skyboxify$skyFeatureRenderer, this.world.dimension.getId() == CommonUtils.NETHER)).isCancelled();
     }
 
     @WrapWithCondition(method = "renderSky", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/vertex/Tesselator;end()V", ordinal = 1))

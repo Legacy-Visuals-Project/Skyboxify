@@ -38,7 +38,6 @@ public class SkyEvents {
         }
     }
 
-    @RequiredArgsConstructor
     public static final class SunMoonStars extends CancellableEvent {
         private final SkyFeatureRenderer skyFeatureRenderer;
         private final boolean isInNether;
@@ -48,9 +47,13 @@ public class SkyEvents {
             this.isInNether = isInNether;
         }
 
-        public SkyFeatureRenderer skyFeatureRenderer() { return this.skyFeatureRenderer; }
+        public SkyFeatureRenderer skyFeatureRenderer() {
+            return this.skyFeatureRenderer;
+        }
 
-        public boolean isInNether() { return this.isInNether; }
+        public boolean isInNether() {
+            return this.isInNether;
+        }
     }
 
     public static final class Celestial extends CancellableEvent {
@@ -60,7 +63,9 @@ public class SkyEvents {
             this.type = type;
         }
 
-        public Type getType() { return this.type; }
+        public Type getType() {
+            return this.type;
+        }
 
         public enum Type {
             SUN,
@@ -88,7 +93,9 @@ public class SkyEvents {
             this.type = type;
         }
 
-        public Type getType() { return this.type; }
+        public Type getType() {
+            return this.type;
+        }
 
         public enum Type {
             TOP,

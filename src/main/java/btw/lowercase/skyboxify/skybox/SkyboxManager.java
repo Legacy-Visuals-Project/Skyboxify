@@ -24,7 +24,6 @@
 package btw.lowercase.skyboxify.skybox;
 
 import btw.lowercase.skyboxify.api.SkyboxifyApi;
-import btw.lowercase.skyboxify.api.SkyboxifyImpl;
 import btw.lowercase.skyboxify.skybox.impl.SkyLayer;
 import btw.lowercase.skyboxify.skybox.impl.Skybox;
 import btw.lowercase.skyboxify.skybox.renderer.SkyFeatureRenderer;
@@ -73,7 +72,7 @@ public final class SkyboxManager {
         this.activeSkies.clear();
     }
 
-    private void releaseTextures(final Skybox skybox)  {
+    private void releaseTextures(final Skybox skybox) {
         final TextureManager textureManager = Minecraft.getInstance().getTextureManager();
         for (final SkyLayer layer : skybox.layers()) {
             textureManager.close(layer.texture().vanilla());

@@ -41,6 +41,7 @@ public class SkyboxifyConfig extends Config {
     public BooleanConfigField showOverworldForUnknownDimension = this.booleanFieldOf("showOverworldForUnknownDimension", true);
     public EnumConfigField<FilteringMode> filteringMode = this.enumFieldOf("filteringMode", FilteringMode.NEAREST);
     public BooleanConfigField debug = this.booleanFieldOf("debug", false);
+    public BooleanConfigField preloadTextures = this.booleanFieldOf("preloadTextures", false);
 
     public SkyboxifyConfig() {
         super(SkyboxifyInfo.MOD_ID);

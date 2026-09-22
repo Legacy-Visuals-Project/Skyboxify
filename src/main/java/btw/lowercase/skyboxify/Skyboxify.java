@@ -26,11 +26,11 @@ package btw.lowercase.skyboxify;
 import btw.lowercase.skyboxify.api.SkyboxifyApi;
 import btw.lowercase.skyboxify.api.SkyboxifyImpl;
 import btw.lowercase.skyboxify.config.SkyboxifyConfig;
-import btw.lowercase.skyboxify.events.EventManager;
 import btw.lowercase.skyboxify.events.SkyEvents;
+import btw.lowercase.skyboxify.skybox.SkyboxManager;
 import btw.lowercase.skyboxify.utils.CommonUtils;
+import btw.lowercase.skyboxify.utils.Id;
 import net.minecraft.client.render.platform.GlStateManager;
-import net.minecraft.client.world.ClientWorld;
 import net.ornithemc.osl.lifecycle.api.client.ClientWorldEvents;
 import org.visuals.legacy.lightconfig.lib.v1.events.EventManager;
 
@@ -41,20 +41,20 @@ public final class Skyboxify {
         return globalEventManager;
     }
 
-    public static Identifier locationOrNull(final String path) {
-        return Identifier.fromNamespaceAndPath(SkyboxifyInfo.MOD_ID, path);
+    public static Id locationOrNull(final String path) {
+        return Id.fromNamespaceAndPath(SkyboxifyInfo.MOD_ID, path);
     }
 
     public static void initialize() {
         final SkyboxifyApi impl = SkyboxifyImpl.getInstance();
-        impl.getConfigHandler().load();
+        impl.getConfig().load();
 
         final SkyboxManager skyboxManager = impl.getSkyboxManager();
         final SkyboxifyConfig config = impl.getConfig();
-        ClientTickEvents.END_LEVEL_TICK.register(skyboxManager::tick);
+        ClientWorldEvents.TICK_END.register(skyboxManager::tick);
 
         globalEventManager.listen(SkyEvents.Disc.class, event -> {
-            if (config.enabled && !config.renderSky) {
+            if (config.enabled.isEnabled() && !config.renderSky.isEnabled()) {
                 event.setCancelled(true);
             }
         });
@@ -78,8 +78,8 @@ public final class Skyboxify {
 
         globalEventManager.listen(SkyEvents.Extraction.class, event -> {
             if (skyboxManager.isEnabled()) {
-                final float delta = event.level().dimension().equals(Level.END) ? 0.0F : event.tickDelta();
-                skyboxManager.extractSkyboxes(event.skyFeatureRenderer(), event.level(), delta);
+                final float delta = event.world().dimension.getId() == CommonUtils.END ? 0.0F : event.tickDelta();
+                skyboxManager.extractSkyboxes(event.skyFeatureRenderer(), event.world(), delta);
             }
         });
 
@@ -93,10 +93,9 @@ public final class Skyboxify {
         });
 
         globalEventManager.listen(SkyEvents.SunMoonStars.class, event -> {
-            final ClientWorld world = event.world();
             if (impl.getSkyboxManager().isEnabled()) {
                 event.skyFeatureRenderer().endFrame();
-                if (world.dimension.getId() == CommonUtils.NETHER) {
+                if (event.isInNether()) {
                     event.setCancelled(true);
                 }
 

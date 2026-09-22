@@ -23,7 +23,9 @@
 
 package btw.lowercase.skyboxify;
 
-import btw.lowercase.skyboxify.skybox.SkyboxResourceHelper;
+import btw.lowercase.skyboxify.api.SkyboxifyImpl;
+import btw.lowercase.skyboxify.skybox.SkyboxManager;
+import btw.lowercase.skyboxify.skybox.SkyboxResourceListener;
 import net.fabricmc.api.ClientModInitializer;
 import net.ornithemc.osl.resource.loader.api.client.ClientResourceLoaderEvents;
 
@@ -31,7 +33,10 @@ public final class SkyboxifyClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         Skyboxify.initialize();
+
+        final SkyboxManager skyboxManager = SkyboxifyImpl.skyboxManager();
 //        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(new SkyboxifyCommand()));
-        ClientResourceLoaderEvents.INIT_RESOURCE_MANAGER.register(resources -> resources.addReloader(new SkyboxResourceHelper()));
+
+        ClientResourceLoaderEvents.INIT_RESOURCE_MANAGER.register(resources -> resources.addReloader(new SkyboxResourceListener(skyboxManager)));
     }
 }
