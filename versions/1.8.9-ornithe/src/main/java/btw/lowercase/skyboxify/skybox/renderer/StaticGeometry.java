@@ -31,7 +31,6 @@ import net.minecraft.client.render.vertex.VertexFormat;
 import net.minecraft.client.render.vertex.VertexFormatElement;
 import org.lwjgl.opengl.GL11;
 
-import java.util.List;
 import java.util.function.Consumer;
 
 public class StaticGeometry implements Geometry {
@@ -81,14 +80,12 @@ public class StaticGeometry implements Geometry {
 
     private void setupBufferState() {
         final int vertexSize = this.vertexFormat.getVertexSize();
-
         int index = 0;
         for (final VertexFormatElement element : this.vertexFormat.getElements()) {
-            final VertexFormatElement.Usage usage = element.getUsage();
             final int glCode = element.getType().getGlCode();
             final int elementIndex = element.getIndex();
             final int offset = this.vertexFormat.getOffset(index++);
-            switch (usage) {
+            switch (element.getUsage()) {
                 case POSITION:
                     GL11.glVertexPointer(element.getCount(), glCode, vertexSize, offset);
                     GL11.glEnableClientState(GL11.GL_VERTEX_ARRAY);
@@ -111,14 +108,9 @@ public class StaticGeometry implements Geometry {
     }
 
     private void clearBufferState() {
-        final List<VertexFormatElement> elements = this.vertexFormat.getElements();
-
-        int index = 0;
-        for (int i = elements.size(); index < i; ++index) {
-            final VertexFormatElement element = elements.get(index);
-            final VertexFormatElement.Usage usage = element.getUsage();
+        for (final VertexFormatElement element : this.vertexFormat.getElements()) {
             final int elementIndex = element.getIndex();
-            switch (usage) {
+            switch (element.getUsage()) {
                 case POSITION:
                     GL11.glDisableClientState(GL11.GL_VERTEX_ARRAY);
                     break;
