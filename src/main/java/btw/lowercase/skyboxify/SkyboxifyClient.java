@@ -23,7 +23,9 @@
 
 package btw.lowercase.skyboxify;
 
+import btw.lowercase.skyboxify.api.SkyboxifyImpl;
 import btw.lowercase.skyboxify.command.SkyboxifyCommand;
+import btw.lowercase.skyboxify.skybox.SkyboxManager;
 import btw.lowercase.skyboxify.skybox.SkyboxResourceListener;
 import dev.kikugie.fletching_table.annotation.fabric.Entrypoint;
 import net.fabricmc.api.ClientModInitializer;
@@ -35,6 +37,8 @@ public final class SkyboxifyClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		Skyboxify.initialize();
+
+        final SkyboxManager skyboxManager = SkyboxifyImpl.skyboxManager();
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(new SkyboxifyCommand()));
 		//? >=1.21.10 {
 		net.fabricmc.fabric.api.resource.v1.ResourceLoader.get(PackType.CLIENT_RESOURCES)
@@ -43,9 +47,9 @@ public final class SkyboxifyClient implements ClientModInitializer {
                 //? } else {
                 /*.registerReloader
                 *///? }
-                (SkyboxResourceListener.SKYBOX_RELOAD_ID, new SkyboxResourceListener());
+                (SkyboxResourceListener.SKYBOX_RELOAD_ID, new SkyboxResourceListener(skyboxManager));
 		//?} else {
-		/*net.fabricmc.fabric.api.resource.ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new SkyboxResourceListener());
+		/*net.fabricmc.fabric.api.resource.ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new SkyboxResourceListener(skyboxManager));
 		 *///?}
 	}
 }

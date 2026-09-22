@@ -62,6 +62,12 @@ public class SkyboxResourceListener implements
 	private static final Pattern MCPATCHER_SKY_PATTERN = Pattern.compile(MCPATCHER_SKY_PARENT + "/" + SKY_PATTERN_ENDING);
 	private static final Logger LOGGER = LoggerFactory.getLogger(SkyboxResourceListener.class);
 
+    private final SkyboxManager skyboxManager;
+
+    public SkyboxResourceListener(final SkyboxManager skyboxManager) {
+        this.skyboxManager = skyboxManager;
+    }
+
 	private static PackResources.ResourceOutput filterResource(final List<Identifier> list) {
 		return (resourceLocation, ioSupplier) -> {
 			if (resourceLocation.getPath().endsWith(".properties")) {
@@ -214,10 +220,9 @@ public class SkyboxResourceListener implements
 	}
 
     private void applySkyboxes(final List<Skybox> skyboxes) {
-        final SkyboxManager skyboxManager = SkyboxifyImpl.skyboxManager();
-        skyboxManager.clearSkyboxes();
-        skyboxes.forEach(skyboxManager::addSkybox);
+        this.skyboxManager.clearSkyboxes();
+        skyboxes.forEach(this.skyboxManager::addSkybox);
         // Tick at-least once as a trick for the sky to show up immediately while in the menu
-        skyboxManager.tick();
+        this.skyboxManager.tick();
     }
 }
