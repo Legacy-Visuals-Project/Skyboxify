@@ -47,4 +47,7 @@ public class SkyboxifyConfig {
 
     @SerialEntry
     public boolean debug = false;
+
+    @SerialEntry
+    public boolean preloadTextures = false;
 }

@@ -14,5 +14,7 @@
 	"options.skyboxify.filteringMode.tooltip": "Change which filtering mode the skybox should render with.",
 	"options.skyboxify.debug": "Debug Mode",
 	"options.skyboxify.debug.tooltip": "Enable debug logging & other debugging aspects.",
+	"options.skyboxify.preloadTextures": "[Experimental] Preload Textures",
+	"options.skyboxify.preloadTextures.tooltip": "Preloads the skybox layer textures on pack load instead of lazy loading.\n\nNOTE: This can cause crashes on Vulkan currently!",
 	"options.reset": "Reset"
 }

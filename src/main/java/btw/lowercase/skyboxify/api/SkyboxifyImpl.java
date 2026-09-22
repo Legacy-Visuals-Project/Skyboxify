@@ -96,6 +96,7 @@ public final class SkyboxifyImpl implements SkyboxifyApi {
             category.option(option("showOverworldForUnknownDimension", defaults.showOverworldForUnknownDimension, () -> config.showOverworldForUnknownDimension, val -> config.showOverworldForUnknownDimension = val));
             category.option(option("filteringMode", defaults.filteringMode, () -> config.filteringMode, val -> config.filteringMode = val));
             category.option(option("debug", defaults.debug, () -> config.debug, val -> config.debug = val));
+            category.option(option("preloadTextures", defaults.preloadTextures, () -> config.preloadTextures, val -> config.preloadTextures = val));
             builder.category(category.build());
 
             return builder;

@@ -59,10 +59,12 @@ public final class SkyboxManager {
     }
 
     private void registerTextures(final Skybox skybox) {
-        final TextureManager textureManager = Minecraft.getInstance().getTextureManager();
-        for (final SkyLayer skyLayer : skybox.layers()) {
-            //~ if >=1.21.4 'register' -> 'registerAndLoad'
-            textureManager.registerAndLoad(skyLayer.texture(), new SimpleTexture(skyLayer.texture()));
+        if (this.api.getConfig().preloadTextures) {
+            final TextureManager textureManager = Minecraft.getInstance().getTextureManager();
+            for (final SkyLayer skyLayer : skybox.layers()) {
+                //~ if >=1.21.4 'register' -> 'registerAndLoad'
+                textureManager.registerAndLoad(skyLayer.texture(), new SimpleTexture(skyLayer.texture()));
+            }
         }
     }
 
@@ -112,12 +114,8 @@ public final class SkyboxManager {
         return this.api.getConfig().enabled && !this.activeSkies.isEmpty();
     }
 
-    public List<Skybox> getSkiesFor(final ResourceKey<Level> resourceKey) {
-        return this.activeSkies.stream().filter(skybox -> resourceKey.equals(skybox.dimension())).toList();
-    }
-
     public boolean containsEnabled(final ResourceKey<Level> resourceKey) {
-        return !getSkiesFor(resourceKey).isEmpty();
+        return this.activeSkies.stream().anyMatch(skybox -> resourceKey.equals(skybox.dimension()));
     }
 
     public List<Skybox> getLoadedSkies() {
