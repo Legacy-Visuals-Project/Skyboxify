@@ -23,6 +23,7 @@
 
 package btw.lowercase.skyboxify.skybox;
 
+import btw.lowercase.skyboxify.Skyboxify;
 import btw.lowercase.skyboxify.api.SkyboxifyImpl;
 import btw.lowercase.skyboxify.skybox.impl.Skybox;
 import btw.lowercase.skyboxify.utils.Id;
@@ -35,21 +36,19 @@ import net.ornithemc.osl.resource.loader.api.resource.ResourceType;
 import net.ornithemc.osl.resource.loader.api.resource.manager.ResourceManager;
 import net.ornithemc.osl.resource.loader.api.resource.pack.ResourceConsumer;
 import net.ornithemc.osl.resource.loader.api.resource.pack.ResourcePack;
-import net.ornithemc.osl.resource.loader.api.resource.reload.ReloadStep;
-import net.ornithemc.osl.resource.loader.api.resource.reload.ResourceReloadListener;
-import org.jetbrains.annotations.NotNull;
+import net.ornithemc.osl.resource.loader.api.resource.reload.SimpleResourceReloader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class SkyboxResourceListener implements ResourceReloadListener {
+public class SkyboxResourceListener implements SimpleResourceReloader<List<Skybox>> {
+    public static final Id SKYBOX_RELOAD_ID = Skyboxify.locationOrNull("skybox_reader");
+
     private static final String OPTIFINE_SKY_PARENT = "optifine/sky";
     private static final String SKY_PATTERN_ENDING = "(?<dimension>[\\w-]+)/(?<name>\\w+).properties$";
     private static final Pattern OPTIFINE_SKY_PATTERN = Pattern.compile(OPTIFINE_SKY_PARENT + "/" + SKY_PATTERN_ENDING);
@@ -88,22 +87,23 @@ public class SkyboxResourceListener implements ResourceReloadListener {
     }
 
     @Override
-    public @NotNull CompletableFuture<Void> reloadResources(final SharedState state, final ReloadStep previousStep, final Executor preparationExecutor, final Executor reloadExecutor) {
-        final ResourceManager manager = state.resourceManager();
-        return CompletableFuture.supplyAsync(() -> {
-            final List<Skybox> skyboxes = new ArrayList<>();
-            manager.getResourcePacks().forEach(pack -> this.parseSkyboxesInPack(pack, skyboxes));
-            return skyboxes;
-        }, preparationExecutor)
-            .thenCompose(previousStep::await)
-            .thenAcceptAsync(this::applySkyboxes, reloadExecutor);
+    public String getName() {
+        return SKYBOX_RELOAD_ID.toString();
     }
 
     @Override
-    public void resourcesReloaded(final ResourceManager manager) {
+    public List<Skybox> reloadResources(final ResourceManager manager) {
         final List<Skybox> skyboxes = new ArrayList<>();
         manager.getResourcePacks().forEach(pack -> this.parseSkyboxesInPack(pack, skyboxes));
-        this.applySkyboxes(skyboxes);
+        return skyboxes;
+    }
+
+    @Override
+    public void applyResources(final List<Skybox> skyboxes, final ResourceManager manager) {
+        this.skyboxManager.clearSkyboxes();
+        skyboxes.forEach(this.skyboxManager::addSkybox);
+        // Tick at-least once as a trick for the sky to show up immediately while in the menu
+        this.skyboxManager.tick();
     }
 
     private void parseSkyboxesInPack(final ResourcePack pack, final List<Skybox> outputSkyboxes) {
@@ -198,12 +198,5 @@ public class SkyboxResourceListener implements ResourceReloadListener {
         if (loadedCount > 0 && SkyboxifyImpl.config().debug.isEnabled()) {
             LOGGER.info("Loaded {} {} from \"{}\"!", loadedCount, (loadedCount == 1 ? "skies" : "sky"), pack.getName());
         }
-    }
-
-    private void applySkyboxes(final List<Skybox> skyboxes) {
-        this.skyboxManager.clearSkyboxes();
-        skyboxes.forEach(this.skyboxManager::addSkybox);
-        // Tick at-least once as a trick for the sky to show up immediately while in the menu
-        this.skyboxManager.tick();
     }
 }
