@@ -23,7 +23,6 @@
 
 package btw.lowercase.skyboxify.skybox.impl;
 
-import btw.lowercase.skyboxify.skybox.SkyStorage;
 import btw.lowercase.skyboxify.skybox.impl.components.*;
 import btw.lowercase.skyboxify.skybox.renderer.Geometry;
 import btw.lowercase.skyboxify.skybox.renderer.RenderUniforms;
@@ -123,13 +122,7 @@ public class SkyLayer {
                 modelViewMatrix.rotate(Axis.of(this.axis).rotationDegrees(this.getAngle(level, skyAngle)));
             }
 
-            final SkyFeatureRenderer.Pipeline pipeline = new SkyFeatureRenderer.Pipeline(
-                    //? >=1.21.6 {
-                    SkyStorage.calculateSkyboxPipeline(this.blend.getBlendFunction())
-                    //? } else {
-                    /*this.blend.getBlendFunction()
-                     *///? }
-            );
+            final SkyFeatureRenderer.Pipeline pipeline = new SkyFeatureRenderer.Pipeline(this.blend.getBlendFunction());
             final RenderUniforms uniforms = new RenderUniforms(modelViewMatrix, this.blend.getShaderColor(finalAlpha));
             skyFeatureRenderer.submit(pipeline, Geometry.DEFAULT, uniforms, this.texture);
         }

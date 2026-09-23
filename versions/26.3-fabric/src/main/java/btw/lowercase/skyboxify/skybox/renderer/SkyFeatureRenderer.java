@@ -24,6 +24,7 @@
 package btw.lowercase.skyboxify.skybox.renderer;
 
 import btw.lowercase.skyboxify.api.SkyboxifyImpl;
+import btw.lowercase.skyboxify.skybox.SkyStorage;
 import btw.lowercase.skyboxify.utils.FilteringMode;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -46,7 +47,7 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
     @Override
     protected Submit createSubmit(final Pipeline pipeline, final Geometry geometry, final RenderUniforms uniforms, final Identifier location) {
         final GpuTextureView textureView = Minecraft.getInstance().getTextureManager().getTexture(location).getTextureView();
-        return new Submit(RenderSystem.getCompiledPipeline(pipeline.pipeline()), geometry, uniforms, textureView);
+        return new Submit(RenderSystem.getCompiledPipeline(SkyStorage.SKYBOX_PIPELINE.apply(pipeline.blendFunction())), geometry, uniforms, textureView);
     }
 
     @Override

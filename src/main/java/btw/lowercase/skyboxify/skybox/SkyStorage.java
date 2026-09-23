@@ -28,8 +28,9 @@ import btw.lowercase.skyboxify.utils.*;
 import com.mojang.blaze3d.vertex.*;
 
 //? >=1.21.6 {
-import java.util.Map;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+//~ if >=1.21.11 'net.minecraft.Util' -> 'net.minecraft.util.Util'
+import net.minecraft.util.Util;
+import java.util.function.Function;
 
 //? <=26.1
 /*import net.minecraft.client.renderer.RenderPipelines;*/
@@ -41,41 +42,36 @@ import com.mojang.renderpearl.api.pipeline.RenderPipeline;
 
 public final class SkyStorage {
     //? >=1.21.6 {
-    private static final Map<BlendFunction, RenderPipeline> renderPipelineCache = new Object2ObjectOpenHashMap<>();
-
-    public static RenderPipeline calculateSkyboxPipeline(final @org.jetbrains.annotations.Nullable BlendFunction blendFunction) {
-        if (renderPipelineCache.containsKey(blendFunction)) {
-            return renderPipelineCache.get(blendFunction);
-        } else {
-            final RenderPipeline.Builder builder = RenderPipeline.builder(
-                    //? <=26.1 {
+    public static final Function<BlendFunction, RenderPipeline> SKYBOX_PIPELINE = Util.memoize((blendFunction) -> {
+        final RenderPipeline.Builder builder = RenderPipeline.builder(
+                //? <=26.1 {
                     /*//? >=1.21.6 {
                     RenderPipelines.MATRICES_PROJECTION_SNIPPET
                     //?} else {
                     *//*RenderPipelines.MATRICES_COLOR_FOG_SNIPPET
-                    *//*//?}
-                     *///? }
-            );
-            builder.withLocation(Skyboxify.locationOrNull("pipeline/custom_skybox"));
-            builder.withVertexShader(SkyboxResourceListener.CUSTOM_SKYBOX_LOCATION);
-            builder.withFragmentShader(SkyboxResourceListener.CUSTOM_SKYBOX_LOCATION);
+                 *//*//?}
+                 *///? }
+        );
+        builder.withLocation(Skyboxify.locationOrNull("pipeline/custom_skybox"));
+        builder.withVertexShader(SkyboxResourceListener.CUSTOM_SKYBOX_LOCATION);
+        builder.withFragmentShader(SkyboxResourceListener.CUSTOM_SKYBOX_LOCATION);
 
-            //? >=26.1 {
-            //~ if >=26.3 'com.mojang.blaze3d.pipeline' -> 'com.mojang.renderpearl.api.pipeline' {
-            final int writeColor = com.mojang.renderpearl.api.pipeline.ColorTargetState.WRITE_COLOR;
-            final com.mojang.renderpearl.api.pipeline.BlendFunction vanillaBlendFunction = blendFunction == null ? null : blendFunction.vanilla();
-            builder.withColorTargetState(new com.mojang.renderpearl.api.pipeline.ColorTargetState(
-                    java.util.Optional.ofNullable(vanillaBlendFunction),
-                    //? >=26.2 {
-                    //~ if >=26.3 'com.mojang.blaze3d.GpuFormat' -> 'com.mojang.renderpearl.api.GpuFormat' {
-                    com.mojang.renderpearl.api.GpuFormat.RGBA8_UNORM, writeColor
-                    //~ }
-                    //? } else {
-                    /*writeColor
-                    *///? }
-            ));
-            //~ }
-            //? } else {
+        //? >=26.1 {
+        //~ if >=26.3 'com.mojang.blaze3d.pipeline' -> 'com.mojang.renderpearl.api.pipeline' {
+        final int writeColor = com.mojang.renderpearl.api.pipeline.ColorTargetState.WRITE_COLOR;
+        final com.mojang.renderpearl.api.pipeline.BlendFunction vanillaBlendFunction = blendFunction == null ? null : blendFunction.vanilla();
+        builder.withColorTargetState(new com.mojang.renderpearl.api.pipeline.ColorTargetState(
+                java.util.Optional.ofNullable(vanillaBlendFunction),
+                //? >=26.2 {
+                //~ if >=26.3 'com.mojang.blaze3d.GpuFormat' -> 'com.mojang.renderpearl.api.GpuFormat' {
+                com.mojang.renderpearl.api.GpuFormat.RGBA8_UNORM, writeColor
+                //~ }
+                //? } else {
+                /*writeColor
+                 *///? }
+        ));
+        //~ }
+        //? } else {
             /*builder.withDepthWrite(false);
             builder.withColorWrite(true, false);
             if (blendFunction != null) {
@@ -83,32 +79,30 @@ public final class SkyStorage {
             }
             *///? }
 
-            //? >=26.2 {
-            //? >=26.3 {
-            builder.withBindGroupLayout(net.minecraft.client.renderer.BindGroupLayouts.DYNAMIC_TRANSFORMS);
-            builder.withBindGroupLayout(net.minecraft.client.renderer.BindGroupLayouts.PROJECTION);
-            //? } else {
-            /*builder.withBindGroupLayout(net.minecraft.client.renderer.BindGroupLayouts.MATRICES_PROJECTION);
-            *///? }
-            builder.withBindGroupLayout(net.minecraft.client.renderer.BindGroupLayouts.SAMPLER0);
-            //? } else {
-            /*builder.withSampler("Sampler0");
-            *///? }
+        //? >=26.2 {
+        //? >=26.3 {
+        builder.withBindGroupLayout(net.minecraft.client.renderer.BindGroupLayouts.DYNAMIC_TRANSFORMS);
+        builder.withBindGroupLayout(net.minecraft.client.renderer.BindGroupLayouts.PROJECTION);
+        //? } else {
+        /*builder.withBindGroupLayout(net.minecraft.client.renderer.BindGroupLayouts.MATRICES_PROJECTION);
+         *///? }
+        builder.withBindGroupLayout(net.minecraft.client.renderer.BindGroupLayouts.SAMPLER0);
+        //? } else {
+        /*builder.withSampler("Sampler0");
+         *///? }
 
-            //? >=26.2 {
-            builder.withVertexBinding(0, DefaultVertexFormat.POSITION_TEX);
-            //~ if >=26.3 'com.mojang.blaze3d.PrimitiveTopology' -> 'com.mojang.renderpearl.api.pipeline.PrimitiveTopology' {
-            builder.withPrimitiveTopology(com.mojang.renderpearl.api.pipeline.PrimitiveTopology.QUADS);
-            //~ }
-            //? } else {
-            /*builder.withVertexFormat(DefaultVertexFormat.POSITION_TEX, VertexFormat.Mode.QUADS);
-            *///? }
+        //? >=26.2 {
+        builder.withVertexBinding(0, DefaultVertexFormat.POSITION_TEX);
+        //~ if >=26.3 'com.mojang.blaze3d.PrimitiveTopology' -> 'com.mojang.renderpearl.api.pipeline.PrimitiveTopology' {
+        builder.withPrimitiveTopology(com.mojang.renderpearl.api.pipeline.PrimitiveTopology.QUADS);
+        //~ }
+        //? } else {
+        /*builder.withVertexFormat(DefaultVertexFormat.POSITION_TEX, VertexFormat.Mode.QUADS);
+         *///? }
 
-            final RenderPipeline pipeline = builder.build();
-            renderPipelineCache.put(blendFunction, pipeline);
-            IrisUtil.assignPipeline(pipeline, IrisPipeline.SKY_TEXTURED);
-            return pipeline;
-        }
-    }
+        final RenderPipeline pipeline = builder.build();
+        IrisUtil.assignPipeline(pipeline, IrisPipeline.SKY_TEXTURED);
+        return pipeline;
+    });
     //?}
 }
