@@ -1,0 +1,90 @@
+/**
+ * Skyboxify
+ * A skybox mod that allows you to use OptiFine skies in Fabric 1.21+
+ * <p>
+ * Copyright (C) 2025-2026 lowercasebtw
+ * Copyright (C) 2025-2026 Contributors to the project retain their copyright
+ * <p>
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * <p>
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * <p>
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * <p>
+ * "MINECRAFT" LINKING EXCEPTION TO THE GPL
+ */
+
+package btw.lowercase.skyboxify.skybox.renderer;
+
+import btw.lowercase.skyboxify.api.SkyboxifyImpl;
+import btw.lowercase.skyboxify.skybox.SkyStorage;
+import btw.lowercase.skyboxify.utils.FilteringMode;
+import com.mojang.blaze3d.pipeline.RenderTarget;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.renderpearl.api.buffers.GpuBufferSlice;
+import com.mojang.renderpearl.api.commands.RenderPass;
+import com.mojang.renderpearl.api.pipeline.CompiledRenderPipeline;
+import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
+import com.mojang.renderpearl.api.textures.FilterMode;
+import com.mojang.renderpearl.api.textures.GpuSampler;
+import com.mojang.renderpearl.api.textures.GpuTextureView;
+import net.minecraft.client.Minecraft;
+import net.minecraft.resources.Identifier;
+import org.joml.Vector4f;
+
+public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submit> {
+    public SkyFeatureRenderer(final RenderTarget renderTarget) {
+        super(renderTarget);
+    }
+
+    @Override
+    protected Submit createSubmit(final Pipeline pipeline, final Geometry geometry, final RenderUniforms uniforms, final Identifier location) {
+        final GpuTextureView textureView = Minecraft.getInstance().getTextureManager().getTexture(location).getTextureView();
+        return new Submit(RenderSystem.getCompiledPipeline(SkyStorage.SKYBOX_PIPELINE.apply(pipeline.blendFunction())), geometry, uniforms, textureView);
+    }
+
+    @Override
+    public void endFrame(final RenderPass pass) {
+        if (!this.submits.isEmpty()) {
+            final RenderSystem.AutoStorageIndexBuffer indexBuffer = RenderSystem.getSequentialBuffer(PrimitiveTopology.QUADS);
+
+            final FilteringMode filteringMode = SkyboxifyImpl.config().filteringMode;
+            final GpuSampler sampler = RenderSystem.getSamplerCache().getClampToEdge(filteringMode == FilteringMode.LINEAR ? FilterMode.LINEAR : FilterMode.NEAREST);
+
+            pass.pushDebugGroup(() -> "Sky Feature End Frame");
+            RenderSystem.bindDefaultUniforms(pass);
+            for (final Submit submit : this.submits) {
+                if (submit.geometry.isClosed()) {
+                    throw new RuntimeException("Cannot render closed geometry!");
+                }
+
+                pass.setPipeline(submit.pipeline);
+                if (submit.geometry instanceof StaticGeometry staticGeometry) {
+                    pass.setVertexBuffer(0, staticGeometry.vertexBuffer().slice());
+                    pass.setIndexBuffer(indexBuffer.getBuffer(staticGeometry.indexCount()), indexBuffer.type());
+                }
+
+                final GpuBufferSlice dynamicTransforms = RenderSystem.getDynamicUniforms().writeTransform(RenderSystem.getModelViewMatrixCopy().mul(submit.uniforms.rotationMatrix()), (Vector4f) submit.uniforms.shaderColor());
+                pass.setUniform("DynamicTransforms", dynamicTransforms);
+                pass.setUniform("Sampler0", submit.textureView, sampler);
+                if (submit.geometry instanceof StaticGeometry staticGeometry) {
+                    pass.drawIndexed(staticGeometry.indexCount(), 1, 0, 0, 0);
+                }
+            }
+
+            pass.popDebugGroup();
+            super.endFrame(pass);
+        }
+    }
+
+    protected record Submit(CompiledRenderPipeline pipeline, Geometry geometry,
+                            RenderUniforms uniforms, GpuTextureView textureView) implements FeatureRenderer.Submit {
+    }
+}

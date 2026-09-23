@@ -26,11 +26,9 @@ package btw.lowercase.skyboxify.utils;
 //? >=1.21.6 {
 import btw.lowercase.skyboxify.api.SkyboxifyImpl;
 
-//? >=26.3 {
-import com.mojang.renderpearl.api.pipeline.RenderPipeline;
-//? } else {
-/*import com.mojang.blaze3d.pipeline.RenderPipeline;
-*///? }
+//~ if =26.3 'com.mojang.blaze3d' -> 'com.mojang.renderpearl.api' {
+import com.mojang.blaze3d.pipeline.RenderPipeline;
+//~ }
 
 import java.lang.reflect.Method;
 import java.util.Arrays;

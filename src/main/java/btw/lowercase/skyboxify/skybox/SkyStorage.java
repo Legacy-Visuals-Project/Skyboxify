@@ -35,8 +35,8 @@ import java.util.function.Function;
 //? <=26.1
 /*import net.minecraft.client.renderer.RenderPipelines;*/
 
-//~ if >=26.3 'com.mojang.blaze3d' -> 'com.mojang.renderpearl.api' {
-import com.mojang.renderpearl.api.pipeline.RenderPipeline;
+//~ if =26.3 'com.mojang.blaze3d' -> 'com.mojang.renderpearl.api' {
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 //~ }
 //?}
 
