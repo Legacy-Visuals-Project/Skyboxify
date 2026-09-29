@@ -228,7 +228,7 @@ dependencies {
         }
 
         optionalProp("deps.yacl_version") { prop ->
-            modImplementation("dev.isxander:yet-another-config-lib:$prop")
+            modImplementation("dev.isxander:yet-another-config-lib:$prop-${loader.name}")
         }
     } else if (loader.isNeoForge) {
         // TODO: "neoForge"("net.neoforged:neoforge:${deps.neoForgeVersion}")
