@@ -25,21 +25,23 @@ package btw.lowercase.skyboxify;
 
 import btw.lowercase.skyboxify.api.SkyboxifyImpl;
 import btw.lowercase.skyboxify.command.SkyboxifyCommand;
-import btw.lowercase.skyboxify.skybox.SkyboxManager;
 import btw.lowercase.skyboxify.skybox.SkyboxResourceListener;
 import dev.kikugie.fletching_table.annotation.fabric.Entrypoint;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import net.minecraft.server.packs.PackType;
+//? >=1.21.10 {
+import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
+//? } else {
+/*import net.minecraft.server.packs.resources.ResourceManager;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.fabric.impl.resource.loader.ResourceManagerHelperImpl;
 import net.minecraft.resources.Identifier;
-import net.minecraft.server.packs.PackType;
-//? <1.21.9
-//import net.minecraft.server.packs.resources.ResourceManager;
 import org.jetbrains.annotations.NotNull;
-
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+*///? }
 
 @Entrypoint
 public final class SkyboxifyClient implements ClientModInitializer {
@@ -47,12 +49,14 @@ public final class SkyboxifyClient implements ClientModInitializer {
     public void onInitializeClient() {
         Skyboxify.initialize();
 
-        final SkyboxManager skyboxManager = SkyboxifyImpl.skyboxManager();
-        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(new SkyboxifyCommand()));
+        ClientCommandRegistrationCallback.EVENT.register((dispatcher, context) -> dispatcher.register(new SkyboxifyCommand()));
 
-        ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new IdentifiableResourceReloadListener() {
-            private final SkyboxResourceListener listener = new SkyboxResourceListener(skyboxManager);
+        final SkyboxResourceListener listener = new SkyboxResourceListener(SkyboxifyImpl.skyboxManager());
 
+        //? >=1.21.10 {
+        ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloadListener(SkyboxResourceListener.SKYBOX_RELOAD_ID, listener);
+        //? } else {
+        /*ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new IdentifiableResourceReloadListener() {
             @Override
             public @NotNull Identifier getFabricId() {
                 return SkyboxResourceListener.SKYBOX_RELOAD_ID;
@@ -63,21 +67,21 @@ public final class SkyboxifyClient implements ClientModInitializer {
                     //? >=1.21.9
                     final @NotNull SharedState state,
                     //? <1.21.9 {
-                    /*final @NotNull PreparationBarrier preparationBarrier,
+                    /^final @NotNull PreparationBarrier preparationBarrier,
                     final @NotNull ResourceManager resourceManager,
-                    *///? }
+                    ^///? }
                     final @NotNull Executor preparationExecutor,
                     //? >=1.21.9
                     final @NotNull PreparationBarrier preparationBarrier,
                     final @NotNull Executor reloadExecutor
             ) {
-                return this.listener.reload(
+                return listener.reload(
                         //? >=1.21.9
                         state,
                         //? <1.21.9 {
-                        /*preparationBarrier,
+                        /^preparationBarrier,
                         resourceManager,
-                        *///? }
+                        ^///? }
                         preparationExecutor,
                         //? >=1.21.9
                         preparationBarrier,
@@ -85,5 +89,6 @@ public final class SkyboxifyClient implements ClientModInitializer {
                 );
             }
         });
+        *///? }
     }
 }
