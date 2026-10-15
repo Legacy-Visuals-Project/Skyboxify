@@ -27,6 +27,7 @@ stonecutter {
         }
 
 		mc("1.8.9", listOf("ornithe"))
+		mc("1.12.2", listOf("ornithe"))
 
 		vcsVersion = "1.8.9-ornithe"
 	}

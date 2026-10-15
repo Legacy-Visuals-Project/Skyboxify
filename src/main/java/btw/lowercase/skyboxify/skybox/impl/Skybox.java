@@ -92,11 +92,17 @@ public class Skybox extends AbstractSkybox {
 
     @Override
     public void tick(final ClientWorld world) {
+        final int dimensionId =
+                //? >=1.12.2 {
+                world.dimension.getType().getId();
+                //? } else {
+                /*world.dimension.getId();
+                *///? }
         final boolean allowOtherDimensions = SkyboxifyImpl.config().showOverworldForUnknownDimension.isEnabled() &&
                 this.dimension.equals(CommonUtils.OVERWORLD_ID) &&
-                !CommonUtils.dimensionIdentifier(world.dimension.getId()).equals(CommonUtils.NETHER_ID) &&
-                !CommonUtils.dimensionIdentifier(world.dimension.getId()).equals(CommonUtils.END_ID);
-        this.active = this.dimension.equals(CommonUtils.dimensionIdentifier(world.dimension.getId())) || allowOtherDimensions;
+                !CommonUtils.dimensionIdentifier(dimensionId).equals(CommonUtils.NETHER_ID) &&
+                !CommonUtils.dimensionIdentifier(dimensionId).equals(CommonUtils.END_ID);
+        this.active = this.dimension.equals(CommonUtils.dimensionIdentifier(dimensionId)) || allowOtherDimensions;
         this.layers.forEach(layer -> layer.tick(this, world));
     }
 }

@@ -79,12 +79,7 @@ repositories {
 
 dependencies {
     minecraft("com.mojang:minecraft:${mod.minecraftVersion}")
-
-    @Suppress("UnstableApiUsage")
-    mappings(ploceus.layeredMappings {
-        mappings(ploceus.featherMappings(deps.featherVersion))
-        mappings(rootProject.file("gradle/feather-overrides.tiny"))
-    })
+    mappings(ploceus.featherMappings(deps.featherVersion))
 
     include(implementation("com.mojang:datafixerupper:10.0.21")!!)
     include(implementation("org.joml:joml:1.10.8")!!)

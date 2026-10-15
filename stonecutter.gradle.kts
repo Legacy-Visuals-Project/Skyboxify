@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.spotless)
 }
 
-stonecutter active "1.8.9-ornithe" /* [SC] DO NOT EDIT */
+stonecutter active "1.12.2-ornithe" /* [SC] DO NOT EDIT */
 
 stonecutter {
     tasks {

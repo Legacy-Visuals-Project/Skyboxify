@@ -31,6 +31,7 @@ import btw.lowercase.skyboxify.skybox.SkyboxManager;
 import btw.lowercase.skyboxify.utils.CommonUtils;
 import btw.lowercase.skyboxify.utils.Id;
 import net.minecraft.client.render.platform.GlStateManager;
+import net.minecraft.world.biome.Biome;
 import net.ornithemc.osl.lifecycle.api.client.ClientWorldEvents;
 import org.visuals.legacy.lightconfig.lib.v1.events.EventManager;
 
@@ -78,7 +79,13 @@ public final class Skyboxify {
 
         globalEventManager.listen(SkyEvents.Extraction.class, event -> {
             if (skyboxManager.isEnabled()) {
-                final float delta = event.world().dimension.getId() == CommonUtils.END ? 0.0F : event.tickDelta();
+                final int dimensionId =
+                    //? >=1.12.2 {
+                    event.world().dimension.getType().getId();
+                    //? } else {
+                    /*event.world().dimension.getId();
+                     *///? }
+                final float delta = dimensionId == CommonUtils.END ? 0.0F : event.tickDelta();
                 skyboxManager.extractSkyboxes(event.skyFeatureRenderer(), event.world(), delta);
             }
         });

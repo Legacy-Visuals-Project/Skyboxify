@@ -84,7 +84,14 @@ public final class BiomeUtil {
     }
 
     public static @Nullable Id legacyId(final Biome biome) {
-        return LEGACY_ID_MAP.getOrDefault(biome.id, null);
+        return LEGACY_ID_MAP.getOrDefault(
+                //? >=1.12.2 {
+                Biome.getId(biome),
+                //? } else {
+                /*biome.id,
+                *///? }
+                null
+        );
     }
 
     public static int fromLegacyOptiFine(final String name) {

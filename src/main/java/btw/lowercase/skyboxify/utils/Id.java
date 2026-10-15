@@ -143,8 +143,14 @@ public record Id(String namespace, String path) implements NamespacedIdentifier,
         return this.path;
     }
 
-    public Id withNamespace(final String namespace) {
-        return new Id(assertValidNamespace(namespace, this.path), this.path);
+    @Override
+    public NamespacedIdentifier prefixed(final String prefix) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public NamespacedIdentifier suffixed(final String suffix) {
+        throw new UnsupportedOperationException();
     }
 
     public Id withPath(final String path) {
