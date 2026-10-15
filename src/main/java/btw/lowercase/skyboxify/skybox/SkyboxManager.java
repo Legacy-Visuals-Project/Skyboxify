@@ -58,11 +58,9 @@ public final class SkyboxManager {
     }
 
     private void registerTextures(final Skybox skybox) {
-        if (this.api.getConfig().preloadTextures.isEnabled()) {
-            final TextureManager textureManager = Minecraft.getInstance().getTextureManager();
-            for (final SkyLayer skyLayer : skybox.layers()) {
-                textureManager.register(skyLayer.texture().vanilla(), new SimpleTexture(skyLayer.texture().vanilla()));
-            }
+        final TextureManager textureManager = Minecraft.getInstance().getTextureManager();
+        for (final SkyLayer skyLayer : skybox.layers()) {
+            textureManager.register(skyLayer.texture().vanilla(), new SimpleTexture(skyLayer.texture().vanilla()));
         }
     }
 
