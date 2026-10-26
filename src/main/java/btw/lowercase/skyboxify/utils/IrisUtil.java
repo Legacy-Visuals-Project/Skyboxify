@@ -27,7 +27,7 @@ package btw.lowercase.skyboxify.utils;
 import btw.lowercase.skyboxify.api.SkyboxifyImpl;
 
 //~ if =26.3 'com.mojang.blaze3d' -> 'com.mojang.renderpearl.api' {
-import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.renderpearl.api.pipeline.RenderPipeline;
 //~ }
 
 import java.lang.reflect.Method;
@@ -62,7 +62,7 @@ public final class IrisUtil {
     public static void assignPipeline(final RenderPipeline pipeline, final IrisPipeline program) {
         try {
             IRIS_ASSIGN_PIPELINE_METHOD.invoke(IRIS_INSTANCE, pipeline, program.internal());
-        } catch (Exception ignored) {
+        } catch (final Exception ignored) {
         }
     }
     //?}

@@ -76,11 +76,6 @@ stonecutter {
 
     replacements.string {
         direction = eval(current.version, ">=26.1")
-        replace("level.getDayTime", "level.getOverworldClockTime")
-    }
-
-    replacements.string {
-        direction = eval(current.version, ">=26.1")
         replace("method_62215", $$"lambda$addSkyPass$0")
     }
 

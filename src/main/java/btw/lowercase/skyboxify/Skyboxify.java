@@ -26,20 +26,13 @@ package btw.lowercase.skyboxify;
 import btw.lowercase.skyboxify.api.SkyboxifyApi;
 import btw.lowercase.skyboxify.api.SkyboxifyImpl;
 import btw.lowercase.skyboxify.config.SkyboxifyConfig;
-import btw.lowercase.skyboxify.events.EventManager;
-import btw.lowercase.skyboxify.events.SkyEvents;
+import btw.lowercase.skyboxify.skybox.SkyEvents;
 import btw.lowercase.skyboxify.skybox.SkyboxManager;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 
 public final class Skyboxify {
-    private static final EventManager globalEventManager = new EventManager();
-
-    public static EventManager eventManager() {
-        return globalEventManager;
-    }
-
     public static Identifier locationOrNull(final String path) {
         return Identifier.fromNamespaceAndPath(SkyboxifyInfo.MOD_ID, path);
     }
@@ -52,62 +45,64 @@ public final class Skyboxify {
         final SkyboxifyConfig config = impl.getConfig();
         ClientTickEvents.END_LEVEL_TICK.register(skyboxManager::tick);
 
-        globalEventManager.listen(SkyEvents.Disc.class, event -> {
-            if (config.enabled && !config.renderSky) {
-                event.setCancelled(true);
-            }
-        });
+        SkyEvents.SKY_DISC.register(it -> !config.enabled || config.renderSky);
 
-        globalEventManager.listen(SkyEvents.Celestial.class, event -> {
+        SkyEvents.CELESTIAL.register(type -> {
             if (config.enabled) {
-                final SkyEvents.Celestial.Type type = event.getType();
-                if (!config.renderSunMoon && (type == SkyEvents.Celestial.Type.SUN || type == SkyEvents.Celestial.Type.MOON)) {
-                    event.setCancelled(true);
+                if (!config.renderSunMoon && (type == SkyEvents.CelestialType.SUN || type == SkyEvents.CelestialType.MOON)) {
+                    return false;
                 }
 
-                if (skyboxManager.isEnabled() && type == SkyEvents.Celestial.Type.STARS) {
-                    if (config.renderStars) {
-                        return;
-                    }
-
-                    event.setCancelled(true);
+                if (skyboxManager.isEnabled() && type == SkyEvents.CelestialType.STARS) {
+                    return config.renderStars;
                 }
             }
+
+            return true;
         });
+
 
         //? >=1.21.4 <1.21.9 {
-		/*globalEventManager.listen(SkyEvents.SunriseSunsetAfter.class, event -> {
+		/*SkyEvents.SUNRISE_SUNSET_AFTER.register((bufferSource) -> {
 			if (skyboxManager.isEnabled()) {
-				event.bufferSource().endBatch(); // Fix horizon rendering over the skybox
+				bufferSource.endBatch(); // Fix horizon rendering over the skybox
 			}
 		});
 		*///?}
 
-        globalEventManager.listen(SkyEvents.Extraction.class, event -> {
+        SkyEvents.EXTRACTION.register((renderer, level, tickDelta) -> {
             if (skyboxManager.isEnabled()) {
-                final float delta = event.level().dimension().equals(Level.END) ? 0.0F : event.tickDelta();
-                skyboxManager.extractSkyboxes(event.skyFeatureRenderer(), event.level(), delta);
+                skyboxManager.extract(renderer, level, level.dimension().equals(Level.END) ? 0.0F : tickDelta);
             }
         });
 
-        globalEventManager.listen(SkyEvents.EndSky.After.class, event -> {
+        SkyEvents.END_SKY_AFTER.register((
+                renderer
+                //? >=26.3
+                , pass
+        ) -> {
             if (skyboxManager.isEnabled()) {
-                event.skyFeatureRenderer().endFrame(
+                renderer.endFrame(
                         //? >=26.3
-                        event.pass()
+                        pass
                 );
             }
         });
 
-        globalEventManager.listen(SkyEvents.SunMoonStars.class, event -> {
+        SkyEvents.SUN_MOON_STARS.register((
+                renderer,
+                isInNether
+                //? >=26.3
+                , pass
+        ) ->  {
             if (skyboxManager.isEnabled()) {
-                event.skyFeatureRenderer().endFrame(
+                renderer.endFrame(
                         //? >=26.3
-                        event.pass()
+                        pass
                 );
-                if (event.isInNether()) {
-                    event.setCancelled(true);
-                }
+                return !isInNether;
+            } else {
+                return true;
             }
         });
     }

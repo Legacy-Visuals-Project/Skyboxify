@@ -26,7 +26,7 @@ package btw.lowercase.skyboxify.skybox.impl;
 import btw.lowercase.skyboxify.skybox.impl.components.*;
 import btw.lowercase.skyboxify.skybox.renderer.Geometry;
 import btw.lowercase.skyboxify.skybox.renderer.RenderUniforms;
-import btw.lowercase.skyboxify.skybox.renderer.SkyFeatureRenderer;
+import btw.lowercase.skyboxify.skybox.renderer.SkyExtractor;
 import btw.lowercase.skyboxify.utils.CommonUtils;
 import btw.lowercase.skyboxify.utils.ParserCodecs;
 import com.google.common.collect.ImmutableList;
@@ -106,30 +106,34 @@ public class SkyLayer {
     }
 
     public void extractRenderState(
-            final SkyFeatureRenderer skyFeatureRenderer,
+            final SkyExtractor extractor,
             final ClientLevel level,
-            final Matrix4f modelViewMatrix,
             final int clampedTimeOfDay,
             final float skyAngle,
             final float rainLevel,
             final float thunderLevel
     ) {
-        final float weatherAlpha = this.weather.getAlpha(rainLevel, thunderLevel);
-        final float fadeAlpha = this.fade.getAlpha(clampedTimeOfDay);
-        final float finalAlpha = Mth.clamp(this.alpha * weatherAlpha * fadeAlpha, 0.0F, 1.0F);
+        final float finalAlpha = this.getFinalAlpha(clampedTimeOfDay, rainLevel, thunderLevel);
         if (finalAlpha >= MIN_ALPHA_ALLOWED) {
+            final Matrix4f rotationMatrix = new Matrix4f().rotate(Axis.YP.rotationDegrees(-90.0F));
             if (this.rotate) {
-                modelViewMatrix.rotate(Axis.of(this.axis).rotationDegrees(this.getAngle(level, skyAngle)));
+                rotationMatrix.rotate(Axis.of(this.axis).rotationDegrees(this.getAngle(level, skyAngle)));
             }
 
-            final SkyFeatureRenderer.Pipeline pipeline = new SkyFeatureRenderer.Pipeline(this.blend.getBlendFunction());
-            final RenderUniforms uniforms = new RenderUniforms(modelViewMatrix, this.blend.getShaderColor(finalAlpha));
-            skyFeatureRenderer.submit(pipeline, Geometry.DEFAULT, uniforms, this.texture);
+            final SkyExtractor.Pipeline pipeline = new SkyExtractor.Pipeline(this.blend.getBlendFunction());
+            final RenderUniforms uniforms = new RenderUniforms(rotationMatrix, this.blend.getShaderColor(finalAlpha));
+            extractor.submit(pipeline, Geometry.DEFAULT, uniforms, this.texture);
         }
     }
 
     public void tick(final Skybox skybox, final ClientLevel level) {
         this.alpha = skybox.isActive() ? this.getPositionBrightness(level) : -1.0F;
+    }
+
+    private float getFinalAlpha(final int clampedTimeOfDay, final float rainLevel, final float thunderLevel) {
+        final float weatherAlpha = this.weather.getAlpha(rainLevel, thunderLevel);
+        final float fadeAlpha = this.fade.getAlpha(clampedTimeOfDay);
+        return Mth.clamp(this.alpha * weatherAlpha * fadeAlpha, 0.0F, 1.0F);
     }
 
     private boolean getConditionCheck(final ClientLevel level) {
@@ -173,6 +177,7 @@ public class SkyLayer {
     private float getAngle(final Level level, final float skyAngle) {
         float angleDayStart = 0.0F;
         if (this.speed != (float) Math.round(this.speed)) {
+            //~ if >= 26.1 'getDayTime' -> 'getOverworldClockTime'
             final long currentWorldDay = (level.getOverworldClockTime() + 18000L) / 24000L;
             final float currentAngle = (float) currentWorldDay * (this.speed % 1.0F);
             angleDayStart = currentAngle % 1.0F;

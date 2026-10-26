@@ -26,11 +26,11 @@ package btw.lowercase.skyboxify.skybox.renderer;
 import btw.lowercase.skyboxify.api.SkyboxifyImpl;
 import btw.lowercase.skyboxify.skybox.SkyStorage;
 import btw.lowercase.skyboxify.utils.FilteringMode;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.renderpearl.api.buffers.GpuBufferSlice;
 import com.mojang.renderpearl.api.commands.RenderPass;
-import com.mojang.renderpearl.api.pipeline.CompiledRenderPipeline;
 import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
 import com.mojang.renderpearl.api.textures.FilterMode;
 import com.mojang.renderpearl.api.textures.GpuSampler;
@@ -39,15 +39,15 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.resources.Identifier;
 import org.joml.Vector4f;
 
-public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submit> {
-    public SkyFeatureRenderer(final RenderTarget renderTarget) {
+public class SkyExtractor extends FeatureRenderer<SkyExtractor.Submit> {
+    public SkyExtractor(final RenderTarget renderTarget) {
         super(renderTarget);
     }
 
     @Override
     protected Submit createSubmit(final Pipeline pipeline, final Geometry geometry, final RenderUniforms uniforms, final Identifier location) {
         final GpuTextureView textureView = Minecraft.getInstance().getTextureManager().getTexture(location).getTextureView();
-        return new Submit(RenderSystem.getCompiledPipeline(SkyStorage.SKYBOX_PIPELINE.apply(pipeline.blendFunction())), geometry, uniforms, textureView);
+        return new Submit(SkyStorage.SKYBOX_PIPELINE.apply(pipeline.blendFunction()), geometry, uniforms, textureView);
     }
 
     @Override
@@ -65,7 +65,7 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
                     throw new RuntimeException("Cannot render closed geometry!");
                 }
 
-                pass.setPipeline(submit.pipeline);
+                pass.setPipeline(RenderSystem.getCompiledPipeline(submit.pipeline));
                 if (submit.geometry instanceof StaticGeometry staticGeometry) {
                     pass.setVertexBuffer(0, staticGeometry.vertexBuffer().slice());
                     pass.setIndexBuffer(indexBuffer.getBuffer(staticGeometry.indexCount()), indexBuffer.type());
@@ -84,7 +84,7 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
         }
     }
 
-    protected record Submit(CompiledRenderPipeline pipeline, Geometry geometry,
+    protected record Submit(RenderPipeline pipeline, Geometry geometry,
                             RenderUniforms uniforms, GpuTextureView textureView) implements FeatureRenderer.Submit {
     }
 }

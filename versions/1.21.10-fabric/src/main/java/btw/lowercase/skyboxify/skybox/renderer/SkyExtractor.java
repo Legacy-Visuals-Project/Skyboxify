@@ -42,8 +42,8 @@ import org.joml.Vector3f;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 
-public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submit> {
-    public SkyFeatureRenderer(final RenderTarget renderTarget) {
+public class SkyExtractor extends FeatureRenderer<SkyExtractor.Submit> {
+    public SkyExtractor(final RenderTarget renderTarget) {
         super(renderTarget);
     }
 

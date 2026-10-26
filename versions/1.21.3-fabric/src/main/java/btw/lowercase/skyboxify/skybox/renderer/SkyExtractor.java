@@ -45,7 +45,7 @@ import org.joml.Vector4fc;
 import java.util.Objects;
 import java.util.function.Function;
 
-public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submit> {
+public class SkyExtractor extends FeatureRenderer<SkyExtractor.Submit> {
     private static final ShaderProgram CUSTOM_SKYBOX_SHADER_PROGRAM = new ShaderProgram(SkyboxResourceListener.CUSTOM_SKYBOX_LOCATION, DefaultVertexFormat.POSITION_TEX, ShaderDefines.EMPTY);
     private static final RenderStateShard.ShaderStateShard SKYBOX_SHADER = new RenderStateShard.ShaderStateShard(CUSTOM_SKYBOX_SHADER_PROGRAM);
 
@@ -75,7 +75,7 @@ public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submi
         );
     });
 
-    public SkyFeatureRenderer(final RenderTarget renderTarget) {
+    public SkyExtractor(final RenderTarget renderTarget) {
         super(renderTarget);
     }
 

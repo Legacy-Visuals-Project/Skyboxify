@@ -33,10 +33,10 @@ import net.minecraft.util.Util;
 import java.util.function.Function;
 
 //? <=26.1
-/*import net.minecraft.client.renderer.RenderPipelines;*/
+//import net.minecraft.client.renderer.RenderPipelines;
 
 //~ if =26.3 'com.mojang.blaze3d' -> 'com.mojang.renderpearl.api' {
-import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.renderpearl.api.pipeline.RenderPipeline;
 //~ }
 //?}
 
@@ -48,8 +48,8 @@ public final class SkyStorage {
                     /*//? >=1.21.6 {
                     RenderPipelines.MATRICES_PROJECTION_SNIPPET
                     //?} else {
-                    *//*RenderPipelines.MATRICES_COLOR_FOG_SNIPPET
-                 *//*//?}
+                    /^RenderPipelines.MATRICES_COLOR_FOG_SNIPPET
+                 ^///?}
                  *///? }
         );
         builder.withLocation(Skyboxify.locationOrNull("pipeline/custom_skybox"));

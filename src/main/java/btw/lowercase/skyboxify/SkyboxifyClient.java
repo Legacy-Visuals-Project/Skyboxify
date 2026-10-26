@@ -54,6 +54,7 @@ public final class SkyboxifyClient implements ClientModInitializer {
         final SkyboxResourceListener listener = new SkyboxResourceListener(SkyboxifyImpl.skyboxManager());
 
         //? >=1.21.10 {
+        //~ if >= 26.1 'registerReloader' -> 'registerReloadListener'
         ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloadListener(SkyboxResourceListener.SKYBOX_RELOAD_ID, listener);
         //? } else {
         /*ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new IdentifiableResourceReloadListener() {

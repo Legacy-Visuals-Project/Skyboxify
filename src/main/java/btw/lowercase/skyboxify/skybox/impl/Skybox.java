@@ -25,23 +25,17 @@ package btw.lowercase.skyboxify.skybox.impl;
 
 import btw.lowercase.skyboxify.api.SkyboxifyImpl;
 import btw.lowercase.skyboxify.skybox.AbstractSkybox;
-import btw.lowercase.skyboxify.skybox.renderer.SkyFeatureRenderer;
+import btw.lowercase.skyboxify.skybox.renderer.SkyExtractor;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
-import org.joml.Matrix4f;
 
 import java.util.List;
 
-//? >=1.21.11 {
+//? >=1.21.11
 import net.minecraft.world.attribute.EnvironmentAttributes;
-//? } else {
-/*import net.minecraft.util.Mth;
-*///? }
 
 public class Skybox extends AbstractSkybox {
     public static final Codec<Skybox> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -80,10 +74,13 @@ public class Skybox extends AbstractSkybox {
     }
 
     @Override
-    public void extractRenderState(final SkyFeatureRenderer skyFeatureRenderer, final ClientLevel level, final Matrix4f modelViewMatrix, final float tickDelta) {
+    public void extractRenderState(final SkyExtractor extractor, final ClientLevel level, final float tickDelta) {
+        //~ if >= 26.1 'getDayTime' -> 'getOverworldClockTime'
         final long dayTime = level.getOverworldClockTime();
         final int clampedTimeOfDay = (int) (dayTime % 24000L);
-        final float skyAngle = this.getSkyAngle(tickDelta);
+
+        //~ if >=1.21.11 'getTimeOfDay(tickDelta)' -> 'environmentAttributes().getDimensionValue(EnvironmentAttributes.SUN_ANGLE) / 360.0F'
+        final float skyAngle = level.environmentAttributes().getDimensionValue(EnvironmentAttributes.SUN_ANGLE) / 360.0F;
 
         float thunderLevel = level.getThunderLevel(tickDelta);
         final float rainLevel = level.getRainLevel(tickDelta);
@@ -93,30 +90,21 @@ public class Skybox extends AbstractSkybox {
 
         for (final SkyLayer layer : this.layers) {
             if (layer.isActive(dayTime, clampedTimeOfDay)) {
-                layer.extractRenderState(skyFeatureRenderer, level, new Matrix4f(modelViewMatrix), clampedTimeOfDay, skyAngle, rainLevel, thunderLevel);
+                layer.extractRenderState(extractor, level, clampedTimeOfDay, skyAngle, rainLevel, thunderLevel);
             }
         }
     }
 
     @Override
     public void tick(final ClientLevel level) {
+        final ResourceKey<Level> dimension = level.dimension();
         final boolean allowOtherDimensions = SkyboxifyImpl.config().showOverworldForUnknownDimension &&
                 this.dimension.equals(Level.OVERWORLD) &&
-                !level.dimension().equals(Level.NETHER) &&
-                !level.dimension().equals(Level.END);
-        this.active = this.dimension.equals(level.dimension()) || allowOtherDimensions;
-        this.layers.forEach(layer -> layer.tick(this, level));
-    }
-
-    private float getSkyAngle(final float tickDelta) {
-        //~ if >=26.2 'getMainCamera' -> 'mainCamera' {
-        final Camera camera = Minecraft.getInstance().gameRenderer.mainCamera();
-        //~ }
-
-        //? >=1.21.11 {
-        return camera.attributeProbe().getValue(EnvironmentAttributes.SUN_ANGLE, tickDelta) / 360.0F;
-        //?} else {
-        /*return camera.getEntity().level().getTimeOfDay(tickDelta);
-         *///?}
+                !dimension.equals(Level.NETHER) &&
+                !dimension.equals(Level.END);
+        this.active = this.dimension.equals(dimension) || allowOtherDimensions;
+        for (final SkyLayer layer : this.layers) {
+            layer.tick(this, level);
+        }
     }
 }

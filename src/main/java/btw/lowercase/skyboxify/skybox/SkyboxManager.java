@@ -26,18 +26,14 @@ package btw.lowercase.skyboxify.skybox;
 import btw.lowercase.skyboxify.api.SkyboxifyApi;
 import btw.lowercase.skyboxify.skybox.impl.SkyLayer;
 import btw.lowercase.skyboxify.skybox.impl.Skybox;
-import btw.lowercase.skyboxify.skybox.renderer.SkyFeatureRenderer;
+import btw.lowercase.skyboxify.skybox.renderer.SkyExtractor;
 import com.google.common.base.Preconditions;
-import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.texture.SimpleTexture;
 import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.level.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.joml.Matrix4f;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,23 +70,22 @@ public final class SkyboxManager {
         this.activeSkies.clear();
     }
 
-    private void releaseTextures(final Skybox skybox)  {
+    private void releaseTextures(final Skybox skybox) {
         final TextureManager textureManager = Minecraft.getInstance().getTextureManager();
         for (final SkyLayer layer : skybox.layers()) {
             textureManager.release(layer.texture());
         }
     }
 
-    public void extractSkyboxes(final SkyFeatureRenderer skyFeatureRenderer, final ClientLevel level, final float tickDelta) {
+    public void extract(final SkyExtractor extractor, final ClientLevel level, final float tickDelta) {
         if (level == null) {
             LOGGER.warn("Failed to extract skyboxify skybox frame! Level was null.");
             return;
         }
 
-        final Matrix4f modelViewMatrix = new Matrix4f();
-        modelViewMatrix.rotate(Axis.YP.rotationDegrees(-90.0F));
+        extractor.clear(); // Clear any previous stale skyboxes
         for (final Skybox skybox : this.activeSkies) {
-            skybox.extractRenderState(skyFeatureRenderer, level, modelViewMatrix, tickDelta);
+            skybox.extractRenderState(extractor, level, tickDelta);
         }
     }
 
@@ -107,15 +102,15 @@ public final class SkyboxManager {
         }
 
         this.activeSkies.removeIf(optiFineSkybox -> !optiFineSkybox.isActive());
-        this.loadedSkies.stream().filter(it -> !this.activeSkies.contains(it) && it.isActive()).forEach(this.activeSkies::add);
+        for (final Skybox skybox : this.loadedSkies) {
+            if (!this.activeSkies.contains(skybox) && skybox.isActive()) {
+                this.activeSkies.add(skybox);
+            }
+        }
     }
 
     public boolean isEnabled() {
         return this.api.getConfig().enabled && !this.activeSkies.isEmpty();
-    }
-
-    public boolean containsEnabled(final ResourceKey<Level> resourceKey) {
-        return this.activeSkies.stream().anyMatch(skybox -> resourceKey.equals(skybox.dimension()));
     }
 
     public List<Skybox> getLoadedSkies() {

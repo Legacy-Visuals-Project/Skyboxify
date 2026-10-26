@@ -1,7 +1,10 @@
-# Release 3.4
+# Release 3.5
 
 ### General
 
-- Add "Filter Mode" option to change filtering/upscaling of the texture when rendering (NEAREST/LINEAR)
-- Reworked how our rendering code & mixins are handled.
-- Added 26.3 support.
+- Fix lag-spike in certain scenarios (fog, underwater, etc)
+- Change conditions to show sky underwater and in the end, even while dragon is alive
+- Use modern resource loader in 1.21.10+
+- Use fabric events instead of custom implementation
+- Add setting for preloading textures on pack load
+- Refactor more code

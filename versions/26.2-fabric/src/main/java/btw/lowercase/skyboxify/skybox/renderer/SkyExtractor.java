@@ -41,8 +41,8 @@ import net.minecraft.resources.Identifier;
 import org.joml.Vector4f;
 import org.jspecify.annotations.NonNull;
 
-public class SkyFeatureRenderer extends FeatureRenderer<SkyFeatureRenderer.Submit> {
-    public SkyFeatureRenderer(final RenderTarget renderTarget) {
+public class SkyExtractor extends FeatureRenderer<SkyExtractor.Submit> {
+    public SkyExtractor(final RenderTarget renderTarget) {
         super(renderTarget);
     }
 

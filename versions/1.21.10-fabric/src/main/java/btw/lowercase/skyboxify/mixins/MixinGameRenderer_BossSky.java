@@ -21,16 +21,18 @@
  * "MINECRAFT" LINKING EXCEPTION TO THE GPL
  */
 
-package btw.lowercase.skyboxify.events;
+package btw.lowercase.skyboxify.mixins;
 
-public abstract class CancellableEvent implements Event {
-    private boolean cancelled = false;
+import btw.lowercase.skyboxify.api.SkyboxifyImpl;
+import net.minecraft.client.renderer.GameRenderer;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 
-    public void setCancelled(final boolean cancelled) {
-        this.cancelled = cancelled;
-    }
-
-    public boolean isCancelled() {
-        return this.cancelled;
+@Mixin(GameRenderer.class)
+public abstract class MixinGameRenderer_BossSky {
+    @ModifyArg(method = "renderLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/LevelRenderer;renderLevel(Lcom/mojang/blaze3d/resource/GraphicsResourceAllocator;Lnet/minecraft/client/DeltaTracker;ZLnet/minecraft/client/Camera;Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lorg/joml/Vector4f;Z)V"), index = 9)
+    private boolean skyboxify$allowSkiesDuringBoss(final boolean original) {
+        return original || SkyboxifyImpl.skyboxManager().isEnabled();
     }
 }

@@ -23,12 +23,11 @@
 
 package btw.lowercase.skyboxify.skybox;
 
-import btw.lowercase.skyboxify.skybox.renderer.SkyFeatureRenderer;
+import btw.lowercase.skyboxify.skybox.renderer.SkyExtractor;
 import net.minecraft.client.multiplayer.ClientLevel;
-import org.joml.Matrix4f;
 
 public abstract class AbstractSkybox {
-    public abstract void extractRenderState(final SkyFeatureRenderer skyFeatureRenderer, final ClientLevel level, final Matrix4f modelViewMatrix, final float tickDelta);
+    public abstract void extractRenderState(final SkyExtractor extractor, final ClientLevel level, final float tickDelta);
 
     public abstract void tick(final ClientLevel level);
 }
