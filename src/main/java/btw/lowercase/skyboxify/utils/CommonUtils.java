@@ -28,6 +28,9 @@ import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
 import java.text.DecimalFormat;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 public final class CommonUtils {
     public static final Vector3f X_AXIS = new Vector3f(1.0F, 0.0F, 0.0F);
@@ -74,5 +77,17 @@ public final class CommonUtils {
         final String y = VECTOR_FORMAT.format(vector3fc.y()).trim();
         final String z = VECTOR_FORMAT.format(vector3fc.z()).trim();
         return String.format("[x=%s, y=%s, z=%s]", x, y, z);
+    }
+
+    private static final Object NULL = new Object();
+
+    public static <Key, Value> Function<Key, Value> safeMemoize(final Function<Key, Value> callback) {
+        return new Function<>() {
+            private final Map<Object, Value> cache = new ConcurrentHashMap<>();
+
+            public Value apply(final Key key) {
+                return this.cache.computeIfAbsent(key == null ? NULL : key, ignored -> callback.apply(key));
+            }
+        };
     }
 }

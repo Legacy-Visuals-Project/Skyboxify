@@ -29,7 +29,6 @@ import com.mojang.blaze3d.vertex.*;
 
 //? >=1.21.6 {
 //~ if >=1.21.11 'net.minecraft.Util' -> 'net.minecraft.util.Util'
-import net.minecraft.util.Util;
 import java.util.function.Function;
 
 //? <=26.1
@@ -42,7 +41,7 @@ import com.mojang.renderpearl.api.pipeline.RenderPipeline;
 
 public final class SkyStorage {
     //? >=1.21.6 {
-    public static final Function<BlendFunction, RenderPipeline> SKYBOX_PIPELINE = Util.memoize((blendFunction) -> {
+    public static final Function<BlendFunction, RenderPipeline> SKYBOX_PIPELINE = CommonUtils.safeMemoize((blendFunction) -> {
         final RenderPipeline.Builder builder = RenderPipeline.builder(
                 //? <=26.1 {
                     /*//? >=1.21.6 {

@@ -28,13 +28,13 @@ import btw.lowercase.skyboxify.api.SkyboxifyImpl;
 import btw.lowercase.skyboxify.skybox.SkyPart;
 import btw.lowercase.skyboxify.skybox.SkyboxResourceListener;
 import btw.lowercase.skyboxify.utils.BlendFunction;
+import btw.lowercase.skyboxify.utils.CommonUtils;
 import btw.lowercase.skyboxify.utils.FilteringMode;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexBuffer;
 import com.mojang.blaze3d.vertex.VertexFormat;
-import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
 import net.minecraft.resources.ResourceLocation;
@@ -49,7 +49,7 @@ public class SkyExtractor extends FeatureRenderer<SkyExtractor.Submit> {
     private static final ShaderProgram CUSTOM_SKYBOX_SHADER_PROGRAM = new ShaderProgram(SkyboxResourceListener.CUSTOM_SKYBOX_LOCATION, DefaultVertexFormat.POSITION_TEX, ShaderDefines.EMPTY);
     private static final RenderStateShard.ShaderStateShard SKYBOX_SHADER = new RenderStateShard.ShaderStateShard(CUSTOM_SKYBOX_SHADER_PROGRAM);
 
-    private final Function<RenderData, RenderType> RENDER_TYPE = Util.memoize(renderData -> {
+    private final Function<RenderData, RenderType> RENDER_TYPE = CommonUtils.safeMemoize(renderData -> {
         final RenderType.CompositeState.CompositeStateBuilder builder = RenderType.CompositeState.builder();
         builder.setShaderState(SKYBOX_SHADER);
         builder.setWriteMaskState(RenderStateShard.COLOR_WRITE);
